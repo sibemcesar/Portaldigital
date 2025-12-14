@@ -1,0 +1,3179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>Portal Digital</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously, onAuthStateChanged, signOut, sendPasswordResetEmail, updateProfile } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    import { getDatabase, ref, set, get, update, remove, onValue, push } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBgEfuLNpU5j9EIcvQ9Qs_reEvtXGPIbO0",
+      authDomain: "gameplus-59458.firebaseapp.com",
+      databaseURL: "https://gameplus-59458-default-rtdb.firebaseio.com",
+      projectId: "gameplus-59458",
+      storageBucket: "gameplus-59458.firebasestorage.app",
+      messagingSenderId: "450449493424",
+      appId: "1:450449493424:web:c8ffa9fee810330761da75",
+      measurementId: "G-8J63PTNPZ5"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const database = getDatabase(app);
+
+    window.firebaseApp = app;
+    window.firebaseAuth = auth;
+    window.firebaseDatabase = database;
+    window.firebaseModules = {
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
+      signInAnonymously,
+      onAuthStateChanged,
+      signOut,
+      sendPasswordResetEmail,
+      updateProfile,
+      ref,
+      set,
+      get,
+      update,
+      remove,
+      onValue,
+      push
+    };
+  </script>
+
+  <style>
+    :root {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f5f5f5;
+      --bg-card: #ffffff;
+      --text-primary: #000000;
+      --text-secondary: #4a4a4a;
+      --text-muted: #888888;
+      --border-color: #e0e0e0;
+      --accent-primary: #333333;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .dark {
+      --bg-primary: #0f0f0f;
+      --bg-secondary: #1a1a1a;
+      --bg-card: #232323;
+      --text-primary: #ffffff;
+      --text-secondary: #c4c4c4;
+      --text-muted: #888888;
+      --border-color: rgba(255, 255, 255, 0.15);
+      --accent-primary: #f5f5f5;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      height: 100vh;
+      line-height: 1.6;
+      opacity: 0;
+      animation: fadeInBody 0.6s ease forwards;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @keyframes fadeInBody {
+      to { opacity: 1; }
+    }
+
+    .header {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 12px 16px;
+      gap: 12px;
+      flex-shrink: 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .app-name {
+      font-size: 14px;
+      font-weight: bold;
+      color: var(--text-primary);
+    }
+
+    .menu-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-primary);
+    }
+    .menu-btn svg {
+      width: 24px;
+      height: 24px;
+      fill: var(--text-primary);
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -100%;
+      width: 260px;
+      height: 100%;
+      background: var(--bg-secondary);
+      box-shadow: 2px 0 8px rgba(0,0,0,0.3);
+      transition: left 0.3s ease;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 100;
+      overflow-y: auto;
+      border-right: 1px solid var(--border-color);
+    }
+    .sidebar.open { left: 0; }
+
+    .sidebar h2 {
+      margin-top: 0;
+      font-size: 18px;
+      color: var(--text-primary);
+      text-align: center;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      padding: 10px;
+      color: var(--text-primary);
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn:hover {
+      background: var(--bg-card);
+      box-shadow: var(--shadow-sm);
+    }
+    .btn svg {
+      width: 18px;
+      height: 18px;
+      fill: var(--text-primary);
+    }
+    .btn:active { transform: scale(0.96); }
+
+    .search-container {
+      max-width: 600px;
+      margin: 0 auto;
+      position: relative;
+      display: none;
+      gap: 10px;
+      align-items: center;
+      padding: 16px 20px 12px;
+      flex-shrink: 0;
+    }
+
+    .search-wrapper {
+      flex: 1;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 12px 44px 12px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 16px;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s ease;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      background: var(--bg-secondary);
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-icon {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--accent-primary);
+      font-size: 18px;
+      pointer-events: none;
+    }
+
+    .filter-tabs {
+      display: none;
+      gap: 8px;
+      padding: 8px 20px 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+
+    .filter-btn {
+      padding: 8px 20px;
+      background: transparent;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      color: var(--text-secondary);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .filter-btn:hover {
+      border-color: var(--accent-primary);
+      color: var(--text-primary);
+    }
+
+    .filter-btn.active {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+      color: var(--bg-primary);
+    }
+
+    .content-wrapper {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 16px;
+      padding: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 600px) {
+      .grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 12px;
+        padding: 12px;
+      }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid var(--border-color);
+      opacity: 0;
+      animation: cardFadeIn 0.4s ease forwards;
+    }
+
+    @keyframes cardFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent-primary);
+      box-shadow: var(--shadow-md);
+    }
+
+    .card-img-container {
+      position: relative;
+      overflow: hidden;
+      padding-top: 150%;
+      background: var(--bg-secondary);
+    }
+
+    .card img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover img {
+      transform: scale(1.05);
+    }
+
+    .card-type {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      z-index: 2;
+      backdrop-filter: blur(8px);
+      background: var(--accent-primary);
+      color: var(--bg-primary);
+    }
+
+    .card-info {
+      padding: 10px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      line-height: 1.3;
+      color: var(--text-primary);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-primary);
+      display: none;
+      z-index: 1000;
+      overflow-y: auto;
+    }
+
+    .overlay.active {
+      display: block;
+    }
+
+    .modal {
+      background: var(--bg-secondary);
+      min-height: 100vh;
+      animation: modalSlideIn 0.3s ease;
+    }
+
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .modal-header {
+      padding: 24px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .modal-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+
+    .modal-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .modal-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .modal-meta-label {
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    .video-container {
+      position: relative;
+      background: #000;
+      overflow: hidden;
+      aspect-ratio: 16 / 9;
+      margin-bottom: 24px;
+      border-radius: 8px;
+    }
+
+    .video-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .info-comments-toggle {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .toggle-btn {
+      flex: 1;
+      padding: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-secondary);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .toggle-btn.active {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+      color: var(--bg-primary);
+    }
+
+    .modal-description {
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    .game-info {
+      display: none;
+    }
+
+    .game-info.active {
+      display: block;
+    }
+
+    .comments-section {
+      display: none;
+    }
+
+    .comments-section.active {
+      display: block;
+    }
+
+    .comment-input-wrapper {
+      margin-bottom: 20px;
+    }
+
+    .comment-input {
+      width: 100%;
+      padding: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 16px;
+      font-family: 'Inter', sans-serif;
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .comment-btn {
+      margin-top: 8px;
+      padding: 10px 20px;
+      background: var(--accent-primary);
+      border: none;
+      border-radius: 8px;
+      color: var(--bg-primary);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .comment-btn:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .comment-item {
+      background: var(--bg-card);
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      border: 1px solid var(--border-color);
+    }
+
+    .comment-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .comment-author {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+
+    .comment-delete-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      opacity: 0.7;
+      transition: opacity 0.2s, background 0.2s;
+    }
+
+    .comment-delete-btn:hover {
+      opacity: 1;
+      background: rgba(244, 67, 54, 0.1);
+    }
+
+    .comment-text {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .comment-time {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .main-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    .btn-main {
+      flex: 1;
+      min-width: 150px;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background: var(--accent-primary);
+      color: var(--bg-primary);
+    }
+
+    .btn-main:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-close {
+      width: 100%;
+      margin-top: 12px;
+      padding: 12px;
+      background: transparent;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-secondary);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-close:hover {
+      border-color: var(--text-muted);
+      color: var(--text-primary);
+      background: var(--bg-card);
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+      font-size: 16px;
+    }
+
+    .custom-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 20px;
+    }
+
+    .custom-modal.active {
+      display: flex;
+    }
+
+    .custom-modal-content {
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      padding: 24px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .custom-modal h2 {
+      margin-top: 0;
+      margin-bottom: 16px;
+      color: var(--text-primary);
+    }
+
+    .custom-modal p {
+      margin-bottom: 16px;
+      color: var(--text-secondary);
+    }
+
+    .custom-modal-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 16px;
+    }
+
+    .custom-modal-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .custom-modal-btn.primary {
+      background: var(--accent-primary);
+      color: var(--bg-primary);
+    }
+
+    .custom-modal-btn.secondary {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      padding: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 16px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+    }
+
+    .user-info {
+      padding: 12px;
+      background: var(--bg-card);
+      border-radius: 8px;
+      margin-bottom: 12px;
+      border: 1px solid var(--border-color);
+    }
+
+    .user-info p {
+      margin: 4px 0;
+      font-size: 14px;
+    }
+
+    .points-display {
+      background: var(--accent-primary);
+      color: var(--bg-primary);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-primary);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--text-muted);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-primary);
+    }
+
+    .insufficient-points {
+      background: #ff6b6b;
+      color: white;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .redeem-section {
+      background: var(--bg-card);
+      padding: 16px;
+      border-radius: 8px;
+      margin-top: 16px;
+      border: 1px solid var(--border-color);
+    }
+
+    .redeem-input {
+      width: 100%;
+      padding: 12px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 16px;
+      font-family: 'Inter', sans-serif;
+      margin-bottom: 8px;
+    }
+
+    .code-display {
+      background: var(--bg-secondary);
+      padding: 12px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 18px;
+      text-align: center;
+      margin-top: 12px;
+      border: 2px dashed var(--border-color);
+    }
+
+    /* Ad Interstitial Styles */
+    .ad-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.95);
+      display: none;
+      z-index: 10000;
+      flex-direction: column;
+    }
+
+    .ad-overlay.active {
+      display: flex;
+    }
+
+    .ad-header {
+      background: var(--bg-secondary);
+      padding: 16px 20px;
+      border-bottom: 2px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .ad-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .ad-timer {
+      background: #4CAF50;
+      color: white;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .ad-timer.complete {
+      background: #2196F3;
+    }
+
+    .ad-iframe-container {
+      flex: 1;
+      background: var(--bg-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .ad-iframe-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .ad-footer {
+      background: var(--bg-secondary);
+      padding: 16px 20px;
+      border-top: 2px solid var(--border-color);
+      display: flex;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .ad-footer button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .ad-footer .open-external-btn {
+      background: var(--accent-primary);
+      color: var(--bg-primary);
+    }
+
+    .ad-footer .open-external-btn:hover {
+      opacity: 0.9;
+    }
+
+    .ad-footer .claim-points-btn {
+      background: #4CAF50;
+      color: white;
+    }
+
+    .ad-footer .claim-points-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .ad-footer .claim-points-btn:not(:disabled):hover {
+      background: #45a049;
+    }
+
+    .earn-points-btn {
+      background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+      color: white !important;
+      border: none !important;
+      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+    }
+
+    .earn-points-btn:hover {
+      background: linear-gradient(135deg, #45a049 0%, #388e3c 100%) !important;
+      box-shadow: 0 6px 16px rgba(76, 175, 80, 0.5) !important;
+    }
+  </style>
+</head>
+<body onload="checarVersao()">
+  <div class="header">
+    <button class="menu-btn" onclick="toggleSidebar()">
+      <svg viewBox="0 0 24 24"><path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/></svg>
+    </button>
+    <div class="app-name">Portal Digital</div>
+    <button onclick="toggleSearch()" style="margin-left: auto; display: flex; align-items: center; background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 4px; cursor: pointer;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" style="margin-right: 6px;">
+        <path d="M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z"/>
+      </svg>
+      Buscar
+    </button>
+    <button onclick="toggleCatalogs()" style="display: flex; align-items: center; background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 4px; cursor: pointer;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24" style="margin-right: 6px;">
+        <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/>
+      </svg>
+      Ver
+    </button>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <h2>Portal Digital</h2>
+
+    <div id="userInfoSection" style="display: none;">
+      <div class="user-info">
+        <p><strong>Nome:</strong> <span id="userName">-</span></p>
+        <p><strong>Conta:</strong> <span id="userEmail">-</span></p>
+        <p><strong>Status:</strong> <span id="userStatus">-</span></p>
+      </div>
+      <div class="points-display">
+       Meus Pontos: <span id="userPoints">0</span>
+      </div>
+    </div>
+
+    <button class="btn" id="loginBtn" onclick="openLoginModal()">
+      <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      Entrar
+    </button>
+
+    <button class="btn" id="registerBtn" onclick="openRegisterModal()">
+      <svg viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      Criar Conta
+    </button>
+
+    <button class="btn" id="publishBtn" onclick="openPublishModal()" style="display: none;">
+      <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      Publicar
+    </button>
+
+    <button class="btn" id="manageBtn" onclick="openManageModal()" style="display: none;">
+      <svg viewBox="0 0 24 24"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg>
+      Meus Post
+    </button>
+
+    <button class="btn" id="generateCodeBtn" onclick="openGenerateCodeModal()" style="display: none;">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+      Gerar Código de Pontos
+    </button>
+
+    <button class="btn" id="manageUsersBtn" onclick="openManageUsersModal()" style="display: none;">
+      <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+      Gerenciar Usuários
+    </button>
+
+    <button class="btn earn-points-btn" id="earnPointsBtn" onclick="openEarnPointsModal()" style="display: none;">
+      <svg viewBox="0 0 24 24" style="fill: white;"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+      Ganhar + Pontos
+    </button>
+
+    <button class="btn" id="redeemCodeBtn" onclick="openRedeemCodeModal()">
+      <svg viewBox="0 0 24 24"><path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 00-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"/></svg>
+      Resgatar Código
+    </button>
+
+    <button class="btn" onclick="openHistoryModal()">
+      <svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+      Histórico
+    </button>
+
+    <button class="btn" id="publishAdBtn" onclick="openPublishAdModal()" style="display: none;">
+      <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+      Publicar Anúncio
+    </button>
+
+    <button class="btn" id="manageAdBtn" onclick="openManageAdModal()" style="display: none;">
+      <svg viewBox="0 0 24 24"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>
+      Meus Anúncios
+    </button>
+
+    <button class="btn" id="logoutBtn" onclick="logout()" style="display: none;">
+      <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+      Sair
+    </button>   
+<button class="btn" id="meuBotao" style="display:none;">
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" 
+       viewBox="0 0 24 24" aria-label="Android app icon" 
+       style="vertical-align:middle; margin-right:8px;">
+    <g fill="#3DDC84">
+      <rect x="5" y="7" width="14" height="8" rx="3"/>
+      <circle cx="9" cy="11" r="1.2" fill="#ffffff"/>
+      <circle cx="15" cy="11" r="1.2" fill="#ffffff"/>
+      <rect x="7" y="3" width="1.8" height="4" rx="0.9" transform="rotate(-25 7.9 5)"/>
+      <rect x="15.2" y="3" width="1.8" height="4" rx="0.9" transform="rotate(25 16.1 5)"/>
+      <rect x="6" y="13" width="12" height="7" rx="2"/>
+      <rect x="3" y="13" width="2" height="6" rx="1.2"/>
+      <rect x="19" y="13" width="2" height="6" rx="1.2"/>
+      <rect x="8" y="20" width="3" height="3" rx="1"/>
+      <rect x="13" y="20" width="3" height="3" rx="1"/>
+    </g>
+  </svg>
+  Baixar o Aplicativo
+</button>
+  </div>
+  <span id="textoInstalar" class="btn" >
+    <small>Continue usando no nosso aplicativo </small> <strong id="instalarLink">Instalar</strong>
+  </span>
+
+  <div id="search-container" class="search-container">
+    <div class="search-wrapper">
+      <input type="text" id="searchInput" class="search-input" placeholder="Pesquisar jogo ou app...">
+      <span class="search-icon">🔍</span>
+    </div>
+  </div>
+
+  <div id="filter-tabs" class="filter-tabs">
+    <button class="filter-btn active" data-filter="all">Todos</button>
+    <button class="filter-btn" data-filter="aplicativos">APLICATIVOS</button>
+    <button class="filter-btn" data-filter="jogos">JOGOS</button>
+    <button class="filter-btn" data-filter="tutoriais">TUTORIAIS</button>
+    <button class="filter-btn" data-filter="pc">PC</button>
+    <button class="filter-btn" data-filter="outros">OUTROS</button>
+  </div>
+
+  <div class="content-wrapper">
+    <div class="grid" id="contentGrid">
+      <div class="loading">Carregando...</div>
+    </div>
+
+    <div id="noResults" class="no-results" style="display: none;">
+      Nenhum resultado encontrado
+    </div>
+  </div>
+
+  <div id="overlay" class="overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modalTitle">Título</h2>
+        <div class="modal-meta" id="modalMeta"></div>
+      </div>
+      <div class="modal-body">
+        <div id="videoContainer" class="video-container" style="display: none;"></div>
+
+        <div id="insufficientPointsWarning" style="display: none;" class="insufficient-points">
+          ⚠️ Você não tem pontos suficientes para baixar este jogo!
+        </div>
+
+        <div class="info-comments-toggle">
+          <button class="toggle-btn active" onclick="showGameInfo()">Informações</button>
+          <button class="toggle-btn" onclick="showComments()">Comentários</button>
+        </div>
+
+        <div class="game-info active" id="gameInfo">
+          <div class="modal-description" id="modalDescription"></div>
+
+          <div class="main-actions" id="mainActions">
+            <button id="btnGA" class="btn-main">Baixar Aqui</button>
+            <button id="btnADM" class="btn-main">Baixar Fora</button>
+          </div>
+        </div>
+
+        <div class="comments-section" id="commentsSection">
+          <div id="commentInputWrapper" class="comment-input-wrapper" style="display: none;">
+            <textarea id="commentInput" class="comment-input" placeholder="Escreva um comentário..."></textarea>
+            <button class="comment-btn" onclick="postComment()">Comentar</button>
+          </div>
+          <div id="commentsList"></div>
+        </div>
+
+        <button class="btn-close" onclick="window.open('game3.html', '_blank')">Voltar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="loginModal" class="custom-modal">
+    <div class="custom-modal-content">
+      <h2>Entrar</h2>
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" id="loginEmail" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Senha</label>
+          <input type="password" class="form-input" id="loginPassword" required>
+        </div>
+        <div style="text-align: right; margin-bottom: 16px;">
+          <a href="#" onclick="openResetPasswordModal(); return false;" style="color: var(--accent-primary); font-size: 14px; text-decoration: none;">Esqueceu a senha?</a>
+        </div>
+        <div class="custom-modal-buttons">
+          <button type="button" class="custom-modal-btn secondary" onclick="closeLoginModal()">Cancelar</button>
+          <button type="submit" class="custom-modal-btn primary">Entrar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="registerModal" class="custom-modal">
+    <div class="custom-modal-content">
+      <h2>Criar Conta</h2>
+      <form id="registerForm" onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label class="form-label">Primeiro e Ultimo Nome</label>
+          <input type="text" class="form-input" id="registerName" placeholder="Seu nome" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email (Gmail)</label>
+          <input type="email" class="form-input" id="registerEmail" placeholder="seuemail@gmail.com" pattern="[a-zA-Z0-9._%+-]+@gmail\.com$" title="Por favor, use um email do Gmail" required>
+          <small style="color: var(--text-muted); font-size: 12px;">Apenas emails @gmail.com são aceitos</small>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Senha</label>
+          <input type="password" class="form-input" id="registerPassword" placeholder="Mínimo 6 caracteres" minlength="6" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirmar Senha</label>
+          <input type="password" class="form-input" id="registerPasswordConfirm" placeholder="Repita a senha" minlength="6" required>
+        </div>
+        <div class="custom-modal-buttons">
+          <button type="button" class="custom-modal-btn secondary" onclick="closeRegisterModal()">Cancelar</button>
+          <button type="submit" class="custom-modal-btn primary">Criar Conta</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="resetPasswordModal" class="custom-modal">
+    <div class="custom-modal-content">
+      <h2>Redefinir Senha</h2>
+      <p>Digite seu email para receber o link de redefinição de senha.</p>
+      <form id="resetPasswordForm" onsubmit="handleResetPassword(event)">
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" id="resetEmail" required>
+        </div>
+        <div class="custom-modal-buttons">
+          <button type="button" class="custom-modal-btn secondary" onclick="closeResetPasswordModal()">Cancelar</button>
+          <button type="submit" class="custom-modal-btn primary">Enviar Link</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="publishModal" class="custom-modal">
+    <div class="custom-modal-content">
+      <h2 id="publishModalTitle">Publicar Jogo</h2>
+      <form id="publishForm" onsubmit="handlePublish(event)">
+        <input type="hidden" id="editGameId">
+
+        <div class="form-group">
+          <label class="form-label">Categoria</label>
+          <select class="form-select" id="gameType" required>
+            <option value="aplicativos">APLICATIVOS</option>
+            <option value="jogos">JOGOS</option>
+            <option value="tutoriais">TUTORIAIS</option>
+            <option value="pc">PC</option>
+            <option value="outros">OUTROS</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Título</label>
+          <input type="text" class="form-input" id="gameTitle" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Gênero</label>
+          <input type="text" class="form-input" id="gameGenre" placeholder="Ex: Ação, Aventura" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tamanho</label>
+          <input type="text" class="form-input" id="gameSize" placeholder="Ex: 1.5 GB" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Descrição</label>
+          <textarea class="form-textarea" id="gameDescription" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">URL da Capa (imagem)</label>
+          <input type="url" class="form-input" id="gamePoster" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Link do Vídeo YouTube (opcional)</label>
+          <input type="url" class="form-input" id="gameVideo" placeholder="https://www.youtube.com/watch?v=...">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Link GA</label>
+          <input type="url" class="form-input" id="linkGA" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Link ADM</label>
+          <input type="url" class="form-input" id="linkADM" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Custo em Pontos</label>
+          <input type="number" class="form-input" id="gameCost" min="0" required>
+        </div>
+
+        <div class="custom-modal-buttons">
+          <button type="button" class="custom-modal-btn secondary" onclick="closePublishModal()">Cancelar</button>
+          <button type="submit" class="custom-modal-btn primary">Publicar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="manageModal" class="custom-modal">
+    <div class="custom-modal-content">
+      <h2>Meus Post</h2>
+      <div id="manageGamesList" class="loading">Carregando...</div>
+      <div class="custom-modal-buttons" style="margin-top: 16px;">
+        <button class="custom-modal-btn secondary" onclick="closeManageModal()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="generateCodeModal" class="custom-modal">
+    <div class="custom-modal-content">
+      <h2>Gerar Código de Pontos</h2>
+      <p>Crie um código de resgate para seus usuários.</p>
+      <div class="form-group">
+        <label class="form-label">Quantidade de Pontos</label>
+        <input type="number" class="form-input" id="codePoints" min="1" value="50" required>
+      </div>
+      <button class="custom-modal-btn primary" onclick="generateCode()">Gerar Código</button>
+      <div id="generatedCodeDisplay" style="display: none;">
+        <p style="margin-top: 16px; font-weight: 600;">Código gerado:</p>
+        <div class="code-display" id="codeDisplay"></div>
+        <p style="margin-top: 8px; font-size: 13px; color: var(--text-muted);">
+          Compartilhe este código com seus usuários. Ele pode ser usado apenas uma vez.
+        </p>
+      </div>
+      <div class="custom-modal-buttons" style="margin-top: 16px;">
+        <button class="custom-modal-btn secondary" onclick="closeGenerateCodeModal()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="redeemCodeModal" class="custom-modal">
+    <div class="custom-modal-content">
+      <h2>Resgatar Código</h2>
+      <p>Insira o código de resgate para receber pontos.</p>
+      <div class="form-group">
+        <label class="form-label">Código</label>
+        <input type="text" class="form-input" id="redeemCodeInput" placeholder="Digite o código aqui" required>
+      </div>
+      <button class="custom-modal-btn primary" onclick="redeemCode()">Resgatar</button>
+      <div class="custom-modal-buttons" style="margin-top: 16px;">
+        <button class="custom-modal-btn secondary" onclick="closeRedeemCodeModal()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="historyModal" class="custom-modal">
+    <div class="custom-modal-content">
+      <h2>Histórico de Post Visualizados</h2>
+      <div id="historyList"></div>
+      <div class="custom-modal-buttons" style="margin-top: 16px;">
+        <button class="custom-modal-btn secondary" onclick="clearHistory()" style="margin-right: auto;">Limpar Histórico</button>
+        <button class="custom-modal-btn secondary" onclick="closeHistoryModal()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="publishAdModal" class="custom-modal">
+    <div class="custom-modal-content">
+      <h2 id="publishAdModalTitle">Publicar Anúncio</h2>
+      <form id="publishAdForm" onsubmit="handlePublishAd(event)">
+        <input type="hidden" id="editAdId">
+
+        <div class="form-group">
+          <label class="form-label">Título do Anúncio</label>
+          <input type="text" class="form-input" id="adTitle" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tipo de Conteúdo</label>
+          <select class="form-select" id="adContentType" onchange="updateAdContentFields()" required>
+            <option value="website">Site/Página Web</option>
+            <option value="video">Vídeo</option>
+            <option value="image">Imagem</option>
+            <option value="audio">Áudio</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="adUrlGroup">
+          <label class="form-label" id="adUrlLabel">URL do Conteúdo (iframe)</label>
+          <input type="url" class="form-input" id="adContentUrl" required>
+          <small style="color: var(--text-muted); font-size: 13px; margin-top: 4px; display: block;">
+            <span id="adUrlHint">URL do site a ser exibido no iframe</span>
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Link Externo (Botão "Abrir Site")</label>
+          <input type="url" class="form-input" id="adExternalUrl" required>
+          <small style="color: var(--text-muted); font-size: 13px; margin-top: 4px; display: block;">
+            Link que abre quando o usuário clica no botão
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tempo de espera (segundos)</label>
+          <input type="number" class="form-input" id="adDuration" min="5" max="120" value="30" required>
+          <small style="color: var(--text-muted); font-size: 13px; margin-top: 4px; display: block;">
+            Tempo que o usuário deve aguardar (5-120 segundos)
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Pontos que o usuário ganha</label>
+          <input type="number" class="form-input" id="adPoints" min="1" max="100" value="10" required>
+        </div>
+
+        <div class="custom-modal-buttons">
+          <button type="button" class="custom-modal-btn secondary" onclick="closePublishAdModal()">Cancelar</button>
+          <button type="submit" class="custom-modal-btn primary">Publicar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="manageAdModal" class="custom-modal">
+    <div class="custom-modal-content">
+      <h2>Meus Anúncios</h2>
+      <div id="manageAdsList" class="loading">Carregando...</div>
+      <div class="custom-modal-buttons" style="margin-top: 16px;">
+        <button class="custom-modal-btn secondary" onclick="closeManageAdModal()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="manageUsersModal" class="custom-modal">
+    <div class="custom-modal-content">
+      <h2>Gerenciar Usuários</h2>
+      <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+        <button class="filter-btn active" id="filterPending" onclick="filterUsers('pending')">Pendentes</button>
+        <button class="filter-btn" id="filterApproved" onclick="filterUsers('approved')">Aprovados</button>
+        <button class="filter-btn" id="filterRejected" onclick="filterUsers('rejected')">Rejeitados</button>
+      </div>
+      <div id="manageUsersList" class="loading">Carregando...</div>
+      <div class="custom-modal-buttons" style="margin-top: 16px;">
+        <button class="custom-modal-btn secondary" onclick="closeManageUsersModal()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="adOverlay" class="ad-overlay">
+    <div class="ad-header">
+      <div class="ad-title" id="adDisplayTitle">Carregando anúncio...</div>
+      <div class="ad-timer" id="adTimer">30s</div>
+    </div>
+    <div class="ad-iframe-container" id="adIframeContainer">
+      <p style="color: var(--text-muted);">Carregando...</p>
+    </div>
+    <div class="ad-footer">
+      <button class="open-external-btn" id="openExternalBtn" onclick="openAdExternal()">Abrir Site Completo</button>
+      <button class="claim-points-btn" id="claimPointsBtn" onclick="claimAdPoints()" disabled>Aguarde 30s para receber pontos</button>
+    </div>
+  </div>
+
+  <script>
+    // Theme management
+    function applyTheme() {
+      const hour = new Date().getHours();
+      if (hour >= 18 || hour < 6) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    }
+
+    applyTheme();
+    setInterval(applyTheme, 60000);
+
+    // Global state
+    const PUBLISHER_EMAILS = ['sibemcesar@gmail.com', 'sibemcesar02@gmail.com'];
+    let currentUser = null;
+    let isPublisher = false;
+    let allGames = {};
+    let allAds = {};
+    let currentFilter = 'all';
+    let searchTerm = '';
+    let userPoints = 0;
+    let userStatus = 'pending';
+    let userName = '';
+    let currentGameData = null;
+    let historyData = [];
+    let currentAd = null;
+    let adTimer = null;
+    let adTimeRemaining = 30;
+
+    // Firebase initialization
+    window.addEventListener('load', () => {
+      const { onAuthStateChanged, signInAnonymously } = window.firebaseModules;
+      const auth = window.firebaseAuth;
+
+      onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          currentUser = user;
+          isPublisher = PUBLISHER_EMAILS.includes(user.email);
+
+          // Only load user data if not anonymous
+          if (!user.isAnonymous) {
+            await loadUserData();
+          }
+
+          updateUIForUser();
+          loadGames();
+          loadAds();
+          loadHistory();
+          updateEarnPointsButton();
+        } else {
+          // Auto login anonymous
+          try {
+            await signInAnonymously(auth);
+          } catch (error) {
+            console.error('Erro no login anônimo:', error);
+            showCustomAlert('Erro ao conectar. Tente novamente.');
+          }
+        }
+      });
+    });
+
+    // User points management
+    async function loadUserData() {
+      if (!currentUser) return;
+
+      const { ref, get, set, update } = window.firebaseModules;
+      const database = window.firebaseDatabase;
+
+      const userRef = ref(database, `users/${currentUser.uid}`);
+      const snapshot = await get(userRef);
+
+      if (snapshot.exists()) {
+        const userData = snapshot.val();
+        userPoints = userData.points || 0;
+        userStatus = userData.status || 'pending';
+        userName = userData.name || '';
+
+        // Se o usuário não tem nome guardado, tenta usar o displayName do Auth
+        if (!userName && currentUser.displayName) {
+          userName = currentUser.displayName;
+          // Atualiza no banco de dados
+          await update(userRef, { name: userName });
+        }
+      } else {
+        userPoints = 0;
+        userStatus = 'pending';
+        userName = currentUser.displayName || '';
+        await set(userRef, {
+          points: 0,
+          status: 'pending',
+          name: userName,
+          email: currentUser.email,
+          createdAt: Date.now()
+        });
+      }
+
+      if (userStatus === 'rejected') {
+        const { signOut, signInAnonymously } = window.firebaseModules;
+        await signOut(window.firebaseAuth);
+        await signInAnonymously(window.firebaseAuth);
+        showCustomAlert('⚠️ Sua conta foi marcada como fraude e foi bloqueada. Entre em contato com o administrador se acredita que isso é um erro.');
+        return false;
+      }
+
+      updatePointsDisplay();
+      updateUserInfoDisplay();
+      return true;
+    }
+
+    function updateUserInfoDisplay() {
+      const userNameEl = document.getElementById('userName');
+      const userStatusEl = document.getElementById('userStatus');
+
+      if (userNameEl) {
+        userNameEl.textContent = userName || 'Não definido';
+      }
+
+      if (userStatusEl) {
+        if (isPublisher) {
+          userStatusEl.innerHTML = '<span style="color: #9c27b0; font-weight: 600;"> Publicador</span>';
+        } else if (userStatus === 'approved') {
+          userStatusEl.innerHTML = '<span style="color: #4CAF50; font-weight: 600;"> Verificado</span>';
+        } else if (userStatus === 'pending') {
+          userStatusEl.innerHTML = '<span style="color: #ff9800; font-weight: 600;"> Pendente</span>';
+        } else if (userStatus === 'rejected') {
+          userStatusEl.innerHTML = '<span style="color: #f44336; font-weight: 600;"> Bloqueado</span>';
+        }
+      }
+    }
+
+    async function loadUserPoints() {
+      return await loadUserData();
+    }
+
+    async function updateUserPoints(newPoints) {
+      if (!currentUser) return;
+
+      const { ref, set } = window.firebaseModules;
+      const database = window.firebaseDatabase;
+
+      userPoints = newPoints;
+      await set(ref(database, `users/${currentUser.uid}/points`), userPoints);
+      updatePointsDisplay();
+    }
+
+    function updatePointsDisplay() {
+      const pointsEl = document.getElementById('userPoints');
+      if (pointsEl) {
+        pointsEl.textContent = userPoints;
+      }
+    }
+
+    // UI updates
+    function updateUIForUser() {
+      const userInfoSection = document.getElementById('userInfoSection');
+      const userEmail = document.getElementById('userEmail');
+      const loginBtn = document.getElementById('loginBtn');
+      const registerBtn = document.getElementById('registerBtn');
+      const publishBtn = document.getElementById('publishBtn');
+      const manageBtn = document.getElementById('manageBtn');
+      const generateCodeBtn = document.getElementById('generateCodeBtn');
+      const manageUsersBtn = document.getElementById('manageUsersBtn');
+      const publishAdBtn = document.getElementById('publishAdBtn');
+      const manageAdBtn = document.getElementById('manageAdBtn');
+      const earnPointsBtn = document.getElementById('earnPointsBtn');
+      const logoutBtn = document.getElementById('logoutBtn');
+
+      if (!currentUser || currentUser.isAnonymous) {
+        // Anonymous mode - viewing only
+        userInfoSection.style.display = 'none';
+        loginBtn.style.display = 'flex';
+        registerBtn.style.display = 'flex';
+        publishBtn.style.display = 'none';
+        manageBtn.style.display = 'none';
+        generateCodeBtn.style.display = 'none';
+        manageUsersBtn.style.display = 'none';
+        publishAdBtn.style.display = 'none';
+        manageAdBtn.style.display = 'none';
+        earnPointsBtn.style.display = 'none';
+        logoutBtn.style.display = 'none';
+      } else {
+        // Logged in user
+        userInfoSection.style.display = 'block';
+        userEmail.textContent = currentUser.email;
+        loginBtn.style.display = 'none';
+        registerBtn.style.display = 'none';
+        logoutBtn.style.display = 'flex';
+
+        // Show earn points only for approved users or publishers
+        if (userStatus === 'approved' || isPublisher) {
+          earnPointsBtn.style.display = 'flex';
+        } else {
+          earnPointsBtn.style.display = 'none';
+        }
+
+        if (isPublisher) {
+          publishBtn.style.display = 'flex';
+          manageBtn.style.display = 'flex';
+          generateCodeBtn.style.display = 'flex';
+          manageUsersBtn.style.display = 'flex';
+          publishAdBtn.style.display = 'flex';
+          manageAdBtn.style.display = 'flex';
+        } else {
+          publishBtn.style.display = 'none';
+          manageBtn.style.display = 'none';
+          generateCodeBtn.style.display = 'none';
+          manageUsersBtn.style.display = 'none';
+          publishAdBtn.style.display = 'none';
+          manageAdBtn.style.display = 'none';
+        }
+
+        updateUserInfoDisplay();
+      }
+    }
+
+    // Load games
+    async function loadGames() {
+      const { ref, onValue } = window.firebaseModules;
+      const database = window.firebaseDatabase;
+
+      const gamesRef = ref(database, 'games');
+      onValue(gamesRef, (snapshot) => {
+        allGames = snapshot.val() || {};
+        renderGrid();
+      });
+    }
+
+    // History management with localStorage (via window)
+    function loadHistory() {
+      try {
+        const storage = window['localStorage'];
+        const saved = storage.getItem('gamePlusHistory');
+        if (saved) {
+          historyData = JSON.parse(saved);
+        }
+      } catch (e) {
+        console.error('Erro ao carregar histórico:', e);
+        historyData = [];
+      }
+    }
+
+    function saveHistory() {
+      try {
+        const storage = window['localStorage'];
+        storage.setItem('gamePlusHistory', JSON.stringify(historyData));
+      } catch (e) {
+        console.error('Erro ao salvar histórico:', e);
+      }
+    }
+
+    function addToHistory(id) {
+      const game = allGames[id];
+      if (!game) return;
+
+      historyData = historyData.filter(h => h.id !== id);
+      historyData.unshift({
+        id: id,
+        titulo: game.titulo,
+        type: game.type,
+        poster: game.poster,
+        timestamp: Date.now()
+      });
+
+      if (historyData.length > 20) {
+        historyData = historyData.slice(0, 20);
+      }
+
+      saveHistory();
+    }
+
+    // Render grid
+    function renderGrid() {
+      const grid = document.getElementById('contentGrid');
+      const noResults = document.getElementById('noResults');
+      grid.innerHTML = '';
+
+      let gamesArray = Object.entries(allGames).map(([id, game]) => ({
+        id,
+        ...game
+      }));
+
+      // Sort by downloads
+      gamesArray.sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
+
+      const filtered = gamesArray.filter((game) => {
+        const matchFilter = currentFilter === 'all' || game.type === currentFilter;
+        const matchSearch = game.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           game.genero.toLowerCase().includes(searchTerm.toLowerCase());
+        return matchFilter && matchSearch;
+      });
+
+      if (filtered.length === 0) {
+        grid.style.display = 'none';
+        noResults.style.display = 'block';
+        return;
+      }
+
+      grid.style.display = 'grid';
+      noResults.style.display = 'none';
+
+      filtered.forEach((game, index) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.animationDelay = `${index * 0.05}s`;
+
+        card.addEventListener('click', function() {
+          openGameDetail(game.id);
+        });
+
+        const typeLabels = {
+          aplicativos: 'APLICATIVOS',
+          jogos: 'JOGOS',
+          tutoriais: 'TUTORIAIS',
+          pc: 'PC',
+          outros: 'OUTROS'
+        };
+
+        card.innerHTML = `
+          <div class="card-img-container">
+            <img src="${game.poster}" alt="${game.titulo}">
+            <div class="card-type">${typeLabels[game.type] || game.type}</div>
+          </div>
+          <div class="card-info">
+            <div class="card-title">${game.titulo}</div>
+            <div class="card-meta">
+              <span>${game.size || 'N/A'}</span>
+              <span>•</span>
+              <span>${game.downloads || 0} downloads</span>
+            </div>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+    }
+
+    // Filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = btn.dataset.filter;
+        renderGrid();
+      });
+    });
+
+    // Search input
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      searchTerm = e.target.value;
+      renderGrid();
+    });
+
+    // Open game detail
+    async function openGameDetail(id) {
+      const game = allGames[id];
+      if (!game) return;
+
+      addToHistory(id);
+      currentGameData = { ...game, id: id };
+
+      document.getElementById('modalTitle').textContent = game.titulo;
+      document.getElementById('modalMeta').innerHTML = `
+        <div class="modal-meta-item">
+          <span class="modal-meta-label">Tamanho:</span>
+          <span>${game.size}</span>
+        </div>
+        <div class="modal-meta-item">
+          <span class="modal-meta-label">Gênero:</span>
+          <span>${game.genero}</span>
+        </div>
+        <div class="modal-meta-item">
+          <span class="modal-meta-label">Downloads:</span>
+          <span>${game.downloads || 0}</span>
+        </div>
+        <div class="modal-meta-item">
+          <span class="modal-meta-label">Custo:</span>
+          <span>${game.cost || 0} pontos</span>
+        </div>
+      `;
+
+      document.getElementById('modalDescription').textContent = game.descricao;
+
+      // YouTube video
+      const videoContainer = document.getElementById('videoContainer');
+      if (game.videoUrl) {
+        const videoId = extractYoutubeId(game.videoUrl);
+        if (videoId) {
+          videoContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe>`;
+          videoContainer.style.display = 'block';
+        } else {
+          videoContainer.style.display = 'none';
+        }
+      } else {
+        videoContainer.style.display = 'none';
+      }
+
+      // Check points
+      const cost = game.cost || 0;
+      const insufficientWarning = document.getElementById('insufficientPointsWarning');
+      if (currentUser && userPoints < cost) {
+        insufficientWarning.style.display = 'block';
+      } else {
+        insufficientWarning.style.display = 'none';
+      }
+
+      // Setup download buttons
+      const btnGA = document.getElementById('btnGA');
+      const btnADM = document.getElementById('btnADM');
+
+      const newBtnGA = btnGA.cloneNode(true);
+      const newBtnADM = btnADM.cloneNode(true);
+      btnGA.parentNode.replaceChild(newBtnGA, btnGA);
+      btnADM.parentNode.replaceChild(newBtnADM, btnADM);
+
+      newBtnGA.addEventListener('click', () => downloadGame(id, 'GA', game.linkGA, cost));
+      newBtnADM.addEventListener('click', () => downloadGame(id, 'ADM', game.linkADM, cost));
+
+      // Load comments
+      loadComments(id);
+
+      // Show comment input if logged in (not anonymous)
+      const commentInputWrapper = document.getElementById('commentInputWrapper');
+      if (currentUser && !currentUser.isAnonymous) {
+        commentInputWrapper.style.display = 'block';
+      } else {
+        commentInputWrapper.style.display = 'none';
+      }
+
+      showGameInfo();
+      document.getElementById('overlay').classList.add('active');
+    }
+
+    function extractYoutubeId(url) {
+      const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+      const match = url.match(regex);
+      return match ? match[1] : null;
+    }
+
+    async function downloadGame(gameId, appType, url, cost) {
+      if (!currentUser || currentUser.isAnonymous) {
+        showCustomAlert('Você precisa fazer login com uma conta para baixar jogos.');
+        return;
+      }
+
+      if (userStatus === 'pending') {
+        showCustomAlert('Sua conta ainda está aguardando aprovação do administrador. Por favor, aguarde.');
+        return;
+      }
+
+      if (userPoints < cost) {
+        showCustomAlert('Você não tem pontos suficientes! Resgate um código para obter mais pontos.');
+        return;
+      }
+
+      // Deduct points
+      await updateUserPoints(userPoints - cost);
+
+      // Increment download count
+      const { ref, get, set } = window.firebaseModules;
+      const database = window.firebaseDatabase;
+      const gameRef = ref(database, `games/${gameId}/downloads`);
+      const snapshot = await get(gameRef);
+      const currentDownloads = snapshot.exists() ? snapshot.val() : 0;
+      await set(gameRef, currentDownloads + 1);
+
+      // Open link
+      window.location.assign(url);
+      setTimeout(function(){
+        if (typeof Android !== "undefined" && Android.openApp) {
+          Android.openApp(appType);
+        }
+      }, 200);
+
+      showCustomAlert(`Download iniciado! ${cost} pontos deduzidos. Pontos restantes: ${userPoints}`);
+    }
+
+    function closeOverlay() {
+      document.getElementById('overlay').classList.remove('active');
+      currentGameData = null;
+    }
+
+    // Comments
+    function showGameInfo() {
+      document.getElementById('gameInfo').classList.add('active');
+      document.getElementById('commentsSection').classList.remove('active');
+      document.querySelectorAll('.toggle-btn')[0].classList.add('active');
+      document.querySelectorAll('.toggle-btn')[1].classList.remove('active');
+    }
+
+    function showComments() {
+      document.getElementById('gameInfo').classList.remove('active');
+      document.getElementById('commentsSection').classList.add('active');
+      document.querySelectorAll('.toggle-btn')[0].classList.remove('active');
+      document.querySelectorAll('.toggle-btn')[1].classList.add('active');
+    }
+
+    async function loadComments(gameId) {
+      const { ref, onValue } = window.firebaseModules;
+      const database = window.firebaseDatabase;
+
+      const commentsRef = ref(database, `comments/${gameId}`);
+      onValue(commentsRef, (snapshot) => {
+        const comments = snapshot.val() || {};
+        renderComments(comments);
+      });
+    }
+
+    function renderComments(comments) {
+      const commentsList = document.getElementById('commentsList');
+
+      const commentsArray = Object.entries(comments).map(([id, comment]) => ({
+        id,
+        ...comment
+      })).sort((a, b) => b.timestamp - a.timestamp);
+
+      if (commentsArray.length === 0) {
+        commentsList.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Nenhum comentário ainda.</p>';
+        return;
+      }
+
+      const currentUserId = currentUser ? currentUser.uid : null;
+
+      commentsList.innerHTML = commentsArray.map(comment => {
+        const authorDisplayName = comment.authorName || comment.authorEmail.split('@')[0];
+        const isAuthor = currentUserId && comment.authorId === currentUserId;
+        const deleteBtn = isAuthor ? `<button class="comment-delete-btn" onclick="deleteComment('${currentGameData.id}', '${comment.id}')" title="Apagar comentário"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="red" viewBox="0 0 24 24">
+  <path d="M3 6h18v2H3V6zm2 3h14l-1.5 12.5a1 1 0 0 1-1 .5H7.5a1 1 0 0 1-1-.5L5 9zm5 2v8h2v-8H10zm4 0v8h2v-8h-2zM9 4V2h6v2h5v2H4V4h5z"/>
+</svg></button>` : '';
+
+        return `
+          <div class="comment-item">
+            <div class="comment-header">
+              <div class="comment-author">${authorDisplayName}</div>
+              ${deleteBtn}
+            </div>
+            <div class="comment-text">${comment.text}</div>
+            <div class="comment-time">${formatTimeAgo(comment.timestamp)}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function deleteComment(gameId, commentId) {
+      showCustomConfirm('Deseja apagar este comentário?', async () => {
+        try {
+          const { ref, remove } = window.firebaseModules;
+          const database = window.firebaseDatabase;
+
+          await remove(ref(database, `comments/${gameId}/${commentId}`));
+          showCustomAlert('Comentário apagado!');
+        } catch (error) {
+          showCustomAlert('Erro ao apagar comentário: ' + error.message);
+        }
+      });
+    }
+
+    async function postComment() {
+      if (!currentUser || currentUser.isAnonymous) {
+        showCustomAlert('Você precisa fazer login com uma conta para comentar.');
+        return;
+      }
+
+      if (userStatus === 'pending') {
+        showCustomAlert('Sua conta ainda está aguardando aprovação do administrador. Por favor, aguarde.');
+        return;
+      }
+
+      if (!currentGameData) return;
+
+      const commentInput = document.getElementById('commentInput');
+      const text = commentInput.value.trim();
+
+      if (!text) {
+        showCustomAlert('Digite um comentário antes de enviar.');
+        return;
+      }
+
+      const { ref, push, set } = window.firebaseModules;
+      const database = window.firebaseDatabase;
+
+      const commentData = {
+        text: text,
+        authorName: userName || currentUser.email.split('@')[0],
+        authorEmail: currentUser.email,
+        authorId: currentUser.uid,
+        timestamp: Date.now()
+      };
+
+      const commentsRef = ref(database, `comments/${currentGameData.id}`);
+      const newCommentRef = push(commentsRef);
+      await set(newCommentRef, commentData);
+
+      commentInput.value = '';
+      showCustomAlert('Comentário publicado!');
+    }
+
+    function formatTimeAgo(timestamp) {
+      const now = Date.now();
+      const diff = now - timestamp;
+      const minutes = Math.floor(diff / 60000);
+      const hours = Math.floor(diff / 3600000);
+      const days = Math.floor(diff / 86400000);
+
+      if (minutes < 1) return 'Agora mesmo';
+      if (minutes < 60) return `${minutes} min atrás`;
+      if (hours < 24) return `${hours}h atrás`;
+      return `${days}d atrás`;
+    }
+
+    // Auth functions
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+
+      try {
+        const { signInWithEmailAndPassword } = window.firebaseModules;
+        await signInWithEmailAndPassword(window.firebaseAuth, email, password);
+        closeLoginModal();
+        showCustomAlert('Login realizado com sucesso!');
+      } catch (error) {
+        showCustomAlert('Erro ao fazer login: ' + error.message);
+      }
+    }
+
+    async function logout() {
+      showCustomConfirm('Deseja realmente sair?', async () => {
+        try {
+          const { signOut, signInAnonymously } = window.firebaseModules;
+          await signOut(window.firebaseAuth);
+
+          // Return to anonymous mode
+          await signInAnonymously(window.firebaseAuth);
+
+          currentUser = null;
+          isPublisher = false;
+          userPoints = 0;
+          updateUIForUser();
+          showCustomAlert('Você saiu da conta. Modo visualização ativado.');
+        } catch (error) {
+          showCustomAlert('Erro ao sair: ' + error.message);
+        }
+      });
+    }
+
+    // Publish game
+    async function handlePublish(e) {
+      e.preventDefault();
+
+      if (!isPublisher) {
+        showCustomAlert('Apenas publicadores autorizados podem publicar jogos.');
+        return;
+      }
+
+      const editId = document.getElementById('editGameId').value;
+      const gameData = {
+        type: document.getElementById('gameType').value,
+        titulo: document.getElementById('gameTitle').value,
+        genero: document.getElementById('gameGenre').value,
+        size: document.getElementById('gameSize').value,
+        descricao: document.getElementById('gameDescription').value,
+        poster: document.getElementById('gamePoster').value,
+        videoUrl: document.getElementById('gameVideo').value || '',
+        linkGA: document.getElementById('linkGA').value,
+        linkADM: document.getElementById('linkADM').value,
+        cost: parseInt(document.getElementById('gameCost').value),
+        authorId: currentUser.uid,
+        authorEmail: currentUser.email,
+        createdAt: Date.now(),
+        downloads: 0
+      };
+
+      try {
+        const { ref, set, push } = window.firebaseModules;
+        const database = window.firebaseDatabase;
+
+        if (editId) {
+          const existingGame = allGames[editId];
+          gameData.downloads = existingGame.downloads || 0;
+          await set(ref(database, `games/${editId}`), gameData);
+          showCustomAlert('Jogo atualizado com sucesso!');
+        } else {
+          const newRef = push(ref(database, 'games'));
+          await set(newRef, gameData);
+          showCustomAlert('Jogo publicado com sucesso!');
+        }
+
+        closePublishModal();
+        document.getElementById('publishForm').reset();
+        document.getElementById('editGameId').value = '';
+      } catch (error) {
+        console.error('Erro completo:', error);
+        showCustomAlert('Erro ao publicar: ' + error.message);
+      }
+    }
+
+    // Manage games
+    async function openManageModal() {
+      if (!isPublisher) {
+        showCustomAlert('Apenas publicadores podem gerenciar jogos.');
+        return;
+      }
+
+      const manageList = document.getElementById('manageGamesList');
+      manageList.innerHTML = '<div class="loading">Carregando...</div>';
+
+      document.getElementById('manageModal').classList.add('active');
+
+      const userGames = Object.entries(allGames).filter(([id, game]) => game.authorId === currentUser.uid);
+
+      if (userGames.length === 0) {
+        manageList.innerHTML = '<p style="color: var(--text-muted);">Você ainda não publicou nenhum jogo.</p>';
+        return;
+      }
+
+      manageList.innerHTML = userGames.map(([id, game]) => `
+        <div style="background: var(--bg-card); padding: 12px; border-radius: 8px; margin-bottom: 12px; border: 1px solid var(--border-color);">
+          <h3 style="margin: 0 0 8px 0; font-size: 16px;">${game.titulo}</h3>
+          <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 12px;">
+            ${game.genero} • ${game.size} • ${game.downloads || 0} downloads
+          </p>
+          <div style="display: flex; gap: 8px;">
+            <button class="custom-modal-btn primary" onclick="editGame('${id}')" style="font-size: 14px; padding: 8px 16px;">Editar</button>
+            <button class="custom-modal-btn secondary" onclick="deleteGame('${id}')" style="font-size: 14px; padding: 8px 16px; color: #ff6b6b; border-color: #ff6b6b;">Apagar</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function editGame(id) {
+      const game = allGames[id];
+      if (!game) return;
+
+      closeManageModal();
+
+      document.getElementById('publishModalTitle').textContent = 'Editar Jogo';
+      document.getElementById('editGameId').value = id;
+      document.getElementById('gameType').value = game.type;
+      document.getElementById('gameTitle').value = game.titulo;
+      document.getElementById('gameGenre').value = game.genero;
+      document.getElementById('gameSize').value = game.size;
+      document.getElementById('gameDescription').value = game.descricao;
+      document.getElementById('gamePoster').value = game.poster;
+      document.getElementById('gameVideo').value = game.videoUrl || '';
+      document.getElementById('linkGA').value = game.linkGA;
+      document.getElementById('linkADM').value = game.linkADM;
+      document.getElementById('gameCost').value = game.cost;
+
+      openPublishModal();
+    }
+
+    async function deleteGame(id) {
+      showCustomConfirm('Deseja realmente apagar este jogo?', async () => {
+        try {
+          const { ref, remove } = window.firebaseModules;
+          await remove(ref(window.firebaseDatabase, `games/${id}`));
+          showCustomAlert('Jogo apagado com sucesso!');
+          openManageModal();
+        } catch (error) {
+          showCustomAlert('Erro ao apagar: ' + error.message);
+        }
+      });
+    }
+
+    // Generate code
+    async function generateCode() {
+      if (!isPublisher) {
+        showCustomAlert('Apenas publicadores podem gerar códigos.');
+        return;
+      }
+
+      const points = parseInt(document.getElementById('codePoints').value);
+      if (points < 1) {
+        showCustomAlert('Digite uma quantidade válida de pontos.');
+        return;
+      }
+
+      const { ref, set, push } = window.firebaseModules;
+      const database = window.firebaseDatabase;
+
+      const codeData = {
+        points: points,
+        createdBy: currentUser.uid,
+        createdAt: Date.now(),
+        used: false
+      };
+
+      const codesRef = ref(database, 'codes');
+      const newCodeRef = push(codesRef);
+      await set(newCodeRef, codeData);
+
+      const codeId = newCodeRef.key;
+      document.getElementById('codeDisplay').textContent = codeId;
+      document.getElementById('generatedCodeDisplay').style.display = 'block';
+    }
+
+    // Redeem code
+    async function redeemCode() {
+      if (!currentUser || currentUser.isAnonymous) {
+        showCustomAlert('Você precisa fazer login com uma conta para resgatar códigos.');
+        return;
+      }
+
+      if (userStatus === 'pending') {
+        showCustomAlert('Sua conta ainda está aguardando aprovação do administrador. Por favor, aguarde.');
+        return;
+      }
+
+      const code = document.getElementById('redeemCodeInput').value.trim();
+      if (!code) {
+        showCustomAlert('Digite um código.');
+        return;
+      }
+
+      const { ref, get, update } = window.firebaseModules;
+      const database = window.firebaseDatabase;
+
+      const codeRef = ref(database, `codes/${code}`);
+      const snapshot = await get(codeRef);
+
+      if (!snapshot.exists()) {
+        showCustomAlert('Código inválido.');
+        return;
+      }
+
+      const codeData = snapshot.val();
+      if (codeData.used) {
+        showCustomAlert('Este código já foi usado.');
+        return;
+      }
+
+      // Mark as used and add points
+      await update(codeRef, { used: true, usedBy: currentUser.uid, usedAt: Date.now() });
+      await updateUserPoints(userPoints + codeData.points);
+
+      document.getElementById('redeemCodeInput').value = '';
+      showCustomAlert(`Código resgatado! Você ganhou ${codeData.points} pontos.`);
+      closeRedeemCodeModal();
+    }
+
+    // Modal functions
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+    }
+
+    function toggleSearch() {
+      const box = document.getElementById('search-container');
+      box.style.display = box.style.display === 'none' || box.style.display === '' ? 'flex' : 'none';
+    }
+
+    function toggleCatalogs() {
+      const box = document.getElementById('filter-tabs');
+      box.style.display = box.style.display === 'none' || box.style.display === '' ? 'flex' : 'none';
+    }
+
+    function openLoginModal() {
+      document.getElementById('loginModal').classList.add('active');
+    }
+
+    function closeLoginModal() {
+      document.getElementById('loginModal').classList.remove('active');
+      document.getElementById('loginForm').reset();
+    }
+
+    function openRegisterModal() {
+      document.getElementById('registerModal').classList.add('active');
+    }
+
+    function closeRegisterModal() {
+      document.getElementById('registerModal').classList.remove('active');
+      document.getElementById('registerForm').reset();
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('registerName').value.trim();
+      const email = document.getElementById('registerEmail').value.trim();
+      const password = document.getElementById('registerPassword').value;
+      const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
+
+      // Validate Gmail
+      if (!email.endsWith('@gmail.com')) {
+        showCustomAlert('Por favor, use um email do Gmail (@gmail.com).');
+        return;
+      }
+
+      // Validate passwords match
+      if (password !== passwordConfirm) {
+        showCustomAlert('As senhas não coincidem.');
+        return;
+      }
+
+      try {
+        const { createUserWithEmailAndPassword, updateProfile } = window.firebaseModules;
+        const { ref, set } = window.firebaseModules;
+        const database = window.firebaseDatabase;
+
+        // Create user in Firebase Auth
+        const userCredential = await createUserWithEmailAndPassword(window.firebaseAuth, email, password);
+        const user = userCredential.user;
+
+        // Update Firebase Auth profile with display name
+        await updateProfile(user, { displayName: name });
+
+        // Create user data in Realtime Database
+        await set(ref(database, `users/${user.uid}`), {
+          name: name,
+          email: email,
+          points: 0,
+          status: 'pending',
+          createdAt: Date.now()
+        });
+
+        userName = name;
+        userStatus = 'pending';
+        userPoints = 0;
+        currentUser = user;
+        isPublisher = PUBLISHER_EMAILS.includes(email);
+
+        closeRegisterModal();
+        updateUIForUser();
+        updateUserInfoDisplay();
+        updatePointsDisplay();
+        showCustomAlert('Conta criada com sucesso! Sua conta está aguardando aprovação do administrador.');
+      } catch (error) {
+        let errorMessage = 'Erro ao criar conta: ';
+        switch (error.code) {
+          case 'auth/email-already-in-use':
+            errorMessage += 'Este email já está em uso.';
+            break;
+          case 'auth/weak-password':
+            errorMessage += 'A senha deve ter pelo menos 6 caracteres.';
+            break;
+          case 'auth/invalid-email':
+            errorMessage += 'Email inválido.';
+            break;
+          default:
+            errorMessage += error.message;
+        }
+        showCustomAlert(errorMessage);
+      }
+    }
+
+    function openPublishModal() {
+      if (!isPublisher) {
+        showCustomAlert('Apenas publicadores podem publicar jogos.');
+        return;
+      }
+      document.getElementById('publishModalTitle').textContent = 'Publicar Jogo';
+      document.getElementById('editGameId').value = '';
+      document.getElementById('publishModal').classList.add('active');
+    }
+
+    function closePublishModal() {
+      document.getElementById('publishModal').classList.remove('active');
+      document.getElementById('publishForm').reset();
+      document.getElementById('editGameId').value = '';
+    }
+
+    function closeManageModal() {
+      document.getElementById('manageModal').classList.remove('active');
+    }
+
+    function openGenerateCodeModal() {
+      document.getElementById('generatedCodeDisplay').style.display = 'none';
+      document.getElementById('codePoints').value = '50';
+      document.getElementById('generateCodeModal').classList.add('active');
+    }
+
+    function closeGenerateCodeModal() {
+      document.getElementById('generateCodeModal').classList.remove('active');
+    }
+
+    function openRedeemCodeModal() {
+      document.getElementById('redeemCodeInput').value = '';
+      document.getElementById('redeemCodeModal').classList.add('active');
+    }
+
+    function closeRedeemCodeModal() {
+      document.getElementById('redeemCodeModal').classList.remove('active');
+    }
+
+    function openHistoryModal() {
+      renderHistoryList();
+      document.getElementById('historyModal').classList.add('active');
+    }
+
+    function closeHistoryModal() {
+      document.getElementById('historyModal').classList.remove('active');
+    }
+
+    function renderHistoryList() {
+      const historyList = document.getElementById('historyList');
+
+      if (historyData.length === 0) {
+        historyList.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 20px;">Nenhum jogo visualizado ainda.</p>';
+        return;
+      }
+
+      historyList.innerHTML = historyData.map(item => `
+        <div style="background: var(--bg-card); padding: 12px; border-radius: 8px; margin-bottom: 12px; border: 1px solid var(--border-color); display: flex; gap: 12px; align-items: center; cursor: pointer;" onclick="openGameFromHistory('${item.id}')">
+          <img src="${item.poster}" alt="${item.titulo}" style="width: 60px; height: 90px; object-fit: cover; border-radius: 4px;">
+          <div style="flex: 1;">
+            <h3 style="margin: 0 0 4px 0; font-size: 14px; font-weight: 600;">${item.titulo}</h3>
+            <p style="color: var(--text-muted); font-size: 12px; margin: 0;">Visualizado ${formatTimeAgo(item.timestamp)}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openGameFromHistory(id) {
+      closeHistoryModal();
+      openGameDetail(id);
+    }
+
+    function clearHistory() {
+      showCustomConfirm('Deseja realmente limpar todo o histórico?', () => {
+        historyData = [];
+        saveHistory();
+        renderHistoryList();
+        showCustomAlert('Histórico limpo com sucesso!');
+      });
+    }
+
+    // Load ads
+    async function loadAds() {
+      const { ref, onValue } = window.firebaseModules;
+      const database = window.firebaseDatabase;
+
+      const adsRef = ref(database, 'ads');
+      onValue(adsRef, (snapshot) => {
+        allAds = snapshot.val() || {};
+      });
+    }
+
+    // Update ad content fields hints based on content type
+    function updateAdContentFields() {
+      const contentType = document.getElementById('adContentType').value;
+      const urlLabel = document.getElementById('adUrlLabel');
+      const urlHint = document.getElementById('adUrlHint');
+
+      switch (contentType) {
+        case 'website':
+          urlLabel.textContent = 'URL do Site (iframe)';
+          urlHint.textContent = 'URL do site a ser exibido no iframe';
+          break;
+        case 'video':
+          urlLabel.textContent = 'URL do Vídeo (iframe)';
+          urlHint.textContent = 'URL do vídeo (YouTube, Vimeo, etc.) ou arquivo MP4';
+          break;
+        case 'image':
+          urlLabel.textContent = 'URL da Imagem';
+          urlHint.textContent = 'URL direta da imagem (JPG, PNG, GIF, etc.)';
+          break;
+        case 'audio':
+          urlLabel.textContent = 'URL do Áudio';
+          urlHint.textContent = 'URL direta do arquivo de áudio (MP3, WAV, etc.)';
+          break;
+      }
+    }
+
+    // Publish ad
+    async function handlePublishAd(e) {
+      e.preventDefault();
+
+      if (!isPublisher) {
+        showCustomAlert('Apenas publicadores autorizados podem publicar anúncios.');
+        return;
+      }
+
+      const editId = document.getElementById('editAdId').value;
+      const adData = {
+        title: document.getElementById('adTitle').value,
+        contentType: document.getElementById('adContentType').value,
+        contentUrl: document.getElementById('adContentUrl').value,
+        externalUrl: document.getElementById('adExternalUrl').value,
+        duration: parseInt(document.getElementById('adDuration').value),
+        points: parseInt(document.getElementById('adPoints').value),
+        authorId: currentUser.uid,
+        authorEmail: currentUser.email,
+        createdAt: Date.now()
+      };
+
+      try {
+        const { ref, set, push } = window.firebaseModules;
+        const database = window.firebaseDatabase;
+
+        if (editId) {
+          await set(ref(database, `ads/${editId}`), adData);
+          showCustomAlert('Anúncio atualizado com sucesso!');
+        } else {
+          const newRef = push(ref(database, 'ads'));
+          await set(newRef, adData);
+          showCustomAlert('Anúncio publicado com sucesso!');
+        }
+
+        closePublishAdModal();
+        document.getElementById('publishAdForm').reset();
+        document.getElementById('editAdId').value = '';
+      } catch (error) {
+        showCustomAlert('Erro ao publicar anúncio: ' + error.message);
+      }
+    }
+
+    // Manage ads
+    async function openManageAdModal() {
+      if (!isPublisher) {
+        showCustomAlert('Apenas publicadores podem gerenciar anúncios.');
+        return;
+      }
+
+      const manageList = document.getElementById('manageAdsList');
+      manageList.innerHTML = '<div class="loading">Carregando...</div>';
+
+      document.getElementById('manageAdModal').classList.add('active');
+
+      const userAds = Object.entries(allAds).filter(([id, ad]) => ad.authorId === currentUser.uid);
+
+      if (userAds.length === 0) {
+        manageList.innerHTML = '<p style="color: var(--text-muted);">Você ainda não publicou nenhum anúncio.</p>';
+        return;
+      }
+
+      manageList.innerHTML = userAds.map(([id, ad]) => `
+        <div style="background: var(--bg-card); padding: 12px; border-radius: 8px; margin-bottom: 12px; border: 1px solid var(--border-color);">
+          <h3 style="margin: 0 0 8px 0; font-size: 16px;">${ad.title}</h3>
+          <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 12px;">
+            ${ad.url} • ${ad.points} pontos
+          </p>
+          <div style="display: flex; gap: 8px;">
+            <button class="custom-modal-btn primary" onclick="editAd('${id}')" style="font-size: 14px; padding: 8px 16px;">Editar</button>
+            <button class="custom-modal-btn secondary" onclick="deleteAd('${id}')" style="font-size: 14px; padding: 8px 16px; color: #ff6b6b; border-color: #ff6b6b;">Apagar</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function editAd(id) {
+      const ad = allAds[id];
+      if (!ad) return;
+
+      closeManageAdModal();
+
+      document.getElementById('publishAdModalTitle').textContent = 'Editar Anúncio';
+      document.getElementById('editAdId').value = id;
+      document.getElementById('adTitle').value = ad.title;
+
+      // Handle both old and new ad formats
+      if (ad.contentType) {
+        document.getElementById('adContentType').value = ad.contentType;
+        document.getElementById('adContentUrl').value = ad.contentUrl;
+        document.getElementById('adExternalUrl').value = ad.externalUrl;
+        document.getElementById('adDuration').value = ad.duration;
+      } else {
+        // Old format - set defaults
+        document.getElementById('adContentType').value = 'website';
+        document.getElementById('adContentUrl').value = ad.url;
+        document.getElementById('adExternalUrl').value = ad.url;
+        document.getElementById('adDuration').value = 30;
+      }
+
+      document.getElementById('adPoints').value = ad.points;
+      updateAdContentFields();
+
+      openPublishAdModal();
+    }
+
+    async function deleteAd(id) {
+      showCustomConfirm('Deseja realmente apagar este anúncio?', async () => {
+        try {
+          const { ref, remove } = window.firebaseModules;
+          await remove(ref(window.firebaseDatabase, `ads/${id}`));
+          showCustomAlert('Anúncio apagado com sucesso!');
+          openManageAdModal();
+        } catch (error) {
+          showCustomAlert('Erro ao apagar: ' + error.message);
+        }
+      });
+    }
+
+    // Earn points modal
+    async function openEarnPointsModal() {
+      if (!currentUser || currentUser.isAnonymous) {
+        showCustomAlert('Você precisa fazer login com uma conta para ganhar pontos.');
+        return;
+      }
+
+      if (userStatus === 'pending') {
+        showCustomAlert('Sua conta ainda está aguardando aprovação do administrador. Por favor, aguarde.');
+        return;
+      }
+
+      // Check daily limit
+      const canWatch = await checkDailyAdLimit();
+      if (!canWatch) {
+        showCustomAlert('Você atingiu o limite diário de 5 anúncios. Volte amanhã para ganhar mais pontos!');
+        return;
+      }
+
+      const adsArray = Object.entries(allAds);
+      if (adsArray.length === 0) {
+        showCustomAlert('Não há anúncios disponíveis no momento. Tente novamente mais tarde.');
+        return;
+      }
+
+      // Pick random ad
+      const randomIndex = Math.floor(Math.random() * adsArray.length);
+      const [adId, ad] = adsArray[randomIndex];
+
+      currentAd = { id: adId, ...ad };
+      startAdInterstitial();
+    }
+
+    // Check if user can watch more ads today
+    async function checkDailyAdLimit() {
+      const { ref, get } = window.firebaseModules;
+      const database = window.firebaseDatabase;
+
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+      const adsWatchedRef = ref(database, `users/${currentUser.uid}/adsWatched`);
+      const snapshot = await get(adsWatchedRef);
+
+      if (!snapshot.exists()) {
+        return true; // No ads watched yet
+      }
+
+      const data = snapshot.val();
+      if (data.date !== today) {
+        return true; // Different day, reset count
+      }
+
+      return data.count < 5; // Check if under limit
+    }
+
+    // Increment ad watch count
+    async function incrementAdWatchCount() {
+      const { ref, set } = window.firebaseModules;
+      const database = window.firebaseDatabase;
+
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+      const adsWatchedRef = ref(database, `users/${currentUser.uid}/adsWatched`);
+      const { get } = window.firebaseModules;
+      const snapshot = await get(adsWatchedRef);
+
+      let count = 1;
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        if (data.date === today) {
+          count = data.count + 1;
+        }
+      }
+
+      await set(adsWatchedRef, {
+        date: today,
+        count: count
+      });
+    }
+
+    function startAdInterstitial() {
+      if (!currentAd) return;
+
+      // Reset timer - use custom duration or default to 30
+      adTimeRemaining = currentAd.duration || 30;
+
+      // Update UI
+      document.getElementById('adDisplayTitle').textContent = currentAd.title;
+      document.getElementById('adTimer').textContent = `${adTimeRemaining}s`;
+      document.getElementById('adTimer').classList.remove('complete');
+
+      // Render content based on type
+      const container = document.getElementById('adIframeContainer');
+      const contentType = currentAd.contentType || 'website';
+      const contentUrl = currentAd.contentUrl || currentAd.url; // Fallback to old 'url' field
+
+      switch (contentType) {
+        case 'website':
+          container.innerHTML = `<iframe src="${contentUrl}" sandbox="allow-scripts allow-same-origin"></iframe>`;
+          break;
+        case 'video':
+          if (contentUrl.includes('youtube.com') || contentUrl.includes('youtu.be')) {
+            const videoId = extractYoutubeId(contentUrl);
+            if (videoId) {
+              container.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe>`;
+            } else {
+              container.innerHTML = `<iframe src="${contentUrl}" sandbox="allow-scripts allow-same-origin"></iframe>`;
+            }
+          } else if (contentUrl.includes('vimeo.com')) {
+            container.innerHTML = `<iframe src="${contentUrl}" allowfullscreen></iframe>`;
+          } else {
+            container.innerHTML = `
+              <video controls autoplay style="width: 100%; height: 100%; background: #000;">
+                <source src="${contentUrl}" type="video/mp4">
+                Seu navegador não suporta vídeo.
+              </video>
+            `;
+          }
+          break;
+        case 'image':
+          container.innerHTML = `
+            <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--bg-secondary);">
+              <img src="${contentUrl}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+            </div>
+          `;
+          break;
+        case 'audio':
+          container.innerHTML = `
+            <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--bg-secondary); flex-direction: column; gap: 20px;">
+              <svg viewBox="0 0 24 24" style="width: 80px; height: 80px; fill: var(--text-muted);">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+              </svg>
+              <audio controls autoplay style="width: 80%; max-width: 500px;">
+                <source src="${contentUrl}" type="audio/mpeg">
+                Seu navegador não suporta áudio.
+              </audio>
+            </div>
+          `;
+          break;
+        default:
+          container.innerHTML = `<iframe src="${contentUrl}" sandbox="allow-scripts allow-same-origin"></iframe>`;
+      }
+
+      const claimBtn = document.getElementById('claimPointsBtn');
+      claimBtn.disabled = true;
+      claimBtn.textContent = `Aguarde ${adTimeRemaining}s para receber pontos`;
+
+      // Show overlay
+      document.getElementById('adOverlay').classList.add('active');
+
+      // Start countdown
+      if (adTimer) clearInterval(adTimer);
+      adTimer = setInterval(() => {
+        adTimeRemaining--;
+        document.getElementById('adTimer').textContent = `${adTimeRemaining}s`;
+        claimBtn.textContent = `Aguarde ${adTimeRemaining}s para receber pontos`;
+
+        if (adTimeRemaining <= 0) {
+          clearInterval(adTimer);
+          document.getElementById('adTimer').textContent = 'Completo!';
+          document.getElementById('adTimer').classList.add('complete');
+          claimBtn.disabled = false;
+          claimBtn.textContent = `Ganhar +${currentAd.points} Pontos`;
+        }
+      }, 1000);
+    }
+
+    function openAdExternal() {
+      if (currentAd) {
+        const url = currentAd.externalUrl || currentAd.url; // Fallback to old 'url' field
+        if (url) {
+          window.open(url, '_blank');
+        }
+      }
+    }
+
+    async function claimAdPoints() {
+      if (!currentAd || adTimeRemaining > 0) return;
+
+      // Verify ad still exists
+      const { ref, get } = window.firebaseModules;
+      const database = window.firebaseDatabase;
+      const adRef = ref(database, `ads/${currentAd.id}`);
+      const snapshot = await get(adRef);
+
+      if (!snapshot.exists()) {
+        closeAdInterstitial();
+        showCustomAlert('Este anúncio foi removido. Tente outro anúncio.');
+        return;
+      }
+
+      // Add points
+      await updateUserPoints(userPoints + currentAd.points);
+
+      // Increment watch count
+      await incrementAdWatchCount();
+
+      // Get remaining ads count
+      const remaining = 5 - await getAdWatchCountToday();
+
+      // Close ad
+      closeAdInterstitial();
+
+      // Update button
+      updateEarnPointsButton();
+
+      showCustomAlert(`Você ganhou +${currentAd.points} pontos! Total: ${userPoints} pontos.\n\nVocê pode assistir mais ${remaining} anúncio(s) hoje.`);
+    }
+
+    // Get today's ad watch count
+    async function getAdWatchCountToday() {
+      if (!currentUser || currentUser.isAnonymous) {
+        return 0;
+      }
+
+      const { ref, get } = window.firebaseModules;
+      const database = window.firebaseDatabase;
+
+      const today = new Date().toISOString().split('T')[0];
+      const adsWatchedRef = ref(database, `users/${currentUser.uid}/adsWatched`);
+      const snapshot = await get(adsWatchedRef);
+
+      if (!snapshot.exists()) {
+        return 0;
+      }
+
+      const data = snapshot.val();
+      if (data.date !== today) {
+        return 0;
+      }
+
+      return data.count;
+    }
+
+    // Update earn points button text
+    async function updateEarnPointsButton() {
+      const btn = document.getElementById('earnPointsBtn');
+      if (!btn || !currentUser || currentUser.isAnonymous) return;
+
+      const count = await getAdWatchCountToday();
+      const remaining = 5 - count;
+
+      if (remaining <= 0) {
+        btn.innerHTML = `
+          <svg viewBox="0 0 24 24" style="fill: white;"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+          Limite Diário Atingido (0/5)
+        `;
+        btn.style.opacity = '0.6';
+      } else {
+        btn.innerHTML = `
+          <svg viewBox="0 0 24 24" style="fill: white;"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+          Ganhar + Pontos (${remaining}/5 hoje)
+        `;
+        btn.style.opacity = '1';
+      }
+    }
+
+    function closeAdInterstitial() {
+      if (adTimer) clearInterval(adTimer);
+      document.getElementById('adOverlay').classList.remove('active');
+      document.getElementById('adIframeContainer').innerHTML = '<p style="color: var(--text-muted);">Carregando...</p>';
+      currentAd = null;
+      adTimeRemaining = 30;
+    }
+
+    // Reset password
+    async function handleResetPassword(e) {
+      e.preventDefault();
+
+      const email = document.getElementById('resetEmail').value;
+
+      try {
+        const { sendPasswordResetEmail } = window.firebaseModules;
+        await sendPasswordResetEmail(window.firebaseAuth, email);
+        closeResetPasswordModal();
+        showCustomAlert('Link de redefinição de senha enviado para ' + email + '. Verifique sua caixa de entrada.');
+      } catch (error) {
+        showCustomAlert('Erro ao enviar email: ' + error.message);
+      }
+    }
+
+    // Modal functions for ads and reset password
+    function openPublishAdModal() {
+      if (!isPublisher) {
+        showCustomAlert('Apenas publicadores podem publicar anúncios.');
+        return;
+      }
+      document.getElementById('publishAdModalTitle').textContent = 'Publicar Anúncio';
+      document.getElementById('editAdId').value = '';
+      document.getElementById('publishAdModal').classList.add('active');
+    }
+
+    function closePublishAdModal() {
+      document.getElementById('publishAdModal').classList.remove('active');
+      document.getElementById('publishAdForm').reset();
+      document.getElementById('editAdId').value = '';
+    }
+
+    function closeManageAdModal() {
+      document.getElementById('manageAdModal').classList.remove('active');
+    }
+
+    // User management functions
+    let currentUserFilter = 'pending';
+    let allUsers = {};
+
+    async function openManageUsersModal() {
+      if (!isPublisher) {
+        showCustomAlert('Apenas publicadores podem gerenciar usuários.');
+        return;
+      }
+
+      document.getElementById('manageUsersModal').classList.add('active');
+      await loadAllUsers();
+    }
+
+    function closeManageUsersModal() {
+      document.getElementById('manageUsersModal').classList.remove('active');
+    }
+
+    async function loadAllUsers() {
+      const { ref, get } = window.firebaseModules;
+      const database = window.firebaseDatabase;
+
+      const usersRef = ref(database, 'users');
+      const snapshot = await get(usersRef);
+
+      if (snapshot.exists()) {
+        allUsers = snapshot.val();
+      } else {
+        allUsers = {};
+      }
+
+      renderUsersList();
+    }
+
+    function filterUsers(status) {
+      currentUserFilter = status;
+
+      document.getElementById('filterPending').classList.remove('active');
+      document.getElementById('filterApproved').classList.remove('active');
+      document.getElementById('filterRejected').classList.remove('active');
+      document.getElementById('filter' + status.charAt(0).toUpperCase() + status.slice(1)).classList.add('active');
+
+      renderUsersList();
+    }
+
+    function renderUsersList() {
+      const usersList = document.getElementById('manageUsersList');
+
+      const filteredUsers = Object.entries(allUsers).filter(([id, user]) => {
+        const status = user.status || 'pending';
+        return status === currentUserFilter;
+      });
+
+      if (filteredUsers.length === 0) {
+        const statusLabels = {
+          pending: 'pendentes',
+          approved: 'aprovados',
+          rejected: 'rejeitados'
+        };
+        usersList.innerHTML = `<p style="color: var(--text-muted); text-align: center;">Nenhum usuário ${statusLabels[currentUserFilter]}.</p>`;
+        return;
+      }
+
+      usersList.innerHTML = filteredUsers.map(([id, user]) => {
+        const createdDate = user.createdAt ? new Date(user.createdAt).toLocaleDateString('pt-BR') : 'N/A';
+        const statusColors = {
+          pending: '#ff9800',
+          approved: '#4CAF50',
+          rejected: '#f44336'
+        };
+        const statusLabels = {
+          pending: 'Pendente',
+          approved: 'Aprovado',
+          rejected: 'Rejeitado'
+        };
+        const status = user.status || 'pending';
+
+        let actionButtons = '';
+        if (status === 'pending') {
+          actionButtons = `
+            <button class="custom-modal-btn primary" onclick="approveUser('${id}')" style="font-size: 12px; padding: 6px 12px; background: #4CAF50;">Aprovar</button>
+            <button class="custom-modal-btn secondary" onclick="rejectUser('${id}')" style="font-size: 12px; padding: 6px 12px; color: #f44336; border-color: #f44336;">Rejeitar</button>
+          `;
+        } else if (status === 'approved') {
+          actionButtons = `
+            <button class="custom-modal-btn secondary" onclick="rejectUser('${id}')" style="font-size: 12px; padding: 6px 12px; color: #f44336; border-color: #f44336;">Marcar como Fraude</button>
+          `;
+        } else if (status === 'rejected') {
+          actionButtons = `
+            <button class="custom-modal-btn primary" onclick="approveUser('${id}')" style="font-size: 12px; padding: 6px 12px; background: #4CAF50;">Restaurar</button>
+          `;
+        }
+
+        return `
+          <div style="background: var(--bg-card); padding: 12px; border-radius: 8px; margin-bottom: 12px; border: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <div>
+                <span style="font-weight: 600; font-size: 14px;">${user.name || 'Sem nome'}</span>
+                <span style="color: var(--text-muted); font-size: 12px; margin-left: 8px;">${user.email || 'Email não disponível'}</span>
+              </div>
+              <span style="background: ${statusColors[status]}; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px;">${statusLabels[status]}</span>
+            </div>
+            <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 8px;">
+              Registrado: ${createdDate} • Pontos: ${user.points || 0}
+            </p>
+            <div style="display: flex; gap: 8px;">
+              ${actionButtons}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function approveUser(userId) {
+      showCustomConfirm('Deseja aprovar este usuário?', async () => {
+        try {
+          const { ref, update } = window.firebaseModules;
+          const database = window.firebaseDatabase;
+
+          await update(ref(database, `users/${userId}`), { status: 'approved' });
+
+          allUsers[userId].status = 'approved';
+          renderUsersList();
+          showCustomAlert('Usuário aprovado com sucesso!');
+        } catch (error) {
+          showCustomAlert('Erro ao aprovar usuário: ' + error.message);
+        }
+      });
+    }
+
+    async function rejectUser(userId) {
+      showCustomConfirm('Deseja rejeitar/bloquear este usuário? Ele será deslogado automaticamente e não poderá mais acessar a conta.', async () => {
+        try {
+          const { ref, update } = window.firebaseModules;
+          const database = window.firebaseDatabase;
+
+          await update(ref(database, `users/${userId}`), { status: 'rejected' });
+
+          allUsers[userId].status = 'rejected';
+          renderUsersList();
+          showCustomAlert('Usuário marcado como fraude e bloqueado!');
+        } catch (error) {
+          showCustomAlert('Erro ao rejeitar usuário: ' + error.message);
+        }
+      });
+    }
+
+    function openResetPasswordModal() {
+      closeLoginModal();
+      document.getElementById('resetPasswordModal').classList.add('active');
+    }
+
+    function closeResetPasswordModal() {
+      document.getElementById('resetPasswordModal').classList.remove('active');
+      document.getElementById('resetPasswordForm').reset();
+    }
+
+    // Custom alert/confirm
+    function showCustomAlert(message) {
+      const modal = document.createElement('div');
+      modal.className = 'custom-modal active';
+      modal.innerHTML = `
+        <div class="custom-modal-content">
+          <p style="margin: 0 0 16px 0;">${message}</p>
+          <div class="custom-modal-buttons">
+            <button class="custom-modal-btn primary" onclick="this.closest('.custom-modal').remove()">OK</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+
+    function showCustomConfirm(message, onConfirm) {
+      const modal = document.createElement('div');
+      modal.className = 'custom-modal active';
+      modal.innerHTML = `
+        <div class="custom-modal-content">
+          <p style="margin: 0 0 16px 0;">${message}</p>
+          <div class="custom-modal-buttons">
+            <button class="custom-modal-btn secondary" onclick="this.closest('.custom-modal').remove()">Cancelar</button>
+            <button class="custom-modal-btn primary" id="confirmBtn">Confirmar</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+
+      modal.querySelector('#confirmBtn').addEventListener('click', () => {
+        modal.remove();
+        onConfirm();
+      });
+    }
+
+    // Close modals on outside click
+    document.addEventListener('click', (e) => {
+      if (e.target.id === 'overlay') {
+        closeOverlay();
+      }
+    });
+
+    // Sidebar swipe to close
+    const sidebar = document.getElementById('sidebar');
+    let startX = 0;
+    let endX = 0;
+
+    sidebar.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+    });
+
+    sidebar.addEventListener('touchmove', (e) => {
+      endX = e.touches[0].clientX;
+    });
+
+    sidebar.addEventListener('touchend', () => {
+      const diffX = endX - startX;
+      if (diffX < -50) {
+        sidebar.classList.remove('open');
+      }
+    });
+  </script>
+ <script>
+  var versaoBotao = "1.0";
+
+ function checarVersao() {
+    if (typeof Atualizar !== "undefined") {
+      Atualizar.verificarVersao(versaoBotao);
+    } else {
+      console.log("Interface Atualizar não disponível (fora do app).");
+    }
+  }
+
+  // Executa automaticamente a cada 1 segundo (1000 ms)
+  setInterval(checarVersao, 1000);
+</script>
+  <script>
+    function isWebView() {
+      const ua = navigator.userAgent || "";
+      const isAndroidWebView = ua.includes("wv"); // Android WebView
+      const isIOSWebView = /iPhone|iPod|iPad/.test(ua) && !ua.includes("Safari"); // iOS WebView
+      return isAndroidWebView || isIOSWebView;
+    }
+
+    window.onload = function() {
+      const botao = document.getElementById("meuBotao");
+      const textoInstalar = document.getElementById("textoInstalar");
+      const instalarLink = document.getElementById("instalarLink");
+
+      if (!isWebView()) {
+        botao.style.display = "inline-block";
+
+        if (localStorage.getItem("instalarClicado") !== "true") {
+          textoInstalar.style.display = "inline-block";
+        } else {
+          textoInstalar.style.display = "none";
+        }
+      } else {
+        botao.style.display = "none";
+        textoInstalar.style.display = "none";
+      }
+
+      botao.onclick = function() {
+        window.open("https://www.mediafire.com/file/nj4zgph4ekr85lr/Portal+Digital+1.0.apk/file", "_blank");
+      };
+
+      instalarLink.onclick = function() {
+        window.open("https://www.mediafire.com/file/nj4zgph4ekr85lr/Portal+Digital+1.0.apk/file", "_blank");
+        localStorage.setItem("instalarClicado", "true");
+        textoInstalar.style.display = "none";
+      };
+    };
+  </script>
+
+</body>
+</html>
+
