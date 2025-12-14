@@ -3697,7 +3697,7 @@
       if (unreadCount > 0) {
         // Trigger Android notification if available
         try {
-          if (typeof Android !== 'undefined' && Android.showNotification) {
+          if (typeof Android !== 'undefined' && AndroidNotify.showNotification();) {
             Android.showNotification();
           }
         } catch (e) {
