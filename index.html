@@ -573,6 +573,315 @@
       background: rgba(244, 67, 54, 0.1);
     }
 
+    /* Notification styles */
+    .notification-btn {
+      position: relative;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #f44336;
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 10px;
+      min-width: 18px;
+      text-align: center;
+      animation: pulse-badge 2s infinite;
+    }
+
+    @keyframes pulse-badge {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .notification-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      transition: all 0.3s ease;
+    }
+
+    .notification-item.unread {
+      border-left: 4px solid #2196F3;
+      background: linear-gradient(135deg, rgba(33, 150, 243, 0.08) 0%, var(--bg-card) 100%);
+      box-shadow: 0 2px 8px rgba(33, 150, 243, 0.15);
+    }
+
+    .notification-item.read {
+      opacity: 0.7;
+      border-left: 4px solid var(--border-color);
+    }
+
+    .notification-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .notification-title {
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+
+    .notification-time {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .notification-message {
+      font-size: 15px;
+      color: var(--text-secondary);
+      margin-bottom: 14px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .notification-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .notification-action-btn {
+      background: none;
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      font-size: 13px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      color: var(--text-primary);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .notification-action-btn:hover {
+      background: var(--bg-hover);
+    }
+
+    .notification-action-btn.mark-read {
+      background: rgba(33, 150, 243, 0.1);
+      border-color: #2196F3;
+      color: #2196F3;
+    }
+
+    .notification-action-btn.mark-read:hover {
+      background: rgba(33, 150, 243, 0.2);
+    }
+
+    .notification-action-btn.delete {
+      color: #f44336;
+      border-color: #f44336;
+    }
+
+    .notification-action-btn.delete:hover {
+      background: rgba(244, 67, 54, 0.1);
+    }
+
+    .notification-unread-indicator {
+      width: 10px;
+      height: 10px;
+      background: #2196F3;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 8px;
+      animation: pulse-indicator 1.5s infinite;
+    }
+
+    @keyframes pulse-indicator {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* Toast notification */
+    .toast-notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      left: 20px;
+      background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+      color: white;
+      padding: 16px 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(33, 150, 243, 0.4);
+      z-index: 10001;
+      animation: slideInToast 0.4s ease, slideOutToast 0.4s ease 4.6s forwards;
+      cursor: pointer;
+    }
+
+    .toast-notification .toast-title {
+      font-weight: 700;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    .toast-notification .toast-message {
+      font-size: 13px;
+      opacity: 0.9;
+    }
+
+    @keyframes slideInToast {
+      from {
+        transform: translateY(-100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideOutToast {
+      from {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateY(-100%);
+        opacity: 0;
+      }
+    }
+
+    /* Skeleton Loading */
+    .skeleton-card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    .skeleton-poster {
+      width: 100%;
+      aspect-ratio: 3/4;
+      background: linear-gradient(
+        -45deg,
+        #e0e0e0 25%,
+        #f5f5f5 50%,
+        #e0e0e0 75%
+      );
+      background-size: 400% 400%;
+      animation: skeleton-wave 1.5s ease-in-out infinite;
+    }
+
+    :root.dark .skeleton-poster {
+      background: linear-gradient(
+        -45deg,
+        #2a2a2a 25%,
+        #3a3a3a 50%,
+        #2a2a2a 75%
+      );
+      background-size: 400% 400%;
+    }
+
+    .skeleton-info {
+      padding: 12px;
+    }
+
+    .skeleton-title {
+      height: 16px;
+      background: linear-gradient(
+        -45deg,
+        #e0e0e0 25%,
+        #f5f5f5 50%,
+        #e0e0e0 75%
+      );
+      background-size: 400% 400%;
+      animation: skeleton-wave 1.5s ease-in-out infinite;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      width: 80%;
+    }
+
+    :root.dark .skeleton-title {
+      background: linear-gradient(
+        -45deg,
+        #2a2a2a 25%,
+        #3a3a3a 50%,
+        #2a2a2a 75%
+      );
+      background-size: 400% 400%;
+    }
+
+    .skeleton-genre {
+      height: 12px;
+      background: linear-gradient(
+        -45deg,
+        #e0e0e0 25%,
+        #f5f5f5 50%,
+        #e0e0e0 75%
+      );
+      background-size: 400% 400%;
+      animation: skeleton-wave 1.5s ease-in-out infinite;
+      animation-delay: 0.1s;
+      border-radius: 4px;
+      width: 60%;
+      margin-bottom: 8px;
+    }
+
+    :root.dark .skeleton-genre {
+      background: linear-gradient(
+        -45deg,
+        #2a2a2a 25%,
+        #3a3a3a 50%,
+        #2a2a2a 75%
+      );
+      background-size: 400% 400%;
+    }
+
+    .skeleton-stats {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .skeleton-stat {
+      height: 10px;
+      background: linear-gradient(
+        -45deg,
+        #e0e0e0 25%,
+        #f5f5f5 50%,
+        #e0e0e0 75%
+      );
+      background-size: 400% 400%;
+      animation: skeleton-wave 1.5s ease-in-out infinite;
+      animation-delay: 0.2s;
+      border-radius: 4px;
+      width: 40px;
+    }
+
+    :root.dark .skeleton-stat {
+      background: linear-gradient(
+        -45deg,
+        #2a2a2a 25%,
+        #3a3a3a 50%,
+        #2a2a2a 75%
+      );
+      background-size: 400% 400%;
+    }
+
+    @keyframes skeleton-wave {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
     .comment-text {
       font-size: 14px;
       color: var(--text-secondary);
@@ -943,7 +1252,7 @@
     }
   </style>
 </head>
-<body onload="checarVersao()">
+<body>
   <div class="header">
     <button class="menu-btn" onclick="toggleSidebar()">
       <svg viewBox="0 0 24 24"><path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/></svg>
@@ -973,7 +1282,7 @@
         <p><strong>Status:</strong> <span id="userStatus">-</span></p>
       </div>
       <div class="points-display">
-       Meus Pontos: <span id="userPoints">0</span>
+        Pontos: <span id="userPoints">0</span>
       </div>
     </div>
 
@@ -1007,6 +1316,17 @@
       Gerenciar Usuários
     </button>
 
+    <button class="btn" id="sendNotificationBtn" onclick="openSendNotificationModal()" style="display: none;">
+      <svg viewBox="0 0 24 24"><path d="M20 17H4V10l8 5 8-5v7zm0-8l-8 5-8-5V7h16v2zm0-4H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2z"/></svg>
+      Enviar Notificação
+    </button>
+
+    <button class="btn notification-btn" id="viewNotificationsBtn" onclick="openNotificationsModal()" style="display: none;">
+      <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/></svg>
+      Notificações
+      <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+    </button>
+
     <button class="btn earn-points-btn" id="earnPointsBtn" onclick="openEarnPointsModal()" style="display: none;">
       <svg viewBox="0 0 24 24" style="fill: white;"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
       Ganhar + Pontos
@@ -1035,30 +1355,15 @@
     <button class="btn" id="logoutBtn" onclick="logout()" style="display: none;">
       <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
       Sair
-    </button>   
-<button class="btn" id="meuBotao" style="display:none;">
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" 
-       viewBox="0 0 24 24" aria-label="Android app icon" 
-       style="vertical-align:middle; margin-right:8px;">
-    <g fill="#3DDC84">
-      <rect x="5" y="7" width="14" height="8" rx="3"/>
-      <circle cx="9" cy="11" r="1.2" fill="#ffffff"/>
-      <circle cx="15" cy="11" r="1.2" fill="#ffffff"/>
-      <rect x="7" y="3" width="1.8" height="4" rx="0.9" transform="rotate(-25 7.9 5)"/>
-      <rect x="15.2" y="3" width="1.8" height="4" rx="0.9" transform="rotate(25 16.1 5)"/>
-      <rect x="6" y="13" width="12" height="7" rx="2"/>
-      <rect x="3" y="13" width="2" height="6" rx="1.2"/>
-      <rect x="19" y="13" width="2" height="6" rx="1.2"/>
-      <rect x="8" y="20" width="3" height="3" rx="1"/>
-      <rect x="13" y="20" width="3" height="3" rx="1"/>
-    </g>
-  </svg>
-  Baixar o Aplicativo
-</button>
+    </button>
+
+    <div style="border-top: 1px solid var(--border-color); margin: 12px 0; padding-top: 12px;">
+      <button class="btn" onclick="openFaqModal()">
+        <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
+        Sobre o App / FAQ
+      </button>
+    </div>
   </div>
-  <span id="textoInstalar" class="btn" >
-    <small>Continue usando no nosso aplicativo </small> <strong id="instalarLink">Instalar</strong>
-  </span>
 
   <div id="search-container" class="search-container">
     <div class="search-wrapper">
@@ -1078,7 +1383,51 @@
 
   <div class="content-wrapper">
     <div class="grid" id="contentGrid">
-      <div class="loading">Carregando...</div>
+      <!-- Skeleton loading inicial -->
+      <div class="skeleton-card">
+        <div class="skeleton-poster"></div>
+        <div class="skeleton-info">
+          <div class="skeleton-title"></div>
+          <div class="skeleton-genre"></div>
+          <div class="skeleton-stats">
+            <div class="skeleton-stat"></div>
+            <div class="skeleton-stat"></div>
+          </div>
+        </div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skeleton-poster"></div>
+        <div class="skeleton-info">
+          <div class="skeleton-title"></div>
+          <div class="skeleton-genre"></div>
+          <div class="skeleton-stats">
+            <div class="skeleton-stat"></div>
+            <div class="skeleton-stat"></div>
+          </div>
+        </div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skeleton-poster"></div>
+        <div class="skeleton-info">
+          <div class="skeleton-title"></div>
+          <div class="skeleton-genre"></div>
+          <div class="skeleton-stats">
+            <div class="skeleton-stat"></div>
+            <div class="skeleton-stat"></div>
+          </div>
+        </div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skeleton-poster"></div>
+        <div class="skeleton-info">
+          <div class="skeleton-title"></div>
+          <div class="skeleton-genre"></div>
+          <div class="skeleton-stats">
+            <div class="skeleton-stat"></div>
+            <div class="skeleton-stat"></div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div id="noResults" class="no-results" style="display: none;">
@@ -1096,7 +1445,7 @@
         <div id="videoContainer" class="video-container" style="display: none;"></div>
 
         <div id="insufficientPointsWarning" style="display: none;" class="insufficient-points">
-          ⚠️ Você não tem pontos suficientes para continuar!
+          ⚠️ Você não tem pontos suficientes para baixar este jogo!
         </div>
 
         <div class="info-comments-toggle">
@@ -1109,12 +1458,12 @@
 
           <div class="main-actions" id="mainActions">
             <button id="btnGA" class="btn-main">Continuar Aqui</button>
-            <button id="btnADM" class="btn-main">Continuar Fora</button>
+            <button id="btnADM" class="btn-main" >Continuar Fora</button>
+              <span class="modal-description">
+  Para abrir ou baixar o conteúdo, clique em um dos botões <strong>CONTINUAR</strong> acima.
+</span>
           </div>
         </div>
-       <span class="modal-description">
-  Para abrir ou baixar o conteúdo, clique em um dos dois botões <strong>CONTINUAR</strong> a acima.
-</span>      
         <div class="comments-section" id="commentsSection">
           <div id="commentInputWrapper" class="comment-input-wrapper" style="display: none;">
             <textarea id="commentInput" class="comment-input" placeholder="Escreva um comentário..."></textarea>
@@ -1123,7 +1472,7 @@
           <div id="commentsList"></div>
         </div>
 
-        <button class="btn-close" onclick="window.open('index.html', '_blank')">Voltar</button>
+        <button class="btn-close" onclick="window.location.href='index.html'">Voltar</button>
       </div>
     </div>
   </div>
@@ -1156,7 +1505,7 @@
       <h2>Criar Conta</h2>
       <form id="registerForm" onsubmit="handleRegister(event)">
         <div class="form-group">
-          <label class="form-label">Primeiro e Ultimo Nome</label>
+          <label class="form-label">Nome Completo</label>
           <input type="text" class="form-input" id="registerName" placeholder="Seu nome" required>
         </div>
         <div class="form-group">
@@ -1316,7 +1665,7 @@
 
   <div id="historyModal" class="custom-modal">
     <div class="custom-modal-content">
-      <h2>Histórico de Post Visualizados</h2>
+      <h2>Histórico Visualizados</h2>
       <div id="historyList"></div>
       <div class="custom-modal-buttons" style="margin-top: 16px;">
         <button class="custom-modal-btn secondary" onclick="clearHistory()" style="margin-right: auto;">Limpar Histórico</button>
@@ -1408,6 +1757,125 @@
     </div>
   </div>
 
+  <!-- Modal para enviar notificação (Admin) -->
+  <div id="sendNotificationModal" class="custom-modal">
+    <div class="custom-modal-content" style="max-width: 500px;">
+      <h2>📤 Enviar Notificação</h2>
+      <form id="sendNotificationForm" onsubmit="handleSendNotification(event)">
+        <div class="form-group">
+          <label class="form-label">Destinatário</label>
+          <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+              <input type="radio" name="notificationTarget" value="all" checked onchange="toggleUserSelector()">
+              <span>Todos os usuários</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+              <input type="radio" name="notificationTarget" value="individual" onchange="toggleUserSelector()">
+              <span>Usuário específico</span>
+            </label>
+          </div>
+          <div id="userSelectorContainer" style="display: none;">
+            <select class="form-input" id="notificationTargetUser" style="width: 100%;">
+              <option value="">Carregando usuários...</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Título</label>
+          <input type="text" class="form-input" id="notificationTitle" placeholder="Título da notificação" required maxlength="100">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mensagem</label>
+          <textarea class="form-input" id="notificationMessage" placeholder="Digite a mensagem..." required maxlength="500" rows="4" style="resize: vertical;"></textarea>
+        </div>
+        <div class="custom-modal-buttons">
+          <button type="button" class="custom-modal-btn secondary" onclick="closeSendNotificationModal()">Cancelar</button>
+          <button type="submit" class="custom-modal-btn primary" id="sendNotificationBtn">Enviar para Todos</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal para ver notificações (Usuário) -->
+  <div id="notificationsModal" class="custom-modal">
+    <div class="custom-modal-content" style="max-width: 500px;">
+      <h2> Minhas Notificações</h2>
+      <div id="notificationsList" style="max-height: 60vh; overflow-y: auto; padding: 8px 0;">Carregando...</div>
+      <div class="custom-modal-buttons" style="margin-top: 16px; justify-content: space-between;">
+        <button class="custom-modal-btn primary" onclick="markAllNotificationsAsRead()" id="markAllReadBtn">✓ Marcar todas como lidas</button>
+        <button class="custom-modal-btn secondary" onclick="closeNotificationsModal()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal FAQ / Sobre o App -->
+  <div id="faqModal" class="custom-modal">
+    <div class="custom-modal-content" style="max-width: 550px;">
+      <h2> Sobre o Portal Digital</h2>
+      <div style="max-height: 65vh; overflow-y: auto; padding: 8px 0;">
+
+        <div style="background: linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(156, 39, 176, 0.1) 100%); padding: 16px; border-radius: 12px; margin-bottom: 20px; text-align: center;">
+          <h3 style="margin: 0 0 8px 0; color: var(--text-primary);"> Portal Digital</h3>
+          <p style="margin: 0; color: var(--text-secondary); font-size: 14px;">Sua plataforma de aplicativos, jogos e tutoriais</p>
+          <p style="margin: 8px 0 0 0; font-size: 12px; color: var(--text-muted);">Versão  1.0</p>
+        </div>
+
+        <div class="faq-item" style="margin-bottom: 16px;">
+          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;"> O que é o Portal Digital?</h4>
+          <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.5;">
+            O Portal Digital é uma plataforma onde você pode encontrar e baixar aplicativos, jogos, tutoriais e muito mais. Nosso objetivo é oferecer conteúdo de qualidade para todos os usuários.
+          </p>
+        </div>
+
+        <div class="faq-item" style="margin-bottom: 16px;">
+          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;"> Como criar uma conta?</h4>
+          <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.5;">
+            Clique em "Criar Conta" no menu lateral, preencha seu nome, email (apenas Gmail) e senha. Sua conta ficará pendente até ser aprovada por um administrador.
+          </p>
+        </div>
+
+        <div class="faq-item" style="margin-bottom: 16px;">
+          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;"> O que são os pontos?</h4>
+          <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.5;">
+            Pontos são a moeda virtual do Portal Digital. Você pode ganhar pontos assistindo anúncios ou resgatando códigos. Use os pontos para desbloquear downloads de conteúdos premium.
+          </p>
+        </div>
+
+        <div class="faq-item" style="margin-bottom: 16px;">
+          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;"> Como baixar um jogo/app?</h4>
+          <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.5;">
+            Clique no card do jogo/app desejado para ver os detalhes. Se tiver pontos suficientes, clique no botão de continuar. Você será redirecionado para o link de download.
+          </p>
+        </div>
+
+        <div class="faq-item" style="margin-bottom: 16px;">
+          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;"> Como funcionam as notificações?</h4>
+          <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.5;">
+            Você receberá notificações sobre novos conteúdos, atualizações e mensagens importantes. Pode marcar como lida ou apagar as notificações a qualquer momento.
+          </p>
+        </div>
+
+        <div class="faq-item" style="margin-bottom: 16px;">
+          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;"> Posso comentar nos jogos?</h4>
+          <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.5;">
+            Sim! Usuários com conta verificada podem deixar comentários em qualquer jogo ou aplicativo. Você também pode apagar seus próprios comentários.
+          </p>
+        </div>
+
+        <div class="faq-item" style="margin-bottom: 16px;">
+          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;"> Contato e Suporte</h4>
+          <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.5;">
+            Para dúvidas, sugestões ou problemas, entre em contato através do nosso gmail <strong>sibemcesar@gmail.com</strong>.
+          </p>
+        </div>
+
+      </div>
+      <div class="custom-modal-buttons" style="margin-top: 16px;">
+        <button class="custom-modal-btn primary" onclick="closeFaqModal()">Entendi!</button>
+      </div>
+    </div>
+  </div>
+
   <div id="adOverlay" class="ad-overlay">
     <div class="ad-header">
       <div class="ad-title" id="adDisplayTitle">Carregando anúncio...</div>
@@ -1446,6 +1914,7 @@
     let searchTerm = '';
     let userPoints = 0;
     let userStatus = 'pending';
+    let gamesLoaded = false;
     let userName = '';
     let currentGameData = null;
     let historyData = [];
@@ -1543,13 +2012,13 @@
 
       if (userStatusEl) {
         if (isPublisher) {
-          userStatusEl.innerHTML = '<span style="color: #9c27b0; font-weight: 600;"> Publicador</span>';
+          userStatusEl.innerHTML = '<span style="color: #9c27b0; font-weight: 600;">👑 Publicador</span>';
         } else if (userStatus === 'approved') {
-          userStatusEl.innerHTML = '<span style="color: #4CAF50; font-weight: 600;"> Verificado</span>';
+          userStatusEl.innerHTML = '<span style="color: #4CAF50; font-weight: 600;">✓ Verificado</span>';
         } else if (userStatus === 'pending') {
-          userStatusEl.innerHTML = '<span style="color: #ff9800; font-weight: 600;"> Pendente</span>';
+          userStatusEl.innerHTML = '<span style="color: #ff9800; font-weight: 600;">⏳ Pendente</span>';
         } else if (userStatus === 'rejected') {
-          userStatusEl.innerHTML = '<span style="color: #f44336; font-weight: 600;"> Bloqueado</span>';
+          userStatusEl.innerHTML = '<span style="color: #f44336; font-weight: 600;">✗ Bloqueado</span>';
         }
       }
     }
@@ -1586,6 +2055,8 @@
       const manageBtn = document.getElementById('manageBtn');
       const generateCodeBtn = document.getElementById('generateCodeBtn');
       const manageUsersBtn = document.getElementById('manageUsersBtn');
+      const sendNotificationBtn = document.getElementById('sendNotificationBtn');
+      const viewNotificationsBtn = document.getElementById('viewNotificationsBtn');
       const publishAdBtn = document.getElementById('publishAdBtn');
       const manageAdBtn = document.getElementById('manageAdBtn');
       const earnPointsBtn = document.getElementById('earnPointsBtn');
@@ -1600,6 +2071,8 @@
         manageBtn.style.display = 'none';
         generateCodeBtn.style.display = 'none';
         manageUsersBtn.style.display = 'none';
+        sendNotificationBtn.style.display = 'none';
+        viewNotificationsBtn.style.display = 'none';
         publishAdBtn.style.display = 'none';
         manageAdBtn.style.display = 'none';
         earnPointsBtn.style.display = 'none';
@@ -1619,11 +2092,15 @@
           earnPointsBtn.style.display = 'none';
         }
 
+        // Show notifications for all logged in users
+        viewNotificationsBtn.style.display = 'flex';
+
         if (isPublisher) {
           publishBtn.style.display = 'flex';
           manageBtn.style.display = 'flex';
           generateCodeBtn.style.display = 'flex';
           manageUsersBtn.style.display = 'flex';
+          sendNotificationBtn.style.display = 'flex';
           publishAdBtn.style.display = 'flex';
           manageAdBtn.style.display = 'flex';
         } else {
@@ -1631,11 +2108,13 @@
           manageBtn.style.display = 'none';
           generateCodeBtn.style.display = 'none';
           manageUsersBtn.style.display = 'none';
+          sendNotificationBtn.style.display = 'none';
           publishAdBtn.style.display = 'none';
           manageAdBtn.style.display = 'none';
         }
 
         updateUserInfoDisplay();
+        loadNotifications();
       }
     }
 
@@ -1644,9 +2123,13 @@
       const { ref, onValue } = window.firebaseModules;
       const database = window.firebaseDatabase;
 
+      // Show skeleton loading initially
+      renderSkeletonLoading();
+
       const gamesRef = ref(database, 'games');
       onValue(gamesRef, (snapshot) => {
         allGames = snapshot.val() || {};
+        gamesLoaded = true;
         renderGrid();
       });
     }
@@ -1695,9 +2178,41 @@
     }
 
     // Render grid
+    function renderSkeletonLoading() {
+      const grid = document.getElementById('contentGrid');
+      grid.style.display = 'grid';
+      grid.innerHTML = '';
+
+      for (let i = 0; i < 4; i++) {
+        const skeleton = document.createElement('div');
+        skeleton.className = 'skeleton-card';
+        skeleton.style.animationDelay = `${i * 0.1}s`;
+        skeleton.innerHTML = `
+          <div class="skeleton-poster"></div>
+          <div class="skeleton-info">
+            <div class="skeleton-title"></div>
+            <div class="skeleton-genre"></div>
+            <div class="skeleton-stats">
+              <div class="skeleton-stat"></div>
+              <div class="skeleton-stat"></div>
+            </div>
+          </div>
+        `;
+        grid.appendChild(skeleton);
+      }
+    }
+
     function renderGrid() {
       const grid = document.getElementById('contentGrid');
       const noResults = document.getElementById('noResults');
+
+      // Show skeleton loading if games haven't loaded yet
+      if (!gamesLoaded) {
+        renderSkeletonLoading();
+        noResults.style.display = 'none';
+        return;
+      }
+
       grid.innerHTML = '';
 
       let gamesArray = Object.entries(allGames).map(([id, game]) => ({
@@ -1949,8 +2464,12 @@
       commentsList.innerHTML = commentsArray.map(comment => {
         const authorDisplayName = comment.authorName || comment.authorEmail.split('@')[0];
         const isAuthor = currentUserId && comment.authorId === currentUserId;
-        const deleteBtn = isAuthor ? `<button class="comment-delete-btn" onclick="deleteComment('${currentGameData.id}', '${comment.id}')" title="Apagar comentário"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="red" viewBox="0 0 24 24">
-  <path d="M3 6h18v2H3V6zm2 3h14l-1.5 12.5a1 1 0 0 1-1 .5H7.5a1 1 0 0 1-1-.5L5 9zm5 2v8h2v-8H10zm4 0v8h2v-8h-2zM9 4V2h6v2h5v2H4V4h5z"/>
+        const deleteBtn = isAuthor ? `<button class="comment-delete-btn" onclick="deleteComment('${currentGameData.id}', '${comment.id}')" title="Apagar comentário"><svg xmlns="http://www.w3.org/2000/svg" 
+     width="20" height="20" 
+     fill="#cc0000" 
+     viewBox="0 0 24 24" 
+     style="display:block; margin-left:0;">
+  <path d="M3 6h18v2H3V6zm2 3h14l-1.5 12.5c-.1.8-.8 1.5-1.6 1.5H8.1c-.8 0-1.5-.7-1.6-1.5L5 9zm5 2v9h2v-9h-2zm4 0v9h2v-9h-2zM9 4V2h6v2h5v2H4V4h5z"/>
 </svg></button>` : '';
 
         return `
@@ -2269,6 +2788,23 @@
       document.getElementById('sidebar').classList.toggle('open');
     }
 
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('open');
+    }
+
+    // Close sidebar when clicking outside
+    document.addEventListener('click', function(event) {
+      const sidebar = document.getElementById('sidebar');
+      const menuBtn = document.querySelector('.menu-btn');
+
+      // Check if sidebar is open and click is outside sidebar and menu button
+      if (sidebar.classList.contains('open')) {
+        if (!sidebar.contains(event.target) && !menuBtn.contains(event.target)) {
+          closeSidebar();
+        }
+      }
+    });
+
     function toggleSearch() {
       const box = document.getElementById('search-container');
       box.style.display = box.style.display === 'none' || box.style.display === '' ? 'flex' : 'none';
@@ -2348,7 +2884,7 @@
         updateUIForUser();
         updateUserInfoDisplay();
         updatePointsDisplay();
-        showCustomAlert('Conta criada com sucesso! Sua conta está aguardando aprovação do administrador.');
+        showCustomAlert('Conta criada com sucesso! Sua conta está aguardando aprovação do administrador, a sua pode ser aprovada no máximo, 3 dias.');
       } catch (error) {
         let errorMessage = 'Erro ao criar conta: ';
         switch (error.code) {
@@ -2909,6 +3445,10 @@
     let currentUserFilter = 'pending';
     let allUsers = {};
 
+    // Notification functions
+    let userNotifications = [];
+    let dismissedNotifications = {};
+
     async function openManageUsersModal() {
       if (!isPublisher) {
         showCustomAlert('Apenas publicadores podem gerenciar usuários.');
@@ -3076,6 +3616,385 @@
       `;
       document.body.appendChild(modal);
     }
+
+    // ===== NOTIFICATION FUNCTIONS =====
+
+    let readNotifications = {};
+    let previousNotificationIds = [];
+    let notificationsInitialized = false;
+
+    async function loadNotifications() {
+      if (!currentUser || currentUser.isAnonymous) return;
+
+      const { ref, onValue, get } = window.firebaseModules;
+      const database = window.firebaseDatabase;
+
+      // Load dismissed notifications for current user
+      const dismissedRef = ref(database, `dismissedNotifications/${currentUser.uid}`);
+      const dismissedSnapshot = await get(dismissedRef);
+      dismissedNotifications = dismissedSnapshot.exists() ? dismissedSnapshot.val() : {};
+
+      // Load read notifications for current user
+      const readRef = ref(database, `readNotifications/${currentUser.uid}`);
+      const readSnapshot = await get(readRef);
+      readNotifications = readSnapshot.exists() ? readSnapshot.val() : {};
+
+      // Listen to notifications
+      const notificationsRef = ref(database, 'notifications');
+      onValue(notificationsRef, (snapshot) => {
+        const allNotifications = snapshot.val() || {};
+
+        // Filter notifications:
+        // 1. Not dismissed
+        // 2. Either global (no targetUserId) OR targeted to this user
+        const filteredNotifications = Object.entries(allNotifications)
+          .filter(([id, notif]) => {
+            // Skip dismissed notifications
+            if (dismissedNotifications[id]) return false;
+
+            // Include if: no target (global) OR target matches current user
+            if (!notif.targetUserId || notif.targetUserId === currentUser.uid) {
+              return true;
+            }
+
+            return false;
+          })
+          .map(([id, notif]) => ({
+            id,
+            ...notif,
+            isRead: !!readNotifications[id],
+            isPersonal: !!notif.targetUserId
+          }))
+          .sort((a, b) => b.createdAt - a.createdAt);
+
+        // Detect new notifications for toast
+        const currentIds = filteredNotifications.map(n => n.id);
+        if (notificationsInitialized) {
+          const newNotifications = filteredNotifications.filter(
+            n => !previousNotificationIds.includes(n.id)
+          );
+
+          // Show toast for new notifications
+          newNotifications.forEach(notif => {
+            showNotificationToast(notif.title, notif.message);
+          });
+        }
+
+        previousNotificationIds = currentIds;
+        notificationsInitialized = true;
+        userNotifications = filteredNotifications;
+
+        updateNotificationBadge();
+
+        // Check for unread notifications and trigger Android notification
+        checkUnreadNotifications();
+      });
+    }
+
+    function checkUnreadNotifications() {
+      const unreadCount = userNotifications.filter(n => !n.isRead).length;
+
+      if (unreadCount > 0) {
+        // Trigger Android notification if available
+        try {
+          if (typeof Android !== 'undefined' && Android.showNotification) {
+            Android.showNotification();
+          }
+        } catch (e) {
+          console.log('Android bridge not available');
+        }
+      }
+    }
+
+    function showNotificationToast(title, message) {
+      // Remove existing toast if any
+      const existingToast = document.querySelector('.toast-notification');
+      if (existingToast) {
+        existingToast.remove();
+      }
+
+      const toast = document.createElement('div');
+      toast.className = 'toast-notification';
+      toast.innerHTML = `
+        <div class="toast-title">🔔 ${title}</div>
+        <div class="toast-message">${message.length > 80 ? message.substring(0, 80) + '...' : message}</div>
+      `;
+
+      toast.onclick = () => {
+        toast.remove();
+        openNotificationsModal();
+      };
+
+      document.body.appendChild(toast);
+
+      // Auto remove after 5 seconds
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.remove();
+        }
+      }, 5000);
+    }
+
+    function updateNotificationBadge() {
+      const badge = document.getElementById('notificationBadge');
+      const unreadCount = userNotifications.filter(n => !n.isRead).length;
+
+      if (unreadCount > 0) {
+        badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+        badge.style.display = 'block';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+
+    async function openSendNotificationModal() {
+      if (!isPublisher) {
+        showCustomAlert('Apenas publicadores podem enviar notificações.');
+        return;
+      }
+      document.getElementById('sendNotificationForm').reset();
+      document.getElementById('userSelectorContainer').style.display = 'none';
+      document.getElementById('sendNotificationBtn').textContent = 'Enviar para Todos';
+
+      // Load users for the selector
+      await loadUsersForNotification();
+
+      document.getElementById('sendNotificationModal').classList.add('active');
+    }
+
+    function closeSendNotificationModal() {
+      document.getElementById('sendNotificationModal').classList.remove('active');
+    }
+
+    function toggleUserSelector() {
+      const target = document.querySelector('input[name="notificationTarget"]:checked').value;
+      const container = document.getElementById('userSelectorContainer');
+      const submitBtn = document.getElementById('sendNotificationBtn');
+
+      if (target === 'individual') {
+        container.style.display = 'block';
+        submitBtn.textContent = 'Enviar para Usuário';
+      } else {
+        container.style.display = 'none';
+        submitBtn.textContent = 'Enviar para Todos';
+      }
+    }
+
+    async function loadUsersForNotification() {
+      const { ref, get } = window.firebaseModules;
+      const database = window.firebaseDatabase;
+
+      try {
+        const usersRef = ref(database, 'users');
+        const snapshot = await get(usersRef);
+
+        if (snapshot.exists()) {
+          const users = snapshot.val();
+          const select = document.getElementById('notificationTargetUser');
+
+          // Filter only approved users and sort by name
+          const userList = Object.entries(users)
+            .filter(([id, user]) => user.status === 'approved' || user.status === 'pending')
+            .map(([id, user]) => ({
+              id,
+              name: user.name || 'Sem nome',
+              email: user.email || '',
+              status: user.status
+            }))
+            .sort((a, b) => a.name.localeCompare(b.name));
+
+          select.innerHTML = '<option value="">Selecione um usuário...</option>' +
+            userList.map(user => {
+              const statusLabel = user.status === 'approved' ? '✓' : '⏳';
+              return `<option value="${user.id}">${user.name} (${user.email}) ${statusLabel}</option>`;
+            }).join('');
+        }
+      } catch (error) {
+        console.error('Erro ao carregar usuários:', error);
+      }
+    }
+
+    async function handleSendNotification(e) {
+      e.preventDefault();
+
+      const title = document.getElementById('notificationTitle').value.trim();
+      const message = document.getElementById('notificationMessage').value.trim();
+      const targetType = document.querySelector('input[name="notificationTarget"]:checked').value;
+      const targetUserId = document.getElementById('notificationTargetUser').value;
+
+      if (!title || !message) {
+        showCustomAlert('Por favor, preencha todos os campos.');
+        return;
+      }
+
+      if (targetType === 'individual' && !targetUserId) {
+        showCustomAlert('Por favor, selecione um usuário.');
+        return;
+      }
+
+      try {
+        const { ref, push, set } = window.firebaseModules;
+        const database = window.firebaseDatabase;
+
+        const notificationsRef = ref(database, 'notifications');
+        const newNotificationRef = push(notificationsRef);
+
+        const notificationData = {
+          title: title,
+          message: message,
+          createdAt: Date.now(),
+          createdBy: currentUser.email
+        };
+
+        // If individual, add target user ID
+        if (targetType === 'individual') {
+          notificationData.targetUserId = targetUserId;
+
+          // Get target user name for confirmation
+          const targetUserSelect = document.getElementById('notificationTargetUser');
+          const targetUserName = targetUserSelect.options[targetUserSelect.selectedIndex].text;
+          notificationData.targetUserName = targetUserName.split(' (')[0]; // Extract just the name
+        }
+
+        await set(newNotificationRef, notificationData);
+
+        closeSendNotificationModal();
+
+        if (targetType === 'individual') {
+          showCustomAlert('Notificação enviada com sucesso para o usuário selecionado!');
+        } else {
+          showCustomAlert('Notificação enviada com sucesso para todos os usuários!');
+        }
+      } catch (error) {
+        showCustomAlert('Erro ao enviar notificação: ' + error.message);
+      }
+    }
+
+    function openNotificationsModal() {
+      document.getElementById('notificationsModal').classList.add('active');
+      renderNotifications();
+    }
+
+    function closeNotificationsModal() {
+      document.getElementById('notificationsModal').classList.remove('active');
+    }
+
+    // FAQ Modal functions
+    function openFaqModal() {
+      document.getElementById('faqModal').classList.add('active');
+    }
+
+    function closeFaqModal() {
+      document.getElementById('faqModal').classList.remove('active');
+    }
+
+    function renderNotifications() {
+      const notificationsList = document.getElementById('notificationsList');
+
+      if (userNotifications.length === 0) {
+        notificationsList.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 20px;">Nenhuma notificação.</p>';
+        return;
+      }
+
+      notificationsList.innerHTML = userNotifications.map(notif => {
+        const timeAgo = formatTimeAgo(notif.createdAt);
+        const isUnread = !notif.isRead;
+        const itemClass = isUnread ? 'notification-item unread' : 'notification-item read';
+        const unreadIndicator = isUnread ? '<span class="notification-unread-indicator"></span>' : '';
+
+        // Personal notification indicator
+        const personalBadge = notif.isPersonal
+          ? '<span style="background: #9c27b0; color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">Para você</span>'
+          : '';
+
+        const markReadBtn = isUnread
+          ? `<button class="notification-action-btn mark-read" onclick="markNotificationAsRead('${notif.id}')">
+               ✓ Marcar como lida
+             </button>`
+          : '';
+
+        return `
+          <div class="${itemClass}">
+            <div class="notification-header">
+              <div>
+                <div class="notification-title">${unreadIndicator}${notif.title}${personalBadge}</div>
+                <div class="notification-time">${timeAgo}</div>
+              </div>
+            </div>
+            <div class="notification-message">${notif.message}</div>
+            <div class="notification-actions">
+              ${markReadBtn}
+              <button class="notification-action-btn delete" onclick="dismissNotification('${notif.id}')">
+                 Apagar
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function markNotificationAsRead(notificationId) {
+      try {
+        const { ref, set } = window.firebaseModules;
+        const database = window.firebaseDatabase;
+
+        // Mark notification as read for this user
+        await set(ref(database, `readNotifications/${currentUser.uid}/${notificationId}`), true);
+
+        // Update local state
+        readNotifications[notificationId] = true;
+        const notifIndex = userNotifications.findIndex(n => n.id === notificationId);
+        if (notifIndex !== -1) {
+          userNotifications[notifIndex].isRead = true;
+        }
+
+        updateNotificationBadge();
+        renderNotifications();
+      } catch (error) {
+        showCustomAlert('Erro ao marcar notificação: ' + error.message);
+      }
+    }
+
+    async function markAllNotificationsAsRead() {
+      try {
+        const { ref, set } = window.firebaseModules;
+        const database = window.firebaseDatabase;
+
+        const unreadNotifications = userNotifications.filter(n => !n.isRead);
+
+        for (const notif of unreadNotifications) {
+          await set(ref(database, `readNotifications/${currentUser.uid}/${notif.id}`), true);
+          readNotifications[notif.id] = true;
+          notif.isRead = true;
+        }
+
+        updateNotificationBadge();
+        renderNotifications();
+      } catch (error) {
+        showCustomAlert('Erro ao marcar notificações: ' + error.message);
+      }
+    }
+
+    async function dismissNotification(notificationId) {
+      try {
+        const { ref, set } = window.firebaseModules;
+        const database = window.firebaseDatabase;
+
+        // Mark notification as dismissed for this user
+        await set(ref(database, `dismissedNotifications/${currentUser.uid}/${notificationId}`), true);
+
+        // Update local state
+        dismissedNotifications[notificationId] = true;
+        userNotifications = userNotifications.filter(n => n.id !== notificationId);
+
+        updateNotificationBadge();
+        renderNotifications();
+      } catch (error) {
+        showCustomAlert('Erro ao apagar notificação: ' + error.message);
+      }
+    }
+
+    // ===== END NOTIFICATION FUNCTIONS =====
 
     function showCustomConfirm(message, onConfirm) {
       const modal = document.createElement('div');
