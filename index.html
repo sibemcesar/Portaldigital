@@ -1480,8 +1480,8 @@
           <div class="modal-description" id="modalDescription"></div>
 
           <div class="main-actions" id="mainActions">
-            <button id="btnGA" class="btn-main">Continuar Aqui</button>
-            <button id="btnADM" class="btn-main" >Continuar Fora</button>
+            <button id="btnGA" class="btn-main">Continuar</button>
+            <button id="btnADM" class="btn-main">Continuar no ADM </button>
               <span class="modal-description">
   Para abrir ou baixar o conteúdo, clique em um dos botões <strong>CONTINUAR</strong>.
 </span>
@@ -4077,47 +4077,54 @@
     }
   }
 
-  // Executa automaticamente a cada 1 segundo (1000 ms)
   setInterval(checarVersao, 1000);
 </script>
-  <script>
-    function isWebView() {
-      const ua = navigator.userAgent || "";
-      const isAndroidWebView = ua.includes("wv"); // Android WebView
-      const isIOSWebView = /iPhone|iPod|iPad/.test(ua) && !ua.includes("Safari"); // iOS WebView
-      return isAndroidWebView || isIOSWebView;
-    }
+ <script>
+  function isWebView() {
+    const ua = navigator.userAgent || "";
+    const isAndroidWebView = ua.includes("wv"); // Android WebView
+    const isIOSWebView = /iPhone|iPod|iPad/.test(ua) && !ua.includes("Safari"); // iOS WebView
+    return isAndroidWebView || isIOSWebView;
+  }
 
-    window.onload = function() {
-      const botao = document.getElementById("meuBotao");
-      const textoInstalar = document.getElementById("textoInstalar");
-      const instalarLink = document.getElementById("instalarLink");
+  window.onload = function() {
+    const botao = document.getElementById("meuBotao");
+    const textoInstalar = document.getElementById("textoInstalar");
+    const instalarLink = document.getElementById("instalarLink");
+    const btnADM = document.getElementById("btnADM"); // novo botão ADM
 
-      if (!isWebView()) {
-        botao.style.display = "inline-block";
+    if (!isWebView()) {
+      botao.style.display = "inline-block";
 
-        if (localStorage.getItem("instalarClicado") !== "true") {
-          textoInstalar.style.display = "inline-block";
-        } else {
-          textoInstalar.style.display = "none";
-        }
-      } else {
-        botao.style.display = "none";
-        textoInstalar.style.display = "none";
+      if (btnADM) {
+        btnADM.style.display = "none";
       }
 
-      botao.onclick = function() {
-        window.open("https://www.mediafire.com/file/nj4zgph4ekr85lr/Portal+Digital+1.0.apk/file", "_blank");
-      };
-
-      instalarLink.onclick = function() {
-        window.open("https://www.mediafire.com/file/nj4zgph4ekr85lr/Portal+Digital+1.0.apk/file", "_blank");
-        localStorage.setItem("instalarClicado", "true");
+      if (localStorage.getItem("instalarClicado") !== "true") {
+        textoInstalar.style.display = "inline-block";
+      } else {
         textoInstalar.style.display = "none";
-      };
-    };
-  </script>
+      }
+    } else {
+      botao.style.display = "none";
+      textoInstalar.style.display = "none";
 
+      if (btnADM) {
+        btnADM.style.display = "inline-block";
+      }
+    }
+
+    botao.onclick = function() {
+      window.open("https://www.mediafire.com/file/nj4zgph4ekr85lr/Portal+Digital+1.0.apk/file", "_blank");
+    };
+
+    instalarLink.onclick = function() {
+      window.open("https://www.mediafire.com/file/nj4zgph4ekr85lr/Portal+Digital+1.0.apk/file", "_blank");
+      localStorage.setItem("instalarClicado", "true");
+      textoInstalar.style.display = "none";
+    };
+  };
+</script>
 </body>
 </html>
 
