@@ -10,10 +10,8 @@
 
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously, onAuthStateChanged, signOut, sendPasswordResetEmail, updateProfile, sendEmailVerification } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously, onAuthStateChanged, signOut, sendPasswordResetEmail, updateProfile } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
     import { getDatabase, ref, set, get, update, remove, onValue, push } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-    // Firestore imports for cached/static data
-    import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc, query, where, orderBy, limit, onSnapshot, increment } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyBgEfuLNpU5j9EIcvQ9Qs_reEvtXGPIbO0",
@@ -29,45 +27,25 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const database = getDatabase(app);
-    const firestore = getFirestore(app);
 
     window.firebaseApp = app;
     window.firebaseAuth = auth;
-    window.firebaseDatabase = database;  // Realtime Database - for real-time updates
-    window.firebaseFirestore = firestore; // Firestore - for cached/static data
+    window.firebaseDatabase = database;
     window.firebaseModules = {
-      // Auth modules
       signInWithEmailAndPassword,
       createUserWithEmailAndPassword,
-      sendEmailVerification,
       signInAnonymously,
       onAuthStateChanged,
       signOut,
       sendPasswordResetEmail,
       updateProfile,
-      // Realtime Database modules
       ref,
       set,
       get,
       update,
       remove,
       onValue,
-      push,
-      // Firestore modules
-      collection,
-      doc,
-      getDoc,
-      getDocs,
-      setDoc,
-      updateDoc,
-      deleteDoc,
-      addDoc,
-      query,
-      where,
-      orderBy,
-      limit,
-      onSnapshot,
-      increment
+      push
     };
   </script>
 
@@ -422,59 +400,6 @@
       }
     }
 
-    /* Content Header */
-    .content-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 16px;
-      background: var(--bg-primary);
-      border-bottom: 1px solid var(--border-color);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .content-header-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 8px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s;
-    }
-
-    .content-header-btn svg {
-      fill: var(--text-primary);
-    }
-
-    .content-header-btn:hover {
-      background: var(--bg-hover);
-    }
-
-    .content-header-btn:active {
-      background: var(--bg-secondary);
-    }
-
-    .content-header-title {
-      flex: 1;
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin: 0 12px;
-      text-align: center;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .share-btn svg {
-      fill: #2196F3;
-    }
-
     .modal-header {
       padding: 24px;
       border-bottom: 1px solid var(--border-color);
@@ -646,390 +571,6 @@
     .comment-delete-btn:hover {
       opacity: 1;
       background: rgba(244, 67, 54, 0.1);
-    }
-
-    /* Notification styles */
-    .notification-btn {
-      position: relative;
-    }
-
-    .notification-badge {
-      position: absolute;
-      top: -5px;
-      right: -5px;
-      background: #f44336;
-      color: white;
-      font-size: 11px;
-      font-weight: 600;
-      padding: 2px 6px;
-      border-radius: 10px;
-      min-width: 18px;
-      text-align: center;
-      animation: pulse-badge 2s infinite;
-    }
-
-    @keyframes pulse-badge {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-    }
-
-    .notification-item {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 16px;
-      transition: all 0.3s ease;
-    }
-
-    .notification-item.unread {
-      border-left: 4px solid #2196F3;
-      background: linear-gradient(135deg, rgba(33, 150, 243, 0.08) 0%, var(--bg-card) 100%);
-      box-shadow: 0 2px 8px rgba(33, 150, 243, 0.15);
-    }
-
-    .notification-item.read {
-      opacity: 0.7;
-      border-left: 4px solid var(--border-color);
-    }
-
-    .notification-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 12px;
-    }
-
-    .notification-title {
-      font-weight: 700;
-      font-size: 16px;
-      color: var(--text-primary);
-      line-height: 1.3;
-    }
-
-    .notification-time {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 4px;
-    }
-
-    .notification-message {
-      font-size: 15px;
-      color: var(--text-secondary);
-      margin-bottom: 14px;
-      line-height: 1.5;
-      white-space: pre-wrap;
-    }
-
-    .notification-actions {
-      display: flex;
-      gap: 8px;
-      justify-content: flex-end;
-    }
-
-    .notification-action-btn {
-      background: none;
-      border: 1px solid var(--border-color);
-      cursor: pointer;
-      font-size: 13px;
-      padding: 8px 14px;
-      border-radius: 8px;
-      color: var(--text-primary);
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .notification-action-btn:hover {
-      background: var(--bg-hover);
-    }
-
-    .notification-action-btn.mark-read {
-      background: rgba(33, 150, 243, 0.1);
-      border-color: #2196F3;
-      color: #2196F3;
-    }
-
-    .notification-action-btn.mark-read:hover {
-      background: rgba(33, 150, 243, 0.2);
-    }
-
-    .notification-action-btn.delete {
-      color: #f44336;
-      border-color: #f44336;
-    }
-
-    .notification-action-btn.delete:hover {
-      background: rgba(244, 67, 54, 0.1);
-    }
-
-    .notification-unread-indicator {
-      width: 10px;
-      height: 10px;
-      background: #2196F3;
-      border-radius: 50%;
-      display: inline-block;
-      margin-right: 8px;
-      animation: pulse-indicator 1.5s infinite;
-    }
-
-    @keyframes pulse-indicator {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-
-    /* Toast notification */
-    .toast-notification {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      left: 20px;
-      background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
-      color: white;
-      padding: 16px 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(33, 150, 243, 0.4);
-      z-index: 10001;
-      animation: slideInToast 0.4s ease, slideOutToast 0.4s ease 4.6s forwards;
-      cursor: pointer;
-    }
-
-    .toast-notification .toast-title {
-      font-weight: 700;
-      font-size: 15px;
-      margin-bottom: 4px;
-    }
-
-    .toast-notification .toast-message {
-      font-size: 13px;
-      opacity: 0.9;
-    }
-
-    @keyframes slideInToast {
-      from {
-        transform: translateY(-100%);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-
-    @keyframes slideOutToast {
-      from {
-        transform: translateY(0);
-        opacity: 1;
-      }
-      to {
-        transform: translateY(-100%);
-        opacity: 0;
-      }
-    }
-
-    /* Skeleton Loading */
-    .skeleton-card {
-      background: var(--bg-card);
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid var(--border-color);
-    }
-
-    .skeleton-poster {
-      width: 100%;
-      aspect-ratio: 3/4;
-      background: linear-gradient(
-        -45deg,
-        #e0e0e0 25%,
-        #f5f5f5 50%,
-        #e0e0e0 75%
-      );
-      background-size: 400% 400%;
-      animation: skeleton-wave 1.5s ease-in-out infinite;
-    }
-
-    :root.dark .skeleton-poster {
-      background: linear-gradient(
-        -45deg,
-        #2a2a2a 25%,
-        #3a3a3a 50%,
-        #2a2a2a 75%
-      );
-      background-size: 400% 400%;
-    }
-
-    .skeleton-info {
-      padding: 12px;
-    }
-
-    .skeleton-title {
-      height: 16px;
-      background: linear-gradient(
-        -45deg,
-        #e0e0e0 25%,
-        #f5f5f5 50%,
-        #e0e0e0 75%
-      );
-      background-size: 400% 400%;
-      animation: skeleton-wave 1.5s ease-in-out infinite;
-      border-radius: 4px;
-      margin-bottom: 8px;
-      width: 80%;
-    }
-
-    :root.dark .skeleton-title {
-      background: linear-gradient(
-        -45deg,
-        #2a2a2a 25%,
-        #3a3a3a 50%,
-        #2a2a2a 75%
-      );
-      background-size: 400% 400%;
-    }
-
-    .skeleton-genre {
-      height: 12px;
-      background: linear-gradient(
-        -45deg,
-        #e0e0e0 25%,
-        #f5f5f5 50%,
-        #e0e0e0 75%
-      );
-      background-size: 400% 400%;
-      animation: skeleton-wave 1.5s ease-in-out infinite;
-      animation-delay: 0.1s;
-      border-radius: 4px;
-      width: 60%;
-      margin-bottom: 8px;
-    }
-
-    :root.dark .skeleton-genre {
-      background: linear-gradient(
-        -45deg,
-        #2a2a2a 25%,
-        #3a3a3a 50%,
-        #2a2a2a 75%
-      );
-      background-size: 400% 400%;
-    }
-
-    .skeleton-stats {
-      display: flex;
-      gap: 12px;
-      margin-top: 8px;
-    }
-
-    .skeleton-stat {
-      height: 10px;
-      background: linear-gradient(
-        -45deg,
-        #e0e0e0 25%,
-        #f5f5f5 50%,
-        #e0e0e0 75%
-      );
-      background-size: 400% 400%;
-      animation: skeleton-wave 1.5s ease-in-out infinite;
-      animation-delay: 0.2s;
-      border-radius: 4px;
-      width: 40px;
-    }
-
-    :root.dark .skeleton-stat {
-      background: linear-gradient(
-        -45deg,
-        #2a2a2a 25%,
-        #3a3a3a 50%,
-        #2a2a2a 75%
-      );
-      background-size: 400% 400%;
-    }
-
-    @keyframes skeleton-wave {
-      0% {
-        background-position: 0% 50%;
-      }
-      50% {
-        background-position: 100% 50%;
-      }
-      100% {
-        background-position: 0% 50%;
-      }
-    }
-
-    /* Rating System Styles */
-    .rating-stars-container {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      padding: 20px 0;
-    }
-
-    .rating-star {
-      font-size: 40px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      color: #ddd;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .rating-star:hover {
-      transform: scale(1.15);
-    }
-
-    .rating-star.active {
-      color: #FFD700;
-      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-    }
-
-    .rating-star.hover {
-      color: #FFD700;
-      opacity: 0.7;
-    }
-
-    .rating-total-display {
-      text-align: center;
-      padding: 16px;
-      background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 193, 7, 0.15) 100%);
-      border-radius: 12px;
-      margin-bottom: 16px;
-    }
-
-    .rating-total-stars {
-      font-size: 28px;
-      font-weight: 700;
-      color: #FFD700;
-    }
-
-    .rating-total-label {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-top: 4px;
-    }
-
-    .rating-already-rated {
-      text-align: center;
-      padding: 20px;
-      background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(139, 195, 74, 0.15) 100%);
-      border-radius: 12px;
-      margin: 16px 0;
-    }
-
-    .rating-already-rated .check-icon {
-      font-size: 48px;
-      display: block;
-      margin-bottom: 12px;
-    }
-
-    .rating-already-rated .message {
-      font-size: 15px;
-      color: var(--text-secondary);
-      line-height: 1.5;
-    }
-
-    .rating-already-rated .your-rating {
-      font-size: 24px;
-      margin-top: 12px;
     }
 
     .comment-text {
@@ -1400,247 +941,9 @@
       background: linear-gradient(135deg, #45a049 0%, #388e3c 100%) !important;
       box-shadow: 0 6px 16px rgba(76, 175, 80, 0.5) !important;
     }
-
-    /* Daily Reward Button */
-    .daily-reward-btn {
-      background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
-      color: white !important;
-      border: none !important;
-      box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
-    }
-
-    .daily-reward-btn:hover {
-      background: linear-gradient(135deg, #F57C00 0%, #E65100 100%) !important;
-      box-shadow: 0 6px 16px rgba(255, 152, 0, 0.5) !important;
-    }
-
-    .daily-reward-btn.claimed {
-      background: linear-gradient(135deg, #9E9E9E 0%, #757575 100%);
-      box-shadow: none;
-      opacity: 0.7;
-    }
-
-    /* Favorites Button */
-    .favorite-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 24px;
-      padding: 8px;
-      transition: transform 0.2s ease;
-    }
-
-    .favorite-btn:hover {
-      transform: scale(1.2);
-    }
-
-    .favorite-btn.active {
-      animation: heartPulse 0.3s ease;
-    }
-
-    @keyframes heartPulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.3); }
-      100% { transform: scale(1); }
-    }
-
-    /* Transfer Button */
-    .transfer-btn {
-      background: linear-gradient(135deg, #00BCD4 0%, #0097A7 100%) !important;
-    }
-
-    .transfer-btn:hover {
-      background: linear-gradient(135deg, #00ACC1 0%, #00838F 100%) !important;
-    }
-
-    /* Like Button */
-    .like-btn {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 20px;
-      padding: 8px 16px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      font-family: 'Inter', sans-serif;
-      font-size: 14px;
-      color: var(--text-secondary);
-    }
-
-    .like-btn:hover {
-      border-color: #e91e63;
-      color: #e91e63;
-    }
-
-    .like-btn.liked {
-      background: linear-gradient(135deg, rgba(233, 30, 99, 0.1) 0%, rgba(233, 30, 99, 0.15) 100%);
-      border-color: #e91e63;
-      color: #e91e63;
-    }
-
-    .like-btn .like-icon {
-      font-size: 18px;
-      transition: transform 0.2s ease;
-    }
-
-    .like-btn.liked .like-icon {
-      animation: likeAnimation 0.3s ease;
-    }
-
-    @keyframes likeAnimation {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.4); }
-      100% { transform: scale(1); }
-    }
-
-    /* Download Links System */
-    .download-link-group {
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 12px;
-    }
-
-    .download-link-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-
-    .download-link-number {
-      font-weight: 600;
-      font-size: 14px;
-      color: var(--accent-primary);
-    }
-
-    .remove-link-btn {
-      background: rgba(244, 67, 54, 0.1);
-      border: 1px solid rgba(244, 67, 54, 0.3);
-      color: #f44336;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
-    }
-
-    .remove-link-btn:hover {
-      background: rgba(244, 67, 54, 0.2);
-      border-color: #f44336;
-    }
-
-    .add-link-btn {
-      width: 100%;
-      padding: 12px;
-      background: var(--bg-tertiary);
-      border: 2px dashed var(--border-color);
-      border-radius: 12px;
-      color: var(--accent-primary);
-      font-family: 'Inter', sans-serif;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      margin-top: 8px;
-    }
-
-    .add-link-btn:hover {
-      border-color: var(--accent-primary);
-      background: rgba(124, 77, 255, 0.1);
-    }
-
-    /* Download Section in Modal */
-    .download-section {
-      background: var(--bg-tertiary);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 12px;
-    }
-
-    .download-section-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 12px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .download-section-buttons {
-      display: flex;
-      gap: 12px;
-    }
-
-    .download-section-buttons .btn-main {
-      flex: 1;
-    }
-
-    /* Favorites Grid Item */
-    .favorites-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background: var(--bg-card);
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 12px;
-      border: 1px solid var(--border-color);
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .favorites-item:hover {
-      border-color: var(--accent-primary);
-      transform: translateX(4px);
-    }
-
-    .favorites-item img {
-      width: 50px;
-      height: 70px;
-      object-fit: cover;
-      border-radius: 6px;
-    }
-
-    .favorites-item-info {
-      flex: 1;
-    }
-
-    .favorites-item-title {
-      font-weight: 600;
-      font-size: 14px;
-      color: var(--text-primary);
-      margin-bottom: 4px;
-    }
-
-    .favorites-item-meta {
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    .favorites-item-remove {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 18px;
-      padding: 8px;
-      opacity: 0.6;
-      transition: opacity 0.2s;
-    }
-
-    .favorites-item-remove:hover {
-      opacity: 1;
-    }
   </style>
 </head>
-<body>
+<body onload="checarVersao()">
   <div class="header">
     <button class="menu-btn" onclick="toggleSidebar()">
       <svg viewBox="0 0 24 24"><path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/></svg>
@@ -1670,7 +973,7 @@
         <p><strong>Status:</strong> <span id="userStatus">-</span></p>
       </div>
       <div class="points-display">
-        Pontos: <span id="userPoints">0</span>
+       Meus Pontos: <span id="userPoints">0</span>
       </div>
     </div>
 
@@ -1691,7 +994,7 @@
 
     <button class="btn" id="manageBtn" onclick="openManageModal()" style="display: none;">
       <svg viewBox="0 0 24 24"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg>
-      Meus Jogos
+      Meus Post
     </button>
 
     <button class="btn" id="generateCodeBtn" onclick="openGenerateCodeModal()" style="display: none;">
@@ -1704,35 +1007,9 @@
       Gerenciar Usuários
     </button>
 
-    <button class="btn" id="sendNotificationBtn" onclick="openSendNotificationModal()" style="display: none;">
-      <svg viewBox="0 0 24 24"><path d="M20 17H4V10l8 5 8-5v7zm0-8l-8 5-8-5V7h16v2zm0-4H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2z"/></svg>
-      Enviar Notificação
-    </button>
-
-    <button class="btn notification-btn" id="viewNotificationsBtn" onclick="openNotificationsModal()" style="display: none;">
-      <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/></svg>
-      Notificações
-      <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
-    </button>
-
     <button class="btn earn-points-btn" id="earnPointsBtn" onclick="openEarnPointsModal()" style="display: none;">
       <svg viewBox="0 0 24 24" style="fill: white;"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
       Ganhar + Pontos
-    </button>
-
-    <button class="btn daily-reward-btn" id="dailyRewardBtn" onclick="claimDailyReward()" style="display: none;">
-      <svg viewBox="0 0 24 24" style="fill: white;"><path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 12 7.4l3.38 4.6L17 10.83 14.92 8H20v6z"/></svg>
-      <span id="dailyRewardText">Recompensa Diária</span>
-    </button>
-
-    <button class="btn" id="favoritesBtn" onclick="openFavoritesModal()" style="display: none;">
-      <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-      Meus Favoritos
-    </button>
-
-    <button class="btn transfer-btn" id="transferBtn" onclick="openTransferModal()" style="display: none;">
-      <svg viewBox="0 0 24 24"><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/></svg>
-      Transferir Pontos
     </button>
 
     <button class="btn" id="redeemCodeBtn" onclick="openRedeemCodeModal()">
@@ -1758,19 +1035,30 @@
     <button class="btn" id="logoutBtn" onclick="logout()" style="display: none;">
       <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
       Sair
-    </button>
-
-    <div style="border-top: 1px solid var(--border-color); margin: 12px 0; padding-top: 12px;">
-      <button class="btn" onclick="openFaqModal()">
-        <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
-        Sobre o App / FAQ
-      </button>
-      <button class="btn" onclick="openRatingModal()">
-        <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-        Avaliar o Aplicativo
-      </button>
-    </div>
+    </button>   
+<button class="btn" id="meuBotao" style="display:none;">
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" 
+       viewBox="0 0 24 24" aria-label="Android app icon" 
+       style="vertical-align:middle; margin-right:8px;">
+    <g fill="#3DDC84">
+      <rect x="5" y="7" width="14" height="8" rx="3"/>
+      <circle cx="9" cy="11" r="1.2" fill="#ffffff"/>
+      <circle cx="15" cy="11" r="1.2" fill="#ffffff"/>
+      <rect x="7" y="3" width="1.8" height="4" rx="0.9" transform="rotate(-25 7.9 5)"/>
+      <rect x="15.2" y="3" width="1.8" height="4" rx="0.9" transform="rotate(25 16.1 5)"/>
+      <rect x="6" y="13" width="12" height="7" rx="2"/>
+      <rect x="3" y="13" width="2" height="6" rx="1.2"/>
+      <rect x="19" y="13" width="2" height="6" rx="1.2"/>
+      <rect x="8" y="20" width="3" height="3" rx="1"/>
+      <rect x="13" y="20" width="3" height="3" rx="1"/>
+    </g>
+  </svg>
+  Baixar o Aplicativo
+</button>
   </div>
+  <span id="textoInstalar" class="btn" >
+    <small>Continue usando no nosso aplicativo </small> <strong id="instalarLink">Instalar</strong>
+  </span>
 
   <div id="search-container" class="search-container">
     <div class="search-wrapper">
@@ -1790,51 +1078,7 @@
 
   <div class="content-wrapper">
     <div class="grid" id="contentGrid">
-      <!-- Skeleton loading inicial -->
-      <div class="skeleton-card">
-        <div class="skeleton-poster"></div>
-        <div class="skeleton-info">
-          <div class="skeleton-title"></div>
-          <div class="skeleton-genre"></div>
-          <div class="skeleton-stats">
-            <div class="skeleton-stat"></div>
-            <div class="skeleton-stat"></div>
-          </div>
-        </div>
-      </div>
-      <div class="skeleton-card">
-        <div class="skeleton-poster"></div>
-        <div class="skeleton-info">
-          <div class="skeleton-title"></div>
-          <div class="skeleton-genre"></div>
-          <div class="skeleton-stats">
-            <div class="skeleton-stat"></div>
-            <div class="skeleton-stat"></div>
-          </div>
-        </div>
-      </div>
-      <div class="skeleton-card">
-        <div class="skeleton-poster"></div>
-        <div class="skeleton-info">
-          <div class="skeleton-title"></div>
-          <div class="skeleton-genre"></div>
-          <div class="skeleton-stats">
-            <div class="skeleton-stat"></div>
-            <div class="skeleton-stat"></div>
-          </div>
-        </div>
-      </div>
-      <div class="skeleton-card">
-        <div class="skeleton-poster"></div>
-        <div class="skeleton-info">
-          <div class="skeleton-title"></div>
-          <div class="skeleton-genre"></div>
-          <div class="skeleton-stats">
-            <div class="skeleton-stat"></div>
-            <div class="skeleton-stat"></div>
-          </div>
-        </div>
-      </div>
+      <div class="loading">Carregando...</div>
     </div>
 
     <div id="noResults" class="no-results" style="display: none;">
@@ -1844,19 +1088,6 @@
 
   <div id="overlay" class="overlay">
     <div class="modal">
-      <!-- Header fixo com voltar, título e compartilhar -->
-      <div class="content-header">
-        <button class="content-header-btn back-btn" onclick="closeModal()">
-          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-        </button>
-        <h1 class="content-header-title" id="contentHeaderTitle">Carregando...</h1>
-        <button class="favorite-btn" id="favoriteBtn" onclick="toggleFavorite()" title="Adicionar aos favoritos" style="padding: 8px;">
-          <svg id="favoriteIcon" viewBox="0 0 24 24" width="24" height="24" style="fill: #9e9e9e; transition: all 0.2s ease;"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-        </button>
-        <button class="content-header-btn share-btn" onclick="shareContent()">
-          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
-        </button>
-      </div>
       <div class="modal-header">
         <h2 class="modal-title" id="modalTitle">Título</h2>
         <div class="modal-meta" id="modalMeta"></div>
@@ -1865,7 +1096,7 @@
         <div id="videoContainer" class="video-container" style="display: none;"></div>
 
         <div id="insufficientPointsWarning" style="display: none;" class="insufficient-points">
-          ⚠️ Você não tem pontos suficientes para baixar este jogo!
+          ⚠️ Você não tem pontos suficientes para continuar!
         </div>
 
         <div class="info-comments-toggle">
@@ -1876,10 +1107,14 @@
         <div class="game-info active" id="gameInfo">
           <div class="modal-description" id="modalDescription"></div>
 
-          <!-- Container dinâmico para múltiplos links de download -->
-          <div id="downloadSectionsContainer"></div>
+          <div class="main-actions" id="mainActions">
+            <button id="btnGA" class="btn-main">Continuar Aqui</button>
+            <button id="btnADM" class="btn-main">Continuar Fora</button>
+          </div>
         </div>
-
+      <span class="modal-description">
+  Para abrir ou baixar o conteúdo, clique em um dos dois botões <strong>CONTINUAR</strong> acima.
+</span>  
         <div class="comments-section" id="commentsSection">
           <div id="commentInputWrapper" class="comment-input-wrapper" style="display: none;">
             <textarea id="commentInput" class="comment-input" placeholder="Escreva um comentário..."></textarea>
@@ -1888,13 +1123,7 @@
           <div id="commentsList"></div>
         </div>
 
-        <div style="display: flex; gap: 12px; align-items: center; justify-content: center; margin-top: 16px;">
-          <button class="like-btn" id="likeBtn" onclick="toggleLike()" title="Curtir este conteúdo">
-            <svg class="like-icon" id="likeIcon" viewBox="0 0 24 24" width="18" height="18" style="fill: currentColor;"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-            Curtir
-          </button>
-          <button class="btn-close" onclick="closeOverlay()">Voltar</button>
-        </div>
+        <button class="btn-close" onclick="window.open('index.html', '_blank')">Voltar</button>
       </div>
     </div>
   </div>
@@ -1927,7 +1156,7 @@
       <h2>Criar Conta</h2>
       <form id="registerForm" onsubmit="handleRegister(event)">
         <div class="form-group">
-          <label class="form-label">Nome Completo</label>
+          <label class="form-label">Primeiro e Ultimo Nome</label>
           <input type="text" class="form-input" id="registerName" placeholder="Seu nome" required>
         </div>
         <div class="form-group">
@@ -1948,17 +1177,6 @@
           <button type="submit" class="custom-modal-btn primary">Criar Conta</button>
         </div>
       </form>
-    </div>
-  </div>
-
-  <!-- Modal Verificação de Email -->
-  <div id="emailVerificationModal" class="custom-modal">
-    <div class="custom-modal-content" style="max-width: 450px;">
-      <h2>📧 Verificar Email</h2>
-
-      <div id="emailVerificationContent">
-        <!-- Content set dynamically -->
-      </div>
     </div>
   </div>
 
@@ -2026,26 +1244,14 @@
           <input type="url" class="form-input" id="gameVideo" placeholder="https://www.youtube.com/watch?v=...">
         </div>
 
-        <!-- Container de Links de Download -->
         <div class="form-group">
-          <label class="form-label">Links de Download</label>
-          <div id="downloadLinksContainer">
-            <!-- Link 1 - Principal -->
-            <div class="download-link-group" data-link-index="1">
-              <div class="download-link-header">
-                <span class="download-link-number">Link 1</span>
-                <button type="button" class="remove-link-btn" onclick="removeDownloadLink(1)" style="display: none;">✕</button>
-              </div>
-              <input type="text" class="form-input" placeholder="Descrição (ex: Jogo Principal, Emulador, ISO...)" id="linkDesc1" required>
-              <div style="display: flex; gap: 8px; margin-top: 8px;">
-                <input type="url" class="form-input" placeholder="Link G.A" id="linkGA1" required style="flex: 1;">
-                <input type="url" class="form-input" placeholder="Link ADM" id="linkADM1" required style="flex: 1;">
-              </div>
-            </div>
-          </div>
-          <button type="button" class="add-link-btn" onclick="addDownloadLink()">
-            + Adicionar mais um link de download
-          </button>
+          <label class="form-label">Link GA</label>
+          <input type="url" class="form-input" id="linkGA" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Link ADM</label>
+          <input type="url" class="form-input" id="linkADM" required>
         </div>
 
         <div class="form-group">
@@ -2063,7 +1269,7 @@
 
   <div id="manageModal" class="custom-modal">
     <div class="custom-modal-content">
-      <h2>Meus Jogos</h2>
+      <h2>Meus Post</h2>
       <div id="manageGamesList" class="loading">Carregando...</div>
       <div class="custom-modal-buttons" style="margin-top: 16px;">
         <button class="custom-modal-btn secondary" onclick="closeManageModal()">Fechar</button>
@@ -2110,7 +1316,7 @@
 
   <div id="historyModal" class="custom-modal">
     <div class="custom-modal-content">
-      <h2>Histórico de Jogos Visualizados</h2>
+      <h2>Histórico de Post Visualizados</h2>
       <div id="historyList"></div>
       <div class="custom-modal-buttons" style="margin-top: 16px;">
         <button class="custom-modal-btn secondary" onclick="clearHistory()" style="margin-right: auto;">Limpar Histórico</button>
@@ -2202,202 +1408,6 @@
     </div>
   </div>
 
-  <!-- Modal para enviar notificação (Admin) -->
-  <div id="sendNotificationModal" class="custom-modal">
-    <div class="custom-modal-content" style="max-width: 500px;">
-      <h2>📤 Enviar Notificação</h2>
-      <form id="sendNotificationForm" onsubmit="handleSendNotification(event)">
-        <div class="form-group">
-          <label class="form-label">Destinatário</label>
-          <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-              <input type="radio" name="notificationTarget" value="all" checked onchange="toggleUserSelector()">
-              <span>Todos os usuários</span>
-            </label>
-            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-              <input type="radio" name="notificationTarget" value="individual" onchange="toggleUserSelector()">
-              <span>Usuário específico</span>
-            </label>
-          </div>
-          <div id="userSelectorContainer" style="display: none;">
-            <select class="form-input" id="notificationTargetUser" style="width: 100%;">
-              <option value="">Carregando usuários...</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Título</label>
-          <input type="text" class="form-input" id="notificationTitle" placeholder="Título da notificação" required maxlength="100">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Mensagem</label>
-          <textarea class="form-input" id="notificationMessage" placeholder="Digite a mensagem..." required maxlength="500" rows="4" style="resize: vertical;"></textarea>
-        </div>
-        <div class="custom-modal-buttons">
-          <button type="button" class="custom-modal-btn secondary" onclick="closeSendNotificationModal()">Cancelar</button>
-          <button type="submit" class="custom-modal-btn primary" id="sendNotificationSubmitBtn">Enviar para Todos</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal para ver notificações (Usuário) -->
-  <div id="notificationsModal" class="custom-modal">
-    <div class="custom-modal-content" style="max-width: 500px;">
-      <h2>🔔 Minhas Notificações</h2>
-      <div id="notificationsList" style="max-height: 60vh; overflow-y: auto; padding: 8px 0;">Carregando...</div>
-      <div class="custom-modal-buttons" style="margin-top: 16px; justify-content: space-between;">
-        <button class="custom-modal-btn primary" onclick="markAllNotificationsAsRead()" id="markAllReadBtn">✓ Marcar todas como lidas</button>
-        <button class="custom-modal-btn secondary" onclick="closeNotificationsModal()">Fechar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal FAQ / Sobre o App -->
-  <div id="faqModal" class="custom-modal">
-    <div class="custom-modal-content" style="max-width: 550px;">
-      <h2>❓ Sobre o Portal Digital</h2>
-      <div style="max-height: 65vh; overflow-y: auto; padding: 8px 0;">
-
-        <div style="background: linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(156, 39, 176, 0.1) 100%); padding: 16px; border-radius: 12px; margin-bottom: 20px; text-align: center;">
-          <h3 style="margin: 0 0 8px 0; color: var(--text-primary);">🎮 Portal Digital</h3>
-          <p style="margin: 0; color: var(--text-secondary); font-size: 14px;">Sua plataforma de aplicativos, jogos e tutoriais</p>
-          <p style="margin: 8px 0 0 0; font-size: 12px; color: var(--text-muted);">Versão 2.0</p>
-        </div>
-
-        <div class="faq-item" style="margin-bottom: 16px;">
-          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;">📱 O que é o Portal Digital?</h4>
-          <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.5;">
-            O Portal Digital é uma plataforma onde você pode encontrar e baixar aplicativos, jogos, tutoriais e muito mais. Nosso objetivo é oferecer conteúdo de qualidade para todos os usuários.
-          </p>
-        </div>
-
-        <div class="faq-item" style="margin-bottom: 16px;">
-          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;">🔐 Como criar uma conta?</h4>
-          <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.5;">
-            Clique em "Criar Conta" no menu lateral, preencha seu nome, email (apenas Gmail) e senha. Sua conta ficará pendente até ser aprovada por um administrador.
-          </p>
-        </div>
-
-        <div class="faq-item" style="margin-bottom: 16px;">
-          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;">⭐ O que são os pontos?</h4>
-          <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.5;">
-            Pontos são a moeda virtual do Portal Digital. Você pode ganhar pontos assistindo anúncios ou resgatando códigos. Use os pontos para desbloquear downloads de conteúdos premium.
-          </p>
-        </div>
-
-        <div class="faq-item" style="margin-bottom: 16px;">
-          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;">📥 Como baixar um jogo/app?</h4>
-          <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.5;">
-            Clique no card do jogo/app desejado para ver os detalhes. Se tiver pontos suficientes, clique no botão de download. Você será redirecionado para o link de download.
-          </p>
-        </div>
-
-        <div class="faq-item" style="margin-bottom: 16px;">
-          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;">🔔 Como funcionam as notificações?</h4>
-          <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.5;">
-            Você receberá notificações sobre novos conteúdos, atualizações e mensagens importantes. Pode marcar como lida ou apagar as notificações a qualquer momento.
-          </p>
-        </div>
-
-        <div class="faq-item" style="margin-bottom: 16px;">
-          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;">💬 Posso comentar nos jogos?</h4>
-          <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.5;">
-            Sim! Usuários com conta verificada podem deixar comentários em qualquer jogo ou aplicativo. Você também pode apagar seus próprios comentários.
-          </p>
-        </div>
-
-        <div class="faq-item" style="margin-bottom: 16px;">
-          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;">📧 Contato e Suporte</h4>
-          <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.5;">
-            Para dúvidas, sugestões ou problemas, entre em contato com os administradores através das redes sociais ou aguarde uma notificação com informações de contato.
-          </p>
-        </div>
-
-      </div>
-      <div class="custom-modal-buttons" style="margin-top: 16px;">
-        <button class="custom-modal-btn primary" onclick="closeFaqModal()">Entendi!</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Avaliação do App -->
-  <div id="ratingModal" class="custom-modal">
-    <div class="custom-modal-content" style="max-width: 420px;">
-      <h2>⭐ Avaliar o Aplicativo</h2>
-
-      <div id="ratingContent">
-        <!-- Content will be set dynamically -->
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Confirmação de Avaliação -->
-  <div id="ratingConfirmModal" class="custom-modal">
-    <div class="custom-modal-content" style="max-width: 400px;">
-      <h2>✅ Confirmar Avaliação</h2>
-      <p style="color: var(--text-secondary); font-size: 15px; line-height: 1.6; margin: 16px 0;">
-        Você confirma sua avaliação de <strong id="confirmStarsText">0 estrelas</strong> para o aplicativo?
-      </p>
-      <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">
-        ⚠️ Essa avaliação não poderá ser alterada depois.
-      </p>
-      <div id="bonusPointsInfo" style="display: none; background: linear-gradient(135deg, rgba(76, 175, 80, 0.15) 0%, rgba(139, 195, 74, 0.15) 100%); padding: 12px; border-radius: 8px; margin-bottom: 16px; text-align: center;">
-        <span style="font-size: 14px; color: #4CAF50; font-weight: 600;">🎁 Você receberá <span id="bonusPointsAmount">0</span> pontos de bônus!</span>
-      </div>
-      <div class="custom-modal-buttons">
-        <button class="custom-modal-btn primary" onclick="confirmRating()">Confirmar</button>
-        <button class="custom-modal-btn secondary" onclick="cancelRatingConfirm()">Cancelar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Favoritos -->
-  <div id="favoritesModal" class="custom-modal">
-    <div class="custom-modal-content" style="max-width: 500px;">
-      <h2>
-        <svg viewBox="0 0 24 24" width="24" height="24" style="fill: #e91e63; vertical-align: middle; margin-right: 8px;"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-        Meus Favoritos
-      </h2>
-      <div id="favoritesList" style="max-height: 60vh; overflow-y: auto; padding: 8px 0;">
-        <p style="color: var(--text-muted); text-align: center;">Carregando...</p>
-      </div>
-      <div class="custom-modal-buttons" style="margin-top: 16px;">
-        <button class="custom-modal-btn secondary" onclick="closeFavoritesModal()">Fechar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Transferência de Pontos -->
-  <div id="transferModal" class="custom-modal">
-    <div class="custom-modal-content" style="max-width: 450px;">
-      <h2>
-        <svg viewBox="0 0 24 24" width="24" height="24" style="fill: #00BCD4; vertical-align: middle; margin-right: 8px;"><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/></svg>
-        Transferir Pontos
-      </h2>
-      <div id="transferInfo" style="background: var(--bg-tertiary); padding: 12px; border-radius: 8px; margin-bottom: 16px;">
-        <p style="margin: 0; color: var(--text-secondary); font-size: 14px;">
-          Seus pontos: <strong id="transferCurrentPoints" style="color: var(--accent-primary);">0</strong>
-        </p>
-        <p id="transferMinInfo" style="margin: 8px 0 0 0; color: var(--text-muted); font-size: 12px;"></p>
-      </div>
-      <form id="transferForm" onsubmit="handleTransfer(event)">
-        <div class="form-group">
-          <label class="form-label">Email do destinatário</label>
-          <input type="email" class="form-input" id="transferEmail" placeholder="email@gmail.com" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Quantidade de pontos</label>
-          <input type="number" class="form-input" id="transferAmount" min="1" placeholder="Ex: 50" required>
-        </div>
-        <div class="custom-modal-buttons">
-          <button type="button" class="custom-modal-btn secondary" onclick="closeTransferModal()">Cancelar</button>
-          <button type="submit" class="custom-modal-btn primary">Transferir</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
   <div id="adOverlay" class="ad-overlay">
     <div class="ad-header">
       <div class="ad-title" id="adDisplayTitle">Carregando anúncio...</div>
@@ -2427,7 +1437,7 @@
     setInterval(applyTheme, 60000);
 
     // Global state
-    const PUBLISHER_EMAILS = ['sibemcesar@gmail.com', 'portaldigitalao@gmail.com'];
+    const PUBLISHER_EMAILS = ['sibemcesar@gmail.com', 'sibemcesar02@gmail.com'];
     let currentUser = null;
     let isPublisher = false;
     let allGames = {};
@@ -2436,7 +1446,6 @@
     let searchTerm = '';
     let userPoints = 0;
     let userStatus = 'pending';
-    let gamesLoaded = false;
     let userName = '';
     let currentGameData = null;
     let historyData = [];
@@ -2534,13 +1543,13 @@
 
       if (userStatusEl) {
         if (isPublisher) {
-          userStatusEl.innerHTML = '<span style="color: #9c27b0; font-weight: 600;">👑 Publicador</span>';
+          userStatusEl.innerHTML = '<span style="color: #9c27b0; font-weight: 600;"> Publicador</span>';
         } else if (userStatus === 'approved') {
-          userStatusEl.innerHTML = '<span style="color: #4CAF50; font-weight: 600;">✓ Verificado</span>';
+          userStatusEl.innerHTML = '<span style="color: #4CAF50; font-weight: 600;"> Verificado</span>';
         } else if (userStatus === 'pending') {
-          userStatusEl.innerHTML = '<span style="color: #ff9800; font-weight: 600;">⏳ Pendente</span> <button onclick="showVerifyEmailOption()" style="background: #2196F3; color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; margin-left: 8px;">Verificar Agora</button>';
+          userStatusEl.innerHTML = '<span style="color: #ff9800; font-weight: 600;"> Pendente</span>';
         } else if (userStatus === 'rejected') {
-          userStatusEl.innerHTML = '<span style="color: #f44336; font-weight: 600;">✗ Bloqueado</span>';
+          userStatusEl.innerHTML = '<span style="color: #f44336; font-weight: 600;"> Bloqueado</span>';
         }
       }
     }
@@ -2577,15 +1586,10 @@
       const manageBtn = document.getElementById('manageBtn');
       const generateCodeBtn = document.getElementById('generateCodeBtn');
       const manageUsersBtn = document.getElementById('manageUsersBtn');
-      const sendNotificationBtn = document.getElementById('sendNotificationBtn');
-      const viewNotificationsBtn = document.getElementById('viewNotificationsBtn');
       const publishAdBtn = document.getElementById('publishAdBtn');
       const manageAdBtn = document.getElementById('manageAdBtn');
       const earnPointsBtn = document.getElementById('earnPointsBtn');
       const logoutBtn = document.getElementById('logoutBtn');
-      const dailyRewardBtn = document.getElementById('dailyRewardBtn');
-      const favoritesBtn = document.getElementById('favoritesBtn');
-      const transferBtn = document.getElementById('transferBtn');
 
       if (!currentUser || currentUser.isAnonymous) {
         // Anonymous mode - viewing only
@@ -2596,14 +1600,9 @@
         manageBtn.style.display = 'none';
         generateCodeBtn.style.display = 'none';
         manageUsersBtn.style.display = 'none';
-        sendNotificationBtn.style.display = 'none';
-        viewNotificationsBtn.style.display = 'none';
         publishAdBtn.style.display = 'none';
         manageAdBtn.style.display = 'none';
         earnPointsBtn.style.display = 'none';
-        dailyRewardBtn.style.display = 'none';
-        favoritesBtn.style.display = 'none';
-        transferBtn.style.display = 'none';
         logoutBtn.style.display = 'none';
       } else {
         // Logged in user
@@ -2613,38 +1612,18 @@
         registerBtn.style.display = 'none';
         logoutBtn.style.display = 'flex';
 
-        // Show earn points, daily reward and favorites for approved users or publishers
+        // Show earn points only for approved users or publishers
         if (userStatus === 'approved' || isPublisher) {
           earnPointsBtn.style.display = 'flex';
-          dailyRewardBtn.style.display = 'flex';
-          favoritesBtn.style.display = 'flex';
-          // Load favorites, likes and check daily reward
-          loadUserFavorites();
-          loadUserLikes();
-          checkDailyReward();
-
-          // Show transfer button: ADMs always, regular users need 300+ points
-          if (isPublisher || userPoints >= 300) {
-            transferBtn.style.display = 'flex';
-          } else {
-            transferBtn.style.display = 'none';
-          }
         } else {
           earnPointsBtn.style.display = 'none';
-          dailyRewardBtn.style.display = 'none';
-          favoritesBtn.style.display = 'none';
-          transferBtn.style.display = 'none';
         }
-
-        // Show notifications for all logged in users
-        viewNotificationsBtn.style.display = 'flex';
 
         if (isPublisher) {
           publishBtn.style.display = 'flex';
           manageBtn.style.display = 'flex';
           generateCodeBtn.style.display = 'flex';
           manageUsersBtn.style.display = 'flex';
-          sendNotificationBtn.style.display = 'flex';
           publishAdBtn.style.display = 'flex';
           manageAdBtn.style.display = 'flex';
         } else {
@@ -2652,65 +1631,24 @@
           manageBtn.style.display = 'none';
           generateCodeBtn.style.display = 'none';
           manageUsersBtn.style.display = 'none';
-          sendNotificationBtn.style.display = 'none';
           publishAdBtn.style.display = 'none';
           manageAdBtn.style.display = 'none';
         }
 
         updateUserInfoDisplay();
-        loadNotifications();
       }
     }
 
     // Load games
     async function loadGames() {
-      const { collection, getDocs, onSnapshot, query, orderBy } = window.firebaseModules;
-      const firestore = window.firebaseFirestore;
+      const { ref, onValue } = window.firebaseModules;
+      const database = window.firebaseDatabase;
 
-      // Show skeleton loading initially
-      renderSkeletonLoading();
-
-      // Use Firestore for games (cached, less bandwidth)
-      const gamesRef = collection(firestore, 'games');
-      const gamesQuery = query(gamesRef, orderBy('downloads', 'desc'));
-
-      // Use onSnapshot for real-time updates but with Firestore's built-in caching
-      onSnapshot(gamesQuery, (snapshot) => {
-        allGames = {};
-        snapshot.forEach((doc) => {
-          allGames[doc.id] = doc.data();
-        });
-        gamesLoaded = true;
+      const gamesRef = ref(database, 'games');
+      onValue(gamesRef, (snapshot) => {
+        allGames = snapshot.val() || {};
         renderGrid();
-        // Check if URL has game ID to auto-open content
-        checkUrlForGameId();
-      }, (error) => {
-        console.error('Erro ao carregar jogos:', error);
-        // Fallback: try to load once without listener
-        loadGamesOnce();
       });
-    }
-
-    // Fallback function to load games once (without real-time)
-    async function loadGamesOnce() {
-      const { collection, getDocs, query, orderBy } = window.firebaseModules;
-      const firestore = window.firebaseFirestore;
-
-      try {
-        const gamesRef = collection(firestore, 'games');
-        const gamesQuery = query(gamesRef, orderBy('downloads', 'desc'));
-        const snapshot = await getDocs(gamesQuery);
-
-        allGames = {};
-        snapshot.forEach((doc) => {
-          allGames[doc.id] = doc.data();
-        });
-        gamesLoaded = true;
-        renderGrid();
-        checkUrlForGameId();
-      } catch (error) {
-        console.error('Erro ao carregar jogos (fallback):', error);
-      }
     }
 
     // History management with localStorage (via window)
@@ -2757,41 +1695,9 @@
     }
 
     // Render grid
-    function renderSkeletonLoading() {
-      const grid = document.getElementById('contentGrid');
-      grid.style.display = 'grid';
-      grid.innerHTML = '';
-
-      for (let i = 0; i < 4; i++) {
-        const skeleton = document.createElement('div');
-        skeleton.className = 'skeleton-card';
-        skeleton.style.animationDelay = `${i * 0.1}s`;
-        skeleton.innerHTML = `
-          <div class="skeleton-poster"></div>
-          <div class="skeleton-info">
-            <div class="skeleton-title"></div>
-            <div class="skeleton-genre"></div>
-            <div class="skeleton-stats">
-              <div class="skeleton-stat"></div>
-              <div class="skeleton-stat"></div>
-            </div>
-          </div>
-        `;
-        grid.appendChild(skeleton);
-      }
-    }
-
     function renderGrid() {
       const grid = document.getElementById('contentGrid');
       const noResults = document.getElementById('noResults');
-
-      // Show skeleton loading if games haven't loaded yet
-      if (!gamesLoaded) {
-        renderSkeletonLoading();
-        noResults.style.display = 'none';
-        return;
-      }
-
       grid.innerHTML = '';
 
       let gamesArray = Object.entries(allGames).map(([id, game]) => ({
@@ -2878,12 +1784,6 @@
       addToHistory(id);
       currentGameData = { ...game, id: id };
 
-      // Update URL with game ID
-      const newUrl = window.location.pathname + '?id=' + id;
-      window.history.pushState({ gameId: id }, game.titulo, newUrl);
-
-      // Update header title
-      document.getElementById('contentHeaderTitle').textContent = game.titulo;
       document.getElementById('modalTitle').textContent = game.titulo;
       document.getElementById('modalMeta').innerHTML = `
         <div class="modal-meta-item">
@@ -2897,10 +1797,6 @@
         <div class="modal-meta-item">
           <span class="modal-meta-label">Downloads:</span>
           <span>${game.downloads || 0}</span>
-        </div>
-        <div class="modal-meta-item">
-          <span class="modal-meta-label">Curtidas:</span>
-          <span id="likeCountMeta">0</span>
         </div>
         <div class="modal-meta-item">
           <span class="modal-meta-label">Custo:</span>
@@ -2933,63 +1829,17 @@
         insufficientWarning.style.display = 'none';
       }
 
-      // Setup download buttons - support both new and legacy format
-      const downloadContainer = document.getElementById('downloadSectionsContainer');
-      let links = [];
+      // Setup download buttons
+      const btnGA = document.getElementById('btnGA');
+      const btnADM = document.getElementById('btnADM');
 
-      if (game.downloadLinks && game.downloadLinks.length > 0) {
-        links = game.downloadLinks;
-      } else {
-        // Legacy format
-        links = [{
-          desc: 'Download',
-          linkGA: game.linkGA || '',
-          linkADM: game.linkADM || ''
-        }];
-      }
+      const newBtnGA = btnGA.cloneNode(true);
+      const newBtnADM = btnADM.cloneNode(true);
+      btnGA.parentNode.replaceChild(newBtnGA, btnGA);
+      btnADM.parentNode.replaceChild(newBtnADM, btnADM);
 
-      downloadContainer.innerHTML = links.map((link, index) => {
-        const hasGA = link.linkGA && link.linkGA.trim() !== '';
-        const hasADM = link.linkADM && link.linkADM.trim() !== '';
-
-        // Se nenhum link disponível, mostrar mensagem
-        if (!hasGA && !hasADM) {
-          return `
-            <div class="download-section">
-              <div class="download-section-title">${link.desc || 'Download'}</div>
-              <div class="download-section-buttons">
-                <span style="color: var(--text-muted); font-size: 14px;">Links não disponíveis</span>
-              </div>
-            </div>
-          `;
-        }
-
-        return `
-          <div class="download-section">
-            <div class="download-section-title">${link.desc || 'Download'}</div>
-            <div class="download-section-buttons">
-              ${hasGA ? `<button class="btn-main download-btn" data-game-id="${id}" data-app-type="GA" data-link-index="${index}" data-cost="${cost}">Baixar G.A</button>` : ''}
-              ${hasADM ? `<button class="btn-main download-btn" data-game-id="${id}" data-app-type="ADM" data-link-index="${index}" data-cost="${cost}">Baixar ADM</button>` : ''}
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      // Store links data for download buttons
-      window.currentDownloadLinks = links;
-
-      // Add event listeners to download buttons
-      downloadContainer.querySelectorAll('.download-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const gameId = this.dataset.gameId;
-          const appType = this.dataset.appType;
-          const linkIndex = parseInt(this.dataset.linkIndex);
-          const cost = parseInt(this.dataset.cost);
-          const linkData = window.currentDownloadLinks[linkIndex];
-          const url = appType === 'GA' ? linkData.linkGA : linkData.linkADM;
-          downloadGame(gameId, appType, url, cost);
-        });
-      });
+      newBtnGA.addEventListener('click', () => downloadGame(id, 'GA', game.linkGA, cost));
+      newBtnADM.addEventListener('click', () => downloadGame(id, 'ADM', game.linkADM, cost));
 
       // Load comments
       loadComments(id);
@@ -3001,11 +1851,6 @@
       } else {
         commentInputWrapper.style.display = 'none';
       }
-
-      // Load likes for this game and update buttons
-      await loadGameLikes(id);
-      updateLikeButton();
-      updateFavoriteButton();
 
       showGameInfo();
       document.getElementById('overlay').classList.add('active');
@@ -3033,146 +1878,31 @@
         return;
       }
 
-      // Verificar se a URL é válida ANTES de deduzir pontos
-      if (!url || url.trim() === '') {
-        showCustomAlert('Erro: Link de download não disponível. Por favor, tente o outro botão ou entre em contato com o administrador.');
-        return;
-      }
+      // Deduct points
+      await updateUserPoints(userPoints - cost);
 
-      // PRIMEIRO: Fazer todas as operações de banco de dados ANTES de abrir o link
-      // Isso garante que o contador seja incrementado mesmo se o navegador redirecionar
+      // Increment download count
+      const { ref, get, set } = window.firebaseModules;
+      const database = window.firebaseDatabase;
+      const gameRef = ref(database, `games/${gameId}/downloads`);
+      const snapshot = await get(gameRef);
+      const currentDownloads = snapshot.exists() ? snapshot.val() : 0;
+      await set(gameRef, currentDownloads + 1);
 
-      // Deduzir pontos primeiro
-      try {
-        await updateUserPoints(userPoints - cost);
-      } catch (error) {
-        console.error('Erro ao deduzir pontos:', error);
-      }
-
-      // Incrementar contador de downloads usando Realtime Database
-      // A regra games/$gameId/downloads permite escrita por usuários autenticados
-      try {
-        const { ref, get, set } = window.firebaseModules;
-        const database = window.firebaseDatabase;
-        const downloadsRef = ref(database, `games/${gameId}/downloads`);
-
-        // Buscar o valor atual e incrementar
-        const snapshot = await get(downloadsRef);
-        const currentDownloads = snapshot.exists() ? (snapshot.val() || 0) : 0;
-        await set(downloadsRef, currentDownloads + 1);
-        console.log('Download count incrementado para:', gameId, '- Novo valor:', currentDownloads + 1);
-
-        // Atualizar o contador local para exibição imediata
-        if (allGames[gameId]) {
-          allGames[gameId].downloads = currentDownloads + 1;
-        }
-      } catch (error) {
-        console.error('Erro ao incrementar downloads:', error.message || error);
-      }
-
-      // AGORA abrir o link (depois que todas as operações de banco terminaram)
-      const downloadWindow = window.open(url, '_blank');
-
-      // Fallback: criar link temporário para download (não interrompe o script)
-      if (!downloadWindow || downloadWindow.closed || typeof downloadWindow.closed === 'undefined') {
-        const tempLink = document.createElement('a');
-        tempLink.href = url;
-        tempLink.target = '_blank';
-        tempLink.rel = 'noopener noreferrer';
-        document.body.appendChild(tempLink);
-        tempLink.click();
-        document.body.removeChild(tempLink);
-      }
-
-      // Chamar Android interface se disponível
+      // Open link
+      window.location.assign(url);
       setTimeout(function(){
         if (typeof Android !== "undefined" && Android.openApp) {
           Android.openApp(appType);
         }
       }, 200);
 
-      showCustomAlert(`Download iniciado! ${cost} pontos deduzidos. Pontos restantes: ${userPoints - cost}`);
+      showCustomAlert(`Download iniciado! ${cost} pontos deduzidos. Pontos restantes: ${userPoints}`);
     }
 
     function closeOverlay() {
       document.getElementById('overlay').classList.remove('active');
       currentGameData = null;
-
-      // Stop video player - clear iframe to stop audio
-      const videoContainer = document.getElementById('videoContainer');
-      if (videoContainer) {
-        videoContainer.innerHTML = '';
-        videoContainer.style.display = 'none';
-      }
-
-      // Remove ID from URL
-      const newUrl = window.location.pathname;
-      window.history.pushState({}, document.title, newUrl);
-    }
-
-    // Alias for closeOverlay (used by header back button)
-    function closeModal() {
-      closeOverlay();
-    }
-
-    // Share content function
-    function shareContent() {
-      if (!currentGameData) return;
-
-      const shareUrl = window.location.href;
-
-      // Try to use native share API first (mobile)
-      if (navigator.share) {
-        navigator.share({
-          title: currentGameData.titulo,
-          text: `Confira ${currentGameData.titulo} no Portal Digital!`,
-          url: shareUrl
-        }).catch(err => {
-          // If share fails, copy to clipboard
-          copyToClipboard(shareUrl);
-        });
-      } else {
-        // Fallback: copy to clipboard
-        copyToClipboard(shareUrl);
-      }
-    }
-
-    function copyToClipboard(text) {
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(text).then(() => {
-          showCustomAlert('Link copiado! Agora você pode compartilhar.');
-        }).catch(() => {
-          fallbackCopyToClipboard(text);
-        });
-      } else {
-        fallbackCopyToClipboard(text);
-      }
-    }
-
-    function fallbackCopyToClipboard(text) {
-      const textArea = document.createElement('textarea');
-      textArea.value = text;
-      textArea.style.position = 'fixed';
-      textArea.style.left = '-9999px';
-      document.body.appendChild(textArea);
-      textArea.select();
-      try {
-        document.execCommand('copy');
-        showCustomAlert('Link copiado! Agora você pode compartilhar.');
-      } catch (err) {
-        showCustomAlert('Erro ao copiar link.');
-      }
-      document.body.removeChild(textArea);
-    }
-
-    // Check URL for game ID on page load
-    function checkUrlForGameId() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const gameId = urlParams.get('id');
-
-      if (gameId && allGames[gameId]) {
-        openGameDetail(gameId);
-      }
     }
 
     // Comments
@@ -3219,7 +1949,9 @@
       commentsList.innerHTML = commentsArray.map(comment => {
         const authorDisplayName = comment.authorName || comment.authorEmail.split('@')[0];
         const isAuthor = currentUserId && comment.authorId === currentUserId;
-        const deleteBtn = isAuthor ? `<button class="comment-delete-btn" onclick="deleteComment('${currentGameData.id}', '${comment.id}')" title="Apagar comentário">🗑️</button>` : '';
+        const deleteBtn = isAuthor ? `<button class="comment-delete-btn" onclick="deleteComment('${currentGameData.id}', '${comment.id}')" title="Apagar comentário"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="red" viewBox="0 0 24 24">
+  <path d="M3 6h18v2H3V6zm2 3h14l-1.5 12.5a1 1 0 0 1-1 .5H7.5a1 1 0 0 1-1-.5L5 9zm5 2v8h2v-8H10zm4 0v8h2v-8h-2zM9 4V2h6v2h5v2H4V4h5z"/>
+</svg></button>` : '';
 
         return `
           <div class="comment-item">
@@ -3346,14 +2078,6 @@
         return;
       }
 
-      // Get download links data
-      const downloadLinks = getDownloadLinksData();
-
-      if (downloadLinks.length === 0) {
-        showCustomAlert('Por favor, adicione pelo menos um link de download.');
-        return;
-      }
-
       const editId = document.getElementById('editGameId').value;
       const gameData = {
         type: document.getElementById('gameType').value,
@@ -3363,10 +2087,8 @@
         descricao: document.getElementById('gameDescription').value,
         poster: document.getElementById('gamePoster').value,
         videoUrl: document.getElementById('gameVideo').value || '',
-        downloadLinks: downloadLinks, // New: Array of download links
-        // Keep legacy fields for backwards compatibility
-        linkGA: downloadLinks[0]?.linkGA || '',
-        linkADM: downloadLinks[0]?.linkADM || '',
+        linkGA: document.getElementById('linkGA').value,
+        linkADM: document.getElementById('linkADM').value,
         cost: parseInt(document.getElementById('gameCost').value),
         authorId: currentUser.uid,
         authorEmail: currentUser.email,
@@ -3375,16 +2097,17 @@
       };
 
       try {
-        const { collection, doc, setDoc, addDoc } = window.firebaseModules;
-        const firestore = window.firebaseFirestore;
+        const { ref, set, push } = window.firebaseModules;
+        const database = window.firebaseDatabase;
 
         if (editId) {
           const existingGame = allGames[editId];
           gameData.downloads = existingGame.downloads || 0;
-          await setDoc(doc(firestore, 'games', editId), gameData);
+          await set(ref(database, `games/${editId}`), gameData);
           showCustomAlert('Jogo atualizado com sucesso!');
         } else {
-          await addDoc(collection(firestore, 'games'), gameData);
+          const newRef = push(ref(database, 'games'));
+          await set(newRef, gameData);
           showCustomAlert('Jogo publicado com sucesso!');
         }
 
@@ -3445,29 +2168,18 @@
       document.getElementById('gameDescription').value = game.descricao;
       document.getElementById('gamePoster').value = game.poster;
       document.getElementById('gameVideo').value = game.videoUrl || '';
+      document.getElementById('linkGA').value = game.linkGA;
+      document.getElementById('linkADM').value = game.linkADM;
       document.getElementById('gameCost').value = game.cost;
 
-      // Load download links - support both new and legacy format
-      if (game.downloadLinks && game.downloadLinks.length > 0) {
-        setDownloadLinksData(game.downloadLinks);
-      } else {
-        // Legacy format: convert to new format
-        setDownloadLinksData([{
-          desc: 'Download Principal',
-          linkGA: game.linkGA || '',
-          linkADM: game.linkADM || ''
-        }]);
-      }
-
-      document.getElementById('publishModal').classList.add('active');
+      openPublishModal();
     }
 
     async function deleteGame(id) {
       showCustomConfirm('Deseja realmente apagar este jogo?', async () => {
         try {
-          const { doc, deleteDoc } = window.firebaseModules;
-          const firestore = window.firebaseFirestore;
-          await deleteDoc(doc(firestore, 'games', id));
+          const { ref, remove } = window.firebaseModules;
+          await remove(ref(window.firebaseDatabase, `games/${id}`));
           showCustomAlert('Jogo apagado com sucesso!');
           openManageModal();
         } catch (error) {
@@ -3557,23 +2269,6 @@
       document.getElementById('sidebar').classList.toggle('open');
     }
 
-    function closeSidebar() {
-      document.getElementById('sidebar').classList.remove('open');
-    }
-
-    // Close sidebar when clicking outside
-    document.addEventListener('click', function(event) {
-      const sidebar = document.getElementById('sidebar');
-      const menuBtn = document.querySelector('.menu-btn');
-
-      // Check if sidebar is open and click is outside sidebar and menu button
-      if (sidebar.classList.contains('open')) {
-        if (!sidebar.contains(event.target) && !menuBtn.contains(event.target)) {
-          closeSidebar();
-        }
-      }
-    });
-
     function toggleSearch() {
       const box = document.getElementById('search-container');
       box.style.display = box.style.display === 'none' || box.style.display === '' ? 'flex' : 'none';
@@ -3600,294 +2295,6 @@
     function closeRegisterModal() {
       document.getElementById('registerModal').classList.remove('active');
       document.getElementById('registerForm').reset();
-    }
-
-    // Email Verification System with Firebase Link
-    let verificationCheckInterval = null;
-
-    function showEmailVerificationOptions(email) {
-      const container = document.getElementById('emailVerificationContent');
-      container.innerHTML = `
-        <div style="text-align: center; padding: 16px 0;">
-          <div style="font-size: 48px; margin-bottom: 16px;">✅</div>
-          <p style="color: var(--text-primary); font-size: 16px; font-weight: 600; margin-bottom: 8px;">
-            Conta criada com sucesso!
-          </p>
-          <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 20px;">
-            Sua conta está aguardando aprovação do administrador.
-          </p>
-
-          <div style="background: linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(33, 150, 243, 0.15) 100%); padding: 16px; border-radius: 12px; margin-bottom: 16px;">
-            <p style="color: var(--text-primary); font-size: 14px; margin-bottom: 12px;">
-              <strong>💡 Quer verificar sua conta agora?</strong>
-            </p>
-            <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 8px;">
-              Enviaremos um link de verificação para seu email.
-            </p>
-            <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 16px;">
-              🎁 Verificação por email: +10 pontos<br>
-              👑 Aprovação pelo ADM: +100 pontos
-            </p>
-            <button class="custom-modal-btn primary" onclick="sendVerificationLink()" style="width: 100%;">
-              📧 Enviar Link de Verificação
-            </button>
-          </div>
-
-          <div class="custom-modal-buttons" style="margin-top: 16px;">
-            <button class="custom-modal-btn secondary" onclick="closeEmailVerificationModal()">Aguardar Aprovação do ADM</button>
-          </div>
-        </div>
-      `;
-      document.getElementById('emailVerificationModal').classList.add('active');
-    }
-
-    async function sendVerificationLink() {
-      const auth = window.firebaseAuth;
-      const user = auth.currentUser;
-
-      if (!user) {
-        showCustomAlert('Erro: usuário não encontrado.');
-        return;
-      }
-
-      const container = document.getElementById('emailVerificationContent');
-      container.innerHTML = `
-        <div style="text-align: center; padding: 20px 0;">
-          <div style="font-size: 32px; margin-bottom: 16px;">⏳</div>
-          <p style="color: var(--text-secondary);">Enviando link de verificação...</p>
-        </div>
-      `;
-
-      try {
-        const { sendEmailVerification } = window.firebaseModules;
-        await sendEmailVerification(user);
-
-        showVerificationLinkSent(user.email);
-
-      } catch (error) {
-        console.error('Erro ao enviar email:', error);
-        let errorMsg = 'Erro ao enviar email de verifica��ão.';
-        if (error.code === 'auth/too-many-requests') {
-          errorMsg = 'Muitas tentativas. Aguarde alguns minutos e tente novamente.';
-        }
-        container.innerHTML = `
-          <div style="text-align: center; padding: 20px 0;">
-            <div style="font-size: 48px; margin-bottom: 16px;">❌</div>
-            <p style="color: var(--text-primary); font-size: 15px; margin-bottom: 16px;">${errorMsg}</p>
-            <div class="custom-modal-buttons">
-              <button class="custom-modal-btn primary" onclick="sendVerificationLink()">Tentar Novamente</button>
-              <button class="custom-modal-btn secondary" onclick="closeEmailVerificationModal()">Fechar</button>
-            </div>
-          </div>
-        `;
-      }
-    }
-
-    function showVerificationLinkSent(email) {
-      const container = document.getElementById('emailVerificationContent');
-      container.innerHTML = `
-        <div style="text-align: center; padding: 16px 0;">
-          <div style="font-size: 48px; margin-bottom: 16px;">📬</div>
-          <p style="color: var(--text-primary); font-size: 16px; font-weight: 600; margin-bottom: 8px;">
-            Email Enviado!
-          </p>
-          <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 20px;">
-            Enviamos um link de verificação para:<br>
-            <strong style="color: var(--text-primary);">${email}</strong>
-          </p>
-
-          <div style="background: var(--bg-card); padding: 16px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 16px;">
-            <p style="color: var(--text-primary); font-size: 14px; font-weight: 600; margin-bottom: 8px;">
-              📌 Instruções:
-            </p>
-            <ol style="color: var(--text-secondary); font-size: 13px; text-align: left; padding-left: 20px; margin: 0;">
-              <li style="margin-bottom: 6px;">Abra seu email (verifique também a pasta de spam)</li>
-              <li style="margin-bottom: 6px;">Clique no link de verificação do Firebase</li>
-              <li style="margin-bottom: 6px;">Volte aqui e clique em "Já Verifiquei"</li>
-            </ol>
-          </div>
-
-          <button class="custom-modal-btn primary" onclick="checkEmailVerification()" style="width: 100%; margin-bottom: 12px;" id="verifyCheckBtn">
-            ✅ Já Verifiquei meu Email
-          </button>
-
-          <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 12px;">
-            Não recebeu o email?
-          </p>
-          <button class="custom-modal-btn secondary" onclick="resendVerificationLink()" id="resendEmailBtn" style="font-size: 13px;">
-            📧 Reenviar Email
-          </button>
-
-          <div style="margin-top: 16px; border-top: 1px solid var(--border-color); padding-top: 16px;">
-            <button class="custom-modal-btn secondary" onclick="closeEmailVerificationModal()" style="font-size: 13px;">
-              Verificar Depois
-            </button>
-          </div>
-        </div>
-      `;
-    }
-
-    async function resendVerificationLink() {
-      const auth = window.firebaseAuth;
-      const user = auth.currentUser;
-
-      if (!user) {
-        showCustomAlert('Erro: usuário não encontrado. Faça login novamente.');
-        return;
-      }
-
-      const btn = document.getElementById('resendEmailBtn');
-      if (btn) {
-        btn.disabled = true;
-        btn.textContent = 'Enviando...';
-      }
-
-      try {
-        const { sendEmailVerification } = window.firebaseModules;
-        await sendEmailVerification(user);
-        showCustomAlert('Email de verificação reenviado! Verifique sua caixa de entrada.');
-        if (btn) {
-          btn.textContent = 'Email Reenviado ✓';
-          setTimeout(() => {
-            btn.disabled = false;
-            btn.textContent = '📧 Reenviar Email';
-          }, 30000);
-        }
-      } catch (error) {
-        console.error('Erro ao reenviar email:', error);
-        if (error.code === 'auth/too-many-requests') {
-          showCustomAlert('Muitas tentativas. Aguarde alguns minutos.');
-        } else {
-          showCustomAlert('Erro ao reenviar email. Tente novamente.');
-        }
-        if (btn) {
-          btn.disabled = false;
-          btn.textContent = '📧 Reenviar Email';
-        }
-      }
-    }
-
-    async function checkEmailVerification() {
-      const auth = window.firebaseAuth;
-      const user = auth.currentUser;
-
-      if (!user) {
-        showCustomAlert('Erro: usuário não encontrado. Faça login novamente.');
-        return;
-      }
-
-      const btn = document.getElementById('verifyCheckBtn');
-      if (btn) {
-        btn.disabled = true;
-        btn.textContent = 'Verificando...';
-      }
-
-      try {
-        // Reload user to get updated emailVerified status
-        await user.reload();
-
-        if (user.emailVerified) {
-          // Email verified! Auto-approve the account
-          await approveAccountAfterEmailVerification();
-        } else {
-          showCustomAlert('Email ainda não verificado. Clique no link enviado para seu email e tente novamente.');
-          if (btn) {
-            btn.disabled = false;
-            btn.textContent = '✅ Já Verifiquei meu Email';
-          }
-        }
-      } catch (error) {
-        console.error('Erro ao verificar:', error);
-        showCustomAlert('Erro ao verificar. Tente novamente.');
-        if (btn) {
-          btn.disabled = false;
-          btn.textContent = '✅ Já Verifiquei meu Email';
-        }
-      }
-    }
-
-    async function approveAccountAfterEmailVerification() {
-      const auth = window.firebaseAuth;
-      const user = auth.currentUser;
-      const { ref, update, get } = window.firebaseModules;
-      const database = window.firebaseDatabase;
-
-      try {
-        // Get current user data to check points
-        const userRef = ref(database, `users/${user.uid}`);
-        const snapshot = await get(userRef);
-        const userData = snapshot.val() || {};
-        const currentPoints = userData.points || 0;
-
-        // Update user status to approved and give 10 bonus points (email verification)
-        await update(ref(database, `users/${user.uid}`), {
-          status: 'approved',
-          emailVerified: true,
-          verifiedAt: Date.now(),
-          verifiedBy: 'email',
-          points: currentPoints + 10 // 10 pontos de bônus por verificação via email
-        });
-
-        userStatus = 'approved';
-        userPoints = currentPoints + 10;
-
-        // Update UI
-        updateUIForUser();
-        updateUserInfoDisplay();
-        updatePointsDisplay();
-
-        // Show success
-        const container = document.getElementById('emailVerificationContent');
-        container.innerHTML = `
-          <div style="text-align: center; padding: 20px 0;">
-            <div style="font-size: 64px; margin-bottom: 16px;">🎉</div>
-            <p style="color: var(--text-primary); font-size: 18px; font-weight: 600; margin-bottom: 8px;">
-              Conta Verificada!
-            </p>
-            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 12px;">
-              Seu email foi verificado e sua conta está ativa!
-            </p>
-            <div style="background: linear-gradient(135deg, rgba(76, 175, 80, 0.15) 0%, rgba(139, 195, 74, 0.15) 100%); padding: 12px; border-radius: 8px; margin-bottom: 20px;">
-              <span style="font-size: 15px; color: #4CAF50; font-weight: 600;">🎁 Você ganhou 10 pontos de bônus!</span>
-            </div>
-            <div class="custom-modal-buttons">
-              <button class="custom-modal-btn primary" onclick="closeEmailVerificationModal()">Começar a Usar</button>
-            </div>
-          </div>
-        `;
-
-      } catch (error) {
-        console.error('Erro ao aprovar conta:', error);
-        showCustomAlert('Email verificado, mas houve um erro ao ativar sua conta. Entre em contato com o suporte.');
-      }
-    }
-
-    function closeEmailVerificationModal() {
-      document.getElementById('emailVerificationModal').classList.remove('active');
-      if (verificationCheckInterval) {
-        clearInterval(verificationCheckInterval);
-        verificationCheckInterval = null;
-      }
-    }
-
-    // Function to show verification option for pending users
-    function showVerifyEmailOption() {
-      const auth = window.firebaseAuth;
-      const user = auth.currentUser;
-
-      if (!user || user.isAnonymous || userStatus !== 'pending') {
-        return;
-      }
-
-      // Check if already email verified
-      if (user.emailVerified) {
-        // Auto-approve if email is verified but status is still pending
-        approveAccountAfterEmailVerification();
-        return;
-      }
-
-      // Show the verification options
-      showEmailVerificationOptions(user.email);
     }
 
     async function handleRegister(e) {
@@ -3941,9 +2348,7 @@
         updateUIForUser();
         updateUserInfoDisplay();
         updatePointsDisplay();
-
-        // Show verification options modal instead of simple alert
-        showEmailVerificationOptions(email);
+        showCustomAlert('Conta criada com sucesso! Sua conta está aguardando aprovação do administrador.');
       } catch (error) {
         let errorMessage = 'Erro ao criar conta: ';
         switch (error.code) {
@@ -3963,9 +2368,6 @@
       }
     }
 
-    // Download Links Counter
-    let downloadLinksCount = 1;
-
     function openPublishModal() {
       if (!isPublisher) {
         showCustomAlert('Apenas publicadores podem publicar jogos.');
@@ -3973,7 +2375,6 @@
       }
       document.getElementById('publishModalTitle').textContent = 'Publicar Jogo';
       document.getElementById('editGameId').value = '';
-      resetDownloadLinks();
       document.getElementById('publishModal').classList.add('active');
     }
 
@@ -3981,111 +2382,6 @@
       document.getElementById('publishModal').classList.remove('active');
       document.getElementById('publishForm').reset();
       document.getElementById('editGameId').value = '';
-      resetDownloadLinks();
-    }
-
-    function resetDownloadLinks() {
-      downloadLinksCount = 1;
-      const container = document.getElementById('downloadLinksContainer');
-      container.innerHTML = `
-        <div class="download-link-group" data-link-index="1">
-          <div class="download-link-header">
-            <span class="download-link-number">Link 1</span>
-            <button type="button" class="remove-link-btn" onclick="removeDownloadLink(1)" style="display: none;">✕</button>
-          </div>
-          <input type="text" class="form-input" placeholder="Descrição (ex: Jogo Principal, Emulador, ISO...)" id="linkDesc1" required>
-          <div style="display: flex; gap: 8px; margin-top: 8px;">
-            <input type="url" class="form-input" placeholder="Link G.A" id="linkGA1" required style="flex: 1;">
-            <input type="url" class="form-input" placeholder="Link ADM" id="linkADM1" required style="flex: 1;">
-          </div>
-        </div>
-      `;
-    }
-
-    function addDownloadLink() {
-      downloadLinksCount++;
-      const container = document.getElementById('downloadLinksContainer');
-
-      const newLinkHTML = `
-        <div class="download-link-group" data-link-index="${downloadLinksCount}">
-          <div class="download-link-header">
-            <span class="download-link-number">Link ${downloadLinksCount}</span>
-            <button type="button" class="remove-link-btn" onclick="removeDownloadLink(${downloadLinksCount})">✕</button>
-          </div>
-          <input type="text" class="form-input" placeholder="Descrição (ex: Emulador, ISO, DLC...)" id="linkDesc${downloadLinksCount}" required>
-          <div style="display: flex; gap: 8px; margin-top: 8px;">
-            <input type="url" class="form-input" placeholder="Link G.A" id="linkGA${downloadLinksCount}" required style="flex: 1;">
-            <input type="url" class="form-input" placeholder="Link ADM" id="linkADM${downloadLinksCount}" required style="flex: 1;">
-          </div>
-        </div>
-      `;
-
-      container.insertAdjacentHTML('beforeend', newLinkHTML);
-
-      // Show remove button on first link if there are multiple links
-      if (downloadLinksCount > 1) {
-        const firstRemoveBtn = container.querySelector('[data-link-index="1"] .remove-link-btn');
-        if (firstRemoveBtn) firstRemoveBtn.style.display = 'flex';
-      }
-    }
-
-    function removeDownloadLink(index) {
-      const container = document.getElementById('downloadLinksContainer');
-      const linkGroup = container.querySelector(`[data-link-index="${index}"]`);
-
-      if (linkGroup) {
-        linkGroup.remove();
-
-        // Count remaining links
-        const remainingLinks = container.querySelectorAll('.download-link-group');
-
-        // Hide remove button if only one link remains
-        if (remainingLinks.length === 1) {
-          const removeBtn = remainingLinks[0].querySelector('.remove-link-btn');
-          if (removeBtn) removeBtn.style.display = 'none';
-        }
-      }
-    }
-
-    function getDownloadLinksData() {
-      const container = document.getElementById('downloadLinksContainer');
-      const linkGroups = container.querySelectorAll('.download-link-group');
-      const links = [];
-
-      linkGroups.forEach((group) => {
-        const index = group.dataset.linkIndex;
-        const desc = document.getElementById(`linkDesc${index}`)?.value || '';
-        const linkGA = document.getElementById(`linkGA${index}`)?.value || '';
-        const linkADM = document.getElementById(`linkADM${index}`)?.value || '';
-
-        if (desc && linkGA && linkADM) {
-          links.push({ desc, linkGA, linkADM });
-        }
-      });
-
-      return links;
-    }
-
-    function setDownloadLinksData(links) {
-      resetDownloadLinks();
-
-      if (!links || links.length === 0) return;
-
-      // Set first link
-      if (links[0]) {
-        document.getElementById('linkDesc1').value = links[0].desc || '';
-        document.getElementById('linkGA1').value = links[0].linkGA || '';
-        document.getElementById('linkADM1').value = links[0].linkADM || '';
-      }
-
-      // Add additional links
-      for (let i = 1; i < links.length; i++) {
-        addDownloadLink();
-        const index = i + 1;
-        document.getElementById(`linkDesc${index}`).value = links[i].desc || '';
-        document.getElementById(`linkGA${index}`).value = links[i].linkGA || '';
-        document.getElementById(`linkADM${index}`).value = links[i].linkADM || '';
-      }
     }
 
     function closeManageModal() {
@@ -4613,10 +2909,6 @@
     let currentUserFilter = 'pending';
     let allUsers = {};
 
-    // Notification functions
-    let userNotifications = [];
-    let dismissedNotifications = {};
-
     async function openManageUsersModal() {
       if (!isPublisher) {
         showCustomAlert('Apenas publicadores podem gerenciar usuários.');
@@ -4727,29 +3019,16 @@
     }
 
     async function approveUser(userId) {
-      showCustomConfirm('Deseja aprovar este usuário? Ele receberá 100 pontos de bônus.', async () => {
+      showCustomConfirm('Deseja aprovar este usuário?', async () => {
         try {
-          const { ref, update, get } = window.firebaseModules;
+          const { ref, update } = window.firebaseModules;
           const database = window.firebaseDatabase;
 
-          // Get current points
-          const userRef = ref(database, `users/${userId}`);
-          const snapshot = await get(userRef);
-          const userData = snapshot.val() || {};
-          const currentPoints = userData.points || 0;
-
-          // Approve and give 100 bonus points
-          await update(ref(database, `users/${userId}`), {
-            status: 'approved',
-            points: currentPoints + 100,
-            approvedAt: Date.now(),
-            approvedBy: 'admin'
-          });
+          await update(ref(database, `users/${userId}`), { status: 'approved' });
 
           allUsers[userId].status = 'approved';
-          allUsers[userId].points = currentPoints + 100;
           renderUsersList();
-          showCustomAlert('Usuário aprovado com sucesso! +100 pontos de bônus concedidos.');
+          showCustomAlert('Usuário aprovado com sucesso!');
         } catch (error) {
           showCustomAlert('Erro ao aprovar usuário: ' + error.message);
         }
@@ -4798,1164 +3077,6 @@
       document.body.appendChild(modal);
     }
 
-    // ===== NOTIFICATION FUNCTIONS =====
-
-    let readNotifications = {};
-    let previousNotificationIds = [];
-    let notificationsInitialized = false;
-
-    async function loadNotifications() {
-      if (!currentUser || currentUser.isAnonymous) return;
-
-      const { ref, onValue, get } = window.firebaseModules;
-      const database = window.firebaseDatabase;
-
-      // Load dismissed notifications for current user
-      const dismissedRef = ref(database, `dismissedNotifications/${currentUser.uid}`);
-      const dismissedSnapshot = await get(dismissedRef);
-      dismissedNotifications = dismissedSnapshot.exists() ? dismissedSnapshot.val() : {};
-
-      // Load read notifications for current user
-      const readRef = ref(database, `readNotifications/${currentUser.uid}`);
-      const readSnapshot = await get(readRef);
-      readNotifications = readSnapshot.exists() ? readSnapshot.val() : {};
-
-      // Listen to notifications
-      const notificationsRef = ref(database, 'notifications');
-      onValue(notificationsRef, (snapshot) => {
-        const allNotifications = snapshot.val() || {};
-
-        // Filter notifications:
-        // 1. Not dismissed
-        // 2. Either global (no targetUserId) OR targeted to this user
-        const filteredNotifications = Object.entries(allNotifications)
-          .filter(([id, notif]) => {
-            // Skip dismissed notifications
-            if (dismissedNotifications[id]) return false;
-
-            // Include if: no target (global) OR target matches current user
-            if (!notif.targetUserId || notif.targetUserId === currentUser.uid) {
-              return true;
-            }
-
-            return false;
-          })
-          .map(([id, notif]) => ({
-            id,
-            ...notif,
-            isRead: !!readNotifications[id],
-            isPersonal: !!notif.targetUserId
-          }))
-          .sort((a, b) => b.createdAt - a.createdAt);
-
-        // Detect new notifications for toast
-        const currentIds = filteredNotifications.map(n => n.id);
-        if (notificationsInitialized) {
-          const newNotifications = filteredNotifications.filter(
-            n => !previousNotificationIds.includes(n.id)
-          );
-
-          // Show toast for new notifications
-          newNotifications.forEach(notif => {
-            showNotificationToast(notif.title, notif.message);
-          });
-        }
-
-        previousNotificationIds = currentIds;
-        notificationsInitialized = true;
-        userNotifications = filteredNotifications;
-
-        updateNotificationBadge();
-
-        // Check for unread notifications and trigger Android notification
-        checkUnreadNotifications();
-      });
-    }
-
-    function checkUnreadNotifications() {
-      const unreadCount = userNotifications.filter(n => !n.isRead).length;
-
-      if (unreadCount > 0) {
-        // Trigger Android notification if available
-        try {
-          if (typeof Android !== 'undefined' && Android.showNotification) {
-            Android.showNotification();
-          }
-        } catch (e) {
-          console.log('Android bridge not available');
-        }
-      }
-    }
-
-    function showNotificationToast(title, message) {
-      // Remove existing toast if any
-      const existingToast = document.querySelector('.toast-notification');
-      if (existingToast) {
-        existingToast.remove();
-      }
-
-      const toast = document.createElement('div');
-      toast.className = 'toast-notification';
-      toast.innerHTML = `
-        <div class="toast-title">🔔 ${title}</div>
-        <div class="toast-message">${message.length > 80 ? message.substring(0, 80) + '...' : message}</div>
-      `;
-
-      toast.onclick = () => {
-        toast.remove();
-        openNotificationsModal();
-      };
-
-      document.body.appendChild(toast);
-
-      // Auto remove after 5 seconds
-      setTimeout(() => {
-        if (toast.parentNode) {
-          toast.remove();
-        }
-      }, 5000);
-    }
-
-    function updateNotificationBadge() {
-      const badge = document.getElementById('notificationBadge');
-      const unreadCount = userNotifications.filter(n => !n.isRead).length;
-
-      if (unreadCount > 0) {
-        badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
-        badge.style.display = 'block';
-      } else {
-        badge.style.display = 'none';
-      }
-    }
-
-    async function openSendNotificationModal() {
-      if (!isPublisher) {
-        showCustomAlert('Apenas publicadores podem enviar notificações.');
-        return;
-      }
-      document.getElementById('sendNotificationForm').reset();
-      document.getElementById('userSelectorContainer').style.display = 'none';
-      document.getElementById('sendNotificationBtn').textContent = 'Enviar para Todos';
-
-      // Load users for the selector
-      await loadUsersForNotification();
-
-      document.getElementById('sendNotificationModal').classList.add('active');
-    }
-
-    function closeSendNotificationModal() {
-      document.getElementById('sendNotificationModal').classList.remove('active');
-    }
-
-    function toggleUserSelector() {
-      const target = document.querySelector('input[name="notificationTarget"]:checked').value;
-      const container = document.getElementById('userSelectorContainer');
-      const submitBtn = document.getElementById('sendNotificationBtn');
-
-      if (target === 'individual') {
-        container.style.display = 'block';
-        submitBtn.textContent = 'Enviar para Usuário';
-      } else {
-        container.style.display = 'none';
-        submitBtn.textContent = 'Enviar para Todos';
-      }
-    }
-
-    async function loadUsersForNotification() {
-      const { ref, get } = window.firebaseModules;
-      const database = window.firebaseDatabase;
-
-      try {
-        const usersRef = ref(database, 'users');
-        const snapshot = await get(usersRef);
-
-        if (snapshot.exists()) {
-          const users = snapshot.val();
-          const select = document.getElementById('notificationTargetUser');
-
-          // Filter only approved users and sort by name
-          const userList = Object.entries(users)
-            .filter(([id, user]) => user.status === 'approved' || user.status === 'pending')
-            .map(([id, user]) => ({
-              id,
-              name: user.name || 'Sem nome',
-              email: user.email || '',
-              status: user.status
-            }))
-            .sort((a, b) => a.name.localeCompare(b.name));
-
-          select.innerHTML = '<option value="">Selecione um usuário...</option>' +
-            userList.map(user => {
-              const statusLabel = user.status === 'approved' ? '✓' : '⏳';
-              return `<option value="${user.id}">${user.name} (${user.email}) ${statusLabel}</option>`;
-            }).join('');
-        }
-      } catch (error) {
-        console.error('Erro ao carregar usuários:', error);
-      }
-    }
-
-    async function handleSendNotification(e) {
-      e.preventDefault();
-
-      const title = document.getElementById('notificationTitle').value.trim();
-      const message = document.getElementById('notificationMessage').value.trim();
-      const targetType = document.querySelector('input[name="notificationTarget"]:checked').value;
-      const targetUserId = document.getElementById('notificationTargetUser').value;
-
-      if (!title || !message) {
-        showCustomAlert('Por favor, preencha todos os campos.');
-        return;
-      }
-
-      if (targetType === 'individual' && !targetUserId) {
-        showCustomAlert('Por favor, selecione um usuário.');
-        return;
-      }
-
-      try {
-        const { ref, push, set } = window.firebaseModules;
-        const database = window.firebaseDatabase;
-
-        const notificationsRef = ref(database, 'notifications');
-        const newNotificationRef = push(notificationsRef);
-
-        const notificationData = {
-          title: title,
-          message: message,
-          createdAt: Date.now(),
-          createdBy: currentUser.email
-        };
-
-        // If individual, add target user ID
-        if (targetType === 'individual') {
-          notificationData.targetUserId = targetUserId;
-
-          // Get target user name for confirmation
-          const targetUserSelect = document.getElementById('notificationTargetUser');
-          const targetUserName = targetUserSelect.options[targetUserSelect.selectedIndex].text;
-          notificationData.targetUserName = targetUserName.split(' (')[0]; // Extract just the name
-        }
-
-        await set(newNotificationRef, notificationData);
-
-        closeSendNotificationModal();
-
-        if (targetType === 'individual') {
-          showCustomAlert('Notificação enviada com sucesso para o usuário selecionado!');
-        } else {
-          showCustomAlert('Notificação enviada com sucesso para todos os usuários!');
-        }
-      } catch (error) {
-        showCustomAlert('Erro ao enviar notificação: ' + error.message);
-      }
-    }
-
-    function openNotificationsModal() {
-      document.getElementById('notificationsModal').classList.add('active');
-      renderNotifications();
-    }
-
-    function closeNotificationsModal() {
-      document.getElementById('notificationsModal').classList.remove('active');
-    }
-
-    // FAQ Modal functions
-    function openFaqModal() {
-      document.getElementById('faqModal').classList.add('active');
-    }
-
-    function closeFaqModal() {
-      document.getElementById('faqModal').classList.remove('active');
-    }
-
-    // Rating System
-    let selectedRating = 0;
-    let totalAppStars = 0;
-    let userHasRated = false;
-    let userPreviousRating = 0;
-
-    async function loadAppRatingData() {
-      const { ref, get } = window.firebaseModules;
-      const database = window.firebaseDatabase;
-      const auth = window.firebaseAuth;
-      const user = auth.currentUser;
-
-      // Load total stars
-      try {
-        const ratingsRef = ref(database, 'appRatings/totalStars');
-        const snapshot = await get(ratingsRef);
-        totalAppStars = snapshot.val() || 0;
-      } catch (e) {
-        totalAppStars = 0;
-      }
-
-      // Check if user has already rated
-      if (user && !user.isAnonymous) {
-        try {
-          const userRatingRef = ref(database, `appRatings/users/${user.uid}`);
-          const userSnapshot = await get(userRatingRef);
-          if (userSnapshot.exists()) {
-            userHasRated = true;
-            userPreviousRating = userSnapshot.val().stars || 0;
-          } else {
-            userHasRated = false;
-            userPreviousRating = 0;
-          }
-        } catch (e) {
-          userHasRated = false;
-        }
-      }
-    }
-
-    async function openRatingModal() {
-      closeSidebar();
-      const auth = window.firebaseAuth;
-      const user = auth.currentUser;
-
-      // Check if user is verified
-      if (!user || user.isAnonymous) {
-        showCustomAlert('Você precisa ter uma conta verificada para avaliar o aplicativo.');
-        return;
-      }
-
-      // Check if user is verified (status approved)
-      const { ref, get } = window.firebaseModules;
-      const database = window.firebaseDatabase;
-
-      try {
-        const userRef = ref(database, `users/${user.uid}`);
-        const snapshot = await get(userRef);
-        const userData = snapshot.val();
-
-        if (!userData || userData.status !== 'approved') {
-          showCustomAlert('Sua conta precisa estar verificada para avaliar o aplicativo.');
-          return;
-        }
-      } catch (e) {
-        showCustomAlert('Erro ao verificar sua conta. Tente novamente.');
-        return;
-      }
-
-      await loadAppRatingData();
-      renderRatingModal();
-      document.getElementById('ratingModal').classList.add('active');
-    }
-
-    function renderRatingModal() {
-      const container = document.getElementById('ratingContent');
-
-      const totalDisplay = `
-        <div class="rating-total-display">
-          <div class="rating-total-stars">⭐ ${totalAppStars}</div>
-          <div class="rating-total-label">Total de estrelas acumuladas</div>
-        </div>
-      `;
-
-      if (userHasRated) {
-        // User already rated
-        const starsDisplay = '⭐'.repeat(userPreviousRating);
-        container.innerHTML = `
-          ${totalDisplay}
-          <div class="rating-already-rated">
-            <span class="check-icon">✅</span>
-            <div class="message">Você já avaliou o aplicativo!</div>
-            <div class="your-rating">Sua avaliação: ${starsDisplay}</div>
-          </div>
-          <div class="custom-modal-buttons">
-            <button class="custom-modal-btn secondary" onclick="closeRatingModal()">Fechar</button>
-          </div>
-        `;
-      } else {
-        // User can rate
-        selectedRating = 0;
-        container.innerHTML = `
-          ${totalDisplay}
-          <p style="text-align: center; color: var(--text-secondary); margin-bottom: 8px;">Clique nas estrelas para avaliar:</p>
-          <div class="rating-stars-container">
-            <span class="rating-star" data-star="1" onclick="selectStar(1)" onmouseover="hoverStar(1)" onmouseout="resetStarHover()">☆</span>
-            <span class="rating-star" data-star="2" onclick="selectStar(2)" onmouseover="hoverStar(2)" onmouseout="resetStarHover()">☆</span>
-            <span class="rating-star" data-star="3" onclick="selectStar(3)" onmouseover="hoverStar(3)" onmouseout="resetStarHover()">☆</span>
-            <span class="rating-star" data-star="4" onclick="selectStar(4)" onmouseover="hoverStar(4)" onmouseout="resetStarHover()">☆</span>
-            <span class="rating-star" data-star="5" onclick="selectStar(5)" onmouseover="hoverStar(5)" onmouseout="resetStarHover()">☆</span>
-          </div>
-          <p style="text-align: center; color: var(--text-muted); font-size: 13px; margin-top: 8px;">
-            💡 Dica: Avaliações de 4⭐ = +5 pontos | 5⭐ = +10 pontos
-          </p>
-          <div class="custom-modal-buttons" style="margin-top: 16px;">
-            <button class="custom-modal-btn primary" id="submitRatingBtn" onclick="submitRating()" disabled style="opacity: 0.5;">Enviar Avaliação</button>
-            <button class="custom-modal-btn secondary" onclick="closeRatingModal()">Cancelar</button>
-          </div>
-        `;
-      }
-    }
-
-    function hoverStar(star) {
-      const stars = document.querySelectorAll('.rating-star');
-      stars.forEach((s, index) => {
-        if (index < star) {
-          s.classList.add('hover');
-          s.textContent = '★';
-        } else {
-          s.classList.remove('hover');
-          if (!s.classList.contains('active')) {
-            s.textContent = '☆';
-          }
-        }
-      });
-    }
-
-    function resetStarHover() {
-      const stars = document.querySelectorAll('.rating-star');
-      stars.forEach((s, index) => {
-        s.classList.remove('hover');
-        if (index < selectedRating) {
-          s.textContent = '★';
-        } else {
-          s.textContent = '☆';
-        }
-      });
-    }
-
-    function selectStar(star) {
-      selectedRating = star;
-      const stars = document.querySelectorAll('.rating-star');
-      stars.forEach((s, index) => {
-        if (index < star) {
-          s.classList.add('active');
-          s.textContent = '★';
-        } else {
-          s.classList.remove('active');
-          s.textContent = '☆';
-        }
-      });
-
-      // Enable submit button
-      const btn = document.getElementById('submitRatingBtn');
-      if (btn) {
-        btn.disabled = false;
-        btn.style.opacity = '1';
-      }
-    }
-
-    function submitRating() {
-      if (selectedRating === 0) {
-        showCustomAlert('Por favor, selecione uma avaliação de 1 a 5 estrelas.');
-        return;
-      }
-
-      // Show confirmation modal
-      const starsText = selectedRating === 1 ? '1 estrela' : `${selectedRating} estrelas`;
-      document.getElementById('confirmStarsText').textContent = starsText;
-
-      // Show bonus points info if applicable
-      const bonusInfo = document.getElementById('bonusPointsInfo');
-      const bonusAmount = document.getElementById('bonusPointsAmount');
-
-      if (selectedRating === 4) {
-        bonusInfo.style.display = 'block';
-        bonusAmount.textContent = '5';
-      } else if (selectedRating === 5) {
-        bonusInfo.style.display = 'block';
-        bonusAmount.textContent = '10';
-      } else {
-        bonusInfo.style.display = 'none';
-      }
-
-      document.getElementById('ratingConfirmModal').classList.add('active');
-    }
-
-    function cancelRatingConfirm() {
-      document.getElementById('ratingConfirmModal').classList.remove('active');
-    }
-
-    async function confirmRating() {
-      const { ref, get, update } = window.firebaseModules;
-      const database = window.firebaseDatabase;
-      const auth = window.firebaseAuth;
-      const user = auth.currentUser;
-
-      if (!user) {
-        showCustomAlert('Erro: usuário não encontrado.');
-        return;
-      }
-
-      try {
-        // Calculate bonus points
-        let bonusPoints = 0;
-        if (selectedRating === 4) {
-          bonusPoints = 5;
-        } else if (selectedRating === 5) {
-          bonusPoints = 10;
-        }
-
-        // Get current total stars
-        const totalRef = ref(database, 'appRatings/totalStars');
-        const totalSnapshot = await get(totalRef);
-        const currentTotal = totalSnapshot.val() || 0;
-        const newTotal = currentTotal + selectedRating;
-
-        // Get current user points
-        const userRef = ref(database, `users/${user.uid}`);
-        const userSnapshot = await get(userRef);
-        const userData = userSnapshot.val() || {};
-        const currentPoints = userData.points || 0;
-
-        // Update everything
-        const updates = {};
-        updates[`appRatings/totalStars`] = newTotal;
-        updates[`appRatings/users/${user.uid}`] = {
-          stars: selectedRating,
-          timestamp: Date.now()
-        };
-
-        if (bonusPoints > 0) {
-          updates[`users/${user.uid}/points`] = currentPoints + bonusPoints;
-        }
-
-        await update(ref(database), updates);
-
-        // Update local state
-        totalAppStars = newTotal;
-        userHasRated = true;
-        userPreviousRating = selectedRating;
-
-        if (bonusPoints > 0) {
-          userPoints = currentPoints + bonusPoints;
-          updatePointsDisplay();
-        }
-
-        // Close confirmation modal
-        document.getElementById('ratingConfirmModal').classList.remove('active');
-
-        // Show success and re-render
-        const starsDisplay = '⭐'.repeat(selectedRating);
-        let successMsg = `Obrigado pela sua avaliação! ${starsDisplay}`;
-        if (bonusPoints > 0) {
-          successMsg += `\n\n🎁 Você ganhou ${bonusPoints} pontos de bônus!`;
-        }
-        showCustomAlert(successMsg);
-
-        // Re-render the rating modal to show "already rated" state
-        renderRatingModal();
-
-      } catch (e) {
-        console.error('Erro ao enviar avaliação:', e);
-        showCustomAlert('Erro ao enviar avaliação. Tente novamente.');
-      }
-    }
-
-    function closeRatingModal() {
-      document.getElementById('ratingModal').classList.remove('active');
-      document.getElementById('ratingConfirmModal').classList.remove('active');
-      selectedRating = 0;
-    }
-
-    function renderNotifications() {
-      const notificationsList = document.getElementById('notificationsList');
-
-      if (userNotifications.length === 0) {
-        notificationsList.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 20px;">Nenhuma notificação.</p>';
-        return;
-      }
-
-      notificationsList.innerHTML = userNotifications.map(notif => {
-        const timeAgo = formatTimeAgo(notif.createdAt);
-        const isUnread = !notif.isRead;
-        const itemClass = isUnread ? 'notification-item unread' : 'notification-item read';
-        const unreadIndicator = isUnread ? '<span class="notification-unread-indicator"></span>' : '';
-
-        // Personal notification indicator
-        const personalBadge = notif.isPersonal
-          ? '<span style="background: #9c27b0; color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">Para você</span>'
-          : '';
-
-        const markReadBtn = isUnread
-          ? `<button class="notification-action-btn mark-read" onclick="markNotificationAsRead('${notif.id}')">
-               ✓ Marcar como lida
-             </button>`
-          : '';
-
-        return `
-          <div class="${itemClass}">
-            <div class="notification-header">
-              <div>
-                <div class="notification-title">${unreadIndicator}${notif.title}${personalBadge}</div>
-                <div class="notification-time">${timeAgo}</div>
-              </div>
-            </div>
-            <div class="notification-message">${notif.message}</div>
-            <div class="notification-actions">
-              ${markReadBtn}
-              <button class="notification-action-btn delete" onclick="dismissNotification('${notif.id}')">
-                🗑️ Apagar
-              </button>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    async function markNotificationAsRead(notificationId) {
-      try {
-        const { ref, set } = window.firebaseModules;
-        const database = window.firebaseDatabase;
-
-        // Mark notification as read for this user
-        await set(ref(database, `readNotifications/${currentUser.uid}/${notificationId}`), true);
-
-        // Update local state
-        readNotifications[notificationId] = true;
-        const notifIndex = userNotifications.findIndex(n => n.id === notificationId);
-        if (notifIndex !== -1) {
-          userNotifications[notifIndex].isRead = true;
-        }
-
-        updateNotificationBadge();
-        renderNotifications();
-      } catch (error) {
-        showCustomAlert('Erro ao marcar notificação: ' + error.message);
-      }
-    }
-
-    async function markAllNotificationsAsRead() {
-      try {
-        const { ref, set } = window.firebaseModules;
-        const database = window.firebaseDatabase;
-
-        const unreadNotifications = userNotifications.filter(n => !n.isRead);
-
-        for (const notif of unreadNotifications) {
-          await set(ref(database, `readNotifications/${currentUser.uid}/${notif.id}`), true);
-          readNotifications[notif.id] = true;
-          notif.isRead = true;
-        }
-
-        updateNotificationBadge();
-        renderNotifications();
-      } catch (error) {
-        showCustomAlert('Erro ao marcar notificações: ' + error.message);
-      }
-    }
-
-    async function dismissNotification(notificationId) {
-      try {
-        const { ref, set } = window.firebaseModules;
-        const database = window.firebaseDatabase;
-
-        // Mark notification as dismissed for this user
-        await set(ref(database, `dismissedNotifications/${currentUser.uid}/${notificationId}`), true);
-
-        // Update local state
-        dismissedNotifications[notificationId] = true;
-        userNotifications = userNotifications.filter(n => n.id !== notificationId);
-
-        updateNotificationBadge();
-        renderNotifications();
-      } catch (error) {
-        showCustomAlert('Erro ao apagar notificação: ' + error.message);
-      }
-    }
-
-    // ===== END NOTIFICATION FUNCTIONS =====
-
-    // ===== FAVORITES, LIKES & DAILY REWARD SYSTEM =====
-    let userFavorites = {};
-    let userLikes = {};
-    let currentGameLikes = 0;
-    let dailyRewardClaimed = false;
-
-    // Load user favorites from Firestore
-    async function loadUserFavorites() {
-      if (!currentUser || currentUser.isAnonymous) return;
-
-      const { doc, getDoc } = window.firebaseModules;
-      const firestore = window.firebaseFirestore;
-
-      try {
-        const favDoc = await getDoc(doc(firestore, 'favorites', currentUser.uid));
-        if (favDoc.exists()) {
-          userFavorites = favDoc.data().games || {};
-        } else {
-          userFavorites = {};
-        }
-      } catch (e) {
-        console.error('Erro ao carregar favoritos:', e);
-        userFavorites = {};
-      }
-    }
-
-    // Load user likes from Firestore
-    async function loadUserLikes() {
-      if (!currentUser || currentUser.isAnonymous) return;
-
-      const { doc, getDoc } = window.firebaseModules;
-      const firestore = window.firebaseFirestore;
-
-      try {
-        const likesDoc = await getDoc(doc(firestore, 'userLikes', currentUser.uid));
-        if (likesDoc.exists()) {
-          userLikes = likesDoc.data().games || {};
-        } else {
-          userLikes = {};
-        }
-      } catch (e) {
-        console.error('Erro ao carregar likes:', e);
-        userLikes = {};
-      }
-    }
-
-    // Toggle favorite
-    async function toggleFavorite() {
-      if (!currentUser || currentUser.isAnonymous) {
-        showCustomAlert('Você precisa fazer login para adicionar favoritos.');
-        return;
-      }
-
-      if (!currentGameData) return;
-
-      const gameId = currentGameData.id;
-      const { doc, setDoc, getDoc } = window.firebaseModules;
-      const firestore = window.firebaseFirestore;
-
-      try {
-        const favRef = doc(firestore, 'favorites', currentUser.uid);
-        const isFavorite = userFavorites[gameId];
-
-        if (isFavorite) {
-          // Remove from favorites
-          delete userFavorites[gameId];
-        } else {
-          // Add to favorites
-          userFavorites[gameId] = {
-            addedAt: Date.now(),
-            titulo: currentGameData.titulo,
-            poster: currentGameData.poster,
-            type: currentGameData.type
-          };
-        }
-
-        await setDoc(favRef, { games: userFavorites }, { merge: true });
-        updateFavoriteButton();
-
-        if (isFavorite) {
-          showCustomAlert('Removido dos favoritos!');
-        } else {
-          showCustomAlert('Adicionado aos favoritos!');
-        }
-      } catch (e) {
-        console.error('Erro ao atualizar favorito:', e);
-        showCustomAlert('Erro ao atualizar favorito.');
-      }
-    }
-
-    function updateFavoriteButton() {
-      if (!currentGameData) return;
-
-      const btn = document.getElementById('favoriteBtn');
-      const icon = document.getElementById('favoriteIcon');
-      if (!btn || !icon) return;
-
-      const isFavorite = userFavorites[currentGameData.id];
-
-      if (isFavorite) {
-        icon.style.fill = '#e91e63';
-        btn.classList.add('active');
-      } else {
-        icon.style.fill = '#9e9e9e';
-        btn.classList.remove('active');
-      }
-    }
-
-    // Toggle like
-    async function toggleLike() {
-      if (!currentUser || currentUser.isAnonymous) {
-        showCustomAlert('Você precisa fazer login para curtir.');
-        return;
-      }
-
-      if (userStatus === 'pending') {
-        showCustomAlert('Sua conta precisa estar verificada para curtir.');
-        return;
-      }
-
-      if (!currentGameData) return;
-
-      const gameId = currentGameData.id;
-      const { doc, setDoc, getDoc, updateDoc } = window.firebaseModules;
-      const firestore = window.firebaseFirestore;
-
-      try {
-        const userLikesRef = doc(firestore, 'userLikes', currentUser.uid);
-        const gameLikesRef = doc(firestore, 'gameLikes', gameId);
-        const isLiked = userLikes[gameId];
-
-        // Get current game likes count
-        let currentLikes = 0;
-        try {
-          const gameLikesDoc = await getDoc(gameLikesRef);
-          if (gameLikesDoc.exists()) {
-            currentLikes = gameLikesDoc.data().count || 0;
-          }
-        } catch (e) {}
-
-        if (isLiked) {
-          // Remove like
-          delete userLikes[gameId];
-          currentLikes = Math.max(0, currentLikes - 1);
-        } else {
-          // Add like
-          userLikes[gameId] = Date.now();
-          currentLikes += 1;
-        }
-
-        // Update user likes
-        await setDoc(userLikesRef, { games: userLikes }, { merge: true });
-
-        // Update game likes count
-        await setDoc(gameLikesRef, { count: currentLikes }, { merge: true });
-
-        currentGameLikes = currentLikes;
-        updateLikeButton();
-      } catch (e) {
-        console.error('Erro ao atualizar like:', e);
-        showCustomAlert('Erro ao curtir.');
-      }
-    }
-
-    async function loadGameLikes(gameId) {
-      const { doc, getDoc } = window.firebaseModules;
-      const firestore = window.firebaseFirestore;
-
-      try {
-        const gameLikesDoc = await getDoc(doc(firestore, 'gameLikes', gameId));
-        if (gameLikesDoc.exists()) {
-          currentGameLikes = gameLikesDoc.data().count || 0;
-        } else {
-          currentGameLikes = 0;
-        }
-      } catch (e) {
-        currentGameLikes = 0;
-      }
-    }
-
-    function updateLikeButton() {
-      if (!currentGameData) return;
-
-      const btn = document.getElementById('likeBtn');
-      const icon = document.getElementById('likeIcon');
-      const countMeta = document.getElementById('likeCountMeta');
-      if (!btn || !icon) return;
-
-      const isLiked = userLikes[currentGameData.id];
-
-      // Atualiza contagem na área de meta informações
-      if (countMeta) {
-        countMeta.textContent = currentGameLikes;
-      }
-
-      if (isLiked) {
-        icon.style.fill = '#e91e63';
-        btn.classList.add('liked');
-      } else {
-        icon.style.fill = 'currentColor';
-        btn.classList.remove('liked');
-      }
-    }
-
-    // Favorites Modal
-    function openFavoritesModal() {
-      closeSidebar();
-      document.getElementById('favoritesModal').classList.add('active');
-      renderFavoritesList();
-    }
-
-    function closeFavoritesModal() {
-      document.getElementById('favoritesModal').classList.remove('active');
-    }
-
-    function renderFavoritesList() {
-      const container = document.getElementById('favoritesList');
-      const favoritesArray = Object.entries(userFavorites);
-
-      if (favoritesArray.length === 0) {
-        container.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 20px;">Você ainda não tem favoritos.<br>Clique no coração nos conteúdos para adicionar!</p>';
-        return;
-      }
-
-      container.innerHTML = favoritesArray.map(([gameId, fav]) => {
-        const typeLabels = {
-          aplicativos: 'APP',
-          jogos: 'JOGO',
-          tutoriais: 'TUTORIAL',
-          pc: 'PC',
-          outros: 'OUTRO'
-        };
-        return `
-          <div class="favorites-item" onclick="openGameFromFavorites('${gameId}')">
-            <img src="${fav.poster}" alt="${fav.titulo}">
-            <div class="favorites-item-info">
-              <div class="favorites-item-title">${fav.titulo}</div>
-              <div class="favorites-item-meta">${typeLabels[fav.type] || fav.type}</div>
-            </div>
-            <button class="favorites-item-remove" onclick="event.stopPropagation(); removeFavorite('${gameId}')" title="Remover">🗑️</button>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function openGameFromFavorites(gameId) {
-      closeFavoritesModal();
-      if (allGames[gameId]) {
-        openGameDetail(gameId);
-      } else {
-        showCustomAlert('Este conteúdo não está mais disponível.');
-        // Remove from favorites
-        removeFavorite(gameId);
-      }
-    }
-
-    async function removeFavorite(gameId) {
-      const { doc, setDoc } = window.firebaseModules;
-      const firestore = window.firebaseFirestore;
-
-      try {
-        delete userFavorites[gameId];
-        const favRef = doc(firestore, 'favorites', currentUser.uid);
-        await setDoc(favRef, { games: userFavorites }, { merge: true });
-        renderFavoritesList();
-        updateFavoriteButton();
-      } catch (e) {
-        console.error('Erro ao remover favorito:', e);
-      }
-    }
-
-    // ===== TRANSFER POINTS SYSTEM =====
-    const TRANSFER_MIN_POINTS = 300;
-
-    function openTransferModal() {
-      if (!currentUser || currentUser.isAnonymous) {
-        showCustomAlert('Você precisa estar logado para transferir pontos.');
-        return;
-      }
-
-      // Check if user can transfer (ADM or 300+ points)
-      if (!isPublisher && userPoints < TRANSFER_MIN_POINTS) {
-        showCustomAlert(`Você precisa ter pelo menos ${TRANSFER_MIN_POINTS} pontos para poder transferir.`);
-        return;
-      }
-
-      closeSidebar();
-
-      // Update modal info
-      document.getElementById('transferCurrentPoints').textContent = userPoints;
-
-      if (isPublisher) {
-        document.getElementById('transferMinInfo').textContent = 'Como ADM, você não tem limite mínimo para transferir.';
-      } else {
-        document.getElementById('transferMinInfo').textContent = `Mínimo de ${TRANSFER_MIN_POINTS} pontos necessários para transferir.`;
-      }
-
-      document.getElementById('transferEmail').value = '';
-      document.getElementById('transferAmount').value = '';
-      document.getElementById('transferModal').classList.add('active');
-    }
-
-    function closeTransferModal() {
-      document.getElementById('transferModal').classList.remove('active');
-      document.getElementById('transferForm').reset();
-    }
-
-    async function handleTransfer(e) {
-      e.preventDefault();
-
-      if (!currentUser || currentUser.isAnonymous) {
-        showCustomAlert('Você precisa estar logado para transferir pontos.');
-        return;
-      }
-
-      const recipientEmail = document.getElementById('transferEmail').value.trim().toLowerCase();
-      const amount = parseInt(document.getElementById('transferAmount').value);
-
-      // Validations
-      if (!recipientEmail || !amount) {
-        showCustomAlert('Por favor, preencha todos os campos.');
-        return;
-      }
-
-      if (recipientEmail === currentUser.email.toLowerCase()) {
-        showCustomAlert('Você não pode transferir pontos para si mesmo.');
-        return;
-      }
-
-      if (amount <= 0) {
-        showCustomAlert('A quantidade de pontos deve ser maior que zero.');
-        return;
-      }
-
-      if (amount > userPoints) {
-        showCustomAlert('Você não tem pontos suficientes para essa transferência.');
-        return;
-      }
-
-      // For non-ADM users, check if they'll have at least 0 points after transfer
-      if (!isPublisher && userPoints < TRANSFER_MIN_POINTS) {
-        showCustomAlert(`Você precisa ter pelo menos ${TRANSFER_MIN_POINTS} pontos para transferir.`);
-        return;
-      }
-
-      try {
-        const { ref, get, update } = window.firebaseModules;
-        const database = window.firebaseDatabase;
-
-        // Find recipient by email
-        const usersRef = ref(database, 'users');
-        const usersSnapshot = await get(usersRef);
-
-        if (!usersSnapshot.exists()) {
-          showCustomAlert('Usuário destinatário não encontrado.');
-          return;
-        }
-
-        let recipientUid = null;
-        let recipientData = null;
-
-        usersSnapshot.forEach((child) => {
-          const userData = child.val();
-          if (userData.email && userData.email.toLowerCase() === recipientEmail) {
-            recipientUid = child.key;
-            recipientData = userData;
-          }
-        });
-
-        if (!recipientUid) {
-          showCustomAlert('Usuário com esse email não encontrado no sistema.');
-          return;
-        }
-
-        // Perform transfer
-        const senderNewPoints = userPoints - amount;
-        const recipientNewPoints = (recipientData.points || 0) + amount;
-
-        // Update both users
-        const updates = {};
-        updates[`users/${currentUser.uid}/points`] = senderNewPoints;
-        updates[`users/${recipientUid}/points`] = recipientNewPoints;
-
-        await update(ref(database), updates);
-
-        // Update local points
-        userPoints = senderNewPoints;
-        updateUserInfoDisplay();
-
-        // Check if transfer button should be hidden (for non-ADMs with now less than 300 points)
-        if (!isPublisher && userPoints < TRANSFER_MIN_POINTS) {
-          document.getElementById('transferBtn').style.display = 'none';
-        }
-
-        showCustomAlert(`Transferência realizada com sucesso!\n${amount} pontos enviados para ${recipientEmail}.`);
-        closeTransferModal();
-
-      } catch (error) {
-        console.error('Erro na transferência:', error);
-        showCustomAlert('Erro ao realizar transferência: ' + error.message);
-      }
-    }
-
-    // ===== DAILY REWARD SYSTEM (20 points) =====
-    async function checkDailyReward() {
-      if (!currentUser || currentUser.isAnonymous) return;
-
-      const { ref, get } = window.firebaseModules;
-      const database = window.firebaseDatabase;
-
-      try {
-        const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-        const rewardRef = ref(database, `users/${currentUser.uid}/dailyReward`);
-        const snapshot = await get(rewardRef);
-
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          if (data.lastClaimed === today) {
-            dailyRewardClaimed = true;
-          } else {
-            dailyRewardClaimed = false;
-          }
-        } else {
-          dailyRewardClaimed = false;
-        }
-
-        updateDailyRewardButton();
-      } catch (e) {
-        console.error('Erro ao verificar recompensa diária:', e);
-      }
-    }
-
-    function updateDailyRewardButton() {
-      const btn = document.getElementById('dailyRewardBtn');
-      const text = document.getElementById('dailyRewardText');
-      if (!btn || !text) return;
-
-      if (dailyRewardClaimed) {
-        btn.classList.add('claimed');
-        text.textContent = 'Já resgatado hoje ✓';
-      } else {
-        btn.classList.remove('claimed');
-        text.textContent = 'Recompensa Diária (+20)';
-      }
-    }
-
-    async function claimDailyReward() {
-      closeSidebar();
-
-      if (!currentUser || currentUser.isAnonymous) {
-        showCustomAlert('Você precisa fazer login para resgatar a recompensa diária.');
-        return;
-      }
-
-      if (userStatus === 'pending') {
-        showCustomAlert('Sua conta precisa estar verificada para resgatar recompensas.');
-        return;
-      }
-
-      if (dailyRewardClaimed) {
-        showCustomAlert('Você já resgatou sua recompensa hoje! Volte amanhã. 🎁');
-        return;
-      }
-
-      const { ref, get, update } = window.firebaseModules;
-      const database = window.firebaseDatabase;
-
-      try {
-        const today = new Date().toISOString().split('T')[0];
-        const userRef = ref(database, `users/${currentUser.uid}`);
-        const snapshot = await get(userRef);
-        const userData = snapshot.val() || {};
-        const currentPoints = userData.points || 0;
-
-        await update(userRef, {
-          points: currentPoints + 20,
-          dailyReward: {
-            lastClaimed: today,
-            claimedAt: Date.now()
-          }
-        });
-
-        userPoints = currentPoints + 20;
-        dailyRewardClaimed = true;
-
-        updatePointsDisplay();
-        updateDailyRewardButton();
-
-        showCustomAlert('🎁 Recompensa diária resgatada!\n\n+20 pontos adicionados à sua conta!');
-      } catch (e) {
-        console.error('Erro ao resgatar recompensa:', e);
-        showCustomAlert('Erro ao resgatar recompensa. Tente novamente.');
-      }
-    }
-
-    // ===== END FAVORITES, LIKES & DAILY REWARD =====
-
     function showCustomConfirm(message, onConfirm) {
       const modal = document.createElement('div');
       modal.className = 'custom-modal active';
@@ -6003,5 +3124,58 @@
       }
     });
   </script>
+ <script>
+  var versaoBotao = "1.0";
+
+ function checarVersao() {
+    if (typeof Atualizar !== "undefined") {
+      Atualizar.verificarVersao(versaoBotao);
+    } else {
+      console.log("Interface Atualizar não disponível (fora do app).");
+    }
+  }
+
+  // Executa automaticamente a cada 1 segundo (1000 ms)
+  setInterval(checarVersao, 1000);
+</script>
+  <script>
+    function isWebView() {
+      const ua = navigator.userAgent || "";
+      const isAndroidWebView = ua.includes("wv"); // Android WebView
+      const isIOSWebView = /iPhone|iPod|iPad/.test(ua) && !ua.includes("Safari"); // iOS WebView
+      return isAndroidWebView || isIOSWebView;
+    }
+
+    window.onload = function() {
+      const botao = document.getElementById("meuBotao");
+      const textoInstalar = document.getElementById("textoInstalar");
+      const instalarLink = document.getElementById("instalarLink");
+
+      if (!isWebView()) {
+        botao.style.display = "inline-block";
+
+        if (localStorage.getItem("instalarClicado") !== "true") {
+          textoInstalar.style.display = "inline-block";
+        } else {
+          textoInstalar.style.display = "none";
+        }
+      } else {
+        botao.style.display = "none";
+        textoInstalar.style.display = "none";
+      }
+
+      botao.onclick = function() {
+        window.open("https://www.mediafire.com/file/nj4zgph4ekr85lr/Portal+Digital+1.0.apk/file", "_blank");
+      };
+
+      instalarLink.onclick = function() {
+        window.open("https://www.mediafire.com/file/nj4zgph4ekr85lr/Portal+Digital+1.0.apk/file", "_blank");
+        localStorage.setItem("instalarClicado", "true");
+        textoInstalar.style.display = "none";
+      };
+    };
+  </script>
+
 </body>
 </html>
+
