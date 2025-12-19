@@ -13,7 +13,7 @@
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously, onAuthStateChanged, signOut, sendPasswordResetEmail, updateProfile, sendEmailVerification } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
     import { getDatabase, ref, set, get, update, remove, onValue, push } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
     // Firestore imports for cached/static data
-    import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc, query, where, orderBy, limit, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc, query, where, orderBy, limit, onSnapshot, increment } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyBgEfuLNpU5j9EIcvQ9Qs_reEvtXGPIbO0",
@@ -66,7 +66,8 @@
       where,
       orderBy,
       limit,
-      onSnapshot
+      onSnapshot,
+      increment
     };
   </script>
 
@@ -1443,6 +1444,15 @@
       100% { transform: scale(1); }
     }
 
+    /* Transfer Button */
+    .transfer-btn {
+      background: linear-gradient(135deg, #00BCD4 0%, #0097A7 100%) !important;
+    }
+
+    .transfer-btn:hover {
+      background: linear-gradient(135deg, #00ACC1 0%, #00838F 100%) !important;
+    }
+
     /* Like Button */
     .like-btn {
       display: flex;
@@ -1720,6 +1730,11 @@
       Meus Favoritos
     </button>
 
+    <button class="btn transfer-btn" id="transferBtn" onclick="openTransferModal()" style="display: none;">
+      <svg viewBox="0 0 24 24"><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/></svg>
+      Transferir Pontos
+    </button>
+
     <button class="btn" id="redeemCodeBtn" onclick="openRedeemCodeModal()">
       <svg viewBox="0 0 24 24"><path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 00-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"/></svg>
       Resgatar Código
@@ -1836,7 +1851,7 @@
         </button>
         <h1 class="content-header-title" id="contentHeaderTitle">Carregando...</h1>
         <button class="favorite-btn" id="favoriteBtn" onclick="toggleFavorite()" title="Adicionar aos favoritos" style="padding: 8px;">
-          <span id="favoriteIcon">🤍</span>
+          <svg id="favoriteIcon" viewBox="0 0 24 24" width="24" height="24" style="fill: #9e9e9e; transition: all 0.2s ease;"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
         </button>
         <button class="content-header-btn share-btn" onclick="shareContent()">
           <svg viewBox="0 0 24 24" width="24" height="24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
@@ -1875,7 +1890,8 @@
 
         <div style="display: flex; gap: 12px; align-items: center; justify-content: center; margin-top: 16px;">
           <button class="like-btn" id="likeBtn" onclick="toggleLike()" title="Curtir este conteúdo">
-            <span class="like-icon" id="likeIcon">🤍</span> Curtir
+            <svg class="like-icon" id="likeIcon" viewBox="0 0 24 24" width="18" height="18" style="fill: currentColor;"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            Curtir
           </button>
           <button class="btn-close" onclick="closeOverlay()">Voltar</button>
         </div>
@@ -2219,7 +2235,7 @@
         </div>
         <div class="custom-modal-buttons">
           <button type="button" class="custom-modal-btn secondary" onclick="closeSendNotificationModal()">Cancelar</button>
-          <button type="submit" class="custom-modal-btn primary" id="sendNotificationBtn">Enviar para Todos</button>
+          <button type="submit" class="custom-modal-btn primary" id="sendNotificationSubmitBtn">Enviar para Todos</button>
         </div>
       </form>
     </div>
@@ -2339,13 +2355,46 @@
   <!-- Modal Favoritos -->
   <div id="favoritesModal" class="custom-modal">
     <div class="custom-modal-content" style="max-width: 500px;">
-      <h2>❤️ Meus Favoritos</h2>
+      <h2>
+        <svg viewBox="0 0 24 24" width="24" height="24" style="fill: #e91e63; vertical-align: middle; margin-right: 8px;"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        Meus Favoritos
+      </h2>
       <div id="favoritesList" style="max-height: 60vh; overflow-y: auto; padding: 8px 0;">
         <p style="color: var(--text-muted); text-align: center;">Carregando...</p>
       </div>
       <div class="custom-modal-buttons" style="margin-top: 16px;">
         <button class="custom-modal-btn secondary" onclick="closeFavoritesModal()">Fechar</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Modal Transferência de Pontos -->
+  <div id="transferModal" class="custom-modal">
+    <div class="custom-modal-content" style="max-width: 450px;">
+      <h2>
+        <svg viewBox="0 0 24 24" width="24" height="24" style="fill: #00BCD4; vertical-align: middle; margin-right: 8px;"><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/></svg>
+        Transferir Pontos
+      </h2>
+      <div id="transferInfo" style="background: var(--bg-tertiary); padding: 12px; border-radius: 8px; margin-bottom: 16px;">
+        <p style="margin: 0; color: var(--text-secondary); font-size: 14px;">
+          Seus pontos: <strong id="transferCurrentPoints" style="color: var(--accent-primary);">0</strong>
+        </p>
+        <p id="transferMinInfo" style="margin: 8px 0 0 0; color: var(--text-muted); font-size: 12px;"></p>
+      </div>
+      <form id="transferForm" onsubmit="handleTransfer(event)">
+        <div class="form-group">
+          <label class="form-label">Email do destinatário</label>
+          <input type="email" class="form-input" id="transferEmail" placeholder="email@gmail.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Quantidade de pontos</label>
+          <input type="number" class="form-input" id="transferAmount" min="1" placeholder="Ex: 50" required>
+        </div>
+        <div class="custom-modal-buttons">
+          <button type="button" class="custom-modal-btn secondary" onclick="closeTransferModal()">Cancelar</button>
+          <button type="submit" class="custom-modal-btn primary">Transferir</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -2536,6 +2585,7 @@
       const logoutBtn = document.getElementById('logoutBtn');
       const dailyRewardBtn = document.getElementById('dailyRewardBtn');
       const favoritesBtn = document.getElementById('favoritesBtn');
+      const transferBtn = document.getElementById('transferBtn');
 
       if (!currentUser || currentUser.isAnonymous) {
         // Anonymous mode - viewing only
@@ -2553,6 +2603,7 @@
         earnPointsBtn.style.display = 'none';
         dailyRewardBtn.style.display = 'none';
         favoritesBtn.style.display = 'none';
+        transferBtn.style.display = 'none';
         logoutBtn.style.display = 'none';
       } else {
         // Logged in user
@@ -2571,10 +2622,18 @@
           loadUserFavorites();
           loadUserLikes();
           checkDailyReward();
+
+          // Show transfer button: ADMs always, regular users need 300+ points
+          if (isPublisher || userPoints >= 300) {
+            transferBtn.style.display = 'flex';
+          } else {
+            transferBtn.style.display = 'none';
+          }
         } else {
           earnPointsBtn.style.display = 'none';
           dailyRewardBtn.style.display = 'none';
           favoritesBtn.style.display = 'none';
+          transferBtn.style.display = 'none';
         }
 
         // Show notifications for all logged in users
@@ -2889,15 +2948,48 @@
         }];
       }
 
-      downloadContainer.innerHTML = links.map((link, index) => `
-        <div class="download-section">
-          <div class="download-section-title">${link.desc}</div>
-          <div class="download-section-buttons">
-            <button class="btn-main" onclick="downloadGame('${id}', 'GA', '${link.linkGA}', ${cost})">Baixar G.A</button>
-            <button class="btn-main" onclick="downloadGame('${id}', 'ADM', '${link.linkADM}', ${cost})">Baixar ADM</button>
+      downloadContainer.innerHTML = links.map((link, index) => {
+        const hasGA = link.linkGA && link.linkGA.trim() !== '';
+        const hasADM = link.linkADM && link.linkADM.trim() !== '';
+
+        // Se nenhum link disponível, mostrar mensagem
+        if (!hasGA && !hasADM) {
+          return `
+            <div class="download-section">
+              <div class="download-section-title">${link.desc || 'Download'}</div>
+              <div class="download-section-buttons">
+                <span style="color: var(--text-muted); font-size: 14px;">Links não disponíveis</span>
+              </div>
+            </div>
+          `;
+        }
+
+        return `
+          <div class="download-section">
+            <div class="download-section-title">${link.desc || 'Download'}</div>
+            <div class="download-section-buttons">
+              ${hasGA ? `<button class="btn-main download-btn" data-game-id="${id}" data-app-type="GA" data-link-index="${index}" data-cost="${cost}">Baixar G.A</button>` : ''}
+              ${hasADM ? `<button class="btn-main download-btn" data-game-id="${id}" data-app-type="ADM" data-link-index="${index}" data-cost="${cost}">Baixar ADM</button>` : ''}
+            </div>
           </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
+
+      // Store links data for download buttons
+      window.currentDownloadLinks = links;
+
+      // Add event listeners to download buttons
+      downloadContainer.querySelectorAll('.download-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const gameId = this.dataset.gameId;
+          const appType = this.dataset.appType;
+          const linkIndex = parseInt(this.dataset.linkIndex);
+          const cost = parseInt(this.dataset.cost);
+          const linkData = window.currentDownloadLinks[linkIndex];
+          const url = appType === 'GA' ? linkData.linkGA : linkData.linkADM;
+          downloadGame(gameId, appType, url, cost);
+        });
+      });
 
       // Load comments
       loadComments(id);
@@ -2941,26 +3033,65 @@
         return;
       }
 
-      // Deduct points
-      await updateUserPoints(userPoints - cost);
+      // Verificar se a URL é válida ANTES de deduzir pontos
+      if (!url || url.trim() === '') {
+        showCustomAlert('Erro: Link de download não disponível. Por favor, tente o outro botão ou entre em contato com o administrador.');
+        return;
+      }
 
-      // Increment download count
-      const { ref, get, set } = window.firebaseModules;
-      const database = window.firebaseDatabase;
-      const gameRef = ref(database, `games/${gameId}/downloads`);
-      const snapshot = await get(gameRef);
-      const currentDownloads = snapshot.exists() ? snapshot.val() : 0;
-      await set(gameRef, currentDownloads + 1);
+      // PRIMEIRO: Fazer todas as operações de banco de dados ANTES de abrir o link
+      // Isso garante que o contador seja incrementado mesmo se o navegador redirecionar
 
-      // Open link
-      window.location.assign(url);
+      // Deduzir pontos primeiro
+      try {
+        await updateUserPoints(userPoints - cost);
+      } catch (error) {
+        console.error('Erro ao deduzir pontos:', error);
+      }
+
+      // Incrementar contador de downloads usando Realtime Database
+      // A regra games/$gameId/downloads permite escrita por usuários autenticados
+      try {
+        const { ref, get, set } = window.firebaseModules;
+        const database = window.firebaseDatabase;
+        const downloadsRef = ref(database, `games/${gameId}/downloads`);
+
+        // Buscar o valor atual e incrementar
+        const snapshot = await get(downloadsRef);
+        const currentDownloads = snapshot.exists() ? (snapshot.val() || 0) : 0;
+        await set(downloadsRef, currentDownloads + 1);
+        console.log('Download count incrementado para:', gameId, '- Novo valor:', currentDownloads + 1);
+
+        // Atualizar o contador local para exibição imediata
+        if (allGames[gameId]) {
+          allGames[gameId].downloads = currentDownloads + 1;
+        }
+      } catch (error) {
+        console.error('Erro ao incrementar downloads:', error.message || error);
+      }
+
+      // AGORA abrir o link (depois que todas as operações de banco terminaram)
+      const downloadWindow = window.open(url, '_blank');
+
+      // Fallback: criar link temporário para download (não interrompe o script)
+      if (!downloadWindow || downloadWindow.closed || typeof downloadWindow.closed === 'undefined') {
+        const tempLink = document.createElement('a');
+        tempLink.href = url;
+        tempLink.target = '_blank';
+        tempLink.rel = 'noopener noreferrer';
+        document.body.appendChild(tempLink);
+        tempLink.click();
+        document.body.removeChild(tempLink);
+      }
+
+      // Chamar Android interface se disponível
       setTimeout(function(){
         if (typeof Android !== "undefined" && Android.openApp) {
           Android.openApp(appType);
         }
       }, 200);
 
-      showCustomAlert(`Download iniciado! ${cost} pontos deduzidos. Pontos restantes: ${userPoints}`);
+      showCustomAlert(`Download iniciado! ${cost} pontos deduzidos. Pontos restantes: ${userPoints - cost}`);
     }
 
     function closeOverlay() {
@@ -3535,7 +3666,7 @@
 
       } catch (error) {
         console.error('Erro ao enviar email:', error);
-        let errorMsg = 'Erro ao enviar email de verificação.';
+        let errorMsg = 'Erro ao enviar email de verifica��ão.';
         if (error.code === 'auth/too-many-requests') {
           errorMsg = 'Muitas tentativas. Aguarde alguns minutos e tente novamente.';
         }
@@ -5410,7 +5541,7 @@
         if (isFavorite) {
           showCustomAlert('Removido dos favoritos!');
         } else {
-          showCustomAlert('Adicionado aos favoritos! ❤️');
+          showCustomAlert('Adicionado aos favoritos!');
         }
       } catch (e) {
         console.error('Erro ao atualizar favorito:', e);
@@ -5428,10 +5559,10 @@
       const isFavorite = userFavorites[currentGameData.id];
 
       if (isFavorite) {
-        icon.textContent = '❤️';
+        icon.style.fill = '#e91e63';
         btn.classList.add('active');
       } else {
-        icon.textContent = '🤍';
+        icon.style.fill = '#9e9e9e';
         btn.classList.remove('active');
       }
     }
@@ -5524,10 +5655,10 @@
       }
 
       if (isLiked) {
-        icon.textContent = '❤️';
+        icon.style.fill = '#e91e63';
         btn.classList.add('liked');
       } else {
-        icon.textContent = '🤍';
+        icon.style.fill = 'currentColor';
         btn.classList.remove('liked');
       }
     }
@@ -5548,7 +5679,7 @@
       const favoritesArray = Object.entries(userFavorites);
 
       if (favoritesArray.length === 0) {
-        container.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 20px;">Você ainda não tem favoritos.<br>Clique no ❤️ nos conteúdos para adicionar!</p>';
+        container.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 20px;">Você ainda não tem favoritos.<br>Clique no coração nos conteúdos para adicionar!</p>';
         return;
       }
 
@@ -5596,6 +5727,138 @@
         updateFavoriteButton();
       } catch (e) {
         console.error('Erro ao remover favorito:', e);
+      }
+    }
+
+    // ===== TRANSFER POINTS SYSTEM =====
+    const TRANSFER_MIN_POINTS = 300;
+
+    function openTransferModal() {
+      if (!currentUser || currentUser.isAnonymous) {
+        showCustomAlert('Você precisa estar logado para transferir pontos.');
+        return;
+      }
+
+      // Check if user can transfer (ADM or 300+ points)
+      if (!isPublisher && userPoints < TRANSFER_MIN_POINTS) {
+        showCustomAlert(`Você precisa ter pelo menos ${TRANSFER_MIN_POINTS} pontos para poder transferir.`);
+        return;
+      }
+
+      closeSidebar();
+
+      // Update modal info
+      document.getElementById('transferCurrentPoints').textContent = userPoints;
+
+      if (isPublisher) {
+        document.getElementById('transferMinInfo').textContent = 'Como ADM, você não tem limite mínimo para transferir.';
+      } else {
+        document.getElementById('transferMinInfo').textContent = `Mínimo de ${TRANSFER_MIN_POINTS} pontos necessários para transferir.`;
+      }
+
+      document.getElementById('transferEmail').value = '';
+      document.getElementById('transferAmount').value = '';
+      document.getElementById('transferModal').classList.add('active');
+    }
+
+    function closeTransferModal() {
+      document.getElementById('transferModal').classList.remove('active');
+      document.getElementById('transferForm').reset();
+    }
+
+    async function handleTransfer(e) {
+      e.preventDefault();
+
+      if (!currentUser || currentUser.isAnonymous) {
+        showCustomAlert('Você precisa estar logado para transferir pontos.');
+        return;
+      }
+
+      const recipientEmail = document.getElementById('transferEmail').value.trim().toLowerCase();
+      const amount = parseInt(document.getElementById('transferAmount').value);
+
+      // Validations
+      if (!recipientEmail || !amount) {
+        showCustomAlert('Por favor, preencha todos os campos.');
+        return;
+      }
+
+      if (recipientEmail === currentUser.email.toLowerCase()) {
+        showCustomAlert('Você não pode transferir pontos para si mesmo.');
+        return;
+      }
+
+      if (amount <= 0) {
+        showCustomAlert('A quantidade de pontos deve ser maior que zero.');
+        return;
+      }
+
+      if (amount > userPoints) {
+        showCustomAlert('Você não tem pontos suficientes para essa transferência.');
+        return;
+      }
+
+      // For non-ADM users, check if they'll have at least 0 points after transfer
+      if (!isPublisher && userPoints < TRANSFER_MIN_POINTS) {
+        showCustomAlert(`Você precisa ter pelo menos ${TRANSFER_MIN_POINTS} pontos para transferir.`);
+        return;
+      }
+
+      try {
+        const { ref, get, update } = window.firebaseModules;
+        const database = window.firebaseDatabase;
+
+        // Find recipient by email
+        const usersRef = ref(database, 'users');
+        const usersSnapshot = await get(usersRef);
+
+        if (!usersSnapshot.exists()) {
+          showCustomAlert('Usuário destinatário não encontrado.');
+          return;
+        }
+
+        let recipientUid = null;
+        let recipientData = null;
+
+        usersSnapshot.forEach((child) => {
+          const userData = child.val();
+          if (userData.email && userData.email.toLowerCase() === recipientEmail) {
+            recipientUid = child.key;
+            recipientData = userData;
+          }
+        });
+
+        if (!recipientUid) {
+          showCustomAlert('Usuário com esse email não encontrado no sistema.');
+          return;
+        }
+
+        // Perform transfer
+        const senderNewPoints = userPoints - amount;
+        const recipientNewPoints = (recipientData.points || 0) + amount;
+
+        // Update both users
+        const updates = {};
+        updates[`users/${currentUser.uid}/points`] = senderNewPoints;
+        updates[`users/${recipientUid}/points`] = recipientNewPoints;
+
+        await update(ref(database), updates);
+
+        // Update local points
+        userPoints = senderNewPoints;
+        updateUserInfoDisplay();
+
+        // Check if transfer button should be hidden (for non-ADMs with now less than 300 points)
+        if (!isPublisher && userPoints < TRANSFER_MIN_POINTS) {
+          document.getElementById('transferBtn').style.display = 'none';
+        }
+
+        showCustomAlert(`Transferência realizada com sucesso!\n${amount} pontos enviados para ${recipientEmail}.`);
+        closeTransferModal();
+
+      } catch (error) {
+        console.error('Erro na transferência:', error);
+        showCustomAlert('Erro ao realizar transferência: ' + error.message);
       }
     }
 
@@ -5742,4 +6005,3 @@
   </script>
 </body>
 </html>
-
