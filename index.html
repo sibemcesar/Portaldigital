@@ -3039,28 +3039,13 @@
         return;
       }
 
-      // PRIMEIRO: Fazer todas as operações de banco de dados ANTES de abrir o link
-      // Isso garante que o contador seja incrementado mesmo se o navegador redirecionar
-
-      // Deduzir pontos primeiro
-      try {
-        await updateUserPoints(userPoints - cost);
-      } catch (error) {
-        console.error('Erro ao deduzir pontos:', error);
-      }
-
-      // Abrir o link de download
+      // IMPORTANTE: Abrir o link IMEDIATAMENTE (antes de qualquer await)
+      // Isso evita bloqueio de popup pelo navegador
       const downloadWindow = window.open(url, '_blank');
 
-      // Fallback: criar link temporário para download
+      // Fallback: se window.open foi bloqueado, usar location.href
       if (!downloadWindow || downloadWindow.closed || typeof downloadWindow.closed === 'undefined') {
-        const tempLink = document.createElement('a');
-        tempLink.href = url;
-        tempLink.target = '_blank';
-        tempLink.rel = 'noopener noreferrer';
-        document.body.appendChild(tempLink);
-        tempLink.click();
-        document.body.removeChild(tempLink);
+        window.location.href = url;
       }
 
       // Chamar Android interface se disponível
@@ -3069,6 +3054,27 @@
           Android.openApp(appType);
         }
       }, 200);
+
+      // Agora fazer as operações assíncronas (depois de abrir o link)
+      // Deduzir pontos primeiro
+      try {
+        await updateUserPoints(userPoints - cost);
+      } catch (error) {
+        console.error('Erro ao deduzir pontos:', error);
+      }
+
+      // Incrementar contador de downloads separadamente
+      try {
+        const { doc: firestoreDoc, updateDoc, increment } = window.firebaseModules;
+        const firestore = window.firebaseFirestore;
+        const gameDocRef = firestoreDoc(firestore, 'games', gameId);
+        await updateDoc(gameDocRef, {
+          downloads: increment(1)
+        });
+        console.log('Download count incrementado para:', gameId);
+      } catch (error) {
+        console.error('Erro ao incrementar downloads:', JSON.stringify(error));
+      }
 
       showCustomAlert(`Download iniciado! ${cost} pontos deduzidos. Pontos restantes: ${userPoints - cost}`);
     }
@@ -3645,7 +3651,7 @@
 
       } catch (error) {
         console.error('Erro ao enviar email:', error);
-        let errorMsg = 'Erro ao enviar email de verifica��ão.';
+        let errorMsg = 'Erro ao enviar email de verificação.';
         if (error.code === 'auth/too-many-requests') {
           errorMsg = 'Muitas tentativas. Aguarde alguns minutos e tente novamente.';
         }
