@@ -13,7 +13,7 @@
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously, onAuthStateChanged, signOut, sendPasswordResetEmail, updateProfile, sendEmailVerification } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
     import { getDatabase, ref, set, get, update, remove, onValue, push } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
     // Firestore imports for cached/static data
-    import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc, query, where, orderBy, limit, onSnapshot, increment } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc, query, where, orderBy, limit, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyBgEfuLNpU5j9EIcvQ9Qs_reEvtXGPIbO0",
@@ -66,8 +66,7 @@
       where,
       orderBy,
       limit,
-      onSnapshot,
-      increment
+      onSnapshot
     };
   </script>
 
@@ -2235,7 +2234,7 @@
         </div>
         <div class="custom-modal-buttons">
           <button type="button" class="custom-modal-btn secondary" onclick="closeSendNotificationModal()">Cancelar</button>
-          <button type="submit" class="custom-modal-btn primary" id="sendNotificationSubmitBtn">Enviar para Todos</button>
+          <button type="submit" class="custom-modal-btn primary" id="sendNotificationBtn">Enviar para Todos</button>
         </div>
       </form>
     </div>
@@ -2675,15 +2674,11 @@
       const gamesQuery = query(gamesRef, orderBy('downloads', 'desc'));
 
       // Use onSnapshot for real-time updates but with Firestore's built-in caching
-      onSnapshot(gamesQuery, async (snapshot) => {
+      onSnapshot(gamesQuery, (snapshot) => {
         allGames = {};
         snapshot.forEach((doc) => {
           allGames[doc.id] = doc.data();
         });
-
-        // Carregar contagem de downloads da coleção separada
-        await loadDownloadCounts();
-
         gamesLoaded = true;
         renderGrid();
         // Check if URL has game ID to auto-open content
@@ -2693,28 +2688,6 @@
         // Fallback: try to load once without listener
         loadGamesOnce();
       });
-    }
-
-    // Função para carregar contagens de downloads da coleção separada
-    async function loadDownloadCounts() {
-      try {
-        const { collection, getDocs } = window.firebaseModules;
-        const firestore = window.firebaseFirestore;
-        const downloadsRef = collection(firestore, 'gameDownloads');
-        const snapshot = await getDocs(downloadsRef);
-
-        snapshot.forEach((doc) => {
-          const gameId = doc.id;
-          const downloadCount = doc.data().count || 0;
-          if (allGames[gameId]) {
-            // Combinar: usar o maior valor entre games.downloads e gameDownloads.count
-            const existingDownloads = allGames[gameId].downloads || 0;
-            allGames[gameId].downloads = Math.max(existingDownloads, downloadCount);
-          }
-        });
-      } catch (error) {
-        console.error('Erro ao carregar contagem de downloads:', error);
-      }
     }
 
     // Fallback function to load games once (without real-time)
@@ -2731,10 +2704,6 @@
         snapshot.forEach((doc) => {
           allGames[doc.id] = doc.data();
         });
-
-        // Carregar contagem de downloads da coleção separada
-        await loadDownloadCounts();
-
         gamesLoaded = true;
         renderGrid();
         checkUrlForGameId();
@@ -3069,52 +3038,19 @@
         return;
       }
 
-      // PRIMEIRO: Fazer todas as operações de banco de dados ANTES de abrir o link
-      // Isso garante que o contador seja incrementado mesmo se o navegador redirecionar
+      // Deduct points
+      await updateUserPoints(userPoints - cost);
 
-      // Deduzir pontos primeiro
-      try {
-        await updateUserPoints(userPoints - cost);
-      } catch (error) {
-        console.error('Erro ao deduzir pontos:', error);
-      }
+      // Increment download count
+      const { ref, get, set } = window.firebaseModules;
+      const database = window.firebaseDatabase;
+      const gameRef = ref(database, `games/${gameId}/downloads`);
+      const snapshot = await get(gameRef);
+      const currentDownloads = snapshot.exists() ? snapshot.val() : 0;
+      await set(gameRef, currentDownloads + 1);
 
-      // Incrementar contador de downloads na coleção separada (gameDownloads)
-      // Isso mantém a coleção 'games' segura (só ADMs podem escrever)
-      try {
-        const { doc: firestoreDoc, getDoc, setDoc } = window.firebaseModules;
-        const firestore = window.firebaseFirestore;
-        const downloadDocRef = firestoreDoc(firestore, 'gameDownloads', gameId);
-
-        // Buscar o valor atual e incrementar manualmente
-        const downloadSnap = await getDoc(downloadDocRef);
-        const currentDownloads = downloadSnap.exists() ? (downloadSnap.data().count || 0) : 0;
-        await setDoc(downloadDocRef, { count: currentDownloads + 1 }, { merge: true });
-        console.log('Download count incrementado para:', gameId, '- Novo valor:', currentDownloads + 1);
-
-        // Atualizar o contador local para exibição imediata
-        if (allGames[gameId]) {
-          allGames[gameId].downloads = currentDownloads + 1;
-        }
-      } catch (error) {
-        console.error('Erro ao incrementar downloads:', error.message || error);
-      }
-
-      // AGORA abrir o link (depois que todas as operações de banco terminaram)
-      const downloadWindow = window.open(url, '_blank');
-
-      // Fallback: criar link temporário para download (não interrompe o script)
-      if (!downloadWindow || downloadWindow.closed || typeof downloadWindow.closed === 'undefined') {
-        const tempLink = document.createElement('a');
-        tempLink.href = url;
-        tempLink.target = '_blank';
-        tempLink.rel = 'noopener noreferrer';
-        document.body.appendChild(tempLink);
-        tempLink.click();
-        document.body.removeChild(tempLink);
-      }
-
-      // Chamar Android interface se disponível
+      // Open link
+      window.open(url, '_blank');
       setTimeout(function(){
         if (typeof Android !== "undefined" && Android.openApp) {
           Android.openApp(appType);
@@ -3696,7 +3632,7 @@
 
       } catch (error) {
         console.error('Erro ao enviar email:', error);
-        let errorMsg = 'Erro ao enviar email de verifica��ão.';
+        let errorMsg = 'Erro ao enviar email de verificação.';
         if (error.code === 'auth/too-many-requests') {
           errorMsg = 'Muitas tentativas. Aguarde alguns minutos e tente novamente.';
         }
@@ -6035,3 +5971,4 @@
   </script>
 </body>
 </html>
+
