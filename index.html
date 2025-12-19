@@ -1690,7 +1690,7 @@
 
     <button class="btn" id="manageBtn" onclick="openManageModal()" style="display: none;">
       <svg viewBox="0 0 24 24"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg>
-      Meus Jogos
+      Meus Post    
     </button>
 
     <button class="btn" id="generateCodeBtn" onclick="openGenerateCodeModal()" style="display: none;">
@@ -1758,6 +1758,26 @@
       <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
       Sair
     </button>
+    
+     <button class="btn" id="meuBotao" style="display:none;margin-left:-58px;">
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" 
+       viewBox="0 0 24 24" aria-label="Android app icon" 
+       style="vertical-align:middle; margin-right:8px;">
+    <g fill="#3DDC84">
+      <rect x="5" y="7" width="14" height="8" rx="3"/>
+      <circle cx="9" cy="11" r="1.2" fill="#ffffff"/>
+      <circle cx="15" cy="11" r="1.2" fill="#ffffff"/>
+      <rect x="7" y="3" width="1.8" height="4" rx="0.9" transform="rotate(-25 7.9 5)"/>
+      <rect x="15.2" y="3" width="1.8" height="4" rx="0.9" transform="rotate(25 16.1 5)"/>
+      <rect x="6" y="13" width="12" height="7" rx="2"/>
+      <rect x="3" y="13" width="2" height="6" rx="1.2"/>
+      <rect x="19" y="13" width="2" height="6" rx="1.2"/>
+      <rect x="8" y="20" width="3" height="3" rx="1"/>
+      <rect x="13" y="20" width="3" height="3" rx="1"/>
+    </g>
+  </svg>
+  Baixar o Aplicativo
+</button>
 
     <div style="border-top: 1px solid var(--border-color); margin: 12px 0; padding-top: 12px;">
       <button class="btn" onclick="openFaqModal()">
@@ -1770,6 +1790,10 @@
       </button>
     </div>
   </div>
+
+ <span id="textoInstalar" class="btn" >
+    <small>Continue usando no nosso aplicativo </small> <strong id="instalarLink">Instalar</strong>
+  </span>
 
   <div id="search-container" class="search-container">
     <div class="search-wrapper">
@@ -1833,9 +1857,10 @@
             <div class="skeleton-stat"></div>
           </div>
         </div>
-      </div>
+      </div>     
     </div>
 
+    
     <div id="noResults" class="no-results" style="display: none;">
       Nenhum resultado encontrado
     </div>
@@ -1864,7 +1889,7 @@
         <div id="videoContainer" class="video-container" style="display: none;"></div>
 
         <div id="insufficientPointsWarning" style="display: none;" class="insufficient-points">
-          ⚠️ Você não tem pontos suficientes para baixar este jogo!
+          ⚠️ Você não tem pontos suficientes para continuar!
         </div>
 
         <div class="info-comments-toggle">
@@ -1953,7 +1978,7 @@
   <!-- Modal Verificação de Email -->
   <div id="emailVerificationModal" class="custom-modal">
     <div class="custom-modal-content" style="max-width: 450px;">
-      <h2>📧 Verificar Email</h2>
+      <h2> Verificar Email</h2>
 
       <div id="emailVerificationContent">
         <!-- Content set dynamically -->
@@ -1980,7 +2005,7 @@
 
   <div id="publishModal" class="custom-modal">
     <div class="custom-modal-content">
-      <h2 id="publishModalTitle">Publicar Jogo</h2>
+      <h2 id="publishModalTitle">Publicar </h2>
       <form id="publishForm" onsubmit="handlePublish(event)">
         <input type="hidden" id="editGameId">
 
@@ -2062,7 +2087,7 @@
 
   <div id="manageModal" class="custom-modal">
     <div class="custom-modal-content">
-      <h2>Meus Jogos</h2>
+      <h2>Meus Post</h2>
       <div id="manageGamesList" class="loading">Carregando...</div>
       <div class="custom-modal-buttons" style="margin-top: 16px;">
         <button class="custom-modal-btn secondary" onclick="closeManageModal()">Fechar</button>
@@ -2204,7 +2229,7 @@
   <!-- Modal para enviar notificação (Admin) -->
   <div id="sendNotificationModal" class="custom-modal">
     <div class="custom-modal-content" style="max-width: 500px;">
-      <h2>📤 Enviar Notificação</h2>
+      <h2> Enviar Notificação</h2>
       <form id="sendNotificationForm" onsubmit="handleSendNotification(event)">
         <div class="form-group">
           <label class="form-label">Destinatário</label>
@@ -2243,7 +2268,7 @@
   <!-- Modal para ver notificações (Usuário) -->
   <div id="notificationsModal" class="custom-modal">
     <div class="custom-modal-content" style="max-width: 500px;">
-      <h2>🔔 Minhas Notificações</h2>
+      <h2> Minhas Notificações</h2>
       <div id="notificationsList" style="max-height: 60vh; overflow-y: auto; padding: 8px 0;">Carregando...</div>
       <div class="custom-modal-buttons" style="margin-top: 16px; justify-content: space-between;">
         <button class="custom-modal-btn primary" onclick="markAllNotificationsAsRead()" id="markAllReadBtn">✓ Marcar todas como lidas</button>
@@ -2255,61 +2280,61 @@
   <!-- Modal FAQ / Sobre o App -->
   <div id="faqModal" class="custom-modal">
     <div class="custom-modal-content" style="max-width: 550px;">
-      <h2>❓ Sobre o Portal Digital</h2>
+      <h2> Sobre o Portal Digital</h2>
       <div style="max-height: 65vh; overflow-y: auto; padding: 8px 0;">
 
         <div style="background: linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(156, 39, 176, 0.1) 100%); padding: 16px; border-radius: 12px; margin-bottom: 20px; text-align: center;">
-          <h3 style="margin: 0 0 8px 0; color: var(--text-primary);">🎮 Portal Digital</h3>
+          <h3 style="margin: 0 0 8px 0; color: var(--text-primary);"> Portal Digital</h3>
           <p style="margin: 0; color: var(--text-secondary); font-size: 14px;">Sua plataforma de aplicativos, jogos e tutoriais</p>
-          <p style="margin: 8px 0 0 0; font-size: 12px; color: var(--text-muted);">Versão 2.0</p>
+          <p style="margin: 8px 0 0 0; font-size: 12px; color: var(--text-muted);">Versão 1.0</p>
         </div>
 
         <div class="faq-item" style="margin-bottom: 16px;">
-          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;">📱 O que é o Portal Digital?</h4>
+          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;"> O que é o Portal Digital?</h4>
           <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.5;">
             O Portal Digital é uma plataforma onde você pode encontrar e baixar aplicativos, jogos, tutoriais e muito mais. Nosso objetivo é oferecer conteúdo de qualidade para todos os usuários.
           </p>
         </div>
 
         <div class="faq-item" style="margin-bottom: 16px;">
-          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;">🔐 Como criar uma conta?</h4>
+          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;"> Como criar uma conta?</h4>
           <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.5;">
             Clique em "Criar Conta" no menu lateral, preencha seu nome, email (apenas Gmail) e senha. Sua conta ficará pendente até ser aprovada por um administrador.
           </p>
         </div>
 
         <div class="faq-item" style="margin-bottom: 16px;">
-          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;">⭐ O que são os pontos?</h4>
+          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;"> O que são os pontos?</h4>
           <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.5;">
             Pontos são a moeda virtual do Portal Digital. Você pode ganhar pontos assistindo anúncios ou resgatando códigos. Use os pontos para desbloquear downloads de conteúdos premium.
           </p>
         </div>
 
         <div class="faq-item" style="margin-bottom: 16px;">
-          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;">📥 Como baixar um jogo/app?</h4>
+          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;"> Como baixar um jogo/app?</h4>
           <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.5;">
             Clique no card do jogo/app desejado para ver os detalhes. Se tiver pontos suficientes, clique no botão de download. Você será redirecionado para o link de download.
           </p>
         </div>
 
         <div class="faq-item" style="margin-bottom: 16px;">
-          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;">🔔 Como funcionam as notificações?</h4>
+          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;"> Como funcionam as notificações?</h4>
           <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.5;">
             Você receberá notificações sobre novos conteúdos, atualizações e mensagens importantes. Pode marcar como lida ou apagar as notificações a qualquer momento.
           </p>
         </div>
 
         <div class="faq-item" style="margin-bottom: 16px;">
-          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;">💬 Posso comentar nos jogos?</h4>
+          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;"> Posso comentar nos jogos?</h4>
           <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.5;">
             Sim! Usuários com conta verificada podem deixar comentários em qualquer jogo ou aplicativo. Você também pode apagar seus próprios comentários.
           </p>
         </div>
 
         <div class="faq-item" style="margin-bottom: 16px;">
-          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;">📧 Contato e Suporte</h4>
+          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;"> Contato e Suporte</h4>
           <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.5;">
-            Para dúvidas, sugestões ou problemas, entre em contato com os administradores através das redes sociais ou aguarde uma notificação com informações de contato.
+            Para dúvidas, sugestões ou problemas, entre em contato com os administradores através do nosso email <strong>portaldigitalao.@gmail.com</strong> ou aguarde uma notificação com informações de contato.
           </p>
         </div>
 
@@ -2323,7 +2348,7 @@
   <!-- Modal Avaliação do App -->
   <div id="ratingModal" class="custom-modal">
     <div class="custom-modal-content" style="max-width: 420px;">
-      <h2>⭐ Avaliar o Aplicativo</h2>
+      <h2> Avaliar o Aplicativo</h2>
 
       <div id="ratingContent">
         <!-- Content will be set dynamically -->
@@ -2334,7 +2359,7 @@
   <!-- Modal Confirmação de Avaliação -->
   <div id="ratingConfirmModal" class="custom-modal">
     <div class="custom-modal-content" style="max-width: 400px;">
-      <h2>✅ Confirmar Avaliação</h2>
+      <h2>Confirmar Avaliação</h2>
       <p style="color: var(--text-secondary); font-size: 15px; line-height: 1.6; margin: 16px 0;">
         Você confirma sua avaliação de <strong id="confirmStarsText">0 estrelas</strong> para o aplicativo?
       </p>
@@ -2951,27 +2976,11 @@
         <div class="download-section">
           <div class="download-section-title">${link.desc}</div>
           <div class="download-section-buttons">
-            <button class="btn-main download-btn" data-game-id="${id}" data-app-type="GA" data-link-index="${index}" data-cost="${cost}">Baixar G.A</button>
-            <button class="btn-main download-btn" data-game-id="${id}" data-app-type="ADM" data-link-index="${index}" data-cost="${cost}">Baixar ADM</button>
+            <button class="btn-main" onclick="downloadGame('${id}', 'GA', '${link.linkGA}', ${cost})">Continuar</button>
+            <button class="btn-main" onclick="downloadGame('${id}', 'ADM', '${link.linkADM}', ${cost})">Continuar no ADM</button>
           </div>
         </div>
       `).join('');
-
-      // Store links data for download buttons
-      window.currentDownloadLinks = links;
-
-      // Add event listeners to download buttons
-      downloadContainer.querySelectorAll('.download-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const gameId = this.dataset.gameId;
-          const appType = this.dataset.appType;
-          const linkIndex = parseInt(this.dataset.linkIndex);
-          const cost = parseInt(this.dataset.cost);
-          const linkData = window.currentDownloadLinks[linkIndex];
-          const url = appType === 'GA' ? linkData.linkGA : linkData.linkADM;
-          downloadGame(gameId, appType, url, cost);
-        });
-      });
 
       // Load comments
       loadComments(id);
@@ -3162,7 +3171,10 @@
       commentsList.innerHTML = commentsArray.map(comment => {
         const authorDisplayName = comment.authorName || comment.authorEmail.split('@')[0];
         const isAuthor = currentUserId && comment.authorId === currentUserId;
-        const deleteBtn = isAuthor ? `<button class="comment-delete-btn" onclick="deleteComment('${currentGameData.id}', '${comment.id}')" title="Apagar comentário">🗑️</button>` : '';
+        const deleteBtn = isAuthor ? `<button class="comment-delete-btn" onclick="deleteComment('${currentGameData.id}', '${comment.id}')" title="Apagar comentário"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+     viewBox="0 0 24 24" fill="#8A8A8A" aria-hidden="true">
+  <path d="M3 6h18v2H3V6zm2 3h14l-1.5 12.5a1 1 0 0 1-1 .5H7.5a1 1 0 0 1-1-.5L5 9zm5 2v8h2v-8h-2zm4 0v8h2v-8h-2zM9 4V2h6v2h5v2H4V4h5z"/>
+</svg></button>` : '';
 
         return `
           <div class="comment-item">
@@ -3552,7 +3564,7 @@
       const container = document.getElementById('emailVerificationContent');
       container.innerHTML = `
         <div style="text-align: center; padding: 16px 0;">
-          <div style="font-size: 48px; margin-bottom: 16px;">✅</div>
+          <div style="font-size: 48px; margin-bottom: 16px;"></div>
           <p style="color: var(--text-primary); font-size: 16px; font-weight: 600; margin-bottom: 8px;">
             Conta criada com sucesso!
           </p>
@@ -3630,7 +3642,7 @@
       const container = document.getElementById('emailVerificationContent');
       container.innerHTML = `
         <div style="text-align: center; padding: 16px 0;">
-          <div style="font-size: 48px; margin-bottom: 16px;">📬</div>
+          <div style="font-size: 48px; margin-bottom: 16px;"></div>
           <p style="color: var(--text-primary); font-size: 16px; font-weight: 600; margin-bottom: 8px;">
             Email Enviado!
           </p>
@@ -3641,7 +3653,7 @@
 
           <div style="background: var(--bg-card); padding: 16px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 16px;">
             <p style="color: var(--text-primary); font-size: 14px; font-weight: 600; margin-bottom: 8px;">
-              📌 Instruções:
+               Instruções:
             </p>
             <ol style="color: var(--text-secondary); font-size: 13px; text-align: left; padding-left: 20px; margin: 0;">
               <li style="margin-bottom: 6px;">Abra seu email (verifique também a pasta de spam)</li>
@@ -3651,14 +3663,14 @@
           </div>
 
           <button class="custom-modal-btn primary" onclick="checkEmailVerification()" style="width: 100%; margin-bottom: 12px;" id="verifyCheckBtn">
-            ✅ Já Verifiquei meu Email
+             Já Verifiquei meu Email
           </button>
 
           <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 12px;">
             Não recebeu o email?
           </p>
           <button class="custom-modal-btn secondary" onclick="resendVerificationLink()" id="resendEmailBtn" style="font-size: 13px;">
-            📧 Reenviar Email
+             Reenviar Email
           </button>
 
           <div style="margin-top: 16px; border-top: 1px solid var(--border-color); padding-top: 16px;">
@@ -3736,7 +3748,7 @@
           showCustomAlert('Email ainda não verificado. Clique no link enviado para seu email e tente novamente.');
           if (btn) {
             btn.disabled = false;
-            btn.textContent = '✅ Já Verifiquei meu Email';
+            btn.textContent = ' Já Verifiquei meu Email';
           }
         }
       } catch (error) {
@@ -3744,7 +3756,7 @@
         showCustomAlert('Erro ao verificar. Tente novamente.');
         if (btn) {
           btn.disabled = false;
-          btn.textContent = '✅ Já Verifiquei meu Email';
+          btn.textContent = ' Já Verifiquei meu Email';
         }
       }
     }
@@ -3914,7 +3926,7 @@
         showCustomAlert('Apenas publicadores podem publicar jogos.');
         return;
       }
-      document.getElementById('publishModalTitle').textContent = 'Publicar Jogo';
+      document.getElementById('publishModalTitle').textContent = 'Publicar ';
       document.getElementById('editGameId').value = '';
       resetDownloadLinks();
       document.getElementById('publishModal').classList.add('active');
@@ -5101,7 +5113,7 @@
         container.innerHTML = `
           ${totalDisplay}
           <div class="rating-already-rated">
-            <span class="check-icon">✅</span>
+            <span class="check-icon"></span>
             <div class="message">Você já avaliou o aplicativo!</div>
             <div class="your-rating">Sua avaliação: ${starsDisplay}</div>
           </div>
@@ -5331,7 +5343,7 @@
             <div class="notification-actions">
               ${markReadBtn}
               <button class="notification-action-btn delete" onclick="dismissNotification('${notif.id}')">
-                🗑️ Apagar
+                 Apagar
               </button>
             </div>
           </div>
@@ -5641,7 +5653,10 @@
               <div class="favorites-item-title">${fav.titulo}</div>
               <div class="favorites-item-meta">${typeLabels[fav.type] || fav.type}</div>
             </div>
-            <button class="favorites-item-remove" onclick="event.stopPropagation(); removeFavorite('${gameId}')" title="Remover">🗑️</button>
+            <button class="favorites-item-remove" onclick="event.stopPropagation(); removeFavorite('${gameId}')" title="Remover"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+     viewBox="0 0 24 24" fill="#8A8A8A" aria-hidden="true">
+  <path d="M3 6h18v2H3V6zm2 3h14l-1.5 12.5a1 1 0 0 1-1 .5H7.5a1 1 0 0 1-1-.5L5 9zm5 2v8h2v-8h-2zm4 0v8h2v-8h-2zM9 4V2h6v2h5v2H4V4h5z"/>
+</svg></button>
           </div>
         `;
       }).join('');
@@ -5946,6 +5961,65 @@
       }
     });
   </script>
+   <script>
+  var versaoBotao = "1.0";
+
+  function checarVersao() {
+    if (typeof Android !== "undefined" && Android.verificarVersao) {
+      Android.verificarVersao(versaoBotao);
+    } else {
+      console.log("Interface Android não disponível (fora do app).");
+    }
+  }
+
+  setInterval(checarVersao, 1000);
+</script>
+ <script>
+  function isWebView() {
+    const ua = navigator.userAgent || "";
+    const isAndroidWebView = ua.includes("wv"); // Android WebView
+    const isIOSWebView = /iPhone|iPod|iPad/.test(ua) && !ua.includes("Safari"); // iOS WebView
+    return isAndroidWebView || isIOSWebView;
+  }
+
+  window.onload = function() {
+    const botao = document.getElementById("meuBotao");
+    const textoInstalar = document.getElementById("textoInstalar");
+    const instalarLink = document.getElementById("instalarLink");
+    const btnADM = document.getElementById("btnADM"); // novo botão ADM
+
+    if (!isWebView()) {
+      botao.style.display = "inline-block";
+
+      if (btnADM) {
+        btnADM.style.display = "none";
+      }
+
+      if (localStorage.getItem("instalarClicado") !== "true") {
+        textoInstalar.style.display = "inline-block";
+      } else {
+        textoInstalar.style.display = "none";
+      }
+    } else {
+      botao.style.display = "none";
+      textoInstalar.style.display = "none";
+
+      if (btnADM) {
+        btnADM.style.display = "inline-block";
+      }
+    }
+
+    botao.onclick = function() {
+      window.open("https://www.mediafire.com/file/nj4zgph4ekr85lr/Portal+Digital+1.0.apk/file", "_blank");
+    };
+
+    instalarLink.onclick = function() {
+      window.open("https://www.mediafire.com/file/nj4zgph4ekr85lr/Portal+Digital+1.0.apk/file", "_blank");
+      localStorage.setItem("instalarClicado", "true");
+      textoInstalar.style.display = "none";
+    };
+  };
+</script>
 </body>
 </html>
 
