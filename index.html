@@ -3049,31 +3049,10 @@
         console.error('Erro ao deduzir pontos:', error);
       }
 
-      // Incrementar contador de downloads usando Realtime Database
-      // A regra games/$gameId/downloads permite escrita por usuários autenticados
-      try {
-        const { ref, get, set } = window.firebaseModules;
-        const database = window.firebaseDatabase;
-        const downloadsRef = ref(database, `games/${gameId}/downloads`);
-
-        // Buscar o valor atual e incrementar
-        const snapshot = await get(downloadsRef);
-        const currentDownloads = snapshot.exists() ? (snapshot.val() || 0) : 0;
-        await set(downloadsRef, currentDownloads + 1);
-        console.log('Download count incrementado para:', gameId, '- Novo valor:', currentDownloads + 1);
-
-        // Atualizar o contador local para exibição imediata
-        if (allGames[gameId]) {
-          allGames[gameId].downloads = currentDownloads + 1;
-        }
-      } catch (error) {
-        console.error('Erro ao incrementar downloads:', error.message || error);
-      }
-
-      // AGORA abrir o link (depois que todas as operações de banco terminaram)
+      // Abrir o link de download
       const downloadWindow = window.open(url, '_blank');
 
-      // Fallback: criar link temporário para download (não interrompe o script)
+      // Fallback: criar link temporário para download
       if (!downloadWindow || downloadWindow.closed || typeof downloadWindow.closed === 'undefined') {
         const tempLink = document.createElement('a');
         tempLink.href = url;
