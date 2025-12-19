@@ -13,7 +13,7 @@
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously, onAuthStateChanged, signOut, sendPasswordResetEmail, updateProfile, sendEmailVerification } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
     import { getDatabase, ref, set, get, update, remove, onValue, push } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
     // Firestore imports for cached/static data
-    import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc, query, where, orderBy, limit, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc, query, where, orderBy, limit, onSnapshot, increment } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyBgEfuLNpU5j9EIcvQ9Qs_reEvtXGPIbO0",
@@ -66,7 +66,8 @@
       where,
       orderBy,
       limit,
-      onSnapshot
+      onSnapshot,
+      increment
     };
   </script>
 
@@ -2234,7 +2235,7 @@
         </div>
         <div class="custom-modal-buttons">
           <button type="button" class="custom-modal-btn secondary" onclick="closeSendNotificationModal()">Cancelar</button>
-          <button type="submit" class="custom-modal-btn primary" id="sendNotificationBtn">Enviar para Todos</button>
+          <button type="submit" class="custom-modal-btn primary" id="sendNotificationSubmitBtn">Enviar para Todos</button>
         </div>
       </form>
     </div>
@@ -3055,23 +3056,31 @@
       }, 200);
 
       // Agora fazer as operações assíncronas (depois de abrir o link)
+      // Deduzir pontos primeiro
       try {
-        // Deduct points
         await updateUserPoints(userPoints - cost);
-
-        // Increment download count
-        const { ref, get, set } = window.firebaseModules;
-        const database = window.firebaseDatabase;
-        const gameRef = ref(database, `games/${gameId}/downloads`);
-        const snapshot = await get(gameRef);
-        const currentDownloads = snapshot.exists() ? snapshot.val() : 0;
-        await set(gameRef, currentDownloads + 1);
-
-        showCustomAlert(`Download iniciado! ${cost} pontos deduzidos. Pontos restantes: ${userPoints - cost}`);
       } catch (error) {
-        console.error('Erro ao processar download:', error);
-        showCustomAlert('Download iniciado, mas houve um erro ao processar. Por favor, verifique seus pontos.');
+        console.error('Erro ao deduzir pontos:', error);
       }
+
+      // Incrementar contador de downloads separadamente
+      try {
+        const { doc: firestoreDoc, getDoc, setDoc } = window.firebaseModules;
+        const firestore = window.firebaseFirestore;
+        const gameDocRef = firestoreDoc(firestore, 'games', gameId);
+
+        // Buscar o valor atual e incrementar manualmente
+        const gameSnap = await getDoc(gameDocRef);
+        if (gameSnap.exists()) {
+          const currentDownloads = gameSnap.data().downloads || 0;
+          await setDoc(gameDocRef, { downloads: currentDownloads + 1 }, { merge: true });
+          console.log('Download count incrementado para:', gameId, '- Novo valor:', currentDownloads + 1);
+        }
+      } catch (error) {
+        console.error('Erro ao incrementar downloads:', error.message || error);
+      }
+
+      showCustomAlert(`Download iniciado! ${cost} pontos deduzidos. Pontos restantes: ${userPoints - cost}`);
     }
 
     function closeOverlay() {
@@ -3646,7 +3655,7 @@
 
       } catch (error) {
         console.error('Erro ao enviar email:', error);
-        let errorMsg = 'Erro ao enviar email de verificação.';
+        let errorMsg = 'Erro ao enviar email de verifica��ão.';
         if (error.code === 'auth/too-many-requests') {
           errorMsg = 'Muitas tentativas. Aguarde alguns minutos e tente novamente.';
         }
@@ -5985,4 +5994,3 @@
   </script>
 </body>
 </html>
-
