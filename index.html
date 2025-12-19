@@ -1836,15 +1836,9 @@
         </button>
         <h1 class="content-header-title" id="contentHeaderTitle">Carregando...</h1>
         <button class="favorite-btn" id="favoriteBtn" onclick="toggleFavorite()" title="Adicionar aos favoritos" style="padding: 8px;">
-          <span id="favoriteIcon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-     viewBox="0 0 24 24" fill="#8A8A8A" aria-hidden="true">
-  <path d="M12 21s-6.716-4.16-9.263-7.197C1.26 12.157 1 10.87 1 9.735 
-           1 6.89 3.27 4.75 6.03 4.75c1.76 0 3.342.88 4.27 2.23 
-           .928-1.35 2.51-2.23 4.27-2.23 2.76 0 5.03 2.14 5.03 4.985 
-           0 1.135-.26 2.422-1.737 4.068C18.716 16.84 12 21 12 21z"/>
-</svg></span>
+          <span id="favoriteIcon">🤍</span>
         </button>
-        <button class="content-header-btn -btn" onclick="shareContent()">
+        <button class="content-header-btn share-btn" onclick="shareContent()">
           <svg viewBox="0 0 24 24" width="24" height="24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
         </button>
       </div>
@@ -5434,28 +5428,12 @@
       const isFavorite = userFavorites[currentGameData.id];
 
       if (isFavorite) {
-  // Ativo: coração azul
-  icon.innerHTML = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-         viewBox="0 0 24 24" fill="#007BFF" aria-hidden="true">
-      <path d="M12 21s-6.716-4.16-9.263-7.197C1.26 12.157 1 10.87 1 9.735 
-               1 6.89 3.27 4.75 6.03 4.75c1.76 0 3.342.88 4.27 2.23 
-               .928-1.35 2.51-2.23 4.27-2.23 2.76 0 5.03 2.14 5.03 4.985 
-               0 1.135-.26 2.422-1.737 4.068C18.716 16.84 12 21 12 21z"/>
-    </svg>`;
-  btn.classList.add('active');
-} else {
-  // Inativo: coração cinzento
-  icon.innerHTML = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-         viewBox="0 0 24 24" fill="#8A8A8A" aria-hidden="true">
-      <path d="M12 21s-6.716-4.16-9.263-7.197C1.26 12.157 1 10.87 1 9.735 
-               1 6.89 3.27 4.75 6.03 4.75c1.76 0 3.342.88 4.27 2.23 
-               .928-1.35 2.51-2.23 4.27-2.23 2.76 0 5.03 2.14 5.03 4.985 
-               0 1.135-.26 2.422-1.737 4.068C18.716 16.84 12 21 12 21z"/>
-    </svg>`;
-  btn.classList.remove('active');
-}
+        icon.textContent = '❤️';
+        btn.classList.add('active');
+      } else {
+        icon.textContent = '🤍';
+        btn.classList.remove('active');
+      }
     }
 
     // Toggle like
