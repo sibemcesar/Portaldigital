@@ -2947,32 +2947,15 @@
         }];
       }
 
-      downloadContainer.innerHTML = links.map((link, index) => {
-        const hasGA = link.linkGA && link.linkGA.trim() !== '';
-        const hasADM = link.linkADM && link.linkADM.trim() !== '';
-
-        // Se nenhum link disponível, mostrar mensagem
-        if (!hasGA && !hasADM) {
-          return `
-            <div class="download-section">
-              <div class="download-section-title">${link.desc || 'Download'}</div>
-              <div class="download-section-buttons">
-                <span style="color: var(--text-muted); font-size: 14px;">Links não disponíveis</span>
-              </div>
-            </div>
-          `;
-        }
-
-        return `
-          <div class="download-section">
-            <div class="download-section-title">${link.desc || 'Download'}</div>
-            <div class="download-section-buttons">
-              ${hasGA ? `<button class="btn-main download-btn" data-game-id="${id}" data-app-type="GA" data-link-index="${index}" data-cost="${cost}">Baixar G.A</button>` : ''}
-              ${hasADM ? `<button class="btn-main download-btn" data-game-id="${id}" data-app-type="ADM" data-link-index="${index}" data-cost="${cost}">Baixar ADM</button>` : ''}
-            </div>
+      downloadContainer.innerHTML = links.map((link, index) => `
+        <div class="download-section">
+          <div class="download-section-title">${link.desc}</div>
+          <div class="download-section-buttons">
+            <button class="btn-main download-btn" data-game-id="${id}" data-app-type="GA" data-link-index="${index}" data-cost="${cost}">Baixar G.A</button>
+            <button class="btn-main download-btn" data-game-id="${id}" data-app-type="ADM" data-link-index="${index}" data-cost="${cost}">Baixar ADM</button>
           </div>
-        `;
-      }).join('');
+        </div>
+      `).join('');
 
       // Store links data for download buttons
       window.currentDownloadLinks = links;
@@ -3032,46 +3015,26 @@
         return;
       }
 
-      // Verificar se a URL é válida ANTES de deduzir pontos
-      if (!url || url.trim() === '') {
-        showCustomAlert('Erro: Link de download não disponível. Por favor, tente o outro botão ou entre em contato com o administrador.');
-        return;
-      }
+      // Deduct points
+      await updateUserPoints(userPoints - cost);
 
-      // IMPORTANTE: Abrir o link IMEDIATAMENTE (antes de qualquer await)
-      // Isso evita bloqueio de popup pelo navegador
-      const downloadWindow = window.open(url, '_blank');
+      // Increment download count
+      const { ref, get, set } = window.firebaseModules;
+      const database = window.firebaseDatabase;
+      const gameRef = ref(database, `games/${gameId}/downloads`);
+      const snapshot = await get(gameRef);
+      const currentDownloads = snapshot.exists() ? snapshot.val() : 0;
+      await set(gameRef, currentDownloads + 1);
 
-      // Fallback: se window.open foi bloqueado, usar location.href
-      if (!downloadWindow || downloadWindow.closed || typeof downloadWindow.closed === 'undefined') {
-        window.location.href = url;
-      }
-
-      // Chamar Android interface se disponível
+      // Open link
+      window.location.assign(url);
       setTimeout(function(){
         if (typeof Android !== "undefined" && Android.openApp) {
           Android.openApp(appType);
         }
       }, 200);
 
-      // Agora fazer as operações assíncronas (depois de abrir o link)
-      try {
-        // Deduct points
-        await updateUserPoints(userPoints - cost);
-
-        // Increment download count
-        const { ref, get, set } = window.firebaseModules;
-        const database = window.firebaseDatabase;
-        const gameRef = ref(database, `games/${gameId}/downloads`);
-        const snapshot = await get(gameRef);
-        const currentDownloads = snapshot.exists() ? snapshot.val() : 0;
-        await set(gameRef, currentDownloads + 1);
-
-        showCustomAlert(`Download iniciado! ${cost} pontos deduzidos. Pontos restantes: ${userPoints - cost}`);
-      } catch (error) {
-        console.error('Erro ao processar download:', error);
-        showCustomAlert('Download iniciado, mas houve um erro ao processar. Por favor, verifique seus pontos.');
-      }
+      showCustomAlert(`Download iniciado! ${cost} pontos deduzidos. Pontos restantes: ${userPoints}`);
     }
 
     function closeOverlay() {
