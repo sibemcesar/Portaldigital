@@ -2675,15 +2675,11 @@
       const gamesQuery = query(gamesRef, orderBy('downloads', 'desc'));
 
       // Use onSnapshot for real-time updates but with Firestore's built-in caching
-      onSnapshot(gamesQuery, async (snapshot) => {
+      onSnapshot(gamesQuery, (snapshot) => {
         allGames = {};
         snapshot.forEach((doc) => {
           allGames[doc.id] = doc.data();
         });
-
-        // Carregar contagem de downloads da coleção separada
-        await loadDownloadCounts();
-
         gamesLoaded = true;
         renderGrid();
         // Check if URL has game ID to auto-open content
@@ -2693,28 +2689,6 @@
         // Fallback: try to load once without listener
         loadGamesOnce();
       });
-    }
-
-    // Função para carregar contagens de downloads da coleção separada
-    async function loadDownloadCounts() {
-      try {
-        const { collection, getDocs } = window.firebaseModules;
-        const firestore = window.firebaseFirestore;
-        const downloadsRef = collection(firestore, 'gameDownloads');
-        const snapshot = await getDocs(downloadsRef);
-
-        snapshot.forEach((doc) => {
-          const gameId = doc.id;
-          const downloadCount = doc.data().count || 0;
-          if (allGames[gameId]) {
-            // Combinar: usar o maior valor entre games.downloads e gameDownloads.count
-            const existingDownloads = allGames[gameId].downloads || 0;
-            allGames[gameId].downloads = Math.max(existingDownloads, downloadCount);
-          }
-        });
-      } catch (error) {
-        console.error('Erro ao carregar contagem de downloads:', error);
-      }
     }
 
     // Fallback function to load games once (without real-time)
@@ -2731,10 +2705,6 @@
         snapshot.forEach((doc) => {
           allGames[doc.id] = doc.data();
         });
-
-        // Carregar contagem de downloads da coleção separada
-        await loadDownloadCounts();
-
         gamesLoaded = true;
         renderGrid();
         checkUrlForGameId();
@@ -3079,17 +3049,17 @@
         console.error('Erro ao deduzir pontos:', error);
       }
 
-      // Incrementar contador de downloads na coleção separada (gameDownloads)
-      // Isso mantém a coleção 'games' segura (só ADMs podem escrever)
+      // Incrementar contador de downloads usando Realtime Database
+      // A regra games/$gameId/downloads permite escrita por usuários autenticados
       try {
-        const { doc: firestoreDoc, getDoc, setDoc } = window.firebaseModules;
-        const firestore = window.firebaseFirestore;
-        const downloadDocRef = firestoreDoc(firestore, 'gameDownloads', gameId);
+        const { ref, get, set } = window.firebaseModules;
+        const database = window.firebaseDatabase;
+        const downloadsRef = ref(database, `games/${gameId}/downloads`);
 
-        // Buscar o valor atual e incrementar manualmente
-        const downloadSnap = await getDoc(downloadDocRef);
-        const currentDownloads = downloadSnap.exists() ? (downloadSnap.data().count || 0) : 0;
-        await setDoc(downloadDocRef, { count: currentDownloads + 1 }, { merge: true });
+        // Buscar o valor atual e incrementar
+        const snapshot = await get(downloadsRef);
+        const currentDownloads = snapshot.exists() ? (snapshot.val() || 0) : 0;
+        await set(downloadsRef, currentDownloads + 1);
         console.log('Download count incrementado para:', gameId, '- Novo valor:', currentDownloads + 1);
 
         // Atualizar o contador local para exibição imediata
