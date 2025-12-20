@@ -5935,7 +5935,11 @@
       }
     }
 
-    // ===== DAILY REWARD SYSTEM (20 points) - SECURED BY SERVER RULES =====
+    // ===== DAILY REWARD SYSTEM (20 points) - SECURED BY SERVER TIMESTAMP =====
+    // Uses server timestamp to prevent device date manipulation
+    const DAILY_REWARD_COOLDOWN = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+    let nextRewardTime = 0; // When the next reward becomes available
+
     async function checkDailyReward() {
       if (!currentUser || currentUser.isAnonymous) return;
 
@@ -5943,26 +5947,102 @@
       const database = window.firebaseDatabase;
 
       try {
-        const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-        // Check in the secure dailyRewardClaims structure (validated by server)
-        const rewardRef = ref(database, `dailyRewardClaims/${currentUser.uid}/${today}`);
+        // Get last claim timestamp from server
+        const rewardRef = ref(database, `dailyRewardClaims/${currentUser.uid}`);
         const snapshot = await get(rewardRef);
 
-        dailyRewardClaimed = snapshot.exists();
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          const lastClaimedAt = data.lastClaimedAt || 0;
+
+          // Get server time by writing a timestamp and reading it back
+          const serverTime = await getServerTimestamp();
+          const timeSinceClaim = serverTime - lastClaimedAt;
+
+          if (timeSinceClaim < DAILY_REWARD_COOLDOWN) {
+            dailyRewardClaimed = true;
+            nextRewardTime = lastClaimedAt + DAILY_REWARD_COOLDOWN;
+          } else {
+            dailyRewardClaimed = false;
+            nextRewardTime = 0;
+          }
+        } else {
+          // Never claimed before
+          dailyRewardClaimed = false;
+          nextRewardTime = 0;
+        }
+
         updateDailyRewardButton();
+        startRewardCountdown();
       } catch (e) {
         console.error('Erro ao verificar recompensa diária:', e);
       }
     }
 
-    function updateDailyRewardButton() {
+    // Get server timestamp using Firebase offset
+    async function getServerTimestamp() {
+      const { ref, get } = window.firebaseModules;
+      const database = window.firebaseDatabase;
+
+      try {
+        // Firebase provides server time offset at .info/serverTimeOffset
+        const offsetRef = ref(database, '.info/serverTimeOffset');
+        const snapshot = await get(offsetRef);
+        const offset = snapshot.val() || 0;
+        return Date.now() + offset;
+      } catch (e) {
+        console.error('Erro ao obter timestamp do servidor:', e);
+        return Date.now(); // Fallback to local time
+      }
+    }
+
+    // Format remaining time as HH:MM:SS
+    function formatTimeRemaining(ms) {
+      if (ms <= 0) return '';
+      const hours = Math.floor(ms / 3600000);
+      const minutes = Math.floor((ms % 3600000) / 60000);
+      const seconds = Math.floor((ms % 60000) / 1000);
+      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    let rewardCountdownInterval = null;
+
+    function startRewardCountdown() {
+      if (rewardCountdownInterval) {
+        clearInterval(rewardCountdownInterval);
+        rewardCountdownInterval = null;
+      }
+
+      if (!dailyRewardClaimed || nextRewardTime <= 0) return;
+
+      rewardCountdownInterval = setInterval(async () => {
+        const serverTime = await getServerTimestamp();
+        const remaining = nextRewardTime - serverTime;
+
+        if (remaining <= 0) {
+          clearInterval(rewardCountdownInterval);
+          rewardCountdownInterval = null;
+          dailyRewardClaimed = false;
+          nextRewardTime = 0;
+          updateDailyRewardButton();
+        } else {
+          updateDailyRewardButton(remaining);
+        }
+      }, 1000);
+    }
+
+    function updateDailyRewardButton(remainingMs = null) {
       const btn = document.getElementById('dailyRewardBtn');
       const text = document.getElementById('dailyRewardText');
       if (!btn || !text) return;
 
       if (dailyRewardClaimed) {
         btn.classList.add('claimed');
-        text.textContent = 'Já resgatado hoje ✓';
+        if (remainingMs && remainingMs > 0) {
+          text.textContent = `Volte em ${formatTimeRemaining(remainingMs)}`;
+        } else {
+          text.textContent = 'Já resgatado ✓';
+        }
       } else {
         btn.classList.remove('claimed');
         text.textContent = 'Recompensa Diária (+20)';
@@ -5983,7 +6063,13 @@
       }
 
       if (dailyRewardClaimed) {
-        showCustomAlert('Você já resgatou sua recompensa hoje! Volte amanhã. 🎁');
+        const serverTime = await getServerTimestamp();
+        const remaining = nextRewardTime - serverTime;
+        if (remaining > 0) {
+          showCustomAlert(`Você já resgatou sua recompensa!\n\nVolte em ${formatTimeRemaining(remaining)} 🎁`);
+        } else {
+          showCustomAlert('Você já resgatou sua recompensa! Volte mais tarde. 🎁');
+        }
         return;
       }
 
@@ -5991,23 +6077,39 @@
       const database = window.firebaseDatabase;
 
       try {
-        const today = new Date().toISOString().split('T')[0];
+        const serverTime = await getServerTimestamp();
+        const claimRef = ref(database, `dailyRewardClaims/${currentUser.uid}`);
 
-        // First, try to claim the reward in the secure structure
-        // Server validates: only once per day, exactly 20 points
-        const claimRef = ref(database, `dailyRewardClaims/${currentUser.uid}/${today}`);
+        // Check current state before claiming
+        const currentSnapshot = await get(claimRef);
+        if (currentSnapshot.exists()) {
+          const data = currentSnapshot.val();
+          const lastClaimedAt = data.lastClaimedAt || 0;
+          const timeSinceClaim = serverTime - lastClaimedAt;
 
+          if (timeSinceClaim < DAILY_REWARD_COOLDOWN) {
+            // Not enough time has passed - server will reject anyway
+            dailyRewardClaimed = true;
+            nextRewardTime = lastClaimedAt + DAILY_REWARD_COOLDOWN;
+            updateDailyRewardButton();
+            startRewardCountdown();
+            showCustomAlert(`Você precisa esperar 24 horas entre resgates!\n\nVolte em ${formatTimeRemaining(nextRewardTime - serverTime)} 🎁`);
+            return;
+          }
+        }
+
+        // Try to claim the reward - server validates 24h cooldown
         try {
           await set(claimRef, {
-            claimedAt: Date.now(),
+            lastClaimedAt: serverTime,
             pointsAwarded: 20
           });
         } catch (claimError) {
-          // Claim failed - already claimed today or validation failed
-          console.log('Recompensa já foi resgatada hoje:', claimError);
+          // Claim failed - server rejected (24h not passed)
+          console.log('Recompensa bloqueada pelo servidor:', claimError);
           dailyRewardClaimed = true;
-          updateDailyRewardButton();
-          showCustomAlert('Você já resgatou sua recompensa hoje! Volte amanhã. 🎁');
+          await checkDailyReward(); // Refresh state from server
+          showCustomAlert('Você precisa esperar 24 horas entre resgates! 🎁');
           return;
         }
 
@@ -6020,16 +6122,17 @@
         await update(userRef, {
           points: currentPoints + 20,
           dailyReward: {
-            lastClaimed: today,
-            claimedAt: Date.now()
+            lastClaimedAt: serverTime
           }
         });
 
         userPoints = currentPoints + 20;
         dailyRewardClaimed = true;
+        nextRewardTime = serverTime + DAILY_REWARD_COOLDOWN;
 
         updatePointsDisplay();
         updateDailyRewardButton();
+        startRewardCountdown();
 
         showCustomAlert('🎁 Recompensa diária resgatada!\n\n+20 pontos adicionados à sua conta!');
       } catch (e) {
