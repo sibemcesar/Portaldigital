@@ -3839,27 +3839,66 @@
     async function approveAccountAfterEmailVerification() {
       const auth = window.firebaseAuth;
       const user = auth.currentUser;
-      const { ref, update, get } = window.firebaseModules;
+      const { ref, update, get, set } = window.firebaseModules;
       const database = window.firebaseDatabase;
 
       try {
+        // Force token refresh to get updated email_verified claim
+        await user.getIdToken(true);
+
         // Get current user data to check points
         const userRef = ref(database, `users/${user.uid}`);
         const snapshot = await get(userRef);
         const userData = snapshot.val() || {};
         const currentPoints = userData.points || 0;
 
-        // Update user status to approved and give 10 bonus points (email verification)
-        await update(ref(database, `users/${user.uid}`), {
-          status: 'approved',
-          emailVerified: true,
-          verifiedAt: Date.now(),
-          verifiedBy: 'email',
-          points: currentPoints + 10 // 10 pontos de bônus por verificação via email
-        });
+        // Check if bonus was already claimed
+        const bonusRef = ref(database, `emailVerificationBonus/${user.uid}`);
+        const bonusSnapshot = await get(bonusRef);
+        const bonusAlreadyClaimed = bonusSnapshot.exists();
+
+        let bonusPoints = 0;
+
+        // Try to claim bonus (server validates: only once, email must be verified, exactly 10 points)
+        if (!bonusAlreadyClaimed) {
+          try {
+            await set(bonusRef, {
+              claimedAt: Date.now(),
+              pointsAwarded: 10
+            });
+            bonusPoints = 10;
+
+            // Only add points if bonus claim succeeded (server validated)
+            await update(ref(database, `users/${user.uid}`), {
+              status: 'approved',
+              emailVerified: true,
+              verifiedAt: Date.now(),
+              verifiedBy: 'email',
+              points: currentPoints + bonusPoints
+            });
+          } catch (bonusError) {
+            // Bonus claim failed (already claimed or validation failed)
+            // Still approve the account but without bonus
+            console.log('Bonus já foi reivindicado ou validação falhou:', bonusError);
+            await update(ref(database, `users/${user.uid}`), {
+              status: 'approved',
+              emailVerified: true,
+              verifiedAt: Date.now(),
+              verifiedBy: 'email'
+            });
+          }
+        } else {
+          // Bonus already claimed, just approve account
+          await update(ref(database, `users/${user.uid}`), {
+            status: 'approved',
+            emailVerified: true,
+            verifiedAt: Date.now(),
+            verifiedBy: 'email'
+          });
+        }
 
         userStatus = 'approved';
-        userPoints = currentPoints + 10;
+        userPoints = currentPoints + bonusPoints;
 
         // Update UI
         updateUIForUser();
@@ -3868,6 +3907,12 @@
 
         // Show success
         const container = document.getElementById('emailVerificationContent');
+        const bonusMessage = bonusPoints > 0
+          ? `<div style="background: linear-gradient(135deg, rgba(76, 175, 80, 0.15) 0%, rgba(139, 195, 74, 0.15) 100%); padding: 12px; border-radius: 8px; margin-bottom: 20px;">
+              <span style="font-size: 15px; color: #4CAF50; font-weight: 600;">🎁 Você ganhou 10 pontos de bônus!</span>
+            </div>`
+          : '';
+
         container.innerHTML = `
           <div style="text-align: center; padding: 20px 0;">
             <div style="font-size: 64px; margin-bottom: 16px;">🎉</div>
@@ -3877,9 +3922,7 @@
             <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 12px;">
               Seu email foi verificado e sua conta está ativa!
             </p>
-            <div style="background: linear-gradient(135deg, rgba(76, 175, 80, 0.15) 0%, rgba(139, 195, 74, 0.15) 100%); padding: 12px; border-radius: 8px; margin-bottom: 20px;">
-              <span style="font-size: 15px; color: #4CAF50; font-weight: 600;">🎁 Você ganhou 10 pontos de bônus!</span>
-            </div>
+            ${bonusMessage}
             <div class="custom-modal-buttons">
               <button class="custom-modal-btn primary" onclick="closeEmailVerificationModal()">Começar a Usar</button>
             </div>
@@ -5892,7 +5935,7 @@
       }
     }
 
-    // ===== DAILY REWARD SYSTEM (20 points) =====
+    // ===== DAILY REWARD SYSTEM (20 points) - SECURED BY SERVER RULES =====
     async function checkDailyReward() {
       if (!currentUser || currentUser.isAnonymous) return;
 
@@ -5901,20 +5944,11 @@
 
       try {
         const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-        const rewardRef = ref(database, `users/${currentUser.uid}/dailyReward`);
+        // Check in the secure dailyRewardClaims structure (validated by server)
+        const rewardRef = ref(database, `dailyRewardClaims/${currentUser.uid}/${today}`);
         const snapshot = await get(rewardRef);
 
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          if (data.lastClaimed === today) {
-            dailyRewardClaimed = true;
-          } else {
-            dailyRewardClaimed = false;
-          }
-        } else {
-          dailyRewardClaimed = false;
-        }
-
+        dailyRewardClaimed = snapshot.exists();
         updateDailyRewardButton();
       } catch (e) {
         console.error('Erro ao verificar recompensa diária:', e);
@@ -5953,11 +5987,31 @@
         return;
       }
 
-      const { ref, get, update } = window.firebaseModules;
+      const { ref, get, set, update } = window.firebaseModules;
       const database = window.firebaseDatabase;
 
       try {
         const today = new Date().toISOString().split('T')[0];
+
+        // First, try to claim the reward in the secure structure
+        // Server validates: only once per day, exactly 20 points
+        const claimRef = ref(database, `dailyRewardClaims/${currentUser.uid}/${today}`);
+
+        try {
+          await set(claimRef, {
+            claimedAt: Date.now(),
+            pointsAwarded: 20
+          });
+        } catch (claimError) {
+          // Claim failed - already claimed today or validation failed
+          console.log('Recompensa já foi resgatada hoje:', claimError);
+          dailyRewardClaimed = true;
+          updateDailyRewardButton();
+          showCustomAlert('Você já resgatou sua recompensa hoje! Volte amanhã. 🎁');
+          return;
+        }
+
+        // Claim succeeded, now add points to user
         const userRef = ref(database, `users/${currentUser.uid}`);
         const snapshot = await get(userRef);
         const userData = snapshot.val() || {};
