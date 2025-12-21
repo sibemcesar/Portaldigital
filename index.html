@@ -3058,41 +3058,91 @@
         return;
       }
 
-      if (userPoints < cost) {
-        showCustomAlert('Você não tem pontos suficientes! Resgate um código para obter mais pontos.');
-        return;
-      }
-
-      // Verificar se a URL é válida ANTES de deduzir pontos
+      // Verificar se a URL é válida ANTES de qualquer operação
       if (!url || url.trim() === '') {
         showCustomAlert('Erro: Link de download não disponível. Por favor, tente o outro botão ou entre em contato com o administrador.');
         return;
       }
 
-      // PRIMEIRO: Fazer todas as operações de banco de dados ANTES de abrir o link
-      // Isso garante que o contador seja incrementado mesmo se o navegador redirecionar
+      const { ref, get, set, push } = window.firebaseModules;
+      const database = window.firebaseDatabase;
 
-      // Deduzir pontos primeiro
+      // SEGURANÇA: Buscar dados REAIS do servidor (não confiar em variáveis locais)
+      let serverPoints, serverGameCost;
       try {
-        await updateUserPoints(userPoints - cost);
+        const [userSnap, gameSnap] = await Promise.all([
+          get(ref(database, `users/${currentUser.uid}/points`)),
+          get(ref(database, `games/${gameId}/cost`))
+        ]);
+
+        serverPoints = userSnap.exists() ? userSnap.val() : 0;
+        serverGameCost = gameSnap.exists() ? gameSnap.val() : 0;
+      } catch (error) {
+        console.error('Erro ao verificar dados do servidor:', error);
+        showCustomAlert('Erro de conexão. Tente novamente.');
+        return;
+      }
+
+      // SEGURANÇA: Validar que o custo passado corresponde ao custo real do servidor
+      if (cost !== serverGameCost) {
+        console.warn('Tentativa de manipulação de custo detectada!', { cost, serverGameCost });
+        showCustomAlert('Erro: Dados inconsistentes. Recarregue a página.');
+        return;
+      }
+
+      // SEGURANÇA: Verificar pontos usando dados do SERVIDOR
+      if (serverPoints < serverGameCost) {
+        // Atualizar display local com valor real do servidor
+        userPoints = serverPoints;
+        updatePointsDisplay();
+        showCustomAlert('Você não tem pontos suficientes! Resgate um código para obter mais pontos.');
+        return;
+      }
+
+      // SEGURANÇA: Criar transação de download PRIMEIRO (validada pelas regras do Firebase)
+      const transactionId = `${currentUser.uid}_${gameId}_${Date.now()}`;
+      const transaction = {
+        userId: currentUser.uid,
+        gameId: gameId,
+        gameCost: serverGameCost,
+        pointsBefore: serverPoints,
+        pointsAfter: serverPoints - serverGameCost,
+        timestamp: Date.now()
+      };
+
+      try {
+        // Registrar transação (as regras do Firebase validam tudo!)
+        await set(ref(database, `downloadTransactions/${transactionId}`), transaction);
+        console.log('Transação de download registrada:', transactionId);
+      } catch (error) {
+        console.error('Erro ao registrar transação:', error);
+        // Se falhar aqui, as regras do Firebase bloquearam (pontos insuficientes ou dados inválidos)
+        showCustomAlert('Erro ao processar download. Verifique seus pontos e tente novamente.');
+        return;
+      }
+
+      // AGORA deduzir pontos (transação já foi validada)
+      try {
+        const newPoints = serverPoints - serverGameCost;
+        await set(ref(database, `users/${currentUser.uid}/points`), newPoints);
+        userPoints = newPoints;
+        updatePointsDisplay();
       } catch (error) {
         console.error('Erro ao deduzir pontos:', error);
+        // Mesmo que falhe aqui, a transação está registrada para auditoria
       }
 
       // Incrementar contador de downloads na coleção separada (gameDownloads)
-      // Isso mantém a coleção 'games' segura (só ADMs podem escrever)
       try {
         const { doc: firestoreDoc, getDoc, setDoc } = window.firebaseModules;
         const firestore = window.firebaseFirestore;
         const downloadDocRef = firestoreDoc(firestore, 'gameDownloads', gameId);
 
-        // Buscar o valor atual e incrementar manualmente
         const downloadSnap = await getDoc(downloadDocRef);
         const currentDownloads = downloadSnap.exists() ? (downloadSnap.data().count || 0) : 0;
         await setDoc(downloadDocRef, { count: currentDownloads + 1 }, { merge: true });
         console.log('Download count incrementado para:', gameId, '- Novo valor:', currentDownloads + 1);
 
-        // Atualizar o contador local para exibição imediata
         if (allGames[gameId]) {
           allGames[gameId].downloads = currentDownloads + 1;
         }
@@ -3103,7 +3153,6 @@
       // AGORA abrir o link (depois que todas as operações de banco terminaram)
       const downloadWindow = window.open(url, '_blank');
 
-      // Fallback: criar link temporário para download (não interrompe o script)
       if (!downloadWindow || downloadWindow.closed || typeof downloadWindow.closed === 'undefined') {
         const tempLink = document.createElement('a');
         tempLink.href = url;
@@ -3121,7 +3170,7 @@
         }
       }, 200);
 
-      showCustomAlert(`Download iniciado! ${cost} pontos deduzidos. Pontos restantes: ${userPoints - cost}`);
+      showCustomAlert(`Download iniciado! ${serverGameCost} pontos deduzidos. Pontos restantes: ${userPoints}`);
     }
 
     function closeOverlay() {
@@ -3556,9 +3605,10 @@
         return;
       }
 
-      const { ref, get, update } = window.firebaseModules;
+      const { ref, get, update, set } = window.firebaseModules;
       const database = window.firebaseDatabase;
 
+      // SEGURANÇA: Buscar dados do código do SERVIDOR
       const codeRef = ref(database, `codes/${code}`);
       const snapshot = await get(codeRef);
 
@@ -3573,12 +3623,39 @@
         return;
       }
 
-      // Mark as used and add points
-      await update(codeRef, { used: true, usedBy: currentUser.uid, usedAt: Date.now() });
-      await updateUserPoints(userPoints + codeData.points);
+      // SEGURANÇA: Buscar pontos REAIS do usuário do servidor
+      const userPointsRef = ref(database, `users/${currentUser.uid}/points`);
+      const userPointsSnap = await get(userPointsRef);
+      const serverUserPoints = userPointsSnap.exists() ? userPointsSnap.val() : 0;
+
+      // SEGURANÇA: Pegar valor de pontos do código do SERVIDOR (não confiar em variável local)
+      const serverCodePoints = codeData.points || 0;
+
+      // Marcar como usado PRIMEIRO (as regras do Firebase validam que só pode marcar se não foi usado)
+      try {
+        await update(codeRef, {
+          used: true,
+          usedBy: currentUser.uid,
+          usedAt: Date.now()
+        });
+      } catch (error) {
+        console.error('Erro ao marcar código como usado:', error);
+        showCustomAlert('Erro ao resgatar código. Tente novamente.');
+        return;
+      }
+
+      // AGORA adicionar pontos (código já foi marcado como usado)
+      try {
+        const newPoints = serverUserPoints + serverCodePoints;
+        await set(userPointsRef, newPoints);
+        userPoints = newPoints;
+        updatePointsDisplay();
+      } catch (error) {
+        console.error('Erro ao adicionar pontos:', error);
+      }
 
       document.getElementById('redeemCodeInput').value = '';
-      showCustomAlert(`Código resgatado! Você ganhou ${codeData.points} pontos.`);
+      showCustomAlert(`Código resgatado! Você ganhou ${serverCodePoints} pontos.`);
       closeRedeemCodeModal();
     }
 
@@ -4559,22 +4636,70 @@
     async function claimAdPoints() {
       if (!currentAd || adTimeRemaining > 0) return;
 
-      // Verify ad still exists
-      const { ref, get } = window.firebaseModules;
+      const { ref, get, set } = window.firebaseModules;
       const database = window.firebaseDatabase;
-      const adRef = ref(database, `ads/${currentAd.id}`);
-      const snapshot = await get(adRef);
 
-      if (!snapshot.exists()) {
+      // SEGURANÇA: Verificar se o anúncio ainda existe E pegar pontos do SERVIDOR
+      const adRef = ref(database, `ads/${currentAd.id}`);
+      const adSnapshot = await get(adRef);
+
+      if (!adSnapshot.exists()) {
         closeAdInterstitial();
         showCustomAlert('Este anúncio foi removido. Tente outro anúncio.');
         return;
       }
 
-      // Add points
-      await updateUserPoints(userPoints + currentAd.points);
+      // SEGURANÇA: Usar valor de pontos do SERVIDOR (não confiar em currentAd.points)
+      const serverAdData = adSnapshot.val();
+      const serverAdPoints = serverAdData.points || 0;
 
-      // Increment watch count
+      // SEGURANÇA: Validar que os pontos do cliente batem com o servidor
+      if (currentAd.points !== serverAdPoints) {
+        console.warn('Tentativa de manipulação de pontos de anúncio detectada!', {
+          clientPoints: currentAd.points,
+          serverPoints: serverAdPoints
+        });
+        closeAdInterstitial();
+        showCustomAlert('Erro: Dados do anúncio inconsistentes. Tente novamente.');
+        return;
+      }
+
+      // SEGURANÇA: Buscar pontos REAIS do usuário do servidor
+      const userPointsRef = ref(database, `users/${currentUser.uid}/points`);
+      const userPointsSnap = await get(userPointsRef);
+      const serverUserPoints = userPointsSnap.exists() ? userPointsSnap.val() : 0;
+
+      // SEGURANÇA: Registrar transação de reward PRIMEIRO
+      const transactionId = `${currentUser.uid}_${currentAd.id}_${Date.now()}`;
+      const rewardTransaction = {
+        userId: currentUser.uid,
+        adId: currentAd.id,
+        pointsEarned: serverAdPoints,
+        timestamp: Date.now()
+      };
+
+      try {
+        // Registrar transação (as regras do Firebase validam!)
+        await set(ref(database, `adRewardTransactions/${transactionId}`), rewardTransaction);
+        console.log('Transação de reward registrada:', transactionId);
+      } catch (error) {
+        console.error('Erro ao registrar transação de reward:', error);
+        closeAdInterstitial();
+        showCustomAlert('Erro ao processar recompensa. Tente novamente.');
+        return;
+      }
+
+      // AGORA adicionar pontos (transação já validada)
+      try {
+        const newPoints = serverUserPoints + serverAdPoints;
+        await set(userPointsRef, newPoints);
+        userPoints = newPoints;
+        updatePointsDisplay();
+      } catch (error) {
+        console.error('Erro ao adicionar pontos:', error);
+      }
+
+      // Incrementar contador de anúncios assistidos
       await incrementAdWatchCount();
 
       // Get remaining ads count
@@ -4586,7 +4711,7 @@
       // Update button
       updateEarnPointsButton();
 
-      showCustomAlert(`Você ganhou +${currentAd.points} pontos! Total: ${userPoints} pontos.\n\nVocê pode assistir mais ${remaining} anúncio(s) hoje.`);
+      showCustomAlert(`Você ganhou +${serverAdPoints} pontos! Total: ${userPoints} pontos.\n\nVocê pode assistir mais ${remaining} anúncio(s) hoje.`);
     }
 
     // Get today's ad watch count
@@ -5850,7 +5975,7 @@
       const recipientEmail = document.getElementById('transferEmail').value.trim().toLowerCase();
       const amount = parseInt(document.getElementById('transferAmount').value);
 
-      // Validations
+      // Validações básicas do cliente
       if (!recipientEmail || !amount) {
         showCustomAlert('Por favor, preencha todos os campos.');
         return;
@@ -5866,20 +5991,28 @@
         return;
       }
 
-      if (amount > userPoints) {
-        showCustomAlert('Você não tem pontos suficientes para essa transferência.');
-        return;
-      }
-
-      // For non-ADM users, check if they'll have at least 0 points after transfer
-      if (!isPublisher && userPoints < TRANSFER_MIN_POINTS) {
-        showCustomAlert(`Você precisa ter pelo menos ${TRANSFER_MIN_POINTS} pontos para transferir.`);
-        return;
-      }
-
       try {
-        const { ref, get, update } = window.firebaseModules;
+        const { ref, get, update, set } = window.firebaseModules;
         const database = window.firebaseDatabase;
+
+        // SEGURANÇA: Buscar pontos REAIS do remetente do servidor
+        const senderPointsRef = ref(database, `users/${currentUser.uid}/points`);
+        const senderPointsSnap = await get(senderPointsRef);
+        const serverSenderPoints = senderPointsSnap.exists() ? senderPointsSnap.val() : 0;
+
+        // SEGURANÇA: Validar contra dados do SERVIDOR
+        if (amount > serverSenderPoints) {
+          userPoints = serverSenderPoints;
+          updatePointsDisplay();
+          showCustomAlert('Você não tem pontos suficientes para essa transferência.');
+          return;
+        }
+
+        // For non-ADM users, check if they have minimum points
+        if (!isPublisher && serverSenderPoints < TRANSFER_MIN_POINTS) {
+          showCustomAlert(`Você precisa ter pelo menos ${TRANSFER_MIN_POINTS} pontos para transferir.`);
+          return;
+        }
 
         // Find recipient by email
         const usersRef = ref(database, 'users');
@@ -5906,11 +6039,40 @@
           return;
         }
 
-        // Perform transfer
-        const senderNewPoints = userPoints - amount;
-        const recipientNewPoints = (recipientData.points || 0) + amount;
+        // SEGURANÇA: Re-buscar pontos do destinatário do servidor
+        const recipientPointsRef = ref(database, `users/${recipientUid}/points`);
+        const recipientPointsSnap = await get(recipientPointsRef);
+        const serverRecipientPoints = recipientPointsSnap.exists() ? recipientPointsSnap.val() : 0;
 
-        // Update both users
+        // Calcular novos valores baseados no SERVIDOR
+        const senderNewPoints = serverSenderPoints - amount;
+        const recipientNewPoints = serverRecipientPoints + amount;
+
+        // SEGURANÇA: Registrar transação de transferência
+        const transactionId = `transfer_${currentUser.uid}_${recipientUid}_${Date.now()}`;
+        const transferTransaction = {
+          type: 'transfer',
+          senderId: currentUser.uid,
+          senderEmail: currentUser.email,
+          recipientId: recipientUid,
+          recipientEmail: recipientEmail,
+          amount: amount,
+          senderPointsBefore: serverSenderPoints,
+          senderPointsAfter: senderNewPoints,
+          recipientPointsBefore: serverRecipientPoints,
+          recipientPointsAfter: recipientNewPoints,
+          timestamp: Date.now()
+        };
+
+        // Registrar transação primeiro
+        try {
+          await set(ref(database, `transferTransactions/${transactionId}`), transferTransaction);
+          console.log('Transação de transferência registrada:', transactionId);
+        } catch (error) {
+          console.error('Erro ao registrar transação de transferência:', error);
+        }
+
+        // AGORA atualizar os pontos de ambos os usuários
         const updates = {};
         updates[`users/${currentUser.uid}/points`] = senderNewPoints;
         updates[`users/${recipientUid}/points`] = recipientNewPoints;
@@ -5919,9 +6081,10 @@
 
         // Update local points
         userPoints = senderNewPoints;
+        updatePointsDisplay();
         updateUserInfoDisplay();
 
-        // Check if transfer button should be hidden (for non-ADMs with now less than 300 points)
+        // Check if transfer button should be hidden
         if (!isPublisher && userPoints < TRANSFER_MIN_POINTS) {
           document.getElementById('transferBtn').style.display = 'none';
         }
