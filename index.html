@@ -3064,19 +3064,28 @@
         return;
       }
 
-      const { ref, get, set, push } = window.firebaseModules;
+      const { ref, get, set, push, doc: firestoreDocRef, getDoc: firestoreGetDoc } = window.firebaseModules;
       const database = window.firebaseDatabase;
+      const firestore = window.firebaseFirestore;
 
       // SEGURANÇA: Buscar dados REAIS do servidor (não confiar em variáveis locais)
       let serverPoints, serverGameCost;
       try {
-        const [userSnap, gameSnap] = await Promise.all([
-          get(ref(database, `users/${currentUser.uid}/points`)),
-          get(ref(database, `games/${gameId}/cost`))
-        ]);
-
+        // Pontos do usuário estão no Realtime Database
+        const userSnap = await get(ref(database, `users/${currentUser.uid}/points`));
         serverPoints = userSnap.exists() ? userSnap.val() : 0;
-        serverGameCost = gameSnap.exists() ? gameSnap.val() : 0;
+
+        // Jogos estão no Firestore - buscar custo de lá
+        const gameDocRef = firestoreDocRef(firestore, 'games', gameId);
+        const gameSnap = await firestoreGetDoc(gameDocRef);
+
+        if (gameSnap.exists()) {
+          serverGameCost = gameSnap.data().cost || 0;
+        } else {
+          // Fallback: tentar buscar do Realtime Database (para games antigos)
+          const rtdbGameSnap = await get(ref(database, `games/${gameId}/cost`));
+          serverGameCost = rtdbGameSnap.exists() ? rtdbGameSnap.val() : 0;
+        }
       } catch (error) {
         console.error('Erro ao verificar dados do servidor:', error);
         showCustomAlert('Erro de conexão. Tente novamente.');
@@ -3084,8 +3093,9 @@
       }
 
       // SEGURANÇA: Validar que o custo passado corresponde ao custo real do servidor
-      if (cost !== serverGameCost) {
-        console.warn('Tentativa de manipulação de custo detectada!', { cost, serverGameCost });
+      // Usar comparação numérica para evitar problemas de tipo (string vs number)
+      if (Number(cost) !== Number(serverGameCost)) {
+        console.warn('Custo inconsistente detectado!', { costCliente: cost, costServidor: serverGameCost, tipoCliente: typeof cost, tipoServidor: typeof serverGameCost });
         showCustomAlert('Erro: Dados inconsistentes. Recarregue a página.');
         return;
       }
