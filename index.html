@@ -3092,13 +3092,13 @@
         const serverTime = await getServerTimestamp();
 
         // 3. Gerar ID único para o registro de download
-        const downloadRecordId = `${currentUser.uid}_${gameId}_${Date.now()}`;
+        const downloadId = `${gameId}_${Date.now()}`;
 
         // 4. TRANSAÇÃO ATÔMICA: Multi-location update no Realtime Database
+        // Segue o padrão: downloadClaims/{userId}/{downloadId}
         const updates = {};
         updates[`users/${currentUser.uid}/points`] = newPointsTotal;
-        updates[`downloadRecords/${downloadRecordId}`] = {
-          userId: currentUser.uid,
+        updates[`downloadClaims/${currentUser.uid}/${downloadId}`] = {
           gameId: gameId,
           appType: appType,
           cost: cost,
