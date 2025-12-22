@@ -3100,7 +3100,6 @@
         updates[`users/${currentUser.uid}/points`] = newPointsTotal;
         updates[`downloadClaims/${currentUser.uid}/${downloadId}`] = {
           gameId: gameId,
-          appType: appType,
           cost: cost,
           previousPoints: currentPoints,
           newPoints: newPointsTotal,
@@ -6241,7 +6240,7 @@
         const serverTime = await getServerTimestamp();
         const remaining = nextRewardTime - serverTime;
         if (remaining > 0) {
-          showCustomAlert(`Você já resgatou sua recompensa!\n\nVolte em ${formatTimeRemaining(remaining)} 🎁`);
+          showCustomAlert(`Você já resgatou sua recompensa!\n\nVolte em ${formatTimeRemaining(remaining)} ����`);
         } else {
           showCustomAlert('Você já resgatou sua recompensa! Volte mais tarde. 🎁');
         }
