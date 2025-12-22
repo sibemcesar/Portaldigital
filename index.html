@@ -2549,12 +2549,8 @@
       return await loadUserData();
     }
 
-    // SEGURANÇA: Função removida - pontos só podem ser alterados via transações atômicas validadas pelo servidor
-    // Esta função agora apenas atualiza a exibição local - sem escrita no banco
     async function updateUserPoints(newPoints) {
       if (!currentUser) return;
-      // BLOQUEADO: Escrita direta em pontos não é mais permitida
-      // Use as funções de transação: claimDailyReward, claimAdPoints, redeemCode, etc.
       console.warn('[SEGURANÇA] Tentativa de atualização direta de pontos bloqueada');
       throw new Error('Operação não permitida: Use as funções de transação apropriadas');
     }
@@ -3074,59 +3070,93 @@
         return;
       }
 
-      // PRIMEIRO: Fazer todas as operações de banco de dados ANTES de abrir o link
-      // Isso garante que o contador seja incrementado mesmo se o navegador redirecionar
-
-      // Deduzir pontos primeiro
       try {
-        await updateUserPoints(userPoints - cost);
-      } catch (error) {
-        console.error('Erro ao deduzir pontos:', error);
-      }
+        // 1. Obter pontos atuais do usuário do servidor (não confiar no valor local)
+        const { ref, get, update } = window.firebaseModules;
+        const database = window.firebaseDatabase;
 
-      // Incrementar contador de downloads na coleção separada (gameDownloads)
-      // Isso mantém a coleção 'games' segura (só ADMs podem escrever)
-      try {
-        const { doc: firestoreDoc, getDoc, setDoc } = window.firebaseModules;
-        const firestore = window.firebaseFirestore;
-        const downloadDocRef = firestoreDoc(firestore, 'gameDownloads', gameId);
+        const userRef = ref(database, `users/${currentUser.uid}`);
+        const userSnapshot = await get(userRef);
+        const userData = userSnapshot.val() || {};
+        const currentPoints = userData.points || 0;
 
-        // Buscar o valor atual e incrementar manualmente
-        const downloadSnap = await getDoc(downloadDocRef);
-        const currentDownloads = downloadSnap.exists() ? (downloadSnap.data().count || 0) : 0;
-        await setDoc(downloadDocRef, { count: currentDownloads + 1 }, { merge: true });
-        console.log('Download count incrementado para:', gameId, '- Novo valor:', currentDownloads + 1);
-
-        // Atualizar o contador local para exibição imediata
-        if (allGames[gameId]) {
-          allGames[gameId].downloads = currentDownloads + 1;
+        // Validar novamente com valor do servidor
+        if (currentPoints < cost) {
+          showCustomAlert('Você não tem pontos suficientes! Resgate um código para obter mais pontos.');
+          return;
         }
-      } catch (error) {
-        console.error('Erro ao incrementar downloads:', error.message || error);
-      }
 
-      // AGORA abrir o link (depois que todas as operações de banco terminaram)
-      const downloadWindow = window.open(url, '_blank');
+        const newPointsTotal = currentPoints - cost;
 
-      // Fallback: criar link temporário para download (não interrompe o script)
-      if (!downloadWindow || downloadWindow.closed || typeof downloadWindow.closed === 'undefined') {
-        const tempLink = document.createElement('a');
-        tempLink.href = url;
-        tempLink.target = '_blank';
-        tempLink.rel = 'noopener noreferrer';
-        document.body.appendChild(tempLink);
-        tempLink.click();
-        document.body.removeChild(tempLink);
-      }
+        // 2. Obter timestamp do servidor
+        const serverTime = await getServerTimestamp();
 
-      // Chamar Android interface se disponível
-      setTimeout(function(){
-        if (typeof Android !== "undefined" && Android.openApp) {
-          Android.openApp(appType);
+        // 3. Gerar ID único para o registro de download
+        const downloadRecordId = `${currentUser.uid}_${gameId}_${Date.now()}`;
+
+        // 4. TRANSAÇÃO ATÔMICA: Multi-location update no Realtime Database
+        const updates = {};
+        updates[`users/${currentUser.uid}/points`] = newPointsTotal;
+        updates[`downloadRecords/${downloadRecordId}`] = {
+          userId: currentUser.uid,
+          gameId: gameId,
+          appType: appType,
+          cost: cost,
+          previousPoints: currentPoints,
+          newPoints: newPointsTotal,
+          downloadedAt: serverTime
+        };
+
+        await update(ref(database), updates);
+
+        // 5. Transação bem-sucedida - atualizar estado local
+        _syncPointsDisplay(newPointsTotal);
+
+        // 6. Incrementar contador de downloads na coleção separada (gameDownloads)
+        try {
+          const { doc: firestoreDoc, getDoc: fsGetDoc, setDoc } = window.firebaseModules;
+          const firestore = window.firebaseFirestore;
+          const downloadDocRef = firestoreDoc(firestore, 'gameDownloads', gameId);
+
+          const downloadSnap = await fsGetDoc(downloadDocRef);
+          const currentDownloads = downloadSnap.exists() ? (downloadSnap.data().count || 0) : 0;
+          await setDoc(downloadDocRef, { count: currentDownloads + 1 }, { merge: true });
+          console.log('Download count incrementado para:', gameId, '- Novo valor:', currentDownloads + 1);
+
+          if (allGames[gameId]) {
+            allGames[gameId].downloads = currentDownloads + 1;
+          }
+        } catch (error) {
+          console.error('Erro ao incrementar downloads:', error.message || error);
         }
-      }, 200);
 
-      showCustomAlert(`Download iniciado! ${cost} pontos deduzidos. Pontos restantes: ${userPoints - cost}`);
+        // 7. AGORA abrir o link (depois que todas as operações de banco terminaram)
+        const downloadWindow = window.open(url, '_blank');
+
+        // Fallback: criar link temporário para download
+        if (!downloadWindow || downloadWindow.closed || typeof downloadWindow.closed === 'undefined') {
+          const tempLink = document.createElement('a');
+          tempLink.href = url;
+          tempLink.target = '_blank';
+          tempLink.rel = 'noopener noreferrer';
+          document.body.appendChild(tempLink);
+          tempLink.click();
+          document.body.removeChild(tempLink);
+        }
+
+        // 8. Chamar Android interface se disponível
+        setTimeout(function(){
+          if (typeof Android !== "undefined" && Android.openApp) {
+            Android.openApp(appType);
+          }
+        }, 200);
+
+        showCustomAlert(`Download iniciado! ${cost} pontos deduzidos. Pontos restantes: ${newPointsTotal}`);
+
+      } catch (error) {
+        console.error('[SEGURANÇA] Erro na transação de download:', error);
+        showCustomAlert('Erro ao processar download. Tente novamente.');
+      }
     }
 
     function closeOverlay() {
@@ -3914,11 +3944,6 @@
           try {
             const newPointsTotal = currentPoints + 10;
 
-            // O Firebase valida que:
-            // - emailVerificationBonus/{uid} não existe (só pode reivindicar uma vez)
-            // - auth.token.email_verified == true (email deve estar verificado)
-            // - pointsAwarded == 10 (valor fixo)
-            // - newPointsTotal == currentPoints + 10
             const updates = {};
             updates[`emailVerificationBonus/${user.uid}`] = {
               claimedAt: serverTime,
