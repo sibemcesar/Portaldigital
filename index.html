@@ -673,27 +673,30 @@
 
     .comment-input-wrapper {
       display: flex;
-      flex-direction: row;
-      align-items: center;
-      gap: 12px;
+      flex-direction: column;
+      gap: 10px;
       padding: 16px;
       background: var(--bg-card);
       border-top: 1px solid var(--border-color);
       flex-shrink: 0;
     }
 
+    .comment-btn-row {
+      display: flex;
+      justify-content: flex-end;
+    }
+
     .comment-input {
-      flex: 1;
-      min-width: 0;
+      width: 100%;
       padding: 12px 18px;
       background: var(--bg-secondary);
       border: 1px solid var(--border-color);
-      border-radius: 24px;
+      border-radius: 16px;
       color: var(--text-primary);
       font-size: 16px;
       font-family: 'Inter', sans-serif;
       resize: none;
-      height: 48px;
+      min-height: 48px;
       line-height: 22px;
       box-sizing: border-box;
     }
@@ -708,9 +711,9 @@
     }
 
     .comment-btn {
-      width: 48px;
-      height: 48px;
-      min-width: 48px;
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
       padding: 0;
       background: var(--accent-primary);
       border: none;
@@ -722,6 +725,7 @@
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     }
 
     .comment-btn:hover {
@@ -734,8 +738,8 @@
     }
 
     .comment-btn svg {
-      width: 22px;
-      height: 22px;
+      width: 20px;
+      height: 20px;
       fill: currentColor;
     }
 
@@ -2023,10 +2027,12 @@
       </div>
       <div id="commentsList" class="comments-list-container"></div>
       <div id="commentInputWrapper" class="comment-input-wrapper" style="display: none;">
+        <div id="commentBtnRow" class="comment-btn-row" style="display: none;">
+          <button id="commentSendBtn" class="comment-btn" onclick="postComment()" title="Enviar">
+            <svg viewBox="0 0 24 24"><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/></svg>
+          </button>
+        </div>
         <textarea id="commentInput" class="comment-input" placeholder="Escreva um comentário..." rows="1"></textarea>
-        <button class="comment-btn" onclick="postComment()" title="Enviar">
-          <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-        </button>
       </div>
     </div>
   </div>
@@ -2959,6 +2965,16 @@
       renderGrid();
     });
 
+    // Comment input - show/hide send button based on text content
+    document.getElementById('commentInput').addEventListener('input', (e) => {
+      const commentBtnRow = document.getElementById('commentBtnRow');
+      if (e.target.value.trim().length > 0) {
+        commentBtnRow.style.display = 'flex';
+      } else {
+        commentBtnRow.style.display = 'none';
+      }
+    });
+
     // Open game detail
     async function openGameDetail(id) {
       const game = allGames[id];
@@ -3441,6 +3457,8 @@
       await set(newCommentRef, commentData);
 
       commentInput.value = '';
+      // Hide the send button after posting
+      document.getElementById('commentBtnRow').style.display = 'none';
       showCustomAlert('Comentário publicado!');
     }
 
@@ -6069,8 +6087,7 @@
       }
     }
 
-    // ===== TRANSFER POINTS SYSTEM =====
-    const TRANSFER_MIN_POINTS = 300;
+    // ===== TRANSFER POINTS SYSTEM (ADM ONLY) =====
 
     function openTransferModal() {
       if (!currentUser || currentUser.isAnonymous) {
@@ -6078,9 +6095,9 @@
         return;
       }
 
-      // Check if user can transfer (ADM or 300+ points)
-      if (!isPublisher && userPoints < TRANSFER_MIN_POINTS) {
-        showCustomAlert(`Você precisa ter pelo menos ${TRANSFER_MIN_POINTS} pontos para poder transferir.`);
+      // Only ADMs can transfer points
+      if (!isPublisher) {
+        showCustomAlert('Apenas administradores podem transferir pontos.');
         return;
       }
 
@@ -6088,12 +6105,7 @@
 
       // Update modal info
       document.getElementById('transferCurrentPoints').textContent = userPoints;
-
-      if (isPublisher) {
-        document.getElementById('transferMinInfo').textContent = 'Como ADM, você não tem limite mínimo para transferir.';
-      } else {
-        document.getElementById('transferMinInfo').textContent = `Mínimo de ${TRANSFER_MIN_POINTS} pontos necessários para transferir.`;
-      }
+      document.getElementById('transferMinInfo').textContent = 'Como ADM, você pode transferir pontos para qualquer usuário.';
 
       document.getElementById('transferEmail').value = '';
       document.getElementById('transferAmount').value = '';
@@ -6110,6 +6122,12 @@
 
       if (!currentUser || currentUser.isAnonymous) {
         showCustomAlert('Você precisa estar logado para transferir pontos.');
+        return;
+      }
+
+      // Only ADMs can transfer points
+      if (!isPublisher) {
+        showCustomAlert('Apenas administradores podem transferir pontos.');
         return;
       }
 
@@ -6137,15 +6155,9 @@
         return;
       }
 
-      // For non-ADM users, check if they'll have at least 0 points after transfer
-      if (!isPublisher && userPoints < TRANSFER_MIN_POINTS) {
-        showCustomAlert(`Você precisa ter pelo menos ${TRANSFER_MIN_POINTS} pontos para transferir.`);
-        return;
-      }
-
       // ===== TRANSFERÊNCIA SEGURA com multi-location update atômico =====
       try {
-        const { ref, get, update } = window.firebaseModules;
+        const { ref, get, update, push, set } = window.firebaseModules;
         const database = window.firebaseDatabase;
 
         // 1. Buscar destinatário por email
@@ -6197,33 +6209,48 @@
         // 5. Criar ID único para a transferência
         const transferId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-        // 6. TRANSAÇÃO ATÔMICA: Multi-location update
-        // O Firebase valida que:
-        // - O remetente tem pontos suficientes
-        // - O remetente é ADM ou tem 300+ pontos
-        // - senderNewPoints == senderCurrentPoints - amount
-        // - recipientNewPoints == recipientCurrentPoints + amount
-        const updates = {};
-        updates[`pointTransfers/${currentUser.uid}/${transferId}`] = {
+        // 6. ADM TRANSFER: Operações separadas para evitar conflitos de regras
+        // O multi-location update pode falhar com regras complexas,
+        // então fazemos operações separadas para ADMs
+
+        // 6.1 Primeiro, registrar a transferência
+        const transferRef = ref(database, `pointTransfers/${currentUser.uid}/${transferId}`);
+        await set(transferRef, {
           recipientId: recipientUid,
           amount: amount,
           transferredAt: serverTime,
           senderNewPoints: senderNewPoints,
           recipientNewPoints: recipientNewPoints
+        });
+
+        // 6.2 Atualizar pontos do remetente (ADM)
+        const senderPointsRef = ref(database, `users/${currentUser.uid}/points`);
+        await set(senderPointsRef, senderNewPoints);
+
+        // 6.3 Atualizar pontos do destinatário (ADM tem permissão para escrever)
+        const recipientPointsRef = ref(database, `users/${recipientUid}/points`);
+        await set(recipientPointsRef, recipientNewPoints);
+
+        // 7. Enviar notificação para o destinatário
+        const senderName = currentUser.displayName || currentUser.email.split('@')[0];
+        const notificationData = {
+          title: '🎁 Você recebeu pontos!',
+          message: `${senderName} transferiu ${amount} pontos para você. Novo saldo: ${recipientNewPoints} pontos.`,
+          targetType: 'individual',
+          targetUserId: recipientUid,
+          targetUserName: recipientEmail.split('@')[0],
+          createdAt: serverTime,
+          createdBy: currentUser.uid,
+          type: 'transfer'
         };
-        updates[`users/${currentUser.uid}/points`] = senderNewPoints;
-        updates[`users/${recipientUid}/points`] = recipientNewPoints;
 
-        await update(ref(database), updates);
+        const notificationsRef = ref(database, 'notifications');
+        const newNotificationRef = push(notificationsRef);
+        await set(newNotificationRef, notificationData);
 
-        // 7. Transação bem-sucedida - atualizar estado local
+        // 8. Transação bem-sucedida - atualizar estado local
         _syncPointsDisplay(senderNewPoints);
         updateUserInfoDisplay();
-
-        // Check if transfer button should be hidden (for non-ADMs with now less than 300 points)
-        if (!isPublisher && senderNewPoints < TRANSFER_MIN_POINTS) {
-          document.getElementById('transferBtn').style.display = 'none';
-        }
 
         showCustomAlert(`Transferência realizada com sucesso!\n${amount} pontos enviados para ${recipientEmail}.`);
         closeTransferModal();
@@ -6496,5 +6523,3 @@
   </script>
 </body>
 </html>
-
-
