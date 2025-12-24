@@ -475,6 +475,10 @@
       fill: #2196F3;
     }
 
+    .help-btn svg {
+      fill: #2196F3;
+    }
+
     .modal-header {
       padding: 24px;
       border-bottom: 1px solid var(--border-color);
@@ -1876,6 +1880,16 @@
       Histórico
     </button>
 
+    <button class="btn" id="reportProblemBtn" onclick="openReportProblemModal()" style="display: none;">
+      <svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+      Reportar Problema
+    </button>
+
+    <button class="btn notification-btn" id="viewReportsBtn" onclick="openViewReportsModal()" style="display: none;">
+      <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm3-4H6v-2h9v2zm0-4H6V7h9v2z"/></svg>
+      Ver Reports (ADM)
+      <span class="notification-badge" id="reportsBadge" style="display: none;">0</span>
+    </button>
 
     <button class="btn" id="logoutBtn" onclick="logout()" style="display: none;">
       <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
@@ -2023,7 +2037,9 @@
           <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
         </button>
         <h1 class="content-header-title">Comentários</h1>
-        <div style="width: 40px;"></div>
+        <button class="content-header-btn help-btn" onclick="openCommentsHelpModal()" title="Dúvidas">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
+        </button>
       </div>
       <div id="commentsList" class="comments-list-container"></div>
       <div id="commentInputWrapper" class="comment-input-wrapper" style="display: none;">
@@ -2465,6 +2481,105 @@
     </div>
   </div>
 
+  <!-- Modal Dúvidas sobre Comentários -->
+  <div id="commentsHelpModal" class="custom-modal">
+    <div class="custom-modal-content" style="max-width: 500px;">
+      <h2>
+        <svg viewBox="0 0 24 24" width="24" height="24" style="fill: #2196F3; vertical-align: middle; margin-right: 8px;"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
+        Sobre os Comentários
+      </h2>
+      <div style="max-height: 55vh; overflow-y: auto; padding: 8px 0;">
+
+        <div style="background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(139, 195, 74, 0.1) 100%); padding: 16px; border-radius: 12px; margin-bottom: 20px;">
+          <h4 style="color: #4CAF50; margin: 0 0 12px 0; font-size: 15px;">✅ O que você PODE fazer:</h4>
+          <ul style="color: var(--text-secondary); margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.8;">
+            <li>Compartilhar suas opiniões sobre o jogo/app</li>
+            <li>Ajudar outros usuários com dicas e sugestões</li>
+            <li>Relatar problemas específicos do conteúdo</li>
+            <li>Fazer perguntas sobre o jogo/aplicativo</li>
+            <li>Elogiar ou criticar construtivamente</li>
+            <li>Interagir de forma respeitosa com a comunidade</li>
+          </ul>
+        </div>
+
+        <div style="background: linear-gradient(135deg, rgba(244, 67, 54, 0.1) 0%, rgba(233, 30, 99, 0.1) 100%); padding: 16px; border-radius: 12px; margin-bottom: 20px;">
+          <h4 style="color: #f44336; margin: 0 0 12px 0; font-size: 15px;">❌ O que você NÃO deve fazer:</h4>
+          <ul style="color: var(--text-secondary); margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.8;">
+            <li>Spam ou mensagens repetitivas</li>
+            <li>Linguagem ofensiva ou palavrões</li>
+            <li>Conteúdo discriminatório ou preconceituoso</li>
+            <li>Divulgar links externos ou propaganda</li>
+            <li>Informações pessoais (suas ou de outros)</li>
+            <li>Discussões políticas ou religiosas</li>
+            <li>Ameaças ou assédio a outros usuários</li>
+            <li>Spoilers sem aviso prévio</li>
+          </ul>
+        </div>
+
+        <div style="background: var(--bg-card); padding: 16px; border-radius: 12px; border: 1px solid var(--border-color);">
+          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;">⚠️ Atenção</h4>
+          <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.6;">
+            Comentários que violam estas regras podem ser removidos e o usuário pode ter sua conta suspensa. Mantenha um ambiente saudável para todos!
+          </p>
+        </div>
+
+      </div>
+      <div class="custom-modal-buttons" style="margin-top: 16px;">
+        <button class="custom-modal-btn primary" onclick="closeCommentsHelpModal()">Entendi!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Reportar Problema -->
+  <div id="reportProblemModal" class="custom-modal">
+    <div class="custom-modal-content" style="max-width: 500px;">
+      <h2>
+        <svg viewBox="0 0 24 24" width="24" height="24" style="fill: #FF9800; vertical-align: middle; margin-right: 8px;"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+        Reportar Problema
+      </h2>
+      <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 16px; line-height: 1.5;">
+        Encontrou um problema em algum jogo ou aplicativo? Nos informe aqui! Cole o link do conteúdo e descreva o problema.
+      </p>
+      <form id="reportProblemForm" onsubmit="handleReportProblem(event)">
+        <div class="form-group">
+          <label class="form-label">Link do conteúdo</label>
+          <input type="url" class="form-input" id="reportLink" placeholder="https://exemplo.com/link-do-jogo" required>
+          <small style="color: var(--text-muted); font-size: 12px;">Cole aqui o link que você encontrou o problema</small>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Descrição do problema</label>
+          <textarea class="form-input" id="reportDescription" placeholder="Descreva o problema encontrado..." required maxlength="1000" rows="4" style="resize: vertical;"></textarea>
+          <small style="color: var(--text-muted); font-size: 12px;"><span id="reportCharCount">0</span>/1000 caracteres</small>
+        </div>
+        <div class="custom-modal-buttons">
+          <button type="button" class="custom-modal-btn secondary" onclick="closeReportProblemModal()">Cancelar</button>
+          <button type="submit" class="custom-modal-btn primary" id="submitReportBtn">Enviar Report</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Ver Reports (Admin) -->
+  <div id="viewReportsModal" class="custom-modal">
+    <div class="custom-modal-content" style="max-width: 600px;">
+      <h2>
+        <svg viewBox="0 0 24 24" width="24" height="24" style="fill: #FF5722; vertical-align: middle; margin-right: 8px;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm3-4H6v-2h9v2zm0-4H6V7h9v2z"/></svg>
+        Reports de Problemas
+      </h2>
+      <div id="reportsFilterContainer" style="margin-bottom: 16px; display: flex; gap: 10px;">
+        <button class="filter-btn active" onclick="filterReports('all')" id="reportFilterAll">Todos</button>
+        <button class="filter-btn" onclick="filterReports('pending')" id="reportFilterPending">Pendentes</button>
+        <button class="filter-btn" onclick="filterReports('resolved')" id="reportFilterResolved">Resolvidos</button>
+      </div>
+      <div id="reportsList" style="max-height: 55vh; overflow-y: auto; padding: 8px 0;">
+        <p style="color: var(--text-muted); text-align: center;">Carregando reports...</p>
+      </div>
+      <div class="custom-modal-buttons" style="margin-top: 16px;">
+        <button class="custom-modal-btn secondary" onclick="closeViewReportsModal()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal Transferência de Pontos -->
   <div id="transferModal" class="custom-modal">
     <div class="custom-modal-content" style="max-width: 450px;">
@@ -2661,6 +2776,8 @@
       const dailyRewardBtn = document.getElementById('dailyRewardBtn');
       const favoritesBtn = document.getElementById('favoritesBtn');
       const transferBtn = document.getElementById('transferBtn');
+      const reportProblemBtn = document.getElementById('reportProblemBtn');
+      const viewReportsBtn = document.getElementById('viewReportsBtn');
 
       if (!currentUser || currentUser.isAnonymous) {
         // Anonymous mode - viewing only
@@ -2676,6 +2793,8 @@
         dailyRewardBtn.style.display = 'none';
         favoritesBtn.style.display = 'none';
         transferBtn.style.display = 'none';
+        reportProblemBtn.style.display = 'none';
+        viewReportsBtn.style.display = 'none';
         logoutBtn.style.display = 'none';
       } else {
         // Logged in user
@@ -2714,16 +2833,30 @@
           generateCodeBtn.style.display = 'flex';
           manageUsersBtn.style.display = 'flex';
           sendNotificationBtn.style.display = 'flex';
+          viewReportsBtn.style.display = 'flex';
+          reportProblemBtn.style.display = 'none'; // ADMs não precisam reportar
         } else {
           publishBtn.style.display = 'none';
           manageBtn.style.display = 'none';
           generateCodeBtn.style.display = 'none';
           manageUsersBtn.style.display = 'none';
           sendNotificationBtn.style.display = 'none';
+          viewReportsBtn.style.display = 'none';
+          // Mostrar botão de reportar para usuários aprovados
+          if (userStatus === 'approved') {
+            reportProblemBtn.style.display = 'flex';
+          } else {
+            reportProblemBtn.style.display = 'none';
+          }
         }
 
         updateUserInfoDisplay();
         loadNotifications();
+
+        // Update reports badge for admins
+        if (isPublisher) {
+          updateReportsBadge();
+        }
       }
     }
 
@@ -5392,6 +5525,286 @@
       document.getElementById('faqModal').classList.remove('active');
     }
 
+    // Comments Help Modal functions
+    function openCommentsHelpModal() {
+      document.getElementById('commentsHelpModal').classList.add('active');
+    }
+
+    function closeCommentsHelpModal() {
+      document.getElementById('commentsHelpModal').classList.remove('active');
+    }
+
+    // ========== Report Problem System ==========
+    let allReports = [];
+    let currentReportFilter = 'all';
+
+    function openReportProblemModal() {
+      closeSidebar();
+      const auth = window.firebaseAuth;
+      const user = auth.currentUser;
+
+      if (!user || user.isAnonymous) {
+        showCustomAlert('Você precisa estar logado para reportar um problema.');
+        return;
+      }
+
+      document.getElementById('reportLink').value = '';
+      document.getElementById('reportDescription').value = '';
+      document.getElementById('reportCharCount').textContent = '0';
+      document.getElementById('reportProblemModal').classList.add('active');
+
+      // Add character counter
+      document.getElementById('reportDescription').oninput = function() {
+        document.getElementById('reportCharCount').textContent = this.value.length;
+      };
+    }
+
+    function closeReportProblemModal() {
+      document.getElementById('reportProblemModal').classList.remove('active');
+    }
+
+    async function handleReportProblem(event) {
+      event.preventDefault();
+
+      const auth = window.firebaseAuth;
+      const user = auth.currentUser;
+
+      if (!user || user.isAnonymous) {
+        showCustomAlert('Você precisa estar logado para reportar um problema.');
+        return;
+      }
+
+      const link = document.getElementById('reportLink').value.trim();
+      const description = document.getElementById('reportDescription').value.trim();
+
+      if (!link || !description) {
+        showCustomAlert('Preencha todos os campos.');
+        return;
+      }
+
+      const submitBtn = document.getElementById('submitReportBtn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Enviando...';
+
+      try {
+        const { ref, push, set, get } = window.firebaseModules;
+        const database = window.firebaseDatabase;
+
+        // Get user data
+        const userRef = ref(database, `users/${user.uid}`);
+        const userSnapshot = await get(userRef);
+        const userData = userSnapshot.val() || {};
+
+        const reportData = {
+          link: link,
+          description: description,
+          reporterId: user.uid,
+          reporterEmail: user.email,
+          reporterName: userData.name || 'Usuário',
+          status: 'pending',
+          createdAt: Date.now(),
+          resolvedAt: null,
+          resolvedBy: null
+        };
+
+        const reportsRef = ref(database, 'problemReports');
+        const newReportRef = push(reportsRef);
+        await set(newReportRef, reportData);
+
+        closeReportProblemModal();
+        showCustomAlert('✅ Report enviado com sucesso! Os administradores irão analisar o problema.');
+      } catch (error) {
+        console.error('Error submitting report:', error);
+        showCustomAlert('Erro ao enviar report. Tente novamente.');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Enviar Report';
+      }
+    }
+
+    // Admin - View Reports
+    async function openViewReportsModal() {
+      closeSidebar();
+      document.getElementById('viewReportsModal').classList.add('active');
+      await loadReports();
+    }
+
+    function closeViewReportsModal() {
+      document.getElementById('viewReportsModal').classList.remove('active');
+    }
+
+    // Function to update reports badge for admin
+    async function updateReportsBadge() {
+      if (!isPublisher) return;
+
+      const badge = document.getElementById('reportsBadge');
+      if (!badge) return;
+
+      try {
+        const { ref, get } = window.firebaseModules;
+        const database = window.firebaseDatabase;
+
+        const reportsRef = ref(database, 'problemReports');
+        const snapshot = await get(reportsRef);
+
+        if (!snapshot.exists()) {
+          badge.style.display = 'none';
+          return;
+        }
+
+        let pendingCount = 0;
+        snapshot.forEach(child => {
+          const report = child.val();
+          if (report.status === 'pending') {
+            pendingCount++;
+          }
+        });
+
+        if (pendingCount > 0) {
+          badge.textContent = pendingCount > 99 ? '99+' : pendingCount;
+          badge.style.display = 'block';
+        } else {
+          badge.style.display = 'none';
+        }
+      } catch (error) {
+        console.error('Error updating reports badge:', error);
+        badge.style.display = 'none';
+      }
+    }
+
+    async function loadReports() {
+      const reportsList = document.getElementById('reportsList');
+      reportsList.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Carregando reports...</p>';
+
+      try {
+        const { ref, get } = window.firebaseModules;
+        const database = window.firebaseDatabase;
+
+        const reportsRef = ref(database, 'problemReports');
+        const snapshot = await get(reportsRef);
+
+        if (!snapshot.exists()) {
+          reportsList.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Nenhum report encontrado.</p>';
+          allReports = [];
+          return;
+        }
+
+        allReports = [];
+        snapshot.forEach(child => {
+          allReports.push({ id: child.key, ...child.val() });
+        });
+
+        // Sort by createdAt descending (newest first)
+        allReports.sort((a, b) => b.createdAt - a.createdAt);
+
+        renderReports();
+      } catch (error) {
+        console.error('Error loading reports:', error);
+        reportsList.innerHTML = '<p style="color: #f44336; text-align: center;">Erro ao carregar reports.</p>';
+      }
+    }
+
+    function filterReports(filter) {
+      currentReportFilter = filter;
+
+      // Update active button
+      document.getElementById('reportFilterAll').classList.remove('active');
+      document.getElementById('reportFilterPending').classList.remove('active');
+      document.getElementById('reportFilterResolved').classList.remove('active');
+
+      if (filter === 'all') document.getElementById('reportFilterAll').classList.add('active');
+      else if (filter === 'pending') document.getElementById('reportFilterPending').classList.add('active');
+      else if (filter === 'resolved') document.getElementById('reportFilterResolved').classList.add('active');
+
+      renderReports();
+    }
+
+    function renderReports() {
+      const reportsList = document.getElementById('reportsList');
+
+      let filteredReports = allReports;
+      if (currentReportFilter !== 'all') {
+        filteredReports = allReports.filter(r => r.status === currentReportFilter);
+      }
+
+      if (filteredReports.length === 0) {
+        reportsList.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Nenhum report encontrado.</p>';
+        return;
+      }
+
+      reportsList.innerHTML = filteredReports.map(report => {
+        const date = new Date(report.createdAt).toLocaleDateString('pt-BR', {
+          day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+
+        const statusColor = report.status === 'pending' ? '#FF9800' : '#4CAF50';
+        const statusText = report.status === 'pending' ? 'Pendente' : 'Resolvido';
+        const statusIcon = report.status === 'pending' ? '⏳' : '✅';
+
+        return `
+          <div class="report-item" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+              <div>
+                <span style="font-size: 12px; color: var(--text-muted);">${date}</span>
+                <div style="font-size: 14px; font-weight: 600; color: var(--text-primary); margin-top: 4px;">${report.reporterName}</div>
+                <div style="font-size: 12px; color: var(--text-muted);">${report.reporterEmail}</div>
+              </div>
+              <span style="background: ${statusColor}20; color: ${statusColor}; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">
+                ${statusIcon} ${statusText}
+              </span>
+            </div>
+            <div style="margin-bottom: 12px;">
+              <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Link:</div>
+              <a href="${report.link}" target="_blank" rel="noopener" style="color: #2196F3; font-size: 13px; word-break: break-all; text-decoration: underline;">${report.link}</a>
+            </div>
+            <div style="margin-bottom: 12px;">
+              <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Descrição:</div>
+              <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.5; margin: 0; white-space: pre-wrap;">${report.description}</p>
+            </div>
+            ${report.status === 'pending' ? `
+              <button onclick="markReportResolved('${report.id}')" style="background: #4CAF50; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; width: 100%;">
+                ✓ Marcar como Resolvido
+              </button>
+            ` : `
+              <div style="text-align: center; font-size: 12px; color: var(--text-muted);">
+                Resolvido em ${report.resolvedAt ? new Date(report.resolvedAt).toLocaleDateString('pt-BR') : 'N/A'}
+              </div>
+            `}
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function markReportResolved(reportId) {
+      try {
+        const { ref, update } = window.firebaseModules;
+        const database = window.firebaseDatabase;
+        const auth = window.firebaseAuth;
+        const user = auth.currentUser;
+
+        const reportRef = ref(database, `problemReports/${reportId}`);
+        await update(reportRef, {
+          status: 'resolved',
+          resolvedAt: Date.now(),
+          resolvedBy: user.email
+        });
+
+        // Update local data and re-render
+        const report = allReports.find(r => r.id === reportId);
+        if (report) {
+          report.status = 'resolved';
+          report.resolvedAt = Date.now();
+          report.resolvedBy = user.email;
+        }
+        renderReports();
+        updateReportsBadge();
+        showCustomAlert('✅ Report marcado como resolvido!');
+      } catch (error) {
+        console.error('Error resolving report:', error);
+        showCustomAlert('Erro ao atualizar report.');
+      }
+    }
+
     // Rating System
     let selectedRating = 0;
     let totalAppStars = 0;
@@ -6150,10 +6563,7 @@
         return;
       }
 
-      if (amount > userPoints) {
-        showCustomAlert('Você não tem pontos suficientes para essa transferência.');
-        return;
-      }
+      // ADMs não têm limite de pontos para transferência
 
       // ===== TRANSFERÊNCIA SEGURA com multi-location update atômico =====
       try {
@@ -6185,49 +6595,19 @@
           return;
         }
 
-        // 2. Obter pontos atuais de ambos os usuários
-        const senderRef = ref(database, `users/${currentUser.uid}`);
-        const senderSnapshot = await get(senderRef);
-        const senderData = senderSnapshot.val() || {};
-        const senderCurrentPoints = senderData.points || 0;
-
+        // 2. Obter pontos atuais do destinatário
         const recipientCurrentPoints = recipientData.points || 0;
 
-        // Validar que o usuário tem pontos suficientes (baseado no servidor)
-        if (amount > senderCurrentPoints) {
-          showCustomAlert('Você não tem pontos suficientes para essa transferência.');
-          return;
-        }
-
-        // 3. Calcular novos valores
-        const senderNewPoints = senderCurrentPoints - amount;
+        // 3. Calcular novo valor do destinatário (ADM não perde pontos)
         const recipientNewPoints = recipientCurrentPoints + amount;
 
         // 4. Obter timestamp do servidor
         const serverTime = await getServerTimestamp();
 
-        // 5. Criar ID único para a transferência
-        const transferId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        // 5. ADM TRANSFER: O ADM pode dar pontos sem limite
+        // ADM não perde pontos - apenas adiciona ao destinatário
 
-        // 6. ADM TRANSFER: Operações separadas para evitar conflitos de regras
-        // O multi-location update pode falhar com regras complexas,
-        // então fazemos operações separadas para ADMs
-
-        // 6.1 Primeiro, registrar a transferência
-        const transferRef = ref(database, `pointTransfers/${currentUser.uid}/${transferId}`);
-        await set(transferRef, {
-          recipientId: recipientUid,
-          amount: amount,
-          transferredAt: serverTime,
-          senderNewPoints: senderNewPoints,
-          recipientNewPoints: recipientNewPoints
-        });
-
-        // 6.2 Atualizar pontos do remetente (ADM)
-        const senderPointsRef = ref(database, `users/${currentUser.uid}/points`);
-        await set(senderPointsRef, senderNewPoints);
-
-        // 6.3 Atualizar pontos do destinatário (ADM tem permissão para escrever)
+        // 5.1 Atualizar pontos do destinatário (ADM tem permissão para escrever em users)
         const recipientPointsRef = ref(database, `users/${recipientUid}/points`);
         await set(recipientPointsRef, recipientNewPoints);
 
@@ -6248,11 +6628,10 @@
         const newNotificationRef = push(notificationsRef);
         await set(newNotificationRef, notificationData);
 
-        // 8. Transação bem-sucedida - atualizar estado local
-        _syncPointsDisplay(senderNewPoints);
+        // 6. Transação bem-sucedida - atualizar estado local
         updateUserInfoDisplay();
 
-        showCustomAlert(`Transferência realizada com sucesso!\n${amount} pontos enviados para ${recipientEmail}.`);
+        showCustomAlert(`Transferência realizada com sucesso!\n${amount} pontos enviados para ${recipientEmail}.\nNovo saldo do destinatário: ${recipientNewPoints} pontos.`);
         closeTransferModal();
 
       } catch (error) {
