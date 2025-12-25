@@ -571,6 +571,362 @@
       display: block;
     }
 
+    /* Auth Overlay - Full screen like Android app */
+    .auth-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg-primary);
+      z-index: 3000;
+      flex-direction: column;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .auth-overlay.active {
+      display: flex;
+    }
+
+    /* Auth Loading Overlay */
+    .auth-loading-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg-primary);
+      z-index: 4000;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+    }
+
+    .auth-loading-overlay.active {
+      display: flex;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .auth-loading-spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid var(--border-color);
+      border-top-color: var(--accent-primary);
+      border-radius: 50%;
+      animation: authSpin 0.8s linear infinite;
+    }
+
+    @keyframes authSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    .auth-loading-text {
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--text-primary);
+      text-align: center;
+    }
+
+    .auth-loading-subtext {
+      font-size: 14px;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: -12px;
+    }
+
+    .auth-loading-icon {
+      width: 80px;
+      height: 80px;
+      background: var(--accent-primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+      animation: authPulse 1.5s ease-in-out infinite;
+    }
+
+    .auth-loading-icon svg {
+      width: 44px;
+      height: 44px;
+      fill: var(--bg-primary);
+    }
+
+    @keyframes authPulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.8; }
+    }
+
+    .auth-overlay-content {
+      width: 100%;
+      height: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+      background: var(--bg-primary);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .auth-main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .auth-welcome {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .auth-welcome-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 20px;
+      background: var(--accent-primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .auth-welcome-icon svg {
+      width: 44px;
+      height: 44px;
+      fill: var(--bg-primary);
+    }
+
+    .auth-welcome h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+
+    .auth-welcome p {
+      font-size: 16px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .auth-options {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 20px 0;
+    }
+
+    .auth-option-btn {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+      padding: 18px 20px;
+      background: var(--bg-card);
+      border: 2px solid var(--border-color);
+      border-radius: 16px;
+      color: var(--text-primary);
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: left;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .auth-option-btn:hover {
+      border-color: var(--accent-primary);
+      background: var(--bg-secondary);
+    }
+
+    .auth-option-btn:active {
+      transform: scale(0.98);
+    }
+
+    .auth-option-btn svg {
+      width: 28px;
+      height: 28px;
+      fill: var(--accent-primary);
+      flex-shrink: 0;
+    }
+
+    .auth-option-btn.primary {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+      color: var(--bg-primary);
+    }
+
+    .auth-option-btn.primary svg {
+      fill: var(--bg-primary);
+    }
+
+    .auth-option-btn.primary:hover {
+      opacity: 0.9;
+    }
+
+    .auth-option-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .auth-option-text small {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .auth-option-btn.primary .auth-option-text small {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .dark .auth-option-btn.primary .auth-option-text small {
+      color: rgba(0, 0, 0, 0.6);
+    }
+
+    /* Auth Form Styles */
+    .auth-form-container {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .auth-form-container.active {
+      display: flex;
+    }
+
+    .auth-form-header {
+      text-align: center;
+      padding-bottom: 24px;
+    }
+
+    .auth-form-header h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .auth-form-header p {
+      font-size: 15px;
+      color: var(--text-muted);
+    }
+
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .auth-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .auth-input-group label {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .auth-input-group input {
+      width: 100%;
+      padding: 16px 18px;
+      background: var(--bg-card);
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-size: 17px;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s ease;
+    }
+
+    .auth-input-group input:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      background: var(--bg-secondary);
+    }
+
+    .auth-input-group input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .auth-input-group small {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .auth-submit-btn {
+      width: 100%;
+      padding: 18px;
+      background: var(--accent-primary);
+      border: none;
+      border-radius: 12px;
+      color: var(--bg-primary);
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 8px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .auth-submit-btn:hover {
+      opacity: 0.9;
+    }
+
+    .auth-submit-btn:active {
+      transform: scale(0.98);
+    }
+
+    .auth-form-footer {
+      text-align: center;
+      padding-top: 20px;
+      margin-top: auto;
+    }
+
+    .auth-form-footer a {
+      color: var(--accent-primary);
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .auth-form-footer a:hover {
+      text-decoration: underline;
+    }
+
+    .auth-back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 500;
+      margin-top: 24px;
+      padding: 12px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .auth-back-link:hover {
+      background: var(--bg-card);
+      color: var(--text-primary);
+    }
+
+    .auth-back-link svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
     /* Comments Overlay - Full screen like game overlay */
     .comments-overlay {
       display: none;
@@ -1624,29 +1980,6 @@
       border-color: var(--accent-primary);
     }
 
-    .user-info {
-      padding: 12px;
-      background: var(--bg-card);
-      border-radius: 8px;
-      margin-bottom: 12px;
-      border: 1px solid var(--border-color);
-    }
-
-    .user-info p {
-      margin: 4px 0;
-      font-size: 14px;
-    }
-
-    .points-display {
-      background: var(--accent-primary);
-      color: var(--bg-primary);
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-weight: 700;
-      text-align: center;
-      margin-bottom: 12px;
-    }
-
     .loading {
       text-align: center;
       padding: 40px;
@@ -2012,6 +2345,719 @@
 
     .favorites-item-remove:hover {
       opacity: 1;
+    }
+
+    /* Profile Overlay - Full screen like Android app */
+    .profile-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg-primary);
+      z-index: 2000;
+      flex-direction: column;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .profile-overlay.active {
+      display: flex;
+    }
+
+    .profile-overlay-content {
+      width: 100%;
+      height: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      background: var(--bg-primary);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .profile-container {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Profile Loading Skeleton Animation */
+    .profile-loading-skeleton {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding: 20px 0;
+    }
+
+    .skeleton-header {
+      background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+      border-radius: 20px;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .skeleton-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--border-color) 50%, var(--bg-secondary) 75%);
+      background-size: 200% 100%;
+      animation: skeletonShimmer 1.5s infinite;
+      margin-bottom: 12px;
+    }
+
+    .skeleton-name {
+      width: 150px;
+      height: 24px;
+      border-radius: 8px;
+      background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--border-color) 50%, var(--bg-secondary) 75%);
+      background-size: 200% 100%;
+      animation: skeletonShimmer 1.5s infinite;
+      animation-delay: 0.1s;
+      margin-bottom: 8px;
+    }
+
+    .skeleton-email {
+      width: 200px;
+      height: 16px;
+      border-radius: 6px;
+      background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--border-color) 50%, var(--bg-secondary) 75%);
+      background-size: 200% 100%;
+      animation: skeletonShimmer 1.5s infinite;
+      animation-delay: 0.2s;
+      margin-bottom: 16px;
+    }
+
+    .skeleton-badge {
+      width: 100px;
+      height: 32px;
+      border-radius: 16px;
+      background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--border-color) 50%, var(--bg-secondary) 75%);
+      background-size: 200% 100%;
+      animation: skeletonShimmer 1.5s infinite;
+      animation-delay: 0.3s;
+    }
+
+    .skeleton-stats {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .skeleton-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .skeleton-stat-value {
+      width: 50px;
+      height: 28px;
+      border-radius: 6px;
+      background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--border-color) 50%, var(--bg-secondary) 75%);
+      background-size: 200% 100%;
+      animation: skeletonShimmer 1.5s infinite;
+      animation-delay: 0.4s;
+    }
+
+    .skeleton-stat-label {
+      width: 60px;
+      height: 14px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--border-color) 50%, var(--bg-secondary) 75%);
+      background-size: 200% 100%;
+      animation: skeletonShimmer 1.5s infinite;
+      animation-delay: 0.5s;
+    }
+
+    .skeleton-info-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .skeleton-info-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .skeleton-info-item:last-child {
+      border-bottom: none;
+    }
+
+    .skeleton-info-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--border-color) 50%, var(--bg-secondary) 75%);
+      background-size: 200% 100%;
+      animation: skeletonShimmer 1.5s infinite;
+      flex-shrink: 0;
+    }
+
+    .skeleton-info-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .skeleton-info-label {
+      width: 60px;
+      height: 12px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--border-color) 50%, var(--bg-secondary) 75%);
+      background-size: 200% 100%;
+      animation: skeletonShimmer 1.5s infinite;
+    }
+
+    .skeleton-info-value {
+      width: 140px;
+      height: 16px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--border-color) 50%, var(--bg-secondary) 75%);
+      background-size: 200% 100%;
+      animation: skeletonShimmer 1.5s infinite;
+    }
+
+    .skeleton-button {
+      width: 100%;
+      height: 54px;
+      border-radius: 14px;
+      background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--border-color) 50%, var(--bg-secondary) 75%);
+      background-size: 200% 100%;
+      animation: skeletonShimmer 1.5s infinite;
+      animation-delay: 0.6s;
+    }
+
+    @keyframes skeletonShimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Profile Default Avatar SVG */
+    .profile-avatar-svg {
+      width: 80px;
+      height: 80px;
+      min-width: 80px;
+      min-height: 80px;
+      border-radius: 50%;
+      background: var(--bg-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+      border: 3px solid rgba(255,255,255,0.3);
+      position: relative;
+      z-index: 1;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .profile-avatar-svg svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .profile-header-card {
+      background: linear-gradient(135deg, var(--accent-primary) 0%, rgba(100, 100, 100, 0.8) 100%);
+      border-radius: 20px;
+      padding: 24px 16px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .profile-user-info-scroll {
+      max-height: 80px;
+      overflow-y: auto;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,0.4) transparent;
+    }
+
+    .profile-user-info-scroll::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .profile-user-info-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .profile-user-info-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.4);
+      border-radius: 2px;
+    }
+
+    .profile-user-info-scroll::-webkit-scrollbar-thumb:hover {
+      background: rgba(255,255,255,0.6);
+    }
+
+    .profile-header-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: shimmer 3s infinite;
+    }
+
+    @keyframes shimmer {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(180deg); }
+    }
+
+    .profile-avatar {
+      width: 80px;
+      height: 80px;
+      min-width: 80px;
+      min-height: 80px;
+      border-radius: 50%;
+      background: var(--bg-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+      font-size: 36px;
+      border: 3px solid rgba(255,255,255,0.3);
+      position: relative;
+      z-index: 1;
+      flex-shrink: 0;
+    }
+
+    .profile-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--bg-primary);
+      margin: 0 0 6px 0;
+      position: relative;
+      z-index: 1;
+      word-break: break-word;
+      overflow-wrap: break-word;
+      max-width: 100%;
+      padding: 0 10px;
+    }
+
+    .dark .profile-name {
+      color: white;
+    }
+
+    .profile-email {
+      font-size: 13px;
+      word-break: break-all;
+      overflow-wrap: break-word;
+      max-width: 100%;
+      padding: 0 10px;
+      color: rgba(255,255,255,0.8);
+      margin: 0 0 16px 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .profile-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      position: relative;
+      z-index: 1;
+    }
+
+    .profile-status-badge.verified {
+      background: rgba(76, 175, 80, 0.2);
+      color: #4CAF50;
+      border: 1px solid rgba(76, 175, 80, 0.4);
+    }
+
+    .profile-status-badge.pending {
+      background: rgba(255, 152, 0, 0.2);
+      color: #FF9800;
+      border: 1px solid rgba(255, 152, 0, 0.4);
+    }
+
+    .profile-status-badge.admin {
+      background: rgba(156, 39, 176, 0.2);
+      color: #9C27B0;
+      border: 1px solid rgba(156, 39, 176, 0.4);
+    }
+
+    .profile-stats-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .profile-stat {
+      text-align: center;
+      flex: 1;
+    }
+
+    .profile-stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .profile-stat-label {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .profile-stat-divider {
+      width: 1px;
+      background: var(--border-color);
+      margin: 0 10px;
+    }
+
+    .profile-info-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .profile-info-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .profile-info-item:last-child {
+      border-bottom: none;
+    }
+
+    .profile-info-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--bg-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .profile-info-icon svg {
+      width: 22px;
+      height: 22px;
+      fill: var(--accent-primary);
+    }
+
+    .profile-info-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .profile-info-label {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    .profile-info-value {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      word-break: break-word;
+    }
+
+    .profile-logout-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 18px;
+      background: transparent;
+      border: 2px solid #ef5350;
+      border-radius: 14px;
+      color: #ef5350;
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 10px;
+    }
+
+    .profile-logout-btn:hover {
+      background: rgba(239, 83, 80, 0.1);
+    }
+
+    .profile-logout-btn svg {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+    }
+
+    .profile-not-logged {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      text-align: center;
+    }
+
+    .profile-not-logged-icon {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      border: 2px solid var(--border-color);
+    }
+
+    .profile-not-logged-icon svg {
+      width: 50px;
+      height: 50px;
+      fill: var(--text-muted);
+    }
+
+    .profile-not-logged h3 {
+      font-size: 22px;
+      color: var(--text-primary);
+      margin: 0 0 10px 0;
+    }
+
+    .profile-not-logged p {
+      font-size: 15px;
+      color: var(--text-muted);
+      margin: 0 0 28px 0;
+      line-height: 1.5;
+    }
+
+    .profile-login-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 18px 48px;
+      background: var(--accent-primary);
+      border: none;
+      border-radius: 14px;
+      color: var(--bg-primary);
+      font-family: 'Inter', sans-serif;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .profile-login-btn:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+
+    .profile-login-btn svg {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+    }
+
+    /* About Overlay - Full screen like Android app */
+    .about-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg-primary);
+      z-index: 2000;
+      flex-direction: column;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .about-overlay.active {
+      display: flex;
+    }
+
+    .about-overlay-content {
+      width: 100%;
+      height: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      background: var(--bg-primary);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .about-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .about-header-card {
+      background: linear-gradient(135deg, rgba(33, 150, 243, 0.15) 0%, rgba(156, 39, 176, 0.1) 100%);
+      border: 1px solid rgba(33, 150, 243, 0.2);
+      border-radius: 20px;
+      padding: 32px 24px;
+      text-align: center;
+    }
+
+    .about-logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      background: var(--accent-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      font-size: 40px;
+    }
+
+    .about-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0 0 8px 0;
+    }
+
+    .about-subtitle {
+      font-size: 15px;
+      color: var(--text-secondary);
+      margin: 0 0 12px 0;
+    }
+
+    .about-version {
+      display: inline-block;
+      padding: 6px 16px;
+      background: var(--bg-card);
+      border-radius: 20px;
+      font-size: 13px;
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+    }
+
+    .about-faq-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .about-faq-item {
+      padding: 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .about-faq-item:last-child {
+      border-bottom: none;
+    }
+
+    .about-faq-question {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0 0 10px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .about-faq-question span {
+      font-size: 18px;
+    }
+
+    .about-faq-answer {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin: 0;
+      padding-left: 28px;
+    }
+
+    .about-contact-card {
+      background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(139, 195, 74, 0.08) 100%);
+      border: 1px solid rgba(76, 175, 80, 0.2);
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    .about-contact-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0 0 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .about-contact-title span {
+      font-size: 24px;
+    }
+
+    .about-contact-email {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      background: var(--bg-card);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+    }
+
+    .about-contact-email svg {
+      width: 24px;
+      height: 24px;
+      fill: var(--accent-primary);
+      flex-shrink: 0;
+    }
+
+    .about-contact-email a {
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 15px;
+      word-break: break-all;
+    }
+
+    .about-contact-email a:hover {
+      text-decoration: underline;
     }
 
     /* History Overlay - Full screen like Android app */
@@ -2527,16 +3573,11 @@
   <div id="sidebar" class="sidebar">
     <h2>Portal Digital</h2>
 
-    <div id="userInfoSection" style="display: none;">
-      <div class="user-info">
-        <p><strong>Nome:</strong> <span id="userName">-</span></p>
-        <p><strong>Conta:</strong> <span id="userEmail">-</span></p>
-        <p><strong>Status:</strong> <span id="userStatus">-</span></p>
-      </div>
-      <div class="points-display">
-        Pontos: <span id="userPoints">0</span>
-      </div>
-    </div>
+    <button class="btn" id="myProfileBtn" onclick="openProfileOverlay()" style="margin-bottom: 8px;">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+      Meu Perfil
+    </button>
+
 
     <button class="btn" id="loginBtn" onclick="openLoginModal()">
       <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
@@ -2622,7 +3663,7 @@
     </button>
 
     <div style="border-top: 1px solid var(--border-color); margin: 12px 0; padding-top: 12px;">
-      <button class="btn" onclick="openFaqModal()">
+      <button class="btn" onclick="openAboutOverlay()">
         <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
         Sobre o App / FAQ
       </button>
@@ -2805,55 +3846,162 @@
     </div>
   </div>
 
-  <div id="loginModal" class="custom-modal">
-    <div class="custom-modal-content">
-      <h2>Entrar</h2>
-      <form id="loginForm" onsubmit="handleLogin(event)">
-        <div class="form-group">
-          <label class="form-label">Email</label>
-          <input type="email" class="form-input" id="loginEmail" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Senha</label>
-          <input type="password" class="form-input" id="loginPassword" required>
-        </div>
-        <div style="text-align: right; margin-bottom: 16px;">
-          <a href="#" onclick="openResetPasswordModal(); return false;" style="color: var(--accent-primary); font-size: 14px; text-decoration: none;">Esqueceu a senha?</a>
-        </div>
-        <div class="custom-modal-buttons">
-          <button type="button" class="custom-modal-btn secondary" onclick="closeLoginModal()">Cancelar</button>
-          <button type="submit" class="custom-modal-btn primary">Entrar</button>
-        </div>
-      </form>
+  <!-- Auth Loading Overlay -->
+  <div id="authLoadingOverlay" class="auth-loading-overlay">
+    <div class="auth-loading-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
     </div>
+    <div class="auth-loading-spinner"></div>
+    <div class="auth-loading-text" id="authLoadingText">A entrar...</div>
+    <div class="auth-loading-subtext" id="authLoadingSubtext">Por favor aguarde</div>
   </div>
 
-  <div id="registerModal" class="custom-modal">
-    <div class="custom-modal-content">
-      <h2>Criar Conta</h2>
-      <form id="registerForm" onsubmit="handleRegister(event)">
-        <div class="form-group">
-          <label class="form-label">Nome Completo</label>
-          <input type="text" class="form-input" id="registerName" placeholder="Seu nome" required>
+  <!-- Auth Overlay - Full Screen -->
+  <div id="authOverlay" class="auth-overlay">
+    <div class="auth-overlay-content">
+      <div class="content-header">
+        <button class="content-header-btn back-btn" onclick="authGoBack()" id="authBackBtn" style="visibility: hidden;">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <h3 class="content-header-title" id="authHeaderTitle">Bem-vindo</h3>
+        <div style="width: 40px;"></div>
+      </div>
+
+      <div class="auth-main">
+        <!-- Welcome Screen with Options -->
+        <div id="authWelcomeScreen" class="auth-form-container active">
+          <div class="auth-welcome">
+            <div class="auth-welcome-icon">
+              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+            </div>
+            <h1>Portal Digital</h1>
+            <p>Baixe jogos, apps e tutoriais exclusivos. Escolha como deseja continuar.</p>
+          </div>
+
+          <div class="auth-options">
+            <button class="auth-option-btn primary" onclick="showLoginForm()">
+              <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+              <div class="auth-option-text">
+                Entrar
+                <small>Acesse sua conta existente</small>
+              </div>
+            </button>
+
+            <button class="auth-option-btn" onclick="showRegisterForm()">
+              <svg viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+              <div class="auth-option-text">
+                Criar Conta
+                <small>Registre-se para baixar conteúdo</small>
+              </div>
+            </button>
+
+            <button class="auth-option-btn" onclick="enterAsVisitor()">
+              <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+              <div class="auth-option-text">
+                Modo Visitante
+                <small>Explore sem criar conta</small>
+              </div>
+            </button>
+          </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Email (Gmail)</label>
-          <input type="email" class="form-input" id="registerEmail" placeholder="seuemail@gmail.com" pattern="[a-zA-Z0-9._%+-]+@gmail\.com$" title="Por favor, use um email do Gmail" required>
-          <small style="color: var(--text-muted); font-size: 12px;">Apenas emails @gmail.com são aceitos</small>
+
+        <!-- Login Form -->
+        <div id="authLoginForm" class="auth-form-container">
+          <div class="auth-form-header">
+            <h2>Entrar na Conta</h2>
+            <p>Insira seus dados para acessar</p>
+          </div>
+
+          <form class="auth-form" onsubmit="handleLogin(event)">
+            <div class="auth-input-group">
+              <label>Email</label>
+              <input type="email" id="loginEmail" placeholder="seu@email.com" required>
+            </div>
+
+            <div class="auth-input-group">
+              <label>Senha</label>
+              <input type="password" id="loginPassword" placeholder="Sua senha" required>
+            </div>
+
+            <button type="submit" class="auth-submit-btn">Entrar</button>
+
+            <div class="auth-form-footer">
+              <a href="#" onclick="showResetPasswordForm(); return false;">Esqueceu a senha?</a>
+            </div>
+          </form>
+
+          <div style="text-align: center;">
+            <a href="#" class="auth-back-link" onclick="authShowWelcome(); return false;">
+              <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+              Voltar às opções
+            </a>
+          </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Senha</label>
-          <input type="password" class="form-input" id="registerPassword" placeholder="Mínimo 6 caracteres" minlength="6" required>
+
+        <!-- Register Form -->
+        <div id="authRegisterForm" class="auth-form-container">
+          <div class="auth-form-header">
+            <h2>Criar Conta</h2>
+            <p>Preencha seus dados para se registrar</p>
+          </div>
+
+          <form class="auth-form" id="registerForm" onsubmit="handleRegister(event)">
+            <div class="auth-input-group">
+              <label>Nome Completo</label>
+              <input type="text" id="registerName" placeholder="Seu nome" required>
+            </div>
+
+            <div class="auth-input-group">
+              <label>Email (Gmail)</label>
+              <input type="email" id="registerEmail" placeholder="seuemail@gmail.com" pattern="[a-zA-Z0-9._%+-]+@gmail\.com$" title="Por favor, use um email do Gmail" required>
+              <small>Apenas emails @gmail.com são aceitos</small>
+            </div>
+
+            <div class="auth-input-group">
+              <label>Senha</label>
+              <input type="password" id="registerPassword" placeholder="Mínimo 6 caracteres" minlength="6" required>
+            </div>
+
+            <div class="auth-input-group">
+              <label>Confirmar Senha</label>
+              <input type="password" id="registerPasswordConfirm" placeholder="Repita a senha" minlength="6" required>
+            </div>
+
+            <button type="submit" class="auth-submit-btn">Criar Conta</button>
+          </form>
+
+          <div style="text-align: center;">
+            <a href="#" class="auth-back-link" onclick="authShowWelcome(); return false;">
+              <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+              Voltar às opções
+            </a>
+          </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Confirmar Senha</label>
-          <input type="password" class="form-input" id="registerPasswordConfirm" placeholder="Repita a senha" minlength="6" required>
+
+        <!-- Reset Password Form -->
+        <div id="authResetForm" class="auth-form-container">
+          <div class="auth-form-header">
+            <h2>Redefinir Senha</h2>
+            <p>Digite seu email para receber o link de redefinição</p>
+          </div>
+
+          <form class="auth-form" onsubmit="handleResetPasswordFromOverlay(event)">
+            <div class="auth-input-group">
+              <label>Email</label>
+              <input type="email" id="resetEmailOverlay" placeholder="seu@email.com" required>
+            </div>
+
+            <button type="submit" class="auth-submit-btn">Enviar Link</button>
+          </form>
+
+          <div style="text-align: center;">
+            <a href="#" class="auth-back-link" onclick="showLoginForm(); return false;">
+              <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+              Voltar ao login
+            </a>
+          </div>
         </div>
-        <div class="custom-modal-buttons">
-          <button type="button" class="custom-modal-btn secondary" onclick="closeRegisterModal()">Cancelar</button>
-          <button type="submit" class="custom-modal-btn primary">Criar Conta</button>
-        </div>
-      </form>
+      </div>
     </div>
   </div>
 
@@ -3031,7 +4179,7 @@
         <!-- Buy Points Box -->
         <div class="buy-points-box">
           <div class="header">
-            <span class="icon">💰</span>
+            <span class="icon"></span>
             <h4>Comprar Pontos</h4>
           </div>
           <p>É possível comprar pontos por um preço acessível! Para mais informações, entre em contacto connosco:</p>
@@ -3042,9 +4190,7 @@
               <div class="label">Unitel</div>
               <div class="number">932 535 389</div>
             </div>
-            <a href="tel:932535389">
-              Ligar
-            </a>
+            
           </div>
 
           <div class="contact-item">
@@ -3053,9 +4199,7 @@
               <div class="label">WhatsApp</div>
               <div class="number">955 597 211</div>
             </div>
-            <a href="https://wa.me/244955597211" target="_blank">
-              Abrir
-            </a>
+            
           </div>
         </div>
       </div>
@@ -3078,6 +4222,86 @@
           <svg viewBox="0 0 24 24" width="20" height="20"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
           Limpar Histórico
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Overlay - Full Screen Android Style -->
+  <div id="profileOverlay" class="profile-overlay">
+    <div class="profile-overlay-content">
+      <div class="content-header">
+        <button class="content-header-btn back-btn" onclick="closeProfileOverlay()">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <h1 class="content-header-title">Meu Perfil</h1>
+        <div style="width: 40px;"></div>
+      </div>
+      <div id="profileContainer" class="profile-container">
+        <!-- Profile content will be dynamically loaded -->
+      </div>
+    </div>
+  </div>
+
+  <!-- About Overlay - Full Screen Android Style -->
+  <div id="aboutOverlay" class="about-overlay">
+    <div class="about-overlay-content">
+      <div class="content-header">
+        <button class="content-header-btn back-btn" onclick="closeAboutOverlay()">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <h1 class="content-header-title">Sobre o App</h1>
+        <div style="width: 40px;"></div>
+      </div>
+      <div class="about-container">
+        <!-- Header Card -->
+        <div class="about-header-card">
+          <div class="about-logo">📱</div>
+          <h1 class="about-title">Portal Digital</h1>
+          <p class="about-subtitle">Sua plataforma de aplicativos, jogos e tutoriais</p>
+          <span class="about-version">Versão 1.0</span>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="about-faq-card">
+          <div class="about-faq-item">
+            <h4 class="about-faq-question"><span>📱</span> O que é o Portal Digital?</h4>
+            <p class="about-faq-answer">O Portal Digital é uma plataforma onde você pode encontrar e baixar aplicativos, jogos, tutoriais e muito mais. Nosso objetivo é oferecer conteúdo de qualidade para todos os usuários.</p>
+          </div>
+
+          <div class="about-faq-item">
+            <h4 class="about-faq-question"><span>👤</span> Como criar uma conta?</h4>
+            <p class="about-faq-answer">Clique em "Criar Conta" no menu lateral, preencha seu nome, email (apenas Gmail) e senha. Sua conta ficará pendente até ser aprovada por um administrador.</p>
+          </div>
+
+          <div class="about-faq-item">
+            <h4 class="about-faq-question"><span>💰</span> O que são os pontos?</h4>
+            <p class="about-faq-answer">Pontos são a moeda virtual do Portal Digital. Você pode ganhar pontos assistindo anúncios ou resgatando códigos. Use os pontos para desbloquear downloads de conteúdos premium.</p>
+          </div>
+
+          <div class="about-faq-item">
+            <h4 class="about-faq-question"><span>📥</span> Como baixar um jogo/app?</h4>
+            <p class="about-faq-answer">Clique no card do jogo/app desejado para ver os detalhes. Se tiver pontos suficientes, clique no botão de download. Você será redirecionado para o link de download.</p>
+          </div>
+
+          <div class="about-faq-item">
+            <h4 class="about-faq-question"><span>🔔</span> Como funcionam as notificações?</h4>
+            <p class="about-faq-answer">Você receberá notificações sobre novos conteúdos, atualizações e mensagens importantes. Pode marcar como lida ou apagar as notificações a qualquer momento.</p>
+          </div>
+
+          <div class="about-faq-item">
+            <h4 class="about-faq-question"><span>💬</span> Posso comentar nos jogos?</h4>
+            <p class="about-faq-answer">Sim! Usuários com conta verificada podem deixar comentários em qualquer jogo ou aplicativo. Você também pode apagar seus próprios comentários.</p>
+          </div>
+        </div>
+
+        <!-- Contact Section -->
+        <div class="about-contact-card">
+          <h4 class="about-contact-title"><span>📧</span> Contato e Suporte</h4>
+          <div class="about-contact-email">
+            <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            <a href="/cdn-cgi/l/email-protection#0c7c637e786d606b6d61697c60797f4c6b616d6560226f6361"><span class="__cf_email__" data-cfemail="98e8f7eaecf9f4fff9f5fde8f4edebd8fff5f9f1f4b6fbf7f5">[email&#160;protected]</span></a>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -3159,61 +4383,61 @@
   <!-- Modal FAQ / Sobre o App -->
   <div id="faqModal" class="custom-modal">
     <div class="custom-modal-content" style="max-width: 550px;">
-      <h2>❓ Sobre o Portal Digital</h2>
+      <h2> Sobre o Portal Digital</h2>
       <div style="max-height: 65vh; overflow-y: auto; padding: 8px 0;">
 
         <div style="background: linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(156, 39, 176, 0.1) 100%); padding: 16px; border-radius: 12px; margin-bottom: 20px; text-align: center;">
-          <h3 style="margin: 0 0 8px 0; color: var(--text-primary);">🎮 Portal Digital</h3>
+          <h3 style="margin: 0 0 8px 0; color: var(--text-primary);"> Portal Digital</h3>
           <p style="margin: 0; color: var(--text-secondary); font-size: 14px;">Sua plataforma de aplicativos, jogos e tutoriais</p>
-          <p style="margin: 8px 0 0 0; font-size: 12px; color: var(--text-muted);">Versão 2.0</p>
+          <p style="margin: 8px 0 0 0; font-size: 12px; color: var(--text-muted);">Versão 1.0</p>
         </div>
 
         <div class="faq-item" style="margin-bottom: 16px;">
-          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;">📱 O que é o Portal Digital?</h4>
+          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;"> O que é o Portal Digital?</h4>
           <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.5;">
             O Portal Digital é uma plataforma onde você pode encontrar e baixar aplicativos, jogos, tutoriais e muito mais. Nosso objetivo é oferecer conteúdo de qualidade para todos os usuários.
           </p>
         </div>
 
         <div class="faq-item" style="margin-bottom: 16px;">
-          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;">🔐 Como criar uma conta?</h4>
+          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;"> Como criar uma conta?</h4>
           <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.5;">
             Clique em "Criar Conta" no menu lateral, preencha seu nome, email (apenas Gmail) e senha. Sua conta ficará pendente até ser aprovada por um administrador.
           </p>
         </div>
 
         <div class="faq-item" style="margin-bottom: 16px;">
-          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;">⭐ O que são os pontos?</h4>
+          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;"> O que são os pontos?</h4>
           <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.5;">
             Pontos são a moeda virtual do Portal Digital. Você pode ganhar pontos assistindo anúncios ou resgatando códigos. Use os pontos para desbloquear downloads de conteúdos premium.
           </p>
         </div>
 
         <div class="faq-item" style="margin-bottom: 16px;">
-          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;">📥 Como baixar um jogo/app?</h4>
+          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;"> Como baixar um jogo/app?</h4>
           <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.5;">
             Clique no card do jogo/app desejado para ver os detalhes. Se tiver pontos suficientes, clique no botão de download. Você será redirecionado para o link de download.
           </p>
         </div>
 
         <div class="faq-item" style="margin-bottom: 16px;">
-          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;">🔔 Como funcionam as notificações?</h4>
+          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;"> Como funcionam as notificações?</h4>
           <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.5;">
             Você receberá notificações sobre novos conteúdos, atualizações e mensagens importantes. Pode marcar como lida ou apagar as notificações a qualquer momento.
           </p>
         </div>
 
         <div class="faq-item" style="margin-bottom: 16px;">
-          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;">💬 Posso comentar nos jogos?</h4>
+          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;"> Posso comentar nos jogos?</h4>
           <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.5;">
             Sim! Usuários com conta verificada podem deixar comentários em qualquer jogo ou aplicativo. Você também pode apagar seus próprios comentários.
           </p>
         </div>
 
         <div class="faq-item" style="margin-bottom: 16px;">
-          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;">📧 Contato e Suporte</h4>
+          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;"> Contato e Suporte</h4>
           <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.5;">
-            Para dúvidas, sugestões ou problemas, entre em contato com os administradores através das redes sociais ou aguarde uma notificação com informações de contato.
+            Para dúvidas, sugestões ou problemas, entre em contato com os administradores através do nosso gmail <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="50203f2224313c3439373924313c313f10373d31393c7e333f3d">[email&#160;protected]</a> </strong>  ou aguarde uma notificação com informações de contato.
           </p>
         </div>
 
@@ -3238,7 +4462,7 @@
   <!-- Modal Confirmação de Avaliação -->
   <div id="ratingConfirmModal" class="custom-modal">
     <div class="custom-modal-content" style="max-width: 400px;">
-      <h2>✅ Confirmar Avaliação</h2>
+      <h2> Confirmar Avaliação</h2>
       <p style="color: var(--text-secondary); font-size: 15px; line-height: 1.6; margin: 16px 0;">
         Você confirma sua avaliação de <strong id="confirmStarsText">0 estrelas</strong> para o aplicativo?
       </p>
@@ -3274,16 +4498,15 @@
     <div class="custom-modal-content" style="max-width: 500px;">
       <h2>
         <svg viewBox="0 0 24 24" width="24" height="24" style="fill: #2196F3; vertical-align: middle; margin-right: 8px;"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
-        Sobre os Comentários
+     Por Favor
       </h2>
       <div style="max-height: 55vh; overflow-y: auto; padding: 8px 0;">
 
         <div style="background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(139, 195, 74, 0.1) 100%); padding: 16px; border-radius: 12px; margin-bottom: 20px;">
-          <h4 style="color: #4CAF50; margin: 0 0 12px 0; font-size: 15px;">✅ O que você PODE fazer:</h4>
+          <h4 style="color: #4CAF50; margin: 0 0 12px 0; font-size: 15px;"> O que você PODE fazer:</h4>
           <ul style="color: var(--text-secondary); margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.8;">
             <li>Compartilhar suas opiniões sobre o jogo/app</li>
             <li>Ajudar outros usuários com dicas e sugestões</li>
-            <li>Relatar problemas específicos do conteúdo</li>
             <li>Fazer perguntas sobre o jogo/aplicativo</li>
             <li>Elogiar ou criticar construtivamente</li>
             <li>Interagir de forma respeitosa com a comunidade</li>
@@ -3405,7 +4628,7 @@
     </div>
   </div>
 
-  <script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     // Theme management
     function applyTheme() {
       const hour = new Date().getHours();
@@ -3433,9 +4656,36 @@
     let currentGameData = null;
     let historyData = [];
 
+    // Check URL for auth parameter
+    function checkUrlForAuth() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const authParam = urlParams.get('auth');
+
+      if (authParam) {
+        showAuthOverlay();
+        switch (authParam) {
+          case 'login':
+            showLoginForm();
+            break;
+          case 'register':
+            showRegisterForm();
+            break;
+          case 'reset':
+            showResetPasswordForm();
+            break;
+          default:
+            // 'welcome' or any other value shows the welcome screen
+            authShowWelcome();
+            break;
+        }
+        return true;
+      }
+      return false;
+    }
+
     // Firebase initialization
     window.addEventListener('load', () => {
-      const { onAuthStateChanged, signInAnonymously } = window.firebaseModules;
+      const { onAuthStateChanged } = window.firebaseModules;
       const auth = window.firebaseAuth;
 
       onAuthStateChanged(auth, async (user) => {
@@ -3448,16 +4698,25 @@
             await loadUserData();
           }
 
+          // Check if URL has auth parameter - if so, show auth overlay
+          // This allows logged-in users to access auth overlay via URL
+          const hasAuthParam = checkUrlForAuth();
+
+          // Close auth overlay if open and no auth param
+          if (!hasAuthParam) {
+            closeAuthOverlay();
+          }
+
           updateUIForUser();
           loadGames();
           loadHistory();
         } else {
-          // Auto login anonymous
-          try {
-            await signInAnonymously(auth);
-          } catch (error) {
-            console.error('Erro no login anônimo:', error);
-            showCustomAlert('Erro ao conectar. Tente novamente.');
+          // Check if URL has specific auth screen requested
+          const hasAuthParam = checkUrlForAuth();
+
+          // If no auth param, show default welcome overlay
+          if (!hasAuthParam) {
+            showAuthOverlay();
           }
         }
       });
@@ -3499,10 +4758,11 @@
       }
 
       if (userStatus === 'rejected') {
-        const { signOut, signInAnonymously } = window.firebaseModules;
+        const { signOut } = window.firebaseModules;
         await signOut(window.firebaseAuth);
-        await signInAnonymously(window.firebaseAuth);
         showCustomAlert('⚠️ Sua conta foi marcada como fraude e foi bloqueada. Entre em contato com o administrador se acredita que isso é um erro.');
+        // Show welcome overlay - user must choose how to enter again
+        showAuthOverlay();
         return false;
       }
 
@@ -3512,24 +4772,7 @@
     }
 
     function updateUserInfoDisplay() {
-      const userNameEl = document.getElementById('userName');
-      const userStatusEl = document.getElementById('userStatus');
-
-      if (userNameEl) {
-        userNameEl.textContent = userName || 'Não definido';
-      }
-
-      if (userStatusEl) {
-        if (isPublisher) {
-          userStatusEl.innerHTML = '<span style="color: #9c27b0; font-weight: 600;">👑 Publicador</span>';
-        } else if (userStatus === 'approved') {
-          userStatusEl.innerHTML = '<span style="color: #4CAF50; font-weight: 600;">✓ Verificado</span>';
-        } else if (userStatus === 'pending') {
-          userStatusEl.innerHTML = '<span style="color: #ff9800; font-weight: 600;">⏳ Pendente</span> <button onclick="showVerifyEmailOption()" style="background: #2196F3; color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; margin-left: 8px;">Verificar Agora</button>';
-        } else if (userStatus === 'rejected') {
-          userStatusEl.innerHTML = '<span style="color: #f44336; font-weight: 600;">✗ Bloqueado</span>';
-        }
-      }
+      // Info now displayed only in profile overlay
     }
 
     async function loadUserPoints() {
@@ -3549,16 +4792,11 @@
     }
 
     function updatePointsDisplay() {
-      const pointsEl = document.getElementById('userPoints');
-      if (pointsEl) {
-        pointsEl.textContent = userPoints;
-      }
+      // Points now displayed only in profile overlay
     }
 
     // UI updates
     function updateUIForUser() {
-      const userInfoSection = document.getElementById('userInfoSection');
-      const userEmail = document.getElementById('userEmail');
       const loginBtn = document.getElementById('loginBtn');
       const registerBtn = document.getElementById('registerBtn');
       const publishBtn = document.getElementById('publishBtn');
@@ -3576,7 +4814,6 @@
 
       if (!currentUser || currentUser.isAnonymous) {
         // Anonymous mode - viewing only
-        userInfoSection.style.display = 'none';
         loginBtn.style.display = 'flex';
         registerBtn.style.display = 'flex';
         publishBtn.style.display = 'none';
@@ -3593,8 +4830,6 @@
         logoutBtn.style.display = 'none';
       } else {
         // Logged in user
-        userInfoSection.style.display = 'block';
-        userEmail.textContent = currentUser.email;
         loginBtn.style.display = 'none';
         registerBtn.style.display = 'none';
         logoutBtn.style.display = 'flex';
@@ -4099,7 +5334,7 @@
         // 3. Gerar ID único para o registro de download
         const downloadId = `${gameId}_${Date.now()}`;
 
-        // 4. TRANSAÇÃO ATÔMICA: Multi-location update no Realtime Database
+        // 4. TRANSA��ÃO ATÔMICA: Multi-location update no Realtime Database
         // Segue o padrão: downloadClaims/{userId}/{downloadId}
         const updates = {};
         updates[`users/${currentUser.uid}/points`] = newPointsTotal;
@@ -4409,12 +5644,25 @@
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
 
+      // Show loading animation
+      showAuthLoading('A entrar...', 'Verificando credenciais');
+
       try {
         const { signInWithEmailAndPassword } = window.firebaseModules;
         await signInWithEmailAndPassword(window.firebaseAuth, email, password);
+
+        // Update loading text for success
+        document.getElementById('authLoadingText').textContent = 'Bem-vindo!';
+        document.getElementById('authLoadingSubtext').textContent = 'Carregando seus dados...';
+
+        // Short delay to show success message
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        hideAuthLoading();
         closeLoginModal();
-        showCustomAlert('Login realizado com sucesso!');
+        closeAuthOverlay();
       } catch (error) {
+        hideAuthLoading();
         showCustomAlert('Erro ao fazer login: ' + error.message);
       }
     }
@@ -4422,17 +5670,18 @@
     async function logout() {
       showCustomConfirm('Deseja realmente sair?', async () => {
         try {
-          const { signOut, signInAnonymously } = window.firebaseModules;
+          const { signOut } = window.firebaseModules;
           await signOut(window.firebaseAuth);
 
-          // Return to anonymous mode
-          await signInAnonymously(window.firebaseAuth);
-
+          // Reset user state
           currentUser = null;
           isPublisher = false;
           userPoints = 0;
-          updateUIForUser();
-          showCustomAlert('Você saiu da conta. Modo visualização ativado.');
+          userStatus = 'pending';
+          userName = '';
+
+          // Show welcome overlay - user must choose how to enter again
+          showAuthOverlay();
         } catch (error) {
           showCustomAlert('Erro ao sair: ' + error.message);
         }
@@ -4729,22 +5978,138 @@
       box.style.display = box.style.display === 'none' || box.style.display === '' ? 'flex' : 'none';
     }
 
+    // Auth Loading Functions
+    function showAuthLoading(text = 'A entrar...', subtext = 'Por favor aguarde') {
+      document.getElementById('authLoadingText').textContent = text;
+      document.getElementById('authLoadingSubtext').textContent = subtext;
+      document.getElementById('authLoadingOverlay').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function hideAuthLoading() {
+      document.getElementById('authLoadingOverlay').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    // Auth Overlay Functions
+    function showAuthOverlay() {
+      document.getElementById('authOverlay').classList.add('active');
+      document.body.style.overflow = 'hidden';
+      authShowWelcome();
+    }
+
+    function closeAuthOverlay() {
+      document.getElementById('authOverlay').classList.remove('active');
+      document.body.style.overflow = '';
+      // Clear URL auth parameter when closing overlay
+      clearAuthUrlParam();
+    }
+
+    function clearAuthUrlParam() {
+      const url = new URL(window.location.href);
+      if (url.searchParams.has('auth')) {
+        url.searchParams.delete('auth');
+        window.history.replaceState({}, '', url.pathname + (url.search || ''));
+      }
+    }
+
+    function authShowWelcome() {
+      hideAllAuthForms();
+      document.getElementById('authWelcomeScreen').classList.add('active');
+      document.getElementById('authHeaderTitle').textContent = 'Bem-vindo';
+      document.getElementById('authBackBtn').style.visibility = 'hidden';
+    }
+
+    function hideAllAuthForms() {
+      document.getElementById('authWelcomeScreen').classList.remove('active');
+      document.getElementById('authLoginForm').classList.remove('active');
+      document.getElementById('authRegisterForm').classList.remove('active');
+      document.getElementById('authResetForm').classList.remove('active');
+    }
+
+    function showLoginForm() {
+      hideAllAuthForms();
+      document.getElementById('authLoginForm').classList.add('active');
+      document.getElementById('authHeaderTitle').textContent = 'Entrar';
+      document.getElementById('authBackBtn').style.visibility = 'visible';
+    }
+
+    function showRegisterForm() {
+      hideAllAuthForms();
+      document.getElementById('authRegisterForm').classList.add('active');
+      document.getElementById('authHeaderTitle').textContent = 'Criar Conta';
+      document.getElementById('authBackBtn').style.visibility = 'visible';
+    }
+
+    function showResetPasswordForm() {
+      hideAllAuthForms();
+      document.getElementById('authResetForm').classList.add('active');
+      document.getElementById('authHeaderTitle').textContent = 'Redefinir Senha';
+      document.getElementById('authBackBtn').style.visibility = 'visible';
+    }
+
+    function authGoBack() {
+      const resetForm = document.getElementById('authResetForm');
+      if (resetForm.classList.contains('active')) {
+        showLoginForm();
+      } else {
+        authShowWelcome();
+      }
+    }
+
+    async function enterAsVisitor() {
+      // Show loading animation
+      showAuthLoading('Modo Visitante', 'A preparar o catálogo...');
+
+      try {
+        const { signInAnonymously } = window.firebaseModules;
+        await signInAnonymously(window.firebaseAuth);
+
+        // Short delay for smooth transition
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        hideAuthLoading();
+        closeAuthOverlay();
+      } catch (error) {
+        hideAuthLoading();
+        console.error('Erro no login anônimo:', error);
+        showCustomAlert('Erro ao conectar. Tente novamente.');
+      }
+    }
+
+    async function handleResetPasswordFromOverlay(e) {
+      e.preventDefault();
+      const email = document.getElementById('resetEmailOverlay').value;
+
+      try {
+        const { sendPasswordResetEmail } = window.firebaseModules;
+        await sendPasswordResetEmail(window.firebaseAuth, email);
+        showCustomAlert('Link de redefinição enviado para seu email!');
+        showLoginForm();
+      } catch (error) {
+        showCustomAlert('Erro ao enviar email: ' + error.message);
+      }
+    }
+
+    // Legacy functions for compatibility
     function openLoginModal() {
-      document.getElementById('loginModal').classList.add('active');
+      closeSidebar();
+      showAuthOverlay();
+      showLoginForm();
     }
 
     function closeLoginModal() {
-      document.getElementById('loginModal').classList.remove('active');
-      document.getElementById('loginForm').reset();
+      closeAuthOverlay();
     }
 
     function openRegisterModal() {
-      document.getElementById('registerModal').classList.add('active');
+      closeSidebar();
+      showAuthOverlay();
+      showRegisterForm();
     }
 
     function closeRegisterModal() {
-      document.getElementById('registerModal').classList.remove('active');
-      document.getElementById('registerForm').reset();
+      closeAuthOverlay();
     }
 
     // Email Verification System with Firebase Link
@@ -4754,7 +6119,7 @@
       const container = document.getElementById('emailVerificationContent');
       container.innerHTML = `
         <div style="text-align: center; padding: 16px 0;">
-          <div style="font-size: 48px; margin-bottom: 16px;">✅</div>
+          <div style="font-size: 48px; margin-bottom: 16px;"></div>
           <p style="color: var(--text-primary); font-size: 16px; font-weight: 600; margin-bottom: 8px;">
             Conta criada com sucesso!
           </p>
@@ -4853,7 +6218,7 @@
           </div>
 
           <button class="custom-modal-btn primary" onclick="checkEmailVerification()" style="width: 100%; margin-bottom: 12px;" id="verifyCheckBtn">
-            ✅ Já Verifiquei meu Email
+             Já Verifiquei meu Email
           </button>
 
           <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 12px;">
@@ -4938,7 +6303,7 @@
           showCustomAlert('Email ainda não verificado. Clique no link enviado para seu email e tente novamente.');
           if (btn) {
             btn.disabled = false;
-            btn.textContent = '✅ Já Verifiquei meu Email';
+            btn.textContent = ' Já Verifiquei meu Email';
           }
         }
       } catch (error) {
@@ -4946,7 +6311,7 @@
         showCustomAlert('Erro ao verificar. Tente novamente.');
         if (btn) {
           btn.disabled = false;
-          btn.textContent = '✅ Já Verifiquei meu Email';
+          btn.textContent = ' Já Verifiquei meu Email';
         }
       }
     }
@@ -5101,6 +6466,9 @@
         return;
       }
 
+      // Show loading animation
+      showAuthLoading('A criar conta...', 'Preparando tudo para você');
+
       try {
         const { createUserWithEmailAndPassword, updateProfile } = window.firebaseModules;
         const { ref, set } = window.firebaseModules;
@@ -5109,6 +6477,10 @@
         // Create user in Firebase Auth
         const userCredential = await createUserWithEmailAndPassword(window.firebaseAuth, email, password);
         const user = userCredential.user;
+
+        // Update loading text
+        document.getElementById('authLoadingText').textContent = 'Configurando perfil...';
+        document.getElementById('authLoadingSubtext').textContent = 'Quase pronto!';
 
         // Update Firebase Auth profile with display name
         await updateProfile(user, { displayName: name });
@@ -5128,7 +6500,16 @@
         currentUser = user;
         isPublisher = PUBLISHER_EMAILS.includes(email);
 
+        // Success message
+        document.getElementById('authLoadingText').textContent = 'Conta criada!';
+        document.getElementById('authLoadingSubtext').textContent = 'Bem-vindo, ' + name + '!';
+
+        // Short delay to show success message
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        hideAuthLoading();
         closeRegisterModal();
+        closeAuthOverlay();
         updateUIForUser();
         updateUserInfoDisplay();
         updatePointsDisplay();
@@ -5136,6 +6517,7 @@
         // Show verification options modal instead of simple alert
         showEmailVerificationOptions(email);
       } catch (error) {
+        hideAuthLoading();
         let errorMessage = 'Erro ao criar conta: ';
         switch (error.code) {
           case 'auth/email-already-in-use':
@@ -6037,7 +7419,13 @@
     }
 
     function openResetPasswordModal() {
-      closeLoginModal();
+      // If auth overlay is open, use the new reset form
+      const authOverlay = document.getElementById('authOverlay');
+      if (authOverlay && authOverlay.classList.contains('active')) {
+        showResetPasswordForm();
+        return;
+      }
+      // Otherwise use the old modal
       document.getElementById('resetPasswordModal').classList.add('active');
     }
 
@@ -6333,13 +7721,273 @@
       document.body.style.overflow = '';
     }
 
-    // FAQ Modal functions
+    // FAQ Modal functions (legacy - redirects to new overlay)
     function openFaqModal() {
-      document.getElementById('faqModal').classList.add('active');
+      openAboutOverlay();
     }
 
     function closeFaqModal() {
-      document.getElementById('faqModal').classList.remove('active');
+      closeAboutOverlay();
+    }
+
+    // ========== Profile Overlay Functions ==========
+    function openProfileOverlay() {
+      closeSidebar();
+      const container = document.getElementById('profileContainer');
+      const auth = window.firebaseAuth;
+      const user = auth.currentUser;
+
+      if (!user || user.isAnonymous) {
+        // User not logged in
+        container.innerHTML = `
+          <div class="profile-not-logged">
+            <div class="profile-not-logged-icon">
+              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+            </div>
+            <h3>Você não está logado</h3>
+            <p>Faça login para ver seu perfil completo e acessar todos os recursos do Portal Digital.</p>
+            <button class="profile-login-btn" onclick="closeProfileOverlay(); openLoginModal();">
+              <svg viewBox="0 0 24 24"><path d="M11 7L9.6 8.4l2.6 2.6H2v2h10.2l-2.6 2.6L11 17l5-5-5-5zm9 12h-8v2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-8v2h8v14z"/></svg>
+              Entrar
+            </button>
+          </div>
+        `;
+      } else {
+        // User is logged in - load profile data
+        loadProfileData(user, container);
+      }
+
+      document.getElementById('profileOverlay').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    // Facebook-style default avatar SVG
+    function getDefaultAvatarSVG() {
+      return `<svg viewBox="0 0 212 212" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="212" height="212" fill="#D8D8D8"/>
+        <path d="M106 106C124.778 106 140 90.7777 140 72C140 53.2223 124.778 38 106 38C87.2223 38 72 53.2223 72 72C72 90.7777 87.2223 106 106 106Z" fill="#FFFFFF"/>
+        <path d="M106 124C72.8 124 46 137.6 46 154V174H166V154C166 137.6 139.2 124 106 124Z" fill="#FFFFFF"/>
+      </svg>`;
+    }
+
+    // Skeleton loading HTML for profile
+    function getProfileSkeletonHTML() {
+      return `
+        <div class="profile-loading-skeleton">
+          <div class="skeleton-header">
+            <div class="skeleton-avatar"></div>
+            <div class="skeleton-name"></div>
+            <div class="skeleton-email"></div>
+            <div class="skeleton-badge"></div>
+          </div>
+
+          <div class="skeleton-stats">
+            <div class="skeleton-stat">
+              <div class="skeleton-stat-value"></div>
+              <div class="skeleton-stat-label"></div>
+            </div>
+            <div class="skeleton-stat">
+              <div class="skeleton-stat-value"></div>
+              <div class="skeleton-stat-label"></div>
+            </div>
+          </div>
+
+          <div class="skeleton-info-card">
+            <div class="skeleton-info-item">
+              <div class="skeleton-info-icon"></div>
+              <div class="skeleton-info-content">
+                <div class="skeleton-info-label"></div>
+                <div class="skeleton-info-value"></div>
+              </div>
+            </div>
+            <div class="skeleton-info-item">
+              <div class="skeleton-info-icon"></div>
+              <div class="skeleton-info-content">
+                <div class="skeleton-info-label"></div>
+                <div class="skeleton-info-value"></div>
+              </div>
+            </div>
+            <div class="skeleton-info-item">
+              <div class="skeleton-info-icon"></div>
+              <div class="skeleton-info-content">
+                <div class="skeleton-info-label"></div>
+                <div class="skeleton-info-value"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="skeleton-button"></div>
+        </div>
+      `;
+    }
+
+    async function loadProfileData(user, container) {
+      // Show skeleton loading animation
+      container.innerHTML = getProfileSkeletonHTML();
+
+      try {
+        // Usar dados já carregados globalmente para evitar erros de permissão
+        const displayName = userName || user.displayName || user.email?.split('@')[0] || 'Usuário';
+        const email = user.email || '';
+        const points = userPoints || 0;
+        const status = userStatus || 'pending';
+        const role = isPublisher ? 'admin' : 'user';
+
+        // Tentar buscar data de criação do banco
+        let createdAt = 'N/A';
+        try {
+          const { ref, get } = window.firebaseModules;
+          const db = window.firebaseDatabase;
+          const userRef = ref(db, 'users/' + user.uid + '/createdAt');
+          const snapshot = await get(userRef);
+          if (snapshot.exists()) {
+            createdAt = new Date(snapshot.val()).toLocaleDateString('pt-BR');
+          }
+        } catch (e) {
+          console.log('Não foi possível buscar data de criação');
+        }
+
+        // Get favorites count - com tratamento de erro
+        let favoritesCount = 0;
+        try {
+          const { ref, get } = window.firebaseModules;
+          const db = window.firebaseDatabase;
+          const favRef = ref(db, 'favorites/' + user.uid);
+          const favSnap = await get(favRef);
+          if (favSnap.exists()) {
+            const favData = favSnap.val();
+            favoritesCount = favData ? Object.keys(favData).length : 0;
+          }
+        } catch (e) {
+          console.log('Não foi possível buscar favoritos');
+        }
+
+        // Get status badge
+        let statusBadgeClass = 'pending';
+        let statusBadgeText = '⏳ Pendente';
+        if (role === 'admin') {
+          statusBadgeClass = 'admin';
+          statusBadgeText = '👑 Administrador';
+        } else if (status === 'approved') {
+          statusBadgeClass = 'verified';
+          statusBadgeText = '✓ Verificado';
+        } else if (status === 'rejected') {
+          statusBadgeClass = 'pending';
+          statusBadgeText = '✗ Rejeitado';
+        }
+
+        container.innerHTML = `
+          <div class="profile-header-card">
+            <div class="profile-avatar-svg">${getDefaultAvatarSVG()}</div>
+            <div class="profile-user-info-scroll">
+              <h2 class="profile-name">${escapeHtml(displayName)}</h2>
+              <p class="profile-email">${escapeHtml(email)}</p>
+            </div>
+            <span class="profile-status-badge ${statusBadgeClass}">${statusBadgeText}</span>
+          </div>
+
+          <div class="profile-stats-card">
+            <div class="profile-stat">
+              <div class="profile-stat-value">${points}</div>
+              <div class="profile-stat-label">Pontos</div>
+            </div>
+            <div class="profile-stat-divider"></div>
+            <div class="profile-stat">
+              <div class="profile-stat-value">${favoritesCount}</div>
+              <div class="profile-stat-label">Favoritos</div>
+            </div>
+          </div>
+
+          <div class="profile-info-card">
+            <div class="profile-info-item">
+              <div class="profile-info-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+              </div>
+              <div class="profile-info-content">
+                <div class="profile-info-label">Nome</div>
+                <div class="profile-info-value">${escapeHtml(displayName)}</div>
+              </div>
+            </div>
+
+            <div class="profile-info-item">
+              <div class="profile-info-icon">
+                <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+              </div>
+              <div class="profile-info-content">
+                <div class="profile-info-label">Email</div>
+                <div class="profile-info-value">${escapeHtml(email)}</div>
+              </div>
+            </div>
+
+            <div class="profile-info-item">
+              <div class="profile-info-icon">
+                <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm-8 4H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/></svg>
+              </div>
+              <div class="profile-info-content">
+                <div class="profile-info-label">Membro desde</div>
+                <div class="profile-info-value">${createdAt}</div>
+              </div>
+            </div>
+          </div>
+
+          <button class="profile-logout-btn" onclick="closeProfileOverlay(); logout();">
+            <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+            Sair da Conta
+          </button>
+        `;
+      } catch (error) {
+        console.error('Error loading profile:', error);
+        // Mostrar perfil básico mesmo em caso de erro
+        const displayName = userName || user.displayName || user.email?.split('@')[0] || 'Usuário';
+        const email = user.email || '';
+
+        container.innerHTML = `
+          <div class="profile-header-card">
+            <div class="profile-avatar-svg">${getDefaultAvatarSVG()}</div>
+            <div class="profile-user-info-scroll">
+              <h2 class="profile-name">${escapeHtml(displayName)}</h2>
+              <p class="profile-email">${escapeHtml(email)}</p>
+            </div>
+          </div>
+
+          <div class="profile-stats-card">
+            <div class="profile-stat">
+              <div class="profile-stat-value">${userPoints || 0}</div>
+              <div class="profile-stat-label">Pontos</div>
+            </div>
+          </div>
+
+          <button class="profile-logout-btn" onclick="closeProfileOverlay(); logout();">
+            <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+            Sair da Conta
+          </button>
+        `;
+      }
+    }
+
+    // Escape HTML to prevent XSS
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function closeProfileOverlay() {
+      document.getElementById('profileOverlay').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    // ========== About Overlay Functions ==========
+    function openAboutOverlay() {
+      closeSidebar();
+      document.getElementById('aboutOverlay').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeAboutOverlay() {
+      document.getElementById('aboutOverlay').classList.remove('active');
+      document.body.style.overflow = '';
     }
 
     // Comments Help Modal functions
@@ -6429,7 +8077,7 @@
         await set(newReportRef, reportData);
 
         closeReportProblemOverlay();
-        showCustomAlert('✅ Report enviado com sucesso! Os administradores irão analisar o problema.');
+        showCustomAlert(' Report enviado com sucesso! Os administradores irão analisar o problema.');
       } catch (error) {
         console.error('Error submitting report:', error);
         showCustomAlert('Erro ao enviar report. Tente novamente.');
@@ -6615,7 +8263,7 @@
         }
         renderReports();
         updateReportsBadge();
-        showCustomAlert('✅ Report marcado como resolvido!');
+        showCustomAlert(' Report marcado como resolvido!');
       } catch (error) {
         console.error('Error resolving report:', error);
         showCustomAlert('Erro ao atualizar report.');
@@ -6711,7 +8359,7 @@
         container.innerHTML = `
           ${totalDisplay}
           <div class="rating-already-rated">
-            <span class="check-icon">✅</span>
+            <span class="check-icon"></span>
             <div class="message">Você já avaliou o aplicativo!</div>
             <div class="your-rating">Sua avaliação: ${starsDisplay}</div>
           </div>
@@ -7749,6 +9397,7 @@
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         // Close overlays in order of priority (top-most first)
+        const authOverlay = document.getElementById('authOverlay');
         const historyOverlay = document.getElementById('historyOverlay');
         const reportOverlay = document.getElementById('reportProblemOverlay');
         const notificationsOverlay = document.getElementById('notificationsOverlay');
@@ -7756,6 +9405,19 @@
         const commentsOverlay = document.getElementById('commentsOverlay');
         const downloadsOverlay = document.getElementById('downloadsOverlay');
         const redeemOverlay = document.getElementById('redeemOverlay');
+
+        // Handle auth overlay - go back or close if user is already logged in
+        if (authOverlay && authOverlay.classList.contains('active')) {
+          const welcomeScreen = document.getElementById('authWelcomeScreen');
+          if (!welcomeScreen.classList.contains('active')) {
+            // If not on welcome screen, go back
+            authGoBack();
+          } else if (currentUser) {
+            // If user is logged in, can close overlay
+            closeAuthOverlay();
+          }
+          return;
+        }
 
         if (redeemOverlay && redeemOverlay.classList.contains('active')) {
           closeRedeemCodeModal();
@@ -7777,6 +9439,9 @@
   </script>
 </body>
 </html>
+
+
+
 
 
 
