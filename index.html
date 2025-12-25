@@ -178,12 +178,14 @@
     .btn {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 14px;
       background: transparent;
       border: none;
-      border-radius: 8px;
-      padding: 10px;
+      border-radius: 12px;
+      padding: 16px 18px;
+      min-height: 56px;
       color: var(--text-primary);
+      font-size: 16px;
       font-weight: 600;
       cursor: pointer;
       transition: background 0.2s;
@@ -193,9 +195,10 @@
       box-shadow: var(--shadow-sm);
     }
     .btn svg {
-      width: 18px;
-      height: 18px;
+      width: 24px;
+      height: 24px;
       fill: var(--text-primary);
+      flex-shrink: 0;
     }
     .btn:active { transform: scale(0.96); }
 
@@ -2552,6 +2555,23 @@
     }
 
     /* Profile Default Avatar SVG */
+    .profile-header-points {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .profile-header-points svg {
+      fill: #FFD700;
+    }
+
     .profile-avatar-svg {
       width: 80px;
       height: 80px;
@@ -2563,11 +2583,32 @@
       align-items: center;
       justify-content: center;
       margin: 0 auto 12px;
-      border: 3px solid rgba(255,255,255,0.3);
+      border: 4px solid rgba(255,255,255,0.3);
       position: relative;
       z-index: 1;
       flex-shrink: 0;
       overflow: hidden;
+      box-sizing: border-box;
+    }
+
+    .profile-avatar-svg.status-verified {
+      border-color: #4CAF50;
+      box-shadow: 0 0 12px rgba(76, 175, 80, 0.4);
+    }
+
+    .profile-avatar-svg.status-pending {
+      border-color: #FF9800;
+      box-shadow: 0 0 12px rgba(255, 152, 0, 0.4);
+    }
+
+    .profile-avatar-svg.status-admin {
+      border-color: #9C27B0;
+      box-shadow: 0 0 12px rgba(156, 39, 176, 0.4);
+    }
+
+    .profile-avatar-svg.status-rejected {
+      border-color: #f44336;
+      box-shadow: 0 0 12px rgba(244, 67, 54, 0.4);
     }
 
     .profile-avatar-svg svg {
@@ -2743,7 +2784,28 @@
       background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 16px;
-      overflow: hidden;
+      overflow-y: auto;
+      overflow-x: hidden;
+      max-height: 280px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--text-muted) transparent;
+    }
+
+    .profile-info-card::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .profile-info-card::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .profile-info-card::-webkit-scrollbar-thumb {
+      background: var(--text-muted);
+      border-radius: 3px;
+    }
+
+    .profile-info-card::-webkit-scrollbar-thumb:hover {
+      background: var(--text-secondary);
     }
 
     .profile-info-item {
@@ -3657,11 +3719,6 @@
       <span class="notification-badge" id="reportsBadge" style="display: none;">0</span>
     </button>
 
-    <button class="btn" id="logoutBtn" onclick="logout()" style="display: none;">
-      <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
-      Sair
-    </button>
-
     <div style="border-top: 1px solid var(--border-color); margin: 12px 0; padding-top: 12px;">
       <button class="btn" onclick="openAboutOverlay()">
         <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
@@ -4128,7 +4185,7 @@
   <div id="generateCodeModal" class="custom-modal">
     <div class="custom-modal-content">
       <h2>Gerar Código de Pontos</h2>
-      <p>Crie um código de resgate para seus usuários.</p>
+      <p>Crie um c��digo de resgate para seus usuários.</p>
       <div class="form-group">
         <label class="form-label">Quantidade de Pontos</label>
         <input type="number" class="form-input" id="codePoints" min="1" value="50" required>
@@ -4234,7 +4291,10 @@
           <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
         </button>
         <h1 class="content-header-title">Meu Perfil</h1>
-        <div style="width: 40px;"></div>
+        <div id="profileHeaderPoints" class="profile-header-points">
+          <svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/></svg>
+          <span id="profileHeaderPointsValue">0</span>
+        </div>
       </div>
       <div id="profileContainer" class="profile-container">
         <!-- Profile content will be dynamically loaded -->
@@ -4250,7 +4310,9 @@
           <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
         </button>
         <h1 class="content-header-title">Sobre o App</h1>
-        <div style="width: 40px;"></div>
+        <button class="content-header-btn help-btn" onclick="openAboutHelpModal()">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
+        </button>
       </div>
       <div class="about-container">
         <!-- Header Card -->
@@ -4261,39 +4323,6 @@
           <span class="about-version">Versão 1.0</span>
         </div>
 
-        <!-- FAQ Section -->
-        <div class="about-faq-card">
-          <div class="about-faq-item">
-            <h4 class="about-faq-question"><span>📱</span> O que é o Portal Digital?</h4>
-            <p class="about-faq-answer">O Portal Digital é uma plataforma onde você pode encontrar e baixar aplicativos, jogos, tutoriais e muito mais. Nosso objetivo é oferecer conteúdo de qualidade para todos os usuários.</p>
-          </div>
-
-          <div class="about-faq-item">
-            <h4 class="about-faq-question"><span>👤</span> Como criar uma conta?</h4>
-            <p class="about-faq-answer">Clique em "Criar Conta" no menu lateral, preencha seu nome, email (apenas Gmail) e senha. Sua conta ficará pendente até ser aprovada por um administrador.</p>
-          </div>
-
-          <div class="about-faq-item">
-            <h4 class="about-faq-question"><span>💰</span> O que são os pontos?</h4>
-            <p class="about-faq-answer">Pontos são a moeda virtual do Portal Digital. Você pode ganhar pontos assistindo anúncios ou resgatando códigos. Use os pontos para desbloquear downloads de conteúdos premium.</p>
-          </div>
-
-          <div class="about-faq-item">
-            <h4 class="about-faq-question"><span>📥</span> Como baixar um jogo/app?</h4>
-            <p class="about-faq-answer">Clique no card do jogo/app desejado para ver os detalhes. Se tiver pontos suficientes, clique no botão de download. Você será redirecionado para o link de download.</p>
-          </div>
-
-          <div class="about-faq-item">
-            <h4 class="about-faq-question"><span>🔔</span> Como funcionam as notificações?</h4>
-            <p class="about-faq-answer">Você receberá notificações sobre novos conteúdos, atualizações e mensagens importantes. Pode marcar como lida ou apagar as notificações a qualquer momento.</p>
-          </div>
-
-          <div class="about-faq-item">
-            <h4 class="about-faq-question"><span>💬</span> Posso comentar nos jogos?</h4>
-            <p class="about-faq-answer">Sim! Usuários com conta verificada podem deixar comentários em qualquer jogo ou aplicativo. Você também pode apagar seus próprios comentários.</p>
-          </div>
-        </div>
-
         <!-- Contact Section -->
         <div class="about-contact-card">
           <h4 class="about-contact-title"><span>📧</span> Contato e Suporte</h4>
@@ -4302,6 +4331,61 @@
             <a href="/cdn-cgi/l/email-protection#0c7c637e786d606b6d61697c60797f4c6b616d6560226f6361"><span class="__cf_email__" data-cfemail="98e8f7eaecf9f4fff9f5fde8f4edebd8fff5f9f1f4b6fbf7f5">[email&#160;protected]</span></a>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- About Help Modal -->
+  <div id="aboutHelpModal" class="custom-modal">
+    <div class="custom-modal-content" style="max-width: 550px; max-height: 85vh; overflow-y: auto;">
+      <h2 style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 28px;">📖</span> Guia Completo do App
+      </h2>
+
+      <div class="about-faq-card" style="margin-top: 16px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px;">
+        <div class="about-faq-item" style="padding: 16px; border-bottom: 1px solid var(--border-color);">
+          <h4 class="about-faq-question" style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px;"><span>📱</span> O que é o Portal Digital?</h4>
+          <p class="about-faq-answer" style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin: 0;">O Portal Digital é uma plataforma onde você pode encontrar e baixar aplicativos, jogos, tutoriais e muito mais. Nosso objetivo é oferecer conteúdo de qualidade para todos os usuários.</p>
+        </div>
+
+        <div class="about-faq-item" style="padding: 16px; border-bottom: 1px solid var(--border-color);">
+          <h4 class="about-faq-question" style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px;"><span>👤</span> Como criar uma conta?</h4>
+          <p class="about-faq-answer" style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin: 0;">Clique em "Criar Conta" no menu lateral, preencha seu nome, email (apenas Gmail) e senha. Sua conta ficará pendente até ser aprovada por um administrador.</p>
+        </div>
+
+        <div class="about-faq-item" style="padding: 16px; border-bottom: 1px solid var(--border-color);">
+          <h4 class="about-faq-question" style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px;"><span>💰</span> O que são os pontos?</h4>
+          <p class="about-faq-answer" style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin: 0;">Pontos são a moeda virtual do Portal Digital. Você pode ganhar pontos assistindo anúncios ou resgatando códigos. Use os pontos para desbloquear downloads de conteúdos premium.</p>
+        </div>
+
+        <div class="about-faq-item" style="padding: 16px; border-bottom: 1px solid var(--border-color);">
+          <h4 class="about-faq-question" style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px;"><span>📥</span> Como baixar um jogo/app?</h4>
+          <p class="about-faq-answer" style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin: 0;">Clique no card do jogo/app desejado para ver os detalhes. Se tiver pontos suficientes, clique no botão de download. Você será redirecionado para o link de download.</p>
+        </div>
+
+        <div class="about-faq-item" style="padding: 16px; border-bottom: 1px solid var(--border-color);">
+          <h4 class="about-faq-question" style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px;"><span>🔔</span> Como funcionam as notificações?</h4>
+          <p class="about-faq-answer" style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin: 0;">Você receberá notificações sobre novos conteúdos, atualizações e mensagens importantes. Pode marcar como lida ou apagar as notificações a qualquer momento.</p>
+        </div>
+
+        <div class="about-faq-item" style="padding: 16px; border-bottom: 1px solid var(--border-color);">
+          <h4 class="about-faq-question" style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px;"><span>💬</span> Posso comentar nos jogos?</h4>
+          <p class="about-faq-answer" style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin: 0;">Sim! Usuários com conta verificada podem deixar comentários em qualquer jogo ou aplicativo. Você também pode apagar seus próprios comentários.</p>
+        </div>
+
+        <div class="about-faq-item" style="padding: 16px; border-bottom: 1px solid var(--border-color);">
+          <h4 class="about-faq-question" style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px;"><span>⭐</span> Como avaliar um conteúdo?</h4>
+          <p class="about-faq-answer" style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin: 0;">Ao abrir um jogo ou aplicativo, você pode deixar uma avaliação de 1 a 5 estrelas. Sua avaliação ajuda outros usuários a descobrirem os melhores conteúdos.</p>
+        </div>
+
+        <div class="about-faq-item" style="padding: 16px;">
+          <h4 class="about-faq-question" style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px;"><span>🔒</span> Minha conta é segura?</h4>
+          <p class="about-faq-answer" style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin: 0;">Sim! Utilizamos autenticação segura via Firebase. Seus dados são protegidos e você pode alterar sua senha a qualquer momento através da opção "Esqueci a senha".</p>
+        </div>
+      </div>
+
+      <div class="custom-modal-buttons" style="margin-top: 20px;">
+        <button class="custom-modal-btn primary" onclick="closeAboutHelpModal()">Entendi</button>
       </div>
     </div>
   </div>
@@ -4805,7 +4889,6 @@
       const manageUsersBtn = document.getElementById('manageUsersBtn');
       const sendNotificationBtn = document.getElementById('sendNotificationBtn');
       const viewNotificationsBtn = document.getElementById('viewNotificationsBtn');
-      const logoutBtn = document.getElementById('logoutBtn');
       const dailyRewardBtn = document.getElementById('dailyRewardBtn');
       const favoritesBtn = document.getElementById('favoritesBtn');
       const transferBtn = document.getElementById('transferBtn');
@@ -4827,12 +4910,10 @@
         transferBtn.style.display = 'none';
         reportProblemBtn.style.display = 'none';
         viewReportsBtn.style.display = 'none';
-        logoutBtn.style.display = 'none';
       } else {
         // Logged in user
         loginBtn.style.display = 'none';
         registerBtn.style.display = 'none';
-        logoutBtn.style.display = 'flex';
 
         // Show daily reward and favorites for approved users or publishers
         if (userStatus === 'approved' || isPublisher) {
@@ -7847,55 +7928,35 @@
           console.log('Não foi possível buscar data de criação');
         }
 
-        // Get favorites count - com tratamento de erro
-        let favoritesCount = 0;
-        try {
-          const { ref, get } = window.firebaseModules;
-          const db = window.firebaseDatabase;
-          const favRef = ref(db, 'favorites/' + user.uid);
-          const favSnap = await get(favRef);
-          if (favSnap.exists()) {
-            const favData = favSnap.val();
-            favoritesCount = favData ? Object.keys(favData).length : 0;
-          }
-        } catch (e) {
-          console.log('Não foi possível buscar favoritos');
-        }
-
-        // Get status badge
+        // Get status badge and avatar class
         let statusBadgeClass = 'pending';
         let statusBadgeText = '⏳ Pendente';
+        let avatarStatusClass = 'status-pending';
         if (role === 'admin') {
           statusBadgeClass = 'admin';
           statusBadgeText = '👑 Administrador';
+          avatarStatusClass = 'status-admin';
         } else if (status === 'approved') {
           statusBadgeClass = 'verified';
           statusBadgeText = '✓ Verificado';
+          avatarStatusClass = 'status-verified';
         } else if (status === 'rejected') {
           statusBadgeClass = 'pending';
           statusBadgeText = '✗ Rejeitado';
+          avatarStatusClass = 'status-rejected';
         }
+
+        // Update points in header
+        document.getElementById('profileHeaderPointsValue').textContent = points;
 
         container.innerHTML = `
           <div class="profile-header-card">
-            <div class="profile-avatar-svg">${getDefaultAvatarSVG()}</div>
+            <div class="profile-avatar-svg ${avatarStatusClass}">${getDefaultAvatarSVG()}</div>
             <div class="profile-user-info-scroll">
               <h2 class="profile-name">${escapeHtml(displayName)}</h2>
               <p class="profile-email">${escapeHtml(email)}</p>
             </div>
             <span class="profile-status-badge ${statusBadgeClass}">${statusBadgeText}</span>
-          </div>
-
-          <div class="profile-stats-card">
-            <div class="profile-stat">
-              <div class="profile-stat-value">${points}</div>
-              <div class="profile-stat-label">Pontos</div>
-            </div>
-            <div class="profile-stat-divider"></div>
-            <div class="profile-stat">
-              <div class="profile-stat-value">${favoritesCount}</div>
-              <div class="profile-stat-label">Favoritos</div>
-            </div>
           </div>
 
           <div class="profile-info-card">
@@ -7941,19 +8002,15 @@
         const displayName = userName || user.displayName || user.email?.split('@')[0] || 'Usuário';
         const email = user.email || '';
 
+        // Update points in header (fallback)
+        document.getElementById('profileHeaderPointsValue').textContent = userPoints || 0;
+
         container.innerHTML = `
           <div class="profile-header-card">
-            <div class="profile-avatar-svg">${getDefaultAvatarSVG()}</div>
+            <div class="profile-avatar-svg status-pending">${getDefaultAvatarSVG()}</div>
             <div class="profile-user-info-scroll">
               <h2 class="profile-name">${escapeHtml(displayName)}</h2>
               <p class="profile-email">${escapeHtml(email)}</p>
-            </div>
-          </div>
-
-          <div class="profile-stats-card">
-            <div class="profile-stat">
-              <div class="profile-stat-value">${userPoints || 0}</div>
-              <div class="profile-stat-label">Pontos</div>
             </div>
           </div>
 
@@ -7988,6 +8045,15 @@
     function closeAboutOverlay() {
       document.getElementById('aboutOverlay').classList.remove('active');
       document.body.style.overflow = '';
+    }
+
+    // About Help Modal functions
+    function openAboutHelpModal() {
+      document.getElementById('aboutHelpModal').classList.add('active');
+    }
+
+    function closeAboutHelpModal() {
+      document.getElementById('aboutHelpModal').classList.remove('active');
     }
 
     // Comments Help Modal functions
@@ -9439,6 +9505,9 @@
   </script>
 </body>
 </html>
+
+
+
 
 
 
