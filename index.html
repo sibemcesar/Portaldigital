@@ -996,6 +996,230 @@
       overflow: hidden;
     }
 
+    /* Reports Overlay - Full screen like Android app */
+    .reports-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg-primary);
+      z-index: 2000;
+      flex-direction: column;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .reports-overlay.active {
+      display: flex;
+    }
+
+    .reports-overlay-content {
+      width: 100%;
+      height: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      background: var(--bg-primary);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .reports-filter-container {
+      display: flex;
+      gap: 10px;
+      padding: 16px;
+      background: var(--bg-primary);
+      border-bottom: 1px solid var(--border-color);
+      flex-shrink: 0;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .reports-filter-btn {
+      padding: 10px 20px;
+      background: transparent;
+      border: 1.5px solid var(--border-color);
+      border-radius: 24px;
+      color: var(--text-secondary);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .reports-filter-btn:hover {
+      border-color: var(--accent-primary);
+      color: var(--text-primary);
+    }
+
+    .reports-filter-btn.active {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+      color: var(--bg-primary);
+    }
+
+    .reports-list-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .report-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .report-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .report-card-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .report-card-date {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .report-card-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .report-card-email {
+      font-size: 13px;
+      color: var(--text-muted);
+      word-break: break-all;
+    }
+
+    .report-status-badge {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .report-status-badge.pending {
+      background: rgba(255, 152, 0, 0.15);
+      color: #FF9800;
+    }
+
+    .report-status-badge.resolved {
+      background: rgba(76, 175, 80, 0.15);
+      color: #4CAF50;
+    }
+
+    .report-card-section {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .report-card-label {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .report-card-link {
+      color: #2196F3;
+      font-size: 15px;
+      word-break: break-all;
+      text-decoration: none;
+    }
+
+    .report-card-link:hover {
+      text-decoration: underline;
+    }
+
+    .report-card-description {
+      color: var(--text-secondary);
+      font-size: 15px;
+      line-height: 1.6;
+      margin: 0;
+      white-space: pre-wrap;
+    }
+
+    .report-resolve-btn {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .report-resolve-btn:hover {
+      background: #43A047;
+      transform: translateY(-1px);
+    }
+
+    .report-resolve-btn:active {
+      transform: translateY(0);
+    }
+
+    .report-resolved-info {
+      text-align: center;
+      font-size: 14px;
+      color: var(--text-muted);
+      padding: 8px 0;
+    }
+
+    .reports-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      text-align: center;
+      color: var(--text-muted);
+      gap: 12px;
+    }
+
+    .reports-empty svg {
+      width: 64px;
+      height: 64px;
+      fill: var(--text-muted);
+      opacity: 0.5;
+    }
+
+    .reports-empty-text {
+      font-size: 16px;
+    }
+
     /* Publish Overlay - Full screen like Android app */
     .publish-overlay {
       display: none;
@@ -4715,7 +4939,7 @@
 
     <button class="btn notification-btn" id="viewReportsBtn" onclick="openViewReportsModal()" style="display: none;">
       <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm3-4H6v-2h9v2zm0-4H6V7h9v2z"/></svg>
-      Ver Reports
+      Ver Reports (ADM)
       <span class="notification-badge" id="reportsBadge" style="display: none;">0</span>
     </button>
 
@@ -5713,23 +5937,26 @@
     </div>
   </div>
 
-  <!-- Modal Ver Reports (Admin) -->
-  <div id="viewReportsModal" class="custom-modal">
-    <div class="custom-modal-content" style="max-width: 600px;">
-      <h2>
-        <svg viewBox="0 0 24 24" width="24" height="24" style="fill: #FF5722; vertical-align: middle; margin-right: 8px;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm3-4H6v-2h9v2zm0-4H6V7h9v2z"/></svg>
-        Reports de Problemas
-      </h2>
-      <div id="reportsFilterContainer" style="margin-bottom: 16px; display: flex; gap: 10px;">
-        <button class="filter-btn active" onclick="filterReports('all')" id="reportFilterAll">Todos</button>
-        <button class="filter-btn" onclick="filterReports('pending')" id="reportFilterPending">Pendentes</button>
-        <button class="filter-btn" onclick="filterReports('resolved')" id="reportFilterResolved">Resolvidos</button>
+  <!-- Reports Overlay (Admin) - Full Screen Android Style -->
+  <div id="reportsOverlay" class="reports-overlay">
+    <div class="reports-overlay-content">
+      <div class="content-header">
+        <button class="content-header-btn back-btn" onclick="closeViewReportsModal()">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <h1 class="content-header-title">Reports de Problemas</h1>
+        <div style="width: 40px;"></div>
       </div>
-      <div id="reportsList" style="max-height: 55vh; overflow-y: auto; padding: 8px 0;">
-        <p style="color: var(--text-muted); text-align: center;">Carregando reports...</p>
+      <div class="reports-filter-container">
+        <button class="reports-filter-btn active" onclick="filterReports('all')" id="reportFilterAll">Todos</button>
+        <button class="reports-filter-btn" onclick="filterReports('pending')" id="reportFilterPending">Pendentes</button>
+        <button class="reports-filter-btn" onclick="filterReports('resolved')" id="reportFilterResolved">Resolvidos</button>
       </div>
-      <div class="custom-modal-buttons" style="margin-top: 16px;">
-        <button class="custom-modal-btn secondary" onclick="closeViewReportsModal()">Fechar</button>
+      <div id="reportsList" class="reports-list-container">
+        <div class="reports-empty">
+          <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm3-4H6v-2h9v2zm0-4H6V7h9v2z"/></svg>
+          <span class="reports-empty-text">Carregando reports...</span>
+        </div>
       </div>
     </div>
   </div>
@@ -6067,21 +6294,20 @@
           generateCodeBtn.style.display = 'none';
           manageUsersBtn.style.display = 'none';
           sendNotificationBtn.style.display = 'none';
-          // Mostrar botão de reportar e ver reports para usuários aprovados
+          viewReportsBtn.style.display = 'none';
+          // Mostrar botão de reportar para usuários aprovados
           if (userStatus === 'approved') {
             reportProblemBtn.style.display = 'flex';
-            viewReportsBtn.style.display = 'flex';
           } else {
             reportProblemBtn.style.display = 'none';
-            viewReportsBtn.style.display = 'none';
           }
         }
 
         updateUserInfoDisplay();
         loadNotifications();
 
-        // Update reports badge for admins and verified users
-        if (isPublisher || userStatus === 'approved') {
+        // Update reports badge for admins
+        if (isPublisher) {
           updateReportsBadge();
         }
       }
@@ -9402,17 +9628,17 @@
     // Admin - View Reports
     async function openViewReportsModal() {
       closeSidebar();
-      document.getElementById('viewReportsModal').classList.add('active');
+      document.getElementById('reportsOverlay').classList.add('active');
       await loadReports();
     }
 
     function closeViewReportsModal() {
-      document.getElementById('viewReportsModal').classList.remove('active');
+      document.getElementById('reportsOverlay').classList.remove('active');
     }
 
-    // Function to update reports badge for admin and verified users
+    // Function to update reports badge for admin
     async function updateReportsBadge() {
-      // Badge is shown for both admins and verified users
+      if (!isPublisher) return;
 
       const badge = document.getElementById('reportsBadge');
       if (!badge) return;
@@ -9451,7 +9677,12 @@
 
     async function loadReports() {
       const reportsList = document.getElementById('reportsList');
-      reportsList.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Carregando reports...</p>';
+      reportsList.innerHTML = `
+        <div class="reports-empty">
+          <svg viewBox="0 0 24 24"><path d="M12 4V2C6.48 2 2 6.48 2 12h2c0-4.41 3.59-8 8-8zm0 16c-4.41 0-8-3.59-8-8H2c0 5.52 4.48 10 10 10v-2zm0-2c3.31 0 6-2.69 6-6h-2c0 2.21-1.79 4-4 4v2zm0-16c5.52 0 10 4.48 10 10h-2c0-4.41-3.59-8-8-8V2z"/></svg>
+          <span class="reports-empty-text">Carregando reports...</span>
+        </div>
+      `;
 
       try {
         const { ref, get } = window.firebaseModules;
@@ -9461,7 +9692,12 @@
         const snapshot = await get(reportsRef);
 
         if (!snapshot.exists()) {
-          reportsList.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Nenhum report encontrado.</p>';
+          reportsList.innerHTML = `
+            <div class="reports-empty">
+              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm3-4H6v-2h9v2zm0-4H6V7h9v2z"/></svg>
+              <span class="reports-empty-text">Nenhum report encontrado</span>
+            </div>
+          `;
           allReports = [];
           return;
         }
@@ -9477,7 +9713,12 @@
         renderReports();
       } catch (error) {
         console.error('Error loading reports:', error);
-        reportsList.innerHTML = '<p style="color: #f44336; text-align: center;">Erro ao carregar reports.</p>';
+        reportsList.innerHTML = `
+          <div class="reports-empty">
+            <svg viewBox="0 0 24 24" style="fill: #f44336;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            <span class="reports-empty-text" style="color: #f44336;">Erro ao carregar reports</span>
+          </div>
+        `;
       }
     }
 
@@ -9505,7 +9746,12 @@
       }
 
       if (filteredReports.length === 0) {
-        reportsList.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Nenhum report encontrado.</p>';
+        reportsList.innerHTML = `
+          <div class="reports-empty">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm3-4H6v-2h9v2zm0-4H6V7h9v2z"/></svg>
+            <span class="reports-empty-text">Nenhum report encontrado</span>
+          </div>
+        `;
         return;
       }
 
@@ -9514,74 +9760,40 @@
           day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
         });
 
-        const statusColor = report.status === 'pending' ? '#FF9800' : '#4CAF50';
+        const statusClass = report.status === 'pending' ? 'pending' : 'resolved';
         const statusText = report.status === 'pending' ? 'Pendente' : 'Resolvido';
         const statusIcon = report.status === 'pending' ? '⏳' : '✅';
 
-        // Check if link exists and is not empty
-        const hasLink = report.link && report.link.trim().length > 0;
-        const linkDisplay = hasLink
-          ? `<a href="${report.link}" target="_blank" rel="noopener" style="color: #2196F3; font-size: 13px; word-break: break-all; text-decoration: underline;">${report.link}</a>`
-          : `<span style="color: var(--text-muted); font-size: 13px; font-style: italic;">Não informado</span>`;
-
-        // Admin action buttons (only for ADMs)
-        let adminActions = '';
-        if (isPublisher) {
-          if (report.status === 'pending') {
-            adminActions = `
-              <div style="display: flex; gap: 8px; margin-top: 12px;">
-                <button onclick="markReportResolved('${report.id}')" style="background: #4CAF50; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; flex: 1;">
-                  ✓ Marcar como Resolvido
-                </button>
-                <button onclick="deleteReport('${report.id}')" style="background: #f44336; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">
-                  🗑️
-                </button>
-              </div>
-            `;
-          } else {
-            adminActions = `
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
-                <div style="font-size: 12px; color: var(--text-muted);">
-                  Resolvido em ${report.resolvedAt ? new Date(report.resolvedAt).toLocaleDateString('pt-BR') : 'N/A'}
-                </div>
-                <button onclick="deleteReport('${report.id}')" style="background: #f44336; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">
-                  🗑️ Apagar
-                </button>
-              </div>
-            `;
-          }
-        } else {
-          // Non-admin users just see the resolved info
-          if (report.status === 'resolved') {
-            adminActions = `
-              <div style="text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 12px;">
-                Resolvido em ${report.resolvedAt ? new Date(report.resolvedAt).toLocaleDateString('pt-BR') : 'N/A'}
-              </div>
-            `;
-          }
-        }
-
         return `
-          <div class="report-item" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 12px;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-              <div>
-                <span style="font-size: 12px; color: var(--text-muted);">${date}</span>
-                <div style="font-size: 14px; font-weight: 600; color: var(--text-primary); margin-top: 4px;">${report.reporterName}</div>
-                <div style="font-size: 12px; color: var(--text-muted);">${report.reporterEmail}</div>
+          <div class="report-card">
+            <div class="report-card-header">
+              <div class="report-card-info">
+                <span class="report-card-date">${date}</span>
+                <div class="report-card-name">${report.reporterName}</div>
+                <div class="report-card-email">${report.reporterEmail}</div>
               </div>
-              <span style="background: ${statusColor}20; color: ${statusColor}; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">
+              <span class="report-status-badge ${statusClass}">
                 ${statusIcon} ${statusText}
               </span>
             </div>
-            <div style="margin-bottom: 12px;">
-              <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Link:</div>
-              ${linkDisplay}
+            <div class="report-card-section">
+              <span class="report-card-label">Link do problema:</span>
+              <a href="${report.link}" target="_blank" rel="noopener" class="report-card-link">${report.link}</a>
             </div>
-            <div style="margin-bottom: 0;">
-              <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Descrição:</div>
-              <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.5; margin: 0; white-space: pre-wrap;">${report.description}</p>
+            <div class="report-card-section">
+              <span class="report-card-label">Descrição:</span>
+              <p class="report-card-description">${report.description}</p>
             </div>
-            ${adminActions}
+            ${report.status === 'pending' ? `
+              <button onclick="markReportResolved('${report.id}')" class="report-resolve-btn">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                Marcar como Resolvido
+              </button>
+            ` : `
+              <div class="report-resolved-info">
+                ✅ Resolvido em ${report.resolvedAt ? new Date(report.resolvedAt).toLocaleDateString('pt-BR') : 'N/A'}
+              </div>
+            `}
           </div>
         `;
       }).join('');
@@ -9615,37 +9827,6 @@
         console.error('Error resolving report:', error);
         showCustomAlert('Erro ao atualizar report.');
       }
-    }
-
-    // Delete report (admin only)
-    async function deleteReport(reportId) {
-      if (!isPublisher) {
-        showCustomAlert('Apenas administradores podem apagar reports.');
-        return;
-      }
-
-      showConfirmModal(
-        '🗑️ Apagar Report',
-        'Tem certeza que deseja apagar este report? Esta ação não pode ser desfeita.',
-        async () => {
-          try {
-            const { ref, remove } = window.firebaseModules;
-            const database = window.firebaseDatabase;
-
-            const reportRef = ref(database, `problemReports/${reportId}`);
-            await remove(reportRef);
-
-            // Remove from local data and re-render
-            allReports = allReports.filter(r => r.id !== reportId);
-            renderReports();
-            updateReportsBadge();
-            showCustomAlert('Report apagado com sucesso!');
-          } catch (error) {
-            console.error('Error deleting report:', error);
-            showCustomAlert('Erro ao apagar report.');
-          }
-        }
-      );
     }
 
     // Rating System
@@ -10822,7 +11003,7 @@
         const serverTime = await getServerTimestamp();
         const remaining = nextRewardTime - serverTime;
         if (remaining > 0) {
-          showCustomAlert(`Voc�� já resgatou sua recompensa!\n\nVolte em ${formatTimeRemaining(remaining)} 🎁`);
+          showCustomAlert(`Você já resgatou sua recompensa!\n\nVolte em ${formatTimeRemaining(remaining)} 🎁`);
         } else {
           showCustomAlert('Você já resgatou sua recompensa! Volte mais tarde. 🎁');
         }
