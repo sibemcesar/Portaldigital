@@ -453,6 +453,12 @@
       z-index: 100;
     }
 
+    /* Header fixo no overlay do jogo */
+    .modal > .content-header {
+      position: sticky;
+      top: 0;
+    }
+
     .content-header-btn {
       background: none;
       border: none;
@@ -494,7 +500,7 @@
     }
 
     .report-btn svg {
-      fill: #FF9800;
+      fill: #9E9E9E;
     }
 
     .help-btn svg {
@@ -1897,7 +1903,7 @@
 
     .generate-code-input-section input:focus {
       outline: none;
-      border-color: #4CAF50;
+      border-color: #2196F3;
       background: var(--bg-primary);
     }
 
@@ -1908,7 +1914,7 @@
     .generate-code-btn {
       width: 100%;
       padding: 18px;
-      background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+      background: linear-gradient(135deg, #2196F3 0%, #64B5F6 100%);
       border: none;
       border-radius: 12px;
       color: white;
@@ -1969,8 +1975,8 @@
       font-size: 24px;
       font-weight: 700;
       text-align: center;
-      border: 2px dashed rgba(76, 175, 80, 0.5);
-      color: #4CAF50;
+      border: 2px dashed rgba(33, 150, 243, 0.5);
+      color: #2196F3;
       letter-spacing: 3px;
       word-break: break-all;
     }
@@ -1986,9 +1992,9 @@
       margin-top: 16px;
       padding: 14px 24px;
       background: transparent;
-      border: 2px solid #4CAF50;
+      border: 2px solid #2196F3;
       border-radius: 10px;
-      color: #4CAF50;
+      color: #2196F3;
       font-size: 15px;
       font-weight: 600;
       font-family: 'Inter', sans-serif;
@@ -2000,13 +2006,13 @@
     }
 
     .generated-code-copy-btn:hover {
-      background: rgba(76, 175, 80, 0.1);
+      background: rgba(33, 150, 243, 0.1);
     }
 
     .generated-code-copy-btn svg {
       width: 18px;
       height: 18px;
-      fill: #4CAF50;
+      fill: #2196F3;
     }
 
 
@@ -11745,6 +11751,7 @@
   </script>
 </body>
 </html>
+
 
 
 
