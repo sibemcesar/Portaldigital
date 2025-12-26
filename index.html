@@ -4715,7 +4715,7 @@
 
     <button class="btn notification-btn" id="viewReportsBtn" onclick="openViewReportsModal()" style="display: none;">
       <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm3-4H6v-2h9v2zm0-4H6V7h9v2z"/></svg>
-      Ver Reports (ADM)
+      Ver Reports
       <span class="notification-badge" id="reportsBadge" style="display: none;">0</span>
     </button>
 
@@ -6067,20 +6067,21 @@
           generateCodeBtn.style.display = 'none';
           manageUsersBtn.style.display = 'none';
           sendNotificationBtn.style.display = 'none';
-          viewReportsBtn.style.display = 'none';
-          // Mostrar botão de reportar para usuários aprovados
+          // Mostrar botão de reportar e ver reports para usuários aprovados
           if (userStatus === 'approved') {
             reportProblemBtn.style.display = 'flex';
+            viewReportsBtn.style.display = 'flex';
           } else {
             reportProblemBtn.style.display = 'none';
+            viewReportsBtn.style.display = 'none';
           }
         }
 
         updateUserInfoDisplay();
         loadNotifications();
 
-        // Update reports badge for admins
-        if (isPublisher) {
+        // Update reports badge for admins and verified users
+        if (isPublisher || userStatus === 'approved') {
           updateReportsBadge();
         }
       }
@@ -9409,9 +9410,9 @@
       document.getElementById('viewReportsModal').classList.remove('active');
     }
 
-    // Function to update reports badge for admin
+    // Function to update reports badge for admin and verified users
     async function updateReportsBadge() {
-      if (!isPublisher) return;
+      // Badge is shown for both admins and verified users
 
       const badge = document.getElementById('reportsBadge');
       if (!badge) return;
@@ -9517,6 +9518,49 @@
         const statusText = report.status === 'pending' ? 'Pendente' : 'Resolvido';
         const statusIcon = report.status === 'pending' ? '⏳' : '✅';
 
+        // Check if link exists and is not empty
+        const hasLink = report.link && report.link.trim().length > 0;
+        const linkDisplay = hasLink
+          ? `<a href="${report.link}" target="_blank" rel="noopener" style="color: #2196F3; font-size: 13px; word-break: break-all; text-decoration: underline;">${report.link}</a>`
+          : `<span style="color: var(--text-muted); font-size: 13px; font-style: italic;">Não informado</span>`;
+
+        // Admin action buttons (only for ADMs)
+        let adminActions = '';
+        if (isPublisher) {
+          if (report.status === 'pending') {
+            adminActions = `
+              <div style="display: flex; gap: 8px; margin-top: 12px;">
+                <button onclick="markReportResolved('${report.id}')" style="background: #4CAF50; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; flex: 1;">
+                  ✓ Marcar como Resolvido
+                </button>
+                <button onclick="deleteReport('${report.id}')" style="background: #f44336; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                  🗑️
+                </button>
+              </div>
+            `;
+          } else {
+            adminActions = `
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
+                <div style="font-size: 12px; color: var(--text-muted);">
+                  Resolvido em ${report.resolvedAt ? new Date(report.resolvedAt).toLocaleDateString('pt-BR') : 'N/A'}
+                </div>
+                <button onclick="deleteReport('${report.id}')" style="background: #f44336; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">
+                  🗑️ Apagar
+                </button>
+              </div>
+            `;
+          }
+        } else {
+          // Non-admin users just see the resolved info
+          if (report.status === 'resolved') {
+            adminActions = `
+              <div style="text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 12px;">
+                Resolvido em ${report.resolvedAt ? new Date(report.resolvedAt).toLocaleDateString('pt-BR') : 'N/A'}
+              </div>
+            `;
+          }
+        }
+
         return `
           <div class="report-item" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 12px;">
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
@@ -9531,21 +9575,13 @@
             </div>
             <div style="margin-bottom: 12px;">
               <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Link:</div>
-              <a href="${report.link}" target="_blank" rel="noopener" style="color: #2196F3; font-size: 13px; word-break: break-all; text-decoration: underline;">${report.link}</a>
+              ${linkDisplay}
             </div>
-            <div style="margin-bottom: 12px;">
+            <div style="margin-bottom: 0;">
               <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Descrição:</div>
               <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.5; margin: 0; white-space: pre-wrap;">${report.description}</p>
             </div>
-            ${report.status === 'pending' ? `
-              <button onclick="markReportResolved('${report.id}')" style="background: #4CAF50; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; width: 100%;">
-                ✓ Marcar como Resolvido
-              </button>
-            ` : `
-              <div style="text-align: center; font-size: 12px; color: var(--text-muted);">
-                Resolvido em ${report.resolvedAt ? new Date(report.resolvedAt).toLocaleDateString('pt-BR') : 'N/A'}
-              </div>
-            `}
+            ${adminActions}
           </div>
         `;
       }).join('');
@@ -9579,6 +9615,37 @@
         console.error('Error resolving report:', error);
         showCustomAlert('Erro ao atualizar report.');
       }
+    }
+
+    // Delete report (admin only)
+    async function deleteReport(reportId) {
+      if (!isPublisher) {
+        showCustomAlert('Apenas administradores podem apagar reports.');
+        return;
+      }
+
+      showConfirmModal(
+        '🗑️ Apagar Report',
+        'Tem certeza que deseja apagar este report? Esta ação não pode ser desfeita.',
+        async () => {
+          try {
+            const { ref, remove } = window.firebaseModules;
+            const database = window.firebaseDatabase;
+
+            const reportRef = ref(database, `problemReports/${reportId}`);
+            await remove(reportRef);
+
+            // Remove from local data and re-render
+            allReports = allReports.filter(r => r.id !== reportId);
+            renderReports();
+            updateReportsBadge();
+            showCustomAlert('Report apagado com sucesso!');
+          } catch (error) {
+            console.error('Error deleting report:', error);
+            showCustomAlert('Erro ao apagar report.');
+          }
+        }
+      );
     }
 
     // Rating System
@@ -10755,7 +10822,7 @@
         const serverTime = await getServerTimestamp();
         const remaining = nextRewardTime - serverTime;
         if (remaining > 0) {
-          showCustomAlert(`Você já resgatou sua recompensa!\n\nVolte em ${formatTimeRemaining(remaining)} 🎁`);
+          showCustomAlert(`Voc�� já resgatou sua recompensa!\n\nVolte em ${formatTimeRemaining(remaining)} 🎁`);
         } else {
           showCustomAlert('Você já resgatou sua recompensa! Volte mais tarde. 🎁');
         }
@@ -10935,6 +11002,7 @@
   </script>
 </body>
 </html>
+
 
 
 
