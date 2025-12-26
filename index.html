@@ -4817,6 +4817,210 @@
       border-radius: 10px;
     }
 
+    /* Send Notification Overlay - Full screen like Android app */
+    .send-notification-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg-primary);
+      z-index: 2000;
+      flex-direction: column;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .send-notification-overlay.active {
+      display: flex;
+    }
+
+    .send-notification-overlay-content {
+      width: 100%;
+      height: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      background: var(--bg-primary);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .send-notification-overlay-content form {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .send-notification-form-container {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .send-notification-form-container .form-group {
+      margin-bottom: 0;
+    }
+
+    .send-notification-form-container .form-label {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--text-primary);
+      display: block;
+    }
+
+    .send-notification-form-container .form-input,
+    .send-notification-form-container .form-textarea,
+    .send-notification-form-container .form-select {
+      font-size: 16px;
+      padding: 16px 18px;
+      border-radius: 14px;
+      width: 100%;
+      background: var(--bg-card);
+      border: 2px solid var(--border-color);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s ease;
+    }
+
+    .send-notification-form-container .form-input:focus,
+    .send-notification-form-container .form-textarea:focus,
+    .send-notification-form-container .form-select:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      background: var(--bg-secondary);
+    }
+
+    .send-notification-form-container .form-input::placeholder,
+    .send-notification-form-container .form-textarea::placeholder {
+      color: var(--text-muted);
+    }
+
+    .send-notification-form-container .form-textarea {
+      min-height: 140px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    .send-notification-target-options {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .send-notification-target-btn {
+      flex: 1;
+      padding: 16px;
+      background: var(--bg-card);
+      border: 2px solid var(--border-color);
+      border-radius: 14px;
+      color: var(--text-secondary);
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .send-notification-target-btn svg {
+      width: 28px;
+      height: 28px;
+      fill: var(--text-muted);
+      transition: fill 0.2s ease;
+    }
+
+    .send-notification-target-btn:hover {
+      border-color: var(--accent-primary);
+      color: var(--text-primary);
+    }
+
+    .send-notification-target-btn.active {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+      color: var(--bg-primary);
+    }
+
+    .send-notification-target-btn.active svg {
+      fill: var(--bg-primary);
+    }
+
+    .send-notification-user-selector {
+      display: none;
+      margin-top: 8px;
+    }
+
+    .send-notification-user-selector.active {
+      display: block;
+    }
+
+    .send-notification-footer {
+      display: flex;
+      gap: 12px;
+      padding: 16px 20px;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border-color);
+      flex-shrink: 0;
+    }
+
+    .send-notification-footer .send-notification-btn {
+      flex: 1;
+      padding: 16px 20px;
+      border: none;
+      border-radius: 14px;
+      font-family: 'Inter', sans-serif;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .send-notification-footer .send-notification-btn.primary {
+      background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+      color: white;
+    }
+
+    .send-notification-footer .send-notification-btn.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+    }
+
+    .send-notification-footer .send-notification-btn.primary:active {
+      transform: translateY(0);
+    }
+
+    .send-notification-footer .send-notification-btn.secondary {
+      background: transparent;
+      border: 2px solid var(--border-color);
+      color: var(--text-secondary);
+    }
+
+    .send-notification-footer .send-notification-btn.secondary:hover {
+      border-color: var(--accent-primary);
+      color: var(--text-primary);
+    }
+
+    .send-notification-footer .send-notification-btn svg {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+    }
+
     /* Enhanced Favorites Item for Overlay */
     .favorites-overlay .favorites-item {
       padding: 16px;
@@ -5715,40 +5919,51 @@
     </div>
   </div>
 
-  <!-- Modal para enviar notificação (Admin) -->
-  <div id="sendNotificationModal" class="custom-modal">
-    <div class="custom-modal-content" style="max-width: 500px;">
-      <h2>📤 Enviar Notificação</h2>
+  <!-- Send Notification Overlay - Full Screen Android Style -->
+  <div id="sendNotificationOverlay" class="send-notification-overlay">
+    <div class="send-notification-overlay-content">
+      <div class="content-header">
+        <button class="content-header-btn back-btn" onclick="closeSendNotificationOverlay()">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <h1 class="content-header-title">Enviar Notificação</h1>
+        <div style="width: 40px;"></div>
+      </div>
       <form id="sendNotificationForm" onsubmit="handleSendNotification(event)">
-        <div class="form-group">
-          <label class="form-label">Destinatário</label>
-          <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-              <input type="radio" name="notificationTarget" value="all" checked onchange="toggleUserSelector()">
-              <span>Todos os usuários</span>
-            </label>
-            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-              <input type="radio" name="notificationTarget" value="individual" onchange="toggleUserSelector()">
-              <span>Usuário específico</span>
-            </label>
+        <div class="send-notification-form-container">
+          <div class="form-group">
+            <label class="form-label">Destinatário</label>
+            <div class="send-notification-target-options">
+              <button type="button" class="send-notification-target-btn active" id="targetAllBtn" onclick="selectNotificationTarget('all')">
+                <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                Todos
+              </button>
+              <button type="button" class="send-notification-target-btn" id="targetIndividualBtn" onclick="selectNotificationTarget('individual')">
+                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                Usuário
+              </button>
+            </div>
+            <input type="hidden" name="notificationTarget" id="notificationTargetInput" value="all">
+            <div id="userSelectorContainer" class="send-notification-user-selector">
+              <select class="form-input form-select" id="notificationTargetUser">
+                <option value="">Selecione um usuário...</option>
+              </select>
+            </div>
           </div>
-          <div id="userSelectorContainer" style="display: none;">
-            <select class="form-input" id="notificationTargetUser" style="width: 100%;">
-              <option value="">Carregando usuários...</option>
-            </select>
+          <div class="form-group">
+            <label class="form-label">Título</label>
+            <input type="text" class="form-input" id="notificationTitle" placeholder="Digite o título da notificação..." required maxlength="100">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Mensagem</label>
+            <textarea class="form-textarea" id="notificationMessage" placeholder="Escreva a mensagem da notificação aqui..." required maxlength="500" rows="5"></textarea>
           </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Título</label>
-          <input type="text" class="form-input" id="notificationTitle" placeholder="Título da notificação" required maxlength="100">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Mensagem</label>
-          <textarea class="form-input" id="notificationMessage" placeholder="Digite a mensagem..." required maxlength="500" rows="4" style="resize: vertical;"></textarea>
-        </div>
-        <div class="custom-modal-buttons">
-          <button type="button" class="custom-modal-btn secondary" onclick="closeSendNotificationModal()">Cancelar</button>
-          <button type="submit" class="custom-modal-btn primary" id="sendNotificationSubmitBtn">Enviar para Todos</button>
+        <div class="send-notification-footer">
+          <button type="submit" class="send-notification-btn primary" id="sendNotificationSubmitBtn">
+            <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            <span id="sendNotificationBtnText">Enviar para Todos</span>
+          </button>
         </div>
       </form>
     </div>
@@ -9166,31 +9381,52 @@
         return;
       }
       document.getElementById('sendNotificationForm').reset();
-      document.getElementById('userSelectorContainer').style.display = 'none';
-      document.getElementById('sendNotificationBtn').textContent = 'Enviar para Todos';
+
+      // Reset to "All users" target
+      selectNotificationTarget('all');
 
       // Load users for the selector
       await loadUsersForNotification();
 
-      document.getElementById('sendNotificationModal').classList.add('active');
+      document.getElementById('sendNotificationOverlay').classList.add('active');
+      document.body.style.overflow = 'hidden';
     }
 
     function closeSendNotificationModal() {
-      document.getElementById('sendNotificationModal').classList.remove('active');
+      closeSendNotificationOverlay();
+    }
+
+    function closeSendNotificationOverlay() {
+      document.getElementById('sendNotificationOverlay').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function selectNotificationTarget(target) {
+      const allBtn = document.getElementById('targetAllBtn');
+      const individualBtn = document.getElementById('targetIndividualBtn');
+      const container = document.getElementById('userSelectorContainer');
+      const submitBtnText = document.getElementById('sendNotificationBtnText');
+      const hiddenInput = document.getElementById('notificationTargetInput');
+
+      if (target === 'individual') {
+        allBtn.classList.remove('active');
+        individualBtn.classList.add('active');
+        container.classList.add('active');
+        submitBtnText.textContent = 'Enviar para Usuário';
+        hiddenInput.value = 'individual';
+      } else {
+        allBtn.classList.add('active');
+        individualBtn.classList.remove('active');
+        container.classList.remove('active');
+        submitBtnText.textContent = 'Enviar para Todos';
+        hiddenInput.value = 'all';
+      }
     }
 
     function toggleUserSelector() {
-      const target = document.querySelector('input[name="notificationTarget"]:checked').value;
-      const container = document.getElementById('userSelectorContainer');
-      const submitBtn = document.getElementById('sendNotificationBtn');
-
-      if (target === 'individual') {
-        container.style.display = 'block';
-        submitBtn.textContent = 'Enviar para Usuário';
-      } else {
-        container.style.display = 'none';
-        submitBtn.textContent = 'Enviar para Todos';
-      }
+      // Legacy function - redirects to new implementation
+      const target = document.getElementById('notificationTargetInput').value;
+      selectNotificationTarget(target === 'individual' ? 'all' : 'individual');
     }
 
     async function loadUsersForNotification() {
@@ -9232,7 +9468,7 @@
 
       const title = document.getElementById('notificationTitle').value.trim();
       const message = document.getElementById('notificationMessage').value.trim();
-      const targetType = document.querySelector('input[name="notificationTarget"]:checked').value;
+      const targetType = document.getElementById('notificationTargetInput').value;
       const targetUserId = document.getElementById('notificationTargetUser').value;
 
       if (!title || !message) {
@@ -11262,6 +11498,7 @@
   </script>
 </body>
 </html>
+
 
 
 
