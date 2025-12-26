@@ -449,8 +449,7 @@
       padding: 12px 16px;
       background: var(--bg-primary);
       border-bottom: 1px solid var(--border-color);
-      position: sticky;
-      top: 0;
+      flex-shrink: 0;
       z-index: 100;
     }
 
@@ -492,6 +491,10 @@
 
     .share-btn svg {
       fill: #2196F3;
+    }
+
+    .report-btn svg {
+      fill: #FF9800;
     }
 
     .help-btn svg {
@@ -991,6 +994,277 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
+    }
+
+    /* Publish Overlay - Full screen like Android app */
+    .publish-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg-primary);
+      z-index: 2000;
+      flex-direction: column;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .publish-overlay.active {
+      display: flex;
+    }
+
+    .publish-overlay-content {
+      width: 100%;
+      height: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      background: var(--bg-primary);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .publish-overlay-content form {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .publish-form-container {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .publish-form-container .form-group {
+      margin-bottom: 0;
+    }
+
+    .publish-form-container .form-label {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .publish-form-container .form-input,
+    .publish-form-container .form-textarea,
+    .publish-form-container .form-select {
+      font-size: 16px;
+      padding: 14px 16px;
+      border-radius: 12px;
+    }
+
+    .publish-form-container .form-textarea {
+      min-height: 120px;
+    }
+
+    .publish-form-container .download-link-group {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .publish-form-container .download-link-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .publish-form-container .download-link-number {
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--accent-primary);
+    }
+
+    .publish-form-container .remove-link-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid #ff6b6b;
+      background: transparent;
+      color: #ff6b6b;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .publish-form-container .remove-link-btn:hover {
+      background: rgba(255, 107, 107, 0.15);
+    }
+
+    .publish-form-container .add-link-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--bg-card);
+      border: 2px dashed var(--border-color);
+      border-radius: 12px;
+      color: var(--accent-primary);
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 8px;
+    }
+
+    .publish-form-container .add-link-btn:hover {
+      border-color: var(--accent-primary);
+      background: var(--bg-secondary);
+    }
+
+    .publish-footer {
+      display: flex;
+      gap: 12px;
+      padding: 16px 20px;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border-color);
+      flex-shrink: 0;
+    }
+
+    .publish-footer .publish-btn {
+      flex: 1;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .publish-footer .publish-btn.primary {
+      background: var(--accent-primary);
+      color: var(--bg-primary);
+    }
+
+    .publish-footer .publish-btn.secondary {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+    }
+
+    /* Manage Games Overlay - Full screen like Android app */
+    .manage-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg-primary);
+      z-index: 2000;
+      flex-direction: column;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .manage-overlay.active {
+      display: flex;
+    }
+
+    .manage-overlay-content {
+      width: 100%;
+      height: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      background: var(--bg-primary);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .manage-list-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .manage-game-card {
+      background: var(--bg-card);
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+    }
+
+    .manage-game-card h3 {
+      margin: 0 0 8px 0;
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .manage-game-card p {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-bottom: 14px;
+      line-height: 1.4;
+    }
+
+    .manage-game-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .manage-game-actions .action-btn {
+      flex: 1;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .manage-game-actions .action-btn.edit {
+      background: var(--accent-primary);
+      color: var(--bg-primary);
+    }
+
+    .manage-game-actions .action-btn.delete {
+      background: transparent;
+      border: 1px solid #ff6b6b;
+      color: #ff6b6b;
+    }
+
+    .manage-empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      padding: 40px;
+      text-align: center;
+    }
+
+    .manage-empty-state .icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .manage-empty-state p {
+      color: var(--text-muted);
+      font-size: 16px;
+      line-height: 1.5;
     }
 
     .downloads-list-container {
@@ -1991,6 +2265,85 @@
       font-size: 16px;
     }
 
+    /* Pagination Controls */
+    .pagination-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 20px;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-color);
+      position: sticky;
+      bottom: 0;
+    }
+
+    .pagination-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .pagination-btn:hover:not(:disabled) {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+      color: var(--bg-primary);
+    }
+
+    .pagination-btn:hover:not(:disabled) svg {
+      fill: var(--bg-primary);
+    }
+
+    .pagination-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .pagination-btn svg {
+      fill: var(--text-primary);
+      transition: fill 0.2s ease;
+    }
+
+    .pagination-btn:active:not(:disabled) {
+      transform: scale(0.96);
+    }
+
+    .pagination-info {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 500;
+      min-width: 100px;
+      text-align: center;
+    }
+
+    @media (max-width: 480px) {
+      .pagination-controls {
+        gap: 8px;
+        padding: 12px;
+      }
+      .pagination-btn {
+        padding: 10px 14px;
+        font-size: 13px;
+      }
+      .pagination-btn span {
+        display: none;
+      }
+      .pagination-info {
+        font-size: 12px;
+        min-width: 80px;
+      }
+    }
+
     .custom-modal {
       position: fixed;
       inset: 0;
@@ -2053,6 +2406,546 @@
       background: transparent;
       border: 1px solid var(--border-color);
       color: var(--text-secondary);
+    }
+
+    /* Transfer Points Overlay - Full screen like Android app */
+    .transfer-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg-primary);
+      z-index: 2000;
+      flex-direction: column;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .transfer-overlay.active {
+      display: flex;
+    }
+
+    .transfer-overlay-content {
+      width: 100%;
+      height: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      background: var(--bg-primary);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .transfer-overlay-content form {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .transfer-form-container {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .transfer-info-card {
+      background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .transfer-points-display {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .transfer-points-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #00BCD4, #00838F);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .transfer-points-icon svg {
+      fill: white;
+      width: 28px;
+      height: 28px;
+    }
+
+    .transfer-points-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .transfer-points-label {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .transfer-info-text {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      padding: 12px;
+      background: var(--bg-secondary);
+      border-radius: 10px;
+    }
+
+    .transfer-type-selector {
+      display: flex;
+      gap: 12px;
+    }
+
+    .transfer-type-option {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 18px 14px;
+      border-radius: 14px;
+      background: var(--bg-card);
+      border: 2px solid var(--border-color);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .transfer-type-option:hover {
+      border-color: var(--text-muted);
+    }
+
+    .transfer-type-option.active {
+      border-color: #00BCD4;
+      background: rgba(0, 188, 212, 0.08);
+    }
+
+    .transfer-type-option input {
+      display: none;
+    }
+
+    .transfer-type-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--bg-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .transfer-type-option.active .transfer-type-icon {
+      background: rgba(0, 188, 212, 0.2);
+    }
+
+    .transfer-type-icon svg {
+      width: 24px;
+      height: 24px;
+      fill: var(--text-secondary);
+      transition: fill 0.2s ease;
+    }
+
+    .transfer-type-option.active .transfer-type-icon svg {
+      fill: #00BCD4;
+    }
+
+    .transfer-type-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      text-align: center;
+    }
+
+    .transfer-form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .transfer-form-label {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .transfer-form-label-hint {
+      font-weight: 400;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .transfer-form-input {
+      padding: 16px 18px;
+      border-radius: 14px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-size: 16px;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s ease;
+    }
+
+    .transfer-form-input:focus {
+      outline: none;
+      border-color: #00BCD4;
+      background: var(--bg-secondary);
+    }
+
+    .transfer-form-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .transfer-all-warning {
+      background: linear-gradient(135deg, rgba(255, 152, 0, 0.1), rgba(255, 193, 7, 0.08));
+      border: 1px solid rgba(255, 152, 0, 0.3);
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .transfer-all-warning-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .transfer-all-warning-header svg {
+      width: 22px;
+      height: 22px;
+      fill: #FF9800;
+    }
+
+    .transfer-all-warning-header strong {
+      color: #FF9800;
+      font-size: 15px;
+    }
+
+    .transfer-all-warning p {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .transfer-submit-footer {
+      padding: 16px 20px;
+      padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+      background: var(--bg-primary);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .transfer-submit-btn {
+      flex: 1;
+      padding: 16px 24px;
+      border-radius: 14px;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .transfer-submit-btn.primary {
+      background: linear-gradient(135deg, #00BCD4, #00838F);
+      color: white;
+    }
+
+    .transfer-submit-btn.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 188, 212, 0.4);
+    }
+
+    .transfer-submit-btn.primary:active {
+      transform: scale(0.98);
+    }
+
+    .transfer-submit-btn.secondary {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+    }
+
+    .transfer-submit-btn.secondary:hover {
+      background: var(--bg-secondary);
+    }
+
+    .transfer-submit-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    /* Manage Users Overlay - Full screen like Android app */
+    .manage-users-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg-primary);
+      z-index: 2000;
+      flex-direction: column;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .manage-users-overlay.active {
+      display: flex;
+    }
+
+    .manage-users-overlay-content {
+      width: 100%;
+      height: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      background: var(--bg-primary);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .manage-users-filter-tabs {
+      display: flex;
+      gap: 8px;
+      padding: 16px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      flex-shrink: 0;
+    }
+
+    .manage-users-filter-btn {
+      flex: 1;
+      padding: 14px 16px;
+      background: var(--bg-card);
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      color: var(--text-secondary);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .manage-users-filter-btn:hover {
+      border-color: var(--accent-primary);
+      color: var(--text-primary);
+    }
+
+    .manage-users-filter-btn.active {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+      color: var(--bg-primary);
+    }
+
+    .manage-users-list-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .manage-user-card {
+      background: var(--bg-card);
+      padding: 18px;
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      animation: slideIn 0.2s ease;
+    }
+
+    .manage-user-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .manage-user-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .manage-user-name {
+      font-weight: 700;
+      font-size: 17px;
+      color: var(--text-primary);
+      word-break: break-word;
+    }
+
+    .manage-user-email {
+      font-size: 14px;
+      color: var(--text-muted);
+      word-break: break-all;
+    }
+
+    .manage-user-status-badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      flex-shrink: 0;
+      margin-left: 12px;
+    }
+
+    .manage-user-status-badge.pending {
+      background: rgba(255, 152, 0, 0.15);
+      color: #ff9800;
+    }
+
+    .manage-user-status-badge.approved {
+      background: rgba(76, 175, 80, 0.15);
+      color: #4CAF50;
+    }
+
+    .manage-user-status-badge.rejected {
+      background: rgba(244, 67, 54, 0.15);
+      color: #f44336;
+    }
+
+    .manage-user-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      padding: 12px;
+      background: var(--bg-secondary);
+      border-radius: 10px;
+    }
+
+    .manage-user-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .manage-user-meta-item svg {
+      width: 18px;
+      height: 18px;
+      fill: var(--text-muted);
+    }
+
+    .manage-user-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .manage-user-action-btn {
+      flex: 1;
+      padding: 14px 18px;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .manage-user-action-btn:active {
+      transform: scale(0.97);
+    }
+
+    .manage-user-action-btn.approve {
+      background: #4CAF50;
+      color: white;
+    }
+
+    .manage-user-action-btn.approve:hover {
+      background: #43A047;
+    }
+
+    .manage-user-action-btn.reject {
+      background: rgba(244, 67, 54, 0.12);
+      color: #f44336;
+      border: 2px solid rgba(244, 67, 54, 0.3);
+    }
+
+    .manage-user-action-btn.reject:hover {
+      background: rgba(244, 67, 54, 0.2);
+      border-color: #f44336;
+    }
+
+    .manage-user-action-btn.restore {
+      background: #4CAF50;
+      color: white;
+    }
+
+    .manage-user-action-btn.restore:hover {
+      background: #43A047;
+    }
+
+    .manage-user-action-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    .manage-users-empty {
+      text-align: center;
+      color: var(--text-muted);
+      padding: 60px 20px;
+      font-size: 15px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .manage-users-empty svg {
+      width: 64px;
+      height: 64px;
+      fill: var(--text-muted);
+      opacity: 0.4;
+      margin-bottom: 20px;
+    }
+
+    .manage-users-empty p {
+      font-size: 16px;
+      margin: 0;
     }
 
     .form-group {
@@ -3903,6 +4796,21 @@
       </div>
     </div>
 
+    <!-- Pagination Controls -->
+    <div class="pagination-controls" id="paginationControls" style="display: none;">
+      <button class="pagination-btn prev-btn" id="prevPageBtn" onclick="goToPrevPage()">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+        <span>Anterior</span>
+      </button>
+      <div class="pagination-info">
+        <span id="paginationText">1 - 10 de 100</span>
+      </div>
+      <button class="pagination-btn next-btn" id="nextPageBtn" onclick="goToNextPage()">
+        <span>Próximo</span>
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
+      </button>
+    </div>
+
     <div id="noResults" class="no-results" style="display: none;">
       Nenhum resultado encontrado
     </div>
@@ -3921,6 +4829,9 @@
         </button>
         <button class="content-header-btn share-btn" onclick="shareContent()">
           <svg viewBox="0 0 24 24" width="24" height="24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+        </button>
+        <button class="content-header-btn report-btn" onclick="openReportFromGame()" title="Reportar Problema">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
         </button>
       </div>
       <div class="modal-header">
@@ -4197,94 +5108,111 @@
     </div>
   </div>
 
-  <div id="publishModal" class="custom-modal">
-    <div class="custom-modal-content">
-      <h2 id="publishModalTitle">Publicar Jogo</h2>
+  <!-- Publish Overlay - Full Screen Android Style -->
+  <div id="publishOverlay" class="publish-overlay">
+    <div class="publish-overlay-content">
+      <div class="content-header">
+        <button class="content-header-btn back-btn" onclick="closePublishModal()">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <h1 class="content-header-title" id="publishModalTitle">Publicar Jogo</h1>
+        <div style="width: 40px;"></div>
+      </div>
       <form id="publishForm" onsubmit="handlePublish(event)">
         <input type="hidden" id="editGameId">
+        <div class="publish-form-container">
+          <div class="form-group">
+            <label class="form-label">Categoria</label>
+            <select class="form-select" id="gameType" required>
+              <option value="aplicativos">APLICATIVOS</option>
+              <option value="jogos">JOGOS</option>
+              <option value="tutoriais">TUTORIAIS</option>
+              <option value="pc">PC</option>
+              <option value="outros">OUTROS</option>
+            </select>
+          </div>
 
-        <div class="form-group">
-          <label class="form-label">Categoria</label>
-          <select class="form-select" id="gameType" required>
-            <option value="aplicativos">APLICATIVOS</option>
-            <option value="jogos">JOGOS</option>
-            <option value="tutoriais">TUTORIAIS</option>
-            <option value="pc">PC</option>
-            <option value="outros">OUTROS</option>
-          </select>
-        </div>
+          <div class="form-group">
+            <label class="form-label">Título</label>
+            <input type="text" class="form-input" id="gameTitle" required>
+          </div>
 
-        <div class="form-group">
-          <label class="form-label">Título</label>
-          <input type="text" class="form-input" id="gameTitle" required>
-        </div>
+          <div class="form-group">
+            <label class="form-label">Gênero</label>
+            <input type="text" class="form-input" id="gameGenre" placeholder="Ex: Ação, Aventura" required>
+          </div>
 
-        <div class="form-group">
-          <label class="form-label">Gênero</label>
-          <input type="text" class="form-input" id="gameGenre" placeholder="Ex: Ação, Aventura" required>
-        </div>
+          <div class="form-group">
+            <label class="form-label">Tamanho</label>
+            <input type="text" class="form-input" id="gameSize" placeholder="Ex: 1.5 GB" required>
+          </div>
 
-        <div class="form-group">
-          <label class="form-label">Tamanho</label>
-          <input type="text" class="form-input" id="gameSize" placeholder="Ex: 1.5 GB" required>
-        </div>
+          <div class="form-group">
+            <label class="form-label">Descrição</label>
+            <textarea class="form-textarea" id="gameDescription" required></textarea>
+          </div>
 
-        <div class="form-group">
-          <label class="form-label">Descrição</label>
-          <textarea class="form-textarea" id="gameDescription" required></textarea>
-        </div>
+          <div class="form-group">
+            <label class="form-label">URL da Capa (imagem)</label>
+            <input type="url" class="form-input" id="gamePoster" required>
+          </div>
 
-        <div class="form-group">
-          <label class="form-label">URL da Capa (imagem)</label>
-          <input type="url" class="form-input" id="gamePoster" required>
-        </div>
+          <div class="form-group">
+            <label class="form-label">Link do Vídeo YouTube (opcional)</label>
+            <input type="url" class="form-input" id="gameVideo" placeholder="https://www.youtube.com/watch?v=...">
+          </div>
 
-        <div class="form-group">
-          <label class="form-label">Link do Vídeo YouTube (opcional)</label>
-          <input type="url" class="form-input" id="gameVideo" placeholder="https://www.youtube.com/watch?v=...">
-        </div>
-
-        <!-- Container de Links de Download -->
-        <div class="form-group">
-          <label class="form-label">Links de Download</label>
-          <div id="downloadLinksContainer">
-            <!-- Link 1 - Principal -->
-            <div class="download-link-group" data-link-index="1">
-              <div class="download-link-header">
-                <span class="download-link-number">Link 1</span>
-                <button type="button" class="remove-link-btn" onclick="removeDownloadLink(1)" style="display: none;">✕</button>
-              </div>
-              <input type="text" class="form-input" placeholder="Descrição (ex: Jogo Principal, Emulador, ISO...)" id="linkDesc1" required>
-              <div style="display: flex; gap: 8px; margin-top: 8px;">
-                <input type="url" class="form-input" placeholder="Link G.A" id="linkGA1" required style="flex: 1;">
-                <input type="url" class="form-input" placeholder="Link ADM" id="linkADM1" required style="flex: 1;">
+          <!-- Container de Links de Download -->
+          <div class="form-group">
+            <label class="form-label">Links de Download</label>
+            <div id="downloadLinksContainer">
+              <!-- Link 1 - Principal -->
+              <div class="download-link-group" data-link-index="1">
+                <div class="download-link-header">
+                  <span class="download-link-number">Link 1</span>
+                  <button type="button" class="remove-link-btn" onclick="removeDownloadLink(1)" style="display: none;">✕</button>
+                </div>
+                <input type="text" class="form-input" placeholder="Descrição (ex: Jogo Principal, Emulador, ISO...)" id="linkDesc1" required>
+                <div style="display: flex; gap: 8px; margin-top: 8px;">
+                  <input type="url" class="form-input" placeholder="Link G.A" id="linkGA1" required style="flex: 1;">
+                  <input type="url" class="form-input" placeholder="Link ADM" id="linkADM1" required style="flex: 1;">
+                </div>
               </div>
             </div>
+            <button type="button" class="add-link-btn" onclick="addDownloadLink()">
+              + Adicionar mais um link de download
+            </button>
           </div>
-          <button type="button" class="add-link-btn" onclick="addDownloadLink()">
-            + Adicionar mais um link de download
-          </button>
+
+          <div class="form-group">
+            <label class="form-label">Custo em Pontos</label>
+            <input type="number" class="form-input" id="gameCost" min="0" required>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Custo em Pontos</label>
-          <input type="number" class="form-input" id="gameCost" min="0" required>
-        </div>
-
-        <div class="custom-modal-buttons">
-          <button type="button" class="custom-modal-btn secondary" onclick="closePublishModal()">Cancelar</button>
-          <button type="submit" class="custom-modal-btn primary">Publicar</button>
+        <div class="publish-footer">
+          <button type="button" class="publish-btn secondary" onclick="closePublishModal()">Cancelar</button>
+          <button type="submit" class="publish-btn primary">Publicar</button>
         </div>
       </form>
     </div>
   </div>
 
-  <div id="manageModal" class="custom-modal">
-    <div class="custom-modal-content">
-      <h2>Meus Jogos</h2>
-      <div id="manageGamesList" class="loading">Carregando...</div>
-      <div class="custom-modal-buttons" style="margin-top: 16px;">
-        <button class="custom-modal-btn secondary" onclick="closeManageModal()">Fechar</button>
+  <!-- Manage Games Overlay - Full Screen Android Style -->
+  <div id="manageOverlay" class="manage-overlay">
+    <div class="manage-overlay-content">
+      <div class="content-header">
+        <button class="content-header-btn back-btn" onclick="closeManageModal()">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <h1 class="content-header-title">Meus Jogos</h1>
+        <div style="width: 40px;"></div>
+      </div>
+      <div id="manageGamesList" class="manage-list-container">
+        <div class="manage-empty-state">
+          <div class="icon">📦</div>
+          <p>Carregando...</p>
+        </div>
       </div>
     </div>
   </div>
@@ -4500,17 +5428,26 @@
     </div>
   </div>
 
-  <div id="manageUsersModal" class="custom-modal">
-    <div class="custom-modal-content">
-      <h2>Gerenciar Usuários</h2>
-      <div style="display: flex; gap: 8px; margin-bottom: 16px;">
-        <button class="filter-btn active" id="filterPending" onclick="filterUsers('pending')">Pendentes</button>
-        <button class="filter-btn" id="filterApproved" onclick="filterUsers('approved')">Aprovados</button>
-        <button class="filter-btn" id="filterRejected" onclick="filterUsers('rejected')">Rejeitados</button>
+  <!-- Manage Users Overlay - Full Screen Android Style -->
+  <div id="manageUsersOverlay" class="manage-users-overlay">
+    <div class="manage-users-overlay-content">
+      <div class="content-header">
+        <button class="content-header-btn back-btn" onclick="closeManageUsersModal()">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <h1 class="content-header-title">Gerenciar Usuários</h1>
+        <div style="width: 40px;"></div>
       </div>
-      <div id="manageUsersList" class="loading">Carregando...</div>
-      <div class="custom-modal-buttons" style="margin-top: 16px;">
-        <button class="custom-modal-btn secondary" onclick="closeManageUsersModal()">Fechar</button>
+      <div class="manage-users-filter-tabs">
+        <button class="manage-users-filter-btn active" id="filterPending" onclick="filterUsers('pending')">Pendentes</button>
+        <button class="manage-users-filter-btn" id="filterApproved" onclick="filterUsers('approved')">Aprovados</button>
+        <button class="manage-users-filter-btn" id="filterRejected" onclick="filterUsers('rejected')">Rejeitados</button>
+      </div>
+      <div id="manageUsersList" class="manage-users-list-container">
+        <div class="manage-users-empty">
+          <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          <p>Carregando usuários...</p>
+        </div>
       </div>
     </div>
   </div>
@@ -4756,9 +5693,9 @@
         </div>
         <form id="reportProblemForm" onsubmit="handleReportProblem(event)">
           <div class="report-form-group">
-            <label class="report-form-label">Link do conteúdo</label>
-            <input type="url" class="report-form-input" id="reportLink" placeholder="https://exemplo.com/link-do-jogo" required>
-            <span class="report-form-hint">Cole aqui o link onde você encontrou o problema</span>
+            <label class="report-form-label">Link do conteúdo <span style="color: var(--text-muted); font-weight: 400;">(opcional)</span></label>
+            <input type="url" class="report-form-input" id="reportLink" placeholder="https://exemplo.com/link-do-jogo">
+            <span class="report-form-hint">Cole aqui o link onde você encontrou o problema (deixe vazio se não for relacionado a um jogo)</span>
           </div>
           <div class="report-form-group" style="margin-top: 20px;">
             <label class="report-form-label">Descrição do problema</label>
@@ -4797,31 +5734,92 @@
     </div>
   </div>
 
-  <!-- Modal Transferência de Pontos -->
-  <div id="transferModal" class="custom-modal">
-    <div class="custom-modal-content" style="max-width: 450px;">
-      <h2>
-        <svg viewBox="0 0 24 24" width="24" height="24" style="fill: #00BCD4; vertical-align: middle; margin-right: 8px;"><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/></svg>
-        Transferir Pontos
-      </h2>
-      <div id="transferInfo" style="background: var(--bg-tertiary); padding: 12px; border-radius: 8px; margin-bottom: 16px;">
-        <p style="margin: 0; color: var(--text-secondary); font-size: 14px;">
-          Seus pontos: <strong id="transferCurrentPoints" style="color: var(--accent-primary);">0</strong>
-        </p>
-        <p id="transferMinInfo" style="margin: 8px 0 0 0; color: var(--text-muted); font-size: 12px;"></p>
+  <!-- Transfer Points Overlay - Full Screen Android Style -->
+  <div id="transferOverlay" class="transfer-overlay">
+    <div class="transfer-overlay-content">
+      <div class="content-header">
+        <button class="content-header-btn back-btn" onclick="closeTransferModal()">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <h1 class="content-header-title">Transferir Pontos</h1>
+        <div style="width: 40px;"></div>
       </div>
+
       <form id="transferForm" onsubmit="handleTransfer(event)">
-        <div class="form-group">
-          <label class="form-label">Email do destinatário</label>
-          <input type="email" class="form-input" id="transferEmail" placeholder="email@gmail.com" required>
+        <div class="transfer-form-container">
+          <!-- Info Card -->
+          <div class="transfer-info-card">
+            <div class="transfer-points-display">
+              <div class="transfer-points-icon">
+                <svg viewBox="0 0 24 24"><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/></svg>
+              </div>
+              <div>
+                <div class="transfer-points-value" id="transferCurrentPoints">0</div>
+                <div class="transfer-points-label">Seus pontos disponíveis</div>
+              </div>
+            </div>
+            <div class="transfer-info-text" id="transferMinInfo">
+              Como ADM, você pode transferir pontos para qualquer usuário.
+            </div>
+          </div>
+
+          <!-- Tipo de Transferência -->
+          <div class="transfer-form-group">
+            <label class="transfer-form-label">Tipo de Transferência</label>
+            <div class="transfer-type-selector">
+              <label class="transfer-type-option active" id="transferTypeIndividual" onclick="selectTransferType('individual')">
+                <input type="radio" name="transferType" value="individual" checked>
+                <div class="transfer-type-icon">
+                  <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                </div>
+                <span class="transfer-type-label">Usuário<br>Específico</span>
+              </label>
+              <label class="transfer-type-option" id="transferTypeAll" onclick="selectTransferType('all')">
+                <input type="radio" name="transferType" value="all">
+                <div class="transfer-type-icon">
+                  <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                </div>
+                <span class="transfer-type-label">Todos os<br>Usuários</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Email do Destinatário -->
+          <div id="transferEmailGroup" class="transfer-form-group">
+            <label class="transfer-form-label">Email do destinatário</label>
+            <input type="email" class="transfer-form-input" id="transferEmail" placeholder="email@gmail.com">
+          </div>
+
+          <!-- Aviso Transferência em Massa -->
+          <div id="transferAllInfo" class="transfer-form-group" style="display: none;">
+            <div class="transfer-all-warning">
+              <div class="transfer-all-warning-header">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                <strong>Transferência em Massa</strong>
+              </div>
+              <p>Os pontos serão enviados para <strong id="totalUsersCount">todos os usuários</strong> registrados no sistema. Esta ação pode levar alguns segundos.</p>
+            </div>
+          </div>
+
+          <!-- Quantidade de Pontos -->
+          <div class="transfer-form-group">
+            <label class="transfer-form-label">
+              Quantidade de pontos
+              <span class="transfer-form-label-hint" id="perUserLabel">(por usuário)</span>
+            </label>
+            <input type="number" class="transfer-form-input" id="transferAmount" min="1" placeholder="Ex: 50" required>
+          </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Quantidade de pontos</label>
-          <input type="number" class="form-input" id="transferAmount" min="1" placeholder="Ex: 50" required>
-        </div>
-        <div class="custom-modal-buttons">
-          <button type="button" class="custom-modal-btn secondary" onclick="closeTransferModal()">Cancelar</button>
-          <button type="submit" class="custom-modal-btn primary">Transferir</button>
+
+        <!-- Footer com Botões -->
+        <div class="transfer-submit-footer">
+          <button type="button" class="transfer-submit-btn secondary" onclick="closeTransferModal()">
+            Cancelar
+          </button>
+          <button type="submit" class="transfer-submit-btn primary" id="transferSubmitBtn">
+            <svg viewBox="0 0 24 24"><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/></svg>
+            Transferir
+          </button>
         </div>
       </form>
     </div>
@@ -4848,6 +5846,8 @@
     let allGames = {};
     let currentFilter = 'all';
     let searchTerm = '';
+    let currentPage = 0;
+    const gamesPerPage = 8;
     let userPoints = 0;
     let userStatus = 'pending';
     let gamesLoaded = false;
@@ -5238,11 +6238,13 @@
     function renderGrid() {
       const grid = document.getElementById('contentGrid');
       const noResults = document.getElementById('noResults');
+      const paginationControls = document.getElementById('paginationControls');
 
       // Show skeleton loading if games haven't loaded yet
       if (!gamesLoaded) {
         renderSkeletonLoading();
         noResults.style.display = 'none';
+        paginationControls.style.display = 'none';
         return;
       }
 
@@ -5266,13 +6268,33 @@
       if (filtered.length === 0) {
         grid.style.display = 'none';
         noResults.style.display = 'block';
+        paginationControls.style.display = 'none';
         return;
       }
+
+      // Pagination logic
+      const totalGames = filtered.length;
+      const totalPages = Math.ceil(totalGames / gamesPerPage);
+
+      // Ensure currentPage is within valid range
+      if (currentPage >= totalPages) {
+        currentPage = totalPages - 1;
+      }
+      if (currentPage < 0) {
+        currentPage = 0;
+      }
+
+      const startIndex = currentPage * gamesPerPage;
+      const endIndex = Math.min(startIndex + gamesPerPage, totalGames);
+      const paginatedGames = filtered.slice(startIndex, endIndex);
+
+      // Update pagination UI
+      updatePaginationUI(startIndex, endIndex, totalGames, totalPages);
 
       grid.style.display = 'grid';
       noResults.style.display = 'none';
 
-      filtered.forEach((game, index) => {
+      paginatedGames.forEach((game, index) => {
         const card = document.createElement('div');
         card.className = 'card';
         card.style.animationDelay = `${index * 0.05}s`;
@@ -5308,12 +6330,49 @@
       });
     }
 
+    // Pagination functions
+    function updatePaginationUI(startIndex, endIndex, totalGames, totalPages) {
+      const paginationControls = document.getElementById('paginationControls');
+      const paginationText = document.getElementById('paginationText');
+      const prevBtn = document.getElementById('prevPageBtn');
+      const nextBtn = document.getElementById('nextPageBtn');
+
+      // Show pagination only if there are more than gamesPerPage games
+      if (totalGames > gamesPerPage) {
+        paginationControls.style.display = 'flex';
+        paginationText.textContent = `${startIndex + 1} - ${endIndex} de ${totalGames}`;
+
+        // Enable/disable buttons
+        prevBtn.disabled = currentPage === 0;
+        nextBtn.disabled = currentPage >= totalPages - 1;
+      } else {
+        paginationControls.style.display = 'none';
+      }
+    }
+
+    function goToPrevPage() {
+      if (currentPage > 0) {
+        currentPage--;
+        renderGrid();
+        // Scroll to top of content
+        document.querySelector('.content-wrapper').scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function goToNextPage() {
+      currentPage++;
+      renderGrid();
+      // Scroll to top of content
+      document.querySelector('.content-wrapper').scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     // Filter buttons
     document.querySelectorAll('.filter-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         currentFilter = btn.dataset.filter;
+        currentPage = 0; // Reset to first page on filter change
         renderGrid();
       });
     });
@@ -5321,6 +6380,7 @@
     // Search input
     document.getElementById('searchInput').addEventListener('input', (e) => {
       searchTerm = e.target.value;
+      currentPage = 0; // Reset to first page on search
       renderGrid();
     });
 
@@ -5954,26 +7014,24 @@
       }
 
       const manageList = document.getElementById('manageGamesList');
-      manageList.innerHTML = '<div class="loading">Carregando...</div>';
+      manageList.innerHTML = '<div class="manage-empty-state"><div class="icon">⏳</div><p>Carregando...</p></div>';
 
-      document.getElementById('manageModal').classList.add('active');
+      document.getElementById('manageOverlay').classList.add('active');
 
       const userGames = Object.entries(allGames).filter(([id, game]) => game.authorId === currentUser.uid);
 
       if (userGames.length === 0) {
-        manageList.innerHTML = '<p style="color: var(--text-muted);">Você ainda não publicou nenhum jogo.</p>';
+        manageList.innerHTML = '<div class="manage-empty-state"><div class="icon">📦</div><p>Você ainda não publicou nenhum jogo.</p></div>';
         return;
       }
 
       manageList.innerHTML = userGames.map(([id, game]) => `
-        <div style="background: var(--bg-card); padding: 12px; border-radius: 8px; margin-bottom: 12px; border: 1px solid var(--border-color);">
-          <h3 style="margin: 0 0 8px 0; font-size: 16px;">${game.titulo}</h3>
-          <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 12px;">
-            ${game.genero} • ${game.size} • ${game.downloads || 0} downloads
-          </p>
-          <div style="display: flex; gap: 8px;">
-            <button class="custom-modal-btn primary" onclick="editGame('${id}')" style="font-size: 14px; padding: 8px 16px;">Editar</button>
-            <button class="custom-modal-btn secondary" onclick="deleteGame('${id}')" style="font-size: 14px; padding: 8px 16px; color: #ff6b6b; border-color: #ff6b6b;">Apagar</button>
+        <div class="manage-game-card">
+          <h3>${game.titulo}</h3>
+          <p>${game.genero} • ${game.size} • ${game.downloads || 0} downloads</p>
+          <div class="manage-game-actions">
+            <button class="action-btn edit" onclick="editGame('${id}')">Editar</button>
+            <button class="action-btn delete" onclick="deleteGame('${id}')">Apagar</button>
           </div>
         </div>
       `).join('');
@@ -6008,7 +7066,7 @@
         }]);
       }
 
-      document.getElementById('publishModal').classList.add('active');
+      document.getElementById('publishOverlay').classList.add('active');
     }
 
     async function deleteGame(id) {
@@ -6745,11 +7803,11 @@
       document.getElementById('publishModalTitle').textContent = 'Publicar Jogo';
       document.getElementById('editGameId').value = '';
       resetDownloadLinks();
-      document.getElementById('publishModal').classList.add('active');
+      document.getElementById('publishOverlay').classList.add('active');
     }
 
     function closePublishModal() {
-      document.getElementById('publishModal').classList.remove('active');
+      document.getElementById('publishOverlay').classList.remove('active');
       document.getElementById('publishForm').reset();
       document.getElementById('editGameId').value = '';
       resetDownloadLinks();
@@ -6860,7 +7918,7 @@
     }
 
     function closeManageModal() {
-      document.getElementById('manageModal').classList.remove('active');
+      document.getElementById('manageOverlay').classList.remove('active');
     }
 
     function openGenerateCodeModal() {
@@ -7466,12 +8524,13 @@
         return;
       }
 
-      document.getElementById('manageUsersModal').classList.add('active');
+      closeSidebar();
+      document.getElementById('manageUsersOverlay').classList.add('active');
       await loadAllUsers();
     }
 
     function closeManageUsersModal() {
-      document.getElementById('manageUsersModal').classList.remove('active');
+      document.getElementById('manageUsersOverlay').classList.remove('active');
     }
 
     async function loadAllUsers() {
@@ -7493,9 +8552,9 @@
     function filterUsers(status) {
       currentUserFilter = status;
 
-      document.getElementById('filterPending').classList.remove('active');
-      document.getElementById('filterApproved').classList.remove('active');
-      document.getElementById('filterRejected').classList.remove('active');
+      // Update filter button states
+      const filterBtns = document.querySelectorAll('.manage-users-filter-btn');
+      filterBtns.forEach(btn => btn.classList.remove('active'));
       document.getElementById('filter' + status.charAt(0).toUpperCase() + status.slice(1)).classList.add('active');
 
       renderUsersList();
@@ -7515,17 +8574,22 @@
           approved: 'aprovados',
           rejected: 'rejeitados'
         };
-        usersList.innerHTML = `<p style="color: var(--text-muted); text-align: center;">Nenhum usuário ${statusLabels[currentUserFilter]}.</p>`;
+        const statusIcons = {
+          pending: '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>',
+          approved: '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>',
+          rejected: '<svg viewBox="0 0 24 24"><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>'
+        };
+        usersList.innerHTML = `
+          <div class="manage-users-empty">
+            ${statusIcons[currentUserFilter]}
+            <p>Nenhum usuário ${statusLabels[currentUserFilter]}</p>
+          </div>
+        `;
         return;
       }
 
       usersList.innerHTML = filteredUsers.map(([id, user]) => {
         const createdDate = user.createdAt ? new Date(user.createdAt).toLocaleDateString('pt-BR') : 'N/A';
-        const statusColors = {
-          pending: '#ff9800',
-          approved: '#4CAF50',
-          rejected: '#f44336'
-        };
         const statusLabels = {
           pending: 'Pendente',
           approved: 'Aprovado',
@@ -7536,32 +8600,51 @@
         let actionButtons = '';
         if (status === 'pending') {
           actionButtons = `
-            <button class="custom-modal-btn primary" onclick="approveUser('${id}')" style="font-size: 12px; padding: 6px 12px; background: #4CAF50;">Aprovar</button>
-            <button class="custom-modal-btn secondary" onclick="rejectUser('${id}')" style="font-size: 12px; padding: 6px 12px; color: #f44336; border-color: #f44336;">Rejeitar</button>
+            <button class="manage-user-action-btn approve" onclick="approveUser('${id}')">
+              <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+              Aprovar
+            </button>
+            <button class="manage-user-action-btn reject" onclick="rejectUser('${id}')">
+              <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+              Rejeitar
+            </button>
           `;
         } else if (status === 'approved') {
           actionButtons = `
-            <button class="custom-modal-btn secondary" onclick="rejectUser('${id}')" style="font-size: 12px; padding: 6px 12px; color: #f44336; border-color: #f44336;">Marcar como Fraude</button>
+            <button class="manage-user-action-btn reject" onclick="rejectUser('${id}')">
+              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+              Marcar como Fraude
+            </button>
           `;
         } else if (status === 'rejected') {
           actionButtons = `
-            <button class="custom-modal-btn primary" onclick="approveUser('${id}')" style="font-size: 12px; padding: 6px 12px; background: #4CAF50;">Restaurar</button>
+            <button class="manage-user-action-btn restore" onclick="approveUser('${id}')">
+              <svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9z"/></svg>
+              Restaurar Usuário
+            </button>
           `;
         }
 
         return `
-          <div style="background: var(--bg-card); padding: 12px; border-radius: 8px; margin-bottom: 12px; border: 1px solid var(--border-color);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <div>
-                <span style="font-weight: 600; font-size: 14px;">${user.name || 'Sem nome'}</span>
-                <span style="color: var(--text-muted); font-size: 12px; margin-left: 8px;">${user.email || 'Email não disponível'}</span>
+          <div class="manage-user-card">
+            <div class="manage-user-header">
+              <div class="manage-user-info">
+                <span class="manage-user-name">${user.name || 'Sem nome'}</span>
+                <span class="manage-user-email">${user.email || 'Email não disponível'}</span>
               </div>
-              <span style="background: ${statusColors[status]}; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px;">${statusLabels[status]}</span>
+              <span class="manage-user-status-badge ${status}">${statusLabels[status]}</span>
             </div>
-            <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 8px;">
-              Registrado: ${createdDate} • Pontos: ${user.points || 0}
-            </p>
-            <div style="display: flex; gap: 8px;">
+            <div class="manage-user-meta">
+              <div class="manage-user-meta-item">
+                <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm-8 4H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/></svg>
+                <span>Registrado: ${createdDate}</span>
+              </div>
+              <div class="manage-user-meta-item">
+                <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+                <span>Pontos: ${user.points || 0}</span>
+              </div>
+            </div>
+            <div class="manage-user-actions">
               ${actionButtons}
             </div>
           </div>
@@ -7644,6 +8727,39 @@
           </div>
         </div>
       `;
+      document.body.appendChild(modal);
+    }
+
+    // Custom confirm modal with callback
+    function showConfirmModal(title, message, onConfirm) {
+      const modal = document.createElement('div');
+      modal.className = 'custom-modal active';
+      modal.innerHTML = `
+        <div class="custom-modal-content" style="max-width: 450px;">
+          <h2 style="margin: 0 0 16px 0; font-size: 18px; color: var(--text-primary);">${title}</h2>
+          <div style="margin: 0 0 20px 0; color: var(--text-secondary); font-size: 14px; line-height: 1.6; white-space: pre-line;">${message}</div>
+          <div class="custom-modal-buttons">
+            <button class="custom-modal-btn secondary confirm-cancel-btn">Cancelar</button>
+            <button class="custom-modal-btn primary confirm-ok-btn">Confirmar</button>
+          </div>
+        </div>
+      `;
+
+      // Add event listeners
+      const cancelBtn = modal.querySelector('.confirm-cancel-btn');
+      const confirmBtn = modal.querySelector('.confirm-ok-btn');
+
+      cancelBtn.addEventListener('click', () => {
+        modal.remove();
+      });
+
+      confirmBtn.addEventListener('click', () => {
+        modal.remove();
+        if (typeof onConfirm === 'function') {
+          onConfirm();
+        }
+      });
+
       document.body.appendChild(modal);
     }
 
@@ -8186,7 +9302,7 @@
     let allReports = [];
     let currentReportFilter = 'all';
 
-    function openReportProblemModal() {
+    function openReportProblemModal(prefillUrl = '') {
       closeSidebar();
       const auth = window.firebaseAuth;
       const user = auth.currentUser;
@@ -8196,7 +9312,7 @@
         return;
       }
 
-      document.getElementById('reportLink').value = '';
+      document.getElementById('reportLink').value = prefillUrl;
       document.getElementById('reportDescription').value = '';
       document.getElementById('reportCharCount').textContent = '0';
       document.getElementById('reportProblemOverlay').classList.add('active');
@@ -8205,6 +9321,18 @@
       document.getElementById('reportDescription').oninput = function() {
         document.getElementById('reportCharCount').textContent = this.value.length;
       };
+    }
+
+    // Open report modal from game detail with pre-filled URL
+    function openReportFromGame() {
+      if (!currentGameData) {
+        showCustomAlert('Nenhum jogo selecionado.');
+        return;
+      }
+
+      // Build the game URL
+      const gameUrl = window.location.origin + window.location.pathname + '?id=' + currentGameData.id;
+      openReportProblemModal(gameUrl);
     }
 
     function closeReportProblemOverlay() {
@@ -8225,8 +9353,8 @@
       const link = document.getElementById('reportLink').value.trim();
       const description = document.getElementById('reportDescription').value.trim();
 
-      if (!link || !description) {
-        showCustomAlert('Preencha todos os campos.');
+      if (!description) {
+        showCustomAlert('Por favor, descreva o problema.');
         return;
       }
 
@@ -9183,6 +10311,61 @@
 
     // ===== TRANSFER POINTS SYSTEM (ADM ONLY) =====
 
+    let allUsersForTransfer = [];
+
+    function toggleTransferType() {
+      const transferType = document.querySelector('input[name="transferType"]:checked').value;
+      const emailGroup = document.getElementById('transferEmailGroup');
+      const allInfoGroup = document.getElementById('transferAllInfo');
+      const perUserLabel = document.getElementById('perUserLabel');
+      const submitBtn = document.getElementById('transferSubmitBtn');
+
+      if (transferType === 'individual') {
+        emailGroup.style.display = 'flex';
+        allInfoGroup.style.display = 'none';
+        perUserLabel.style.display = 'none';
+        submitBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/></svg> Transferir';
+        document.getElementById('transferEmail').required = true;
+      } else {
+        emailGroup.style.display = 'none';
+        allInfoGroup.style.display = 'flex';
+        perUserLabel.style.display = 'inline';
+        submitBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg> Transferir para Todos';
+        document.getElementById('transferEmail').required = false;
+        // Update user count
+        updateTransferUsersCount();
+      }
+    }
+
+    async function updateTransferUsersCount() {
+      try {
+        const { ref, get } = window.firebaseModules;
+        const database = window.firebaseDatabase;
+
+        const usersRef = ref(database, 'users');
+        const usersSnapshot = await get(usersRef);
+
+        if (usersSnapshot.exists()) {
+          allUsersForTransfer = [];
+          usersSnapshot.forEach((child) => {
+            const userData = child.val();
+            // Exclude current user (ADM) from the list
+            if (child.key !== currentUser.uid) {
+              allUsersForTransfer.push({
+                uid: child.key,
+                email: userData.email || '',
+                points: userData.points || 0,
+                name: userData.name || userData.email?.split('@')[0] || 'Usuário'
+              });
+            }
+          });
+          document.getElementById('totalUsersCount').textContent = `${allUsersForTransfer.length} usuários`;
+        }
+      } catch (e) {
+        console.error('Erro ao contar usuários:', e);
+      }
+    }
+
     function openTransferModal() {
       if (!currentUser || currentUser.isAnonymous) {
         showCustomAlert('Você precisa estar logado para transferir pontos.');
@@ -9199,16 +10382,39 @@
 
       // Update modal info
       document.getElementById('transferCurrentPoints').textContent = userPoints;
-      document.getElementById('transferMinInfo').textContent = 'Como ADM, você pode transferir pontos para qualquer usuário.';
 
+      // Reset form
       document.getElementById('transferEmail').value = '';
       document.getElementById('transferAmount').value = '';
-      document.getElementById('transferModal').classList.add('active');
+
+      // Reset to individual transfer type
+      selectTransferType('individual');
+
+      document.getElementById('transferOverlay').classList.add('active');
     }
 
     function closeTransferModal() {
-      document.getElementById('transferModal').classList.remove('active');
+      document.getElementById('transferOverlay').classList.remove('active');
       document.getElementById('transferForm').reset();
+    }
+
+    function selectTransferType(type) {
+      const individualOption = document.getElementById('transferTypeIndividual');
+      const allOption = document.getElementById('transferTypeAll');
+      const individualRadio = document.querySelector('input[name="transferType"][value="individual"]');
+      const allRadio = document.querySelector('input[name="transferType"][value="all"]');
+
+      if (type === 'individual') {
+        individualOption.classList.add('active');
+        allOption.classList.remove('active');
+        individualRadio.checked = true;
+      } else {
+        individualOption.classList.remove('active');
+        allOption.classList.add('active');
+        allRadio.checked = true;
+      }
+
+      toggleTransferType();
     }
 
     async function handleTransfer(e) {
@@ -9225,12 +10431,27 @@
         return;
       }
 
-      const recipientEmail = document.getElementById('transferEmail').value.trim().toLowerCase();
+      const transferType = document.querySelector('input[name="transferType"]:checked').value;
       const amount = parseInt(document.getElementById('transferAmount').value);
 
+      if (!amount || amount <= 0) {
+        showCustomAlert('A quantidade de pontos deve ser maior que zero.');
+        return;
+      }
+
+      if (transferType === 'all') {
+        await handleTransferToAll(amount);
+      } else {
+        await handleTransferToIndividual(amount);
+      }
+    }
+
+    async function handleTransferToIndividual(amount) {
+      const recipientEmail = document.getElementById('transferEmail').value.trim().toLowerCase();
+
       // Validations
-      if (!recipientEmail || !amount) {
-        showCustomAlert('Por favor, preencha todos os campos.');
+      if (!recipientEmail) {
+        showCustomAlert('Por favor, preencha o email do destinatário.');
         return;
       }
 
@@ -9238,13 +10459,6 @@
         showCustomAlert('Você não pode transferir pontos para si mesmo.');
         return;
       }
-
-      if (amount <= 0) {
-        showCustomAlert('A quantidade de pontos deve ser maior que zero.');
-        return;
-      }
-
-      // ADMs não têm limite de pontos para transferência
 
       // ===== TRANSFERÊNCIA SEGURA com multi-location update atômico =====
       try {
@@ -9318,6 +10532,94 @@
       } catch (error) {
         console.error('[SEGURANÇA] Erro na transferência:', error);
         showCustomAlert('Erro ao realizar transferência: ' + error.message);
+      }
+    }
+
+    async function handleTransferToAll(amount) {
+      // Confirm the mass transfer
+      showConfirmModal(
+        `⚠️ Confirmar Transferência em Massa`,
+        `Você está prestes a transferir <strong>${amount} pontos</strong> para <strong>${allUsersForTransfer.length} usuários</strong>.\n\nTotal de pontos a serem distribuídos: <strong>${amount * allUsersForTransfer.length}</strong>\n\nDeseja continuar?`,
+        async () => {
+          await executeMassTransfer(amount);
+        }
+      );
+    }
+
+    async function executeMassTransfer(amount) {
+      const submitBtn = document.getElementById('transferSubmitBtn');
+      const originalText = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Transferindo...';
+
+      try {
+        const { ref, get, set, push } = window.firebaseModules;
+        const database = window.firebaseDatabase;
+
+        // Refresh user list before transfer
+        await updateTransferUsersCount();
+
+        if (allUsersForTransfer.length === 0) {
+          showCustomAlert('Nenhum usuário encontrado para transferência.');
+          return;
+        }
+
+        const serverTime = await getServerTimestamp();
+        const senderName = currentUser.displayName || currentUser.email.split('@')[0];
+
+        let successCount = 0;
+        let errorCount = 0;
+
+        // Process users in batches to avoid timeout
+        for (const user of allUsersForTransfer) {
+          try {
+            // Update points
+            const newPoints = user.points + amount;
+            const userPointsRef = ref(database, `users/${user.uid}/points`);
+            await set(userPointsRef, newPoints);
+
+            // Create notification
+            const notificationData = {
+              title: '🎁 Você recebeu pontos!',
+              message: `${senderName} distribuiu ${amount} pontos para todos os usuários. Novo saldo: ${newPoints} pontos.`,
+              targetType: 'individual',
+              targetUserId: user.uid,
+              targetUserName: user.name,
+              createdAt: serverTime,
+              createdBy: currentUser.uid,
+              type: 'transfer'
+            };
+
+            const notificationsRef = ref(database, 'notifications');
+            const newNotificationRef = push(notificationsRef);
+            await set(newNotificationRef, notificationData);
+
+            successCount++;
+
+            // Update button text with progress
+            submitBtn.textContent = `Transferindo... (${successCount}/${allUsersForTransfer.length})`;
+          } catch (err) {
+            console.error(`Erro ao transferir para ${user.email}:`, err);
+            errorCount++;
+          }
+        }
+
+        updateUserInfoDisplay();
+
+        if (errorCount === 0) {
+          showCustomAlert(`Transferência em massa concluída com sucesso!\n\n${amount} pontos enviados para ${successCount} usuários.\nTotal distribuído: ${amount * successCount} pontos.`);
+        } else {
+          showCustomAlert(`Transferência parcialmente concluída.\n\nSucesso: ${successCount} usuários\nErros: ${errorCount} usuários`);
+        }
+
+        closeTransferModal();
+
+      } catch (error) {
+        console.error('[SEGURANÇA] Erro na transferência em massa:', error);
+        showCustomAlert('Erro ao realizar transferência: ' + error.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
       }
     }
 
@@ -9593,6 +10895,8 @@
         const commentsOverlay = document.getElementById('commentsOverlay');
         const downloadsOverlay = document.getElementById('downloadsOverlay');
         const redeemOverlay = document.getElementById('redeemOverlay');
+        const publishOverlay = document.getElementById('publishOverlay');
+        const manageOverlay = document.getElementById('manageOverlay');
 
         // Handle auth overlay - go back or close if user is already logged in
         if (authOverlay && authOverlay.classList.contains('active')) {
@@ -9607,7 +10911,11 @@
           return;
         }
 
-        if (redeemOverlay && redeemOverlay.classList.contains('active')) {
+        if (publishOverlay && publishOverlay.classList.contains('active')) {
+          closePublishModal();
+        } else if (manageOverlay && manageOverlay.classList.contains('active')) {
+          closeManageModal();
+        } else if (redeemOverlay && redeemOverlay.classList.contains('active')) {
           closeRedeemCodeModal();
         } else if (historyOverlay && historyOverlay.classList.contains('active')) {
           closeHistoryOverlay();
@@ -9627,6 +10935,9 @@
   </script>
 </body>
 </html>
+
+
+
 
 
 
