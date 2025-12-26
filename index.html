@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <title>Portal Digital</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <script>
+    <script>
     function isWebView() {
       const ua = navigator.userAgent || navigator.vendor || window.opera;
       if (/wv/.test(ua)) return true;
@@ -19,7 +18,6 @@
       console.log("Rodando dentro do WebView");
     }
   </script>
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -28,7 +26,6 @@
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously, onAuthStateChanged, signOut, sendPasswordResetEmail, updateProfile, sendEmailVerification } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
     import { getDatabase, ref, set, get, update, remove, onValue, push } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-    // Firestore imports for cached/static data
     import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc, query, where, orderBy, limit, onSnapshot, increment } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
     const firebaseConfig = {
@@ -52,7 +49,6 @@
     window.firebaseDatabase = database;  // Realtime Database - for real-time updates
     window.firebaseFirestore = firestore; // Firestore - for cached/static data
     window.firebaseModules = {
-      // Auth modules
       signInWithEmailAndPassword,
       createUserWithEmailAndPassword,
       sendEmailVerification,
@@ -61,7 +57,6 @@
       signOut,
       sendPasswordResetEmail,
       updateProfile,
-      // Realtime Database modules
       ref,
       set,
       get,
@@ -69,7 +64,6 @@
       remove,
       onValue,
       push,
-      // Firestore modules
       collection,
       doc,
       getDoc,
@@ -184,11 +178,29 @@
     }
     .sidebar.open { left: 0; }
 
-    .sidebar h2 {
-      margin-top: 0;
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+
+    .sidebar-header h2 {
+      margin: 0;
       font-size: 18px;
       color: var(--text-primary);
-      text-align: center;
+      flex: 1;
+    }
+
+    .sidebar-header .theme-toggle-btn {
+      width: 36px;
+      height: 36px;
+    }
+
+    .sidebar-header .theme-toggle-btn svg {
+      width: 18px;
+      height: 18px;
     }
 
     .btn {
@@ -227,6 +239,57 @@
       align-items: center;
       padding: 16px 20px 12px;
       flex-shrink: 0;
+    }
+
+    .theme-toggle-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: none;
+      background: var(--bg-card);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-sm);
+      flex-shrink: 0;
+    }
+
+    .theme-toggle-btn:hover {
+      background: var(--bg-hover);
+      transform: scale(1.05);
+    }
+
+    .theme-toggle-btn:active {
+      transform: scale(0.95);
+    }
+
+    .theme-toggle-btn svg {
+      width: 22px;
+      height: 22px;
+      fill: var(--text-primary);
+      transition: transform 0.3s ease;
+    }
+
+    .theme-toggle-btn:hover svg {
+      transform: rotate(15deg);
+    }
+
+    .theme-toggle-btn .sun-icon {
+      display: block;
+    }
+
+    .theme-toggle-btn .moon-icon {
+      display: none;
+    }
+
+    .dark .theme-toggle-btn .sun-icon {
+      display: none;
+    }
+
+    .dark .theme-toggle-btn .moon-icon {
+      display: block;
     }
 
     .search-wrapper {
@@ -441,7 +504,6 @@
       }
     }
 
-    /* Content Header */
     .content-header {
       display: flex;
       align-items: center;
@@ -453,7 +515,6 @@
       z-index: 100;
     }
 
-    /* Header fixo no overlay do jogo */
     .modal > .content-header {
       position: sticky;
       top: 0;
@@ -599,7 +660,6 @@
       display: block;
     }
 
-    /* Auth Overlay - Full screen like Android app */
     .auth-overlay {
       display: none;
       position: fixed;
@@ -617,7 +677,6 @@
       display: flex;
     }
 
-    /* Auth Loading Overlay */
     .auth-loading-overlay {
       display: none;
       position: fixed;
@@ -817,7 +876,6 @@
       color: rgba(0, 0, 0, 0.6);
     }
 
-    /* Auth Form Styles */
     .auth-form-container {
       display: none;
       flex-direction: column;
@@ -955,7 +1013,6 @@
       fill: currentColor;
     }
 
-    /* Comments Overlay - Full screen like game overlay */
     .comments-overlay {
       display: none;
       position: fixed;
@@ -973,7 +1030,6 @@
       display: flex;
     }
 
-    /* Downloads Overlay - Same style as comments overlay */
     .downloads-overlay {
       display: none;
       position: fixed;
@@ -1002,7 +1058,6 @@
       overflow: hidden;
     }
 
-    /* Reports Overlay - Full screen like Android app */
     .reports-overlay {
       display: none;
       position: fixed;
@@ -1265,7 +1320,6 @@
       font-size: 16px;
     }
 
-    /* Publish Overlay - Full screen like Android app */
     .publish-overlay {
       display: none;
       position: fixed;
@@ -1427,7 +1481,6 @@
       color: var(--text-secondary);
     }
 
-    /* Manage Games Overlay - Full screen like Android app */
     .manage-overlay {
       display: none;
       position: fixed;
@@ -1573,7 +1626,6 @@
       margin-top: 12px;
     }
 
-    /* Redeem Points Overlay - Full screen Android style */
     .redeem-overlay {
       display: none;
       position: fixed;
@@ -1808,7 +1860,7 @@
     .contact-item a:hover {
       opacity: 0.9;
     }
-    /* Generate Code Overlay - Full Screen Android Style */
+    
     .generate-code-overlay {
       display: none;
       position: fixed;
@@ -2015,8 +2067,6 @@
       fill: #2196F3;
     }
 
-
-
     .comments-overlay-content {
       width: 100%;
       height: 100%;
@@ -2198,7 +2248,6 @@
       margin-bottom: 16px;
     }
 
-    /* Notification styles */
     .notification-btn {
       position: relative;
     }
@@ -2329,7 +2378,6 @@
       50% { opacity: 0.5; }
     }
 
-    /* Toast notification */
     .toast-notification {
       position: fixed;
       top: 20px;
@@ -2378,7 +2426,6 @@
       }
     }
 
-    /* Skeleton Loading */
     .skeleton-card {
       background: var(--bg-card);
       border-radius: 12px;
@@ -2507,7 +2554,6 @@
       }
     }
 
-    /* Rating Overlay - Full Screen Android Style */
     .rating-overlay {
       display: none;
       position: fixed;
@@ -2545,7 +2591,6 @@
       gap: 20px;
     }
 
-    /* Rating System Styles */
     .rating-stars-container {
       display: flex;
       justify-content: center;
@@ -2742,7 +2787,6 @@
       font-size: 16px;
     }
 
-    /* Pagination Controls */
     .pagination-controls {
       display: flex;
       align-items: center;
@@ -2885,7 +2929,6 @@
       color: var(--text-secondary);
     }
 
-    /* Transfer Points Overlay - Full screen like Android app */
     .transfer-overlay {
       display: none;
       position: fixed;
@@ -3181,7 +3224,6 @@
       fill: currentColor;
     }
 
-    /* Manage Users Overlay - Full screen like Android app */
     .manage-users-overlay {
       display: none;
       position: fixed;
@@ -3520,7 +3562,6 @@
       border: 2px dashed var(--border-color);
     }
 
-    /* Daily Reward Button */
     .daily-reward-btn {
       background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
       color: white !important;
@@ -3539,7 +3580,6 @@
       opacity: 0.7;
     }
 
-    /* Favorites Button */
     .favorite-btn {
       background: none;
       border: none;
@@ -3563,7 +3603,6 @@
       100% { transform: scale(1); }
     }
 
-    /* Transfer Button */
     .transfer-btn {
       background: linear-gradient(135deg, #00BCD4 0%, #0097A7 100%) !important;
     }
@@ -3572,7 +3611,6 @@
       background: linear-gradient(135deg, #00ACC1 0%, #00838F 100%) !important;
     }
 
-    /* Like Button */
     .like-btn {
       display: flex;
       align-items: center;
@@ -3608,7 +3646,6 @@
       animation: likeAnimation 0.3s ease;
     }
 
-    /* Footer do Overlay */
     .overlay-footer {
       position: fixed;
       bottom: 0;
@@ -3669,7 +3706,6 @@
       animation: likeAnimation 0.3s ease;
     }
 
-    /* Ajuste do modal-body para não ficar atrás do footer */
     .modal-body {
       padding-bottom: 100px;
     }
@@ -3680,7 +3716,6 @@
       100% { transform: scale(1); }
     }
 
-    /* Download Links System */
     .download-link-group {
       background: var(--bg-tertiary);
       border: 1px solid var(--border-color);
@@ -3742,7 +3777,6 @@
       background: rgba(124, 77, 255, 0.1);
     }
 
-    /* Download Section in Modal */
     .download-section {
       background: var(--bg-tertiary);
       border-radius: 12px;
@@ -3768,7 +3802,6 @@
       flex: 1;
     }
 
-    /* Favorites Grid Item */
     .favorites-item {
       display: flex;
       align-items: center;
@@ -3824,7 +3857,6 @@
       opacity: 1;
     }
 
-    /* Profile Overlay - Full screen like Android app */
     .profile-overlay {
       display: none;
       position: fixed;
@@ -3864,7 +3896,6 @@
       gap: 20px;
     }
 
-    /* Profile Loading Skeleton Animation */
     .profile-loading-skeleton {
       display: flex;
       flex-direction: column;
@@ -4028,7 +4059,6 @@
       100% { background-position: -200% 0; }
     }
 
-    /* Profile Default Avatar SVG */
     .profile-header-points {
       display: flex;
       align-items: center;
@@ -4435,7 +4465,6 @@
       fill: currentColor;
     }
 
-    /* About Overlay - Full screen like Android app */
     .about-overlay {
       display: none;
       position: fixed;
@@ -4604,7 +4633,6 @@
       text-decoration: underline;
     }
 
-    /* History Overlay - Full screen like Android app */
     .history-overlay {
       display: none;
       position: fixed;
@@ -4753,7 +4781,6 @@
       margin: 0;
     }
 
-    /* Report Problem Overlay - Full screen like Android app */
     .report-overlay {
       display: none;
       position: fixed;
@@ -4895,7 +4922,6 @@
       fill: currentColor;
     }
 
-    /* Notifications Overlay - Full screen like comments overlay */
     .notifications-overlay {
       display: none;
       position: fixed;
@@ -4966,7 +4992,6 @@
       transform: translateY(0);
     }
 
-    /* Favorites Overlay - Full screen like comments overlay */
     .favorites-overlay {
       display: none;
       position: fixed;
@@ -5004,7 +5029,6 @@
       gap: 12px;
     }
 
-    /* Enhanced Notification Item for Overlay */
     .notifications-overlay .notification-item {
       padding: 18px;
       margin-bottom: 0;
@@ -5031,7 +5055,6 @@
       border-radius: 10px;
     }
 
-    /* Send Notification Overlay - Full screen like Android app */
     .send-notification-overlay {
       display: none;
       position: fixed;
@@ -5235,7 +5258,6 @@
       fill: currentColor;
     }
 
-    /* Enhanced Favorites Item for Overlay */
     .favorites-overlay .favorites-item {
       padding: 16px;
       border-radius: 14px;
@@ -5264,7 +5286,6 @@
       padding: 12px;
     }
 
-    /* Empty state styling for overlays */
     .overlay-empty-state {
       display: flex;
       flex-direction: column;
@@ -5319,13 +5340,18 @@
   </div>
 
   <div id="sidebar" class="sidebar">
-    <h2>Portal Digital</h2>
+    <div class="sidebar-header">
+      <h2>Portal Digital</h2>
+      <button class="theme-toggle-btn" onclick="toggleTheme()" title="Alternar tema">
+        <svg class="sun-icon" viewBox="0 0 24 24"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0 .39-.39.39-1.03 0-1.41l-1.06-1.06zm1.06-10.96c.39-.39.39-1.03 0-1.41-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36c.39-.39.39-1.03 0-1.41-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/></svg>
+        <svg class="moon-icon" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/></svg>
+      </button>
+    </div>
 
     <button class="btn" id="myProfileBtn" onclick="openProfileOverlay()" style="margin-bottom: 8px;">
       <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
       Meu Perfil
     </button>
-
 
     <button class="btn" id="loginBtn" onclick="openLoginModal()">
       <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
@@ -5368,7 +5394,6 @@
       <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
     </button>
 
-
     <button class="btn daily-reward-btn" id="dailyRewardBtn" onclick="claimDailyReward()" style="display: none;">
       <svg viewBox="0 0 24 24" style="fill: white;"><path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 12 7.4l3.38 4.6L17 10.83 14.92 8H20v6z"/></svg>
       <span id="dailyRewardText">Recompensa Diária</span>
@@ -5403,7 +5428,7 @@
     <div style="border-top: 1px solid var(--border-color); margin: 12px 0; padding-top: 12px;">
       <button class="btn" onclick="openAboutOverlay()">
         <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
-        Sobre o App / FAQ
+        Sobre Nós
       </button>
       <button class="btn" onclick="openRatingModal()">
         <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
@@ -5430,7 +5455,7 @@
 
   <div class="content-wrapper">
     <div class="grid" id="contentGrid">
-      <!-- Skeleton loading inicial -->
+      
       <div class="skeleton-card">
         <div class="skeleton-poster"></div>
         <div class="skeleton-info">
@@ -5477,7 +5502,6 @@
       </div>
     </div>
 
-    <!-- Pagination Controls -->
     <div class="pagination-controls" id="paginationControls" style="display: none;">
       <button class="pagination-btn prev-btn" id="prevPageBtn" onclick="goToPrevPage()">
         <svg viewBox="0 0 24 24" width="20" height="20"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
@@ -5499,7 +5523,7 @@
 
   <div id="overlay" class="overlay">
     <div class="modal">
-      <!-- Header fixo com voltar, título e compartilhar -->
+      
       <div class="content-header">
         <button class="content-header-btn back-btn" onclick="closeModal()">
           <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
@@ -5526,10 +5550,8 @@
           <div class="modal-description" id="modalDescription"></div>
         </div>
 
-
       </div>
 
-      <!-- Footer com botões -->
       <div class="overlay-footer">
         <button class="footer-btn" id="footerDownloadsBtn" onclick="showDownloads(); updateFooterActive('downloads')">
           <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
@@ -5551,7 +5573,6 @@
     </div>
   </div>
 
-  <!-- Comments Overlay -->
   <div id="commentsOverlay" class="comments-overlay">
     <div class="comments-overlay-content">
       <div class="content-header">
@@ -5575,7 +5596,6 @@
     </div>
   </div>
 
-  <!-- Downloads Overlay -->
   <div id="downloadsOverlay" class="downloads-overlay">
     <div class="downloads-overlay-content">
       <div class="content-header">
@@ -5587,7 +5607,7 @@
       </div>
       <div class="downloads-list-container">
         <div id="downloadsInsufficientWarning" style="display: none;" class="insufficient-points">
-          ⚠️ Você não tem pontos suficientes para baixar este jogo!
+           Você não tem pontos suficientes para baixar este jogo!
         </div>
         <div class="downloads-info-box">
           <p>Escolha uma das opções abaixo para baixar o conteúdo. Cada download irá descontar os pontos indicados.</p>
@@ -5596,13 +5616,12 @@
             <span id="downloadsCostValue">0 pontos</span>
           </div>
         </div>
-        <!-- Container dinâmico para múltiplos links de download -->
+        
         <div id="downloadSectionsContainer"></div>
       </div>
     </div>
   </div>
 
-  <!-- Auth Loading Overlay -->
   <div id="authLoadingOverlay" class="auth-loading-overlay">
     <div class="auth-loading-icon">
       <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
@@ -5612,7 +5631,6 @@
     <div class="auth-loading-subtext" id="authLoadingSubtext">Por favor aguarde</div>
   </div>
 
-  <!-- Auth Overlay - Full Screen -->
   <div id="authOverlay" class="auth-overlay">
     <div class="auth-overlay-content">
       <div class="content-header">
@@ -5624,7 +5642,7 @@
       </div>
 
       <div class="auth-main">
-        <!-- Welcome Screen with Options -->
+        
         <div id="authWelcomeScreen" class="auth-form-container active">
           <div class="auth-welcome">
             <div class="auth-welcome-icon">
@@ -5661,7 +5679,6 @@
           </div>
         </div>
 
-        <!-- Login Form -->
         <div id="authLoginForm" class="auth-form-container">
           <div class="auth-form-header">
             <h2>Entrar na Conta</h2>
@@ -5694,7 +5711,6 @@
           </div>
         </div>
 
-        <!-- Register Form -->
         <div id="authRegisterForm" class="auth-form-container">
           <div class="auth-form-header">
             <h2>Criar Conta</h2>
@@ -5734,7 +5750,6 @@
           </div>
         </div>
 
-        <!-- Reset Password Form -->
         <div id="authResetForm" class="auth-form-container">
           <div class="auth-form-header">
             <h2>Redefinir Senha</h2>
@@ -5761,13 +5776,12 @@
     </div>
   </div>
 
-  <!-- Modal Verificação de Email -->
   <div id="emailVerificationModal" class="custom-modal">
     <div class="custom-modal-content" style="max-width: 450px;">
       <h2>📧 Verificar Email</h2>
 
       <div id="emailVerificationContent">
-        <!-- Content set dynamically -->
+        
       </div>
     </div>
   </div>
@@ -5789,7 +5803,6 @@
     </div>
   </div>
 
-  <!-- Publish Overlay - Full Screen Android Style -->
   <div id="publishOverlay" class="publish-overlay">
     <div class="publish-overlay-content">
       <div class="content-header">
@@ -5843,11 +5856,10 @@
             <input type="url" class="form-input" id="gameVideo" placeholder="https://www.youtube.com/watch?v=...">
           </div>
 
-          <!-- Container de Links de Download -->
           <div class="form-group">
             <label class="form-label">Links de Download</label>
             <div id="downloadLinksContainer">
-              <!-- Link 1 - Principal -->
+              
               <div class="download-link-group" data-link-index="1">
                 <div class="download-link-header">
                   <span class="download-link-number">Link 1</span>
@@ -5879,7 +5891,6 @@
     </div>
   </div>
 
-  <!-- Manage Games Overlay - Full Screen Android Style -->
   <div id="manageOverlay" class="manage-overlay">
     <div class="manage-overlay-content">
       <div class="content-header">
@@ -5898,7 +5909,6 @@
     </div>
   </div>
 
-  <!-- Generate Code Overlay - Full Screen Android Style -->
   <div id="generateCodeOverlay" class="generate-code-overlay">
     <div class="generate-code-overlay-content">
       <div class="content-header">
@@ -5910,14 +5920,13 @@
       </div>
 
       <div class="generate-code-container">
-        <!-- Header Box -->
+        
         <div class="generate-code-header-box">
-          <div class="icon">🎫</div>
+          <div class="icon"></div>
           <h3>Criar Código de Resgate</h3>
           <p>Gere um código único para que seus usuários possam resgatar pontos na plataforma</p>
         </div>
 
-        <!-- Input Section -->
         <div class="generate-code-input-section">
           <label>Quantidade de Pontos</label>
           <input type="number" id="codePoints" min="1" value="50" placeholder="Digite a quantidade" required>
@@ -5927,9 +5936,8 @@
           </button>
         </div>
 
-        <!-- Result Section -->
         <div id="generatedCodeResult" class="generated-code-result">
-          <h4>✅ Código Gerado com Sucesso!</h4>
+          <h4> Código Gerado com Sucesso!</h4>
           <div id="codeDisplay" class="generated-code-display"></div>
           <p class="generated-code-hint">
             Compartilhe este código com seus usuários. Cada código pode ser usado apenas uma vez.
@@ -5943,7 +5951,6 @@
     </div>
   </div>
 
-  <!-- Redeem Points Overlay - Full Screen Android Style -->
   <div id="redeemOverlay" class="redeem-overlay">
     <div class="redeem-overlay-content">
       <div class="content-header">
@@ -5955,14 +5962,13 @@
       </div>
 
       <div class="redeem-container">
-        <!-- Header Box -->
+        
         <div class="redeem-header-box">
           <div class="icon">🎁</div>
           <h3>Resgate seu Código</h3>
           <p>Insira o código de resgate abaixo para adicionar pontos à sua conta</p>
         </div>
 
-        <!-- Input Section -->
         <div class="redeem-input-section">
           <label>Código de Resgate</label>
           <input type="text" id="redeemCodeInput" placeholder="Digite o código aqui" required>
@@ -5972,7 +5978,6 @@
           </button>
         </div>
 
-        <!-- Buy Points Box -->
         <div class="buy-points-box">
           <div class="header">
             <span class="icon"></span>
@@ -6002,7 +6007,6 @@
     </div>
   </div>
 
-  <!-- History Overlay - Full Screen Android Style -->
   <div id="historyOverlay" class="history-overlay">
     <div class="history-overlay-content">
       <div class="content-header">
@@ -6022,7 +6026,6 @@
     </div>
   </div>
 
-  <!-- Profile Overlay - Full Screen Android Style -->
   <div id="profileOverlay" class="profile-overlay">
     <div class="profile-overlay-content">
       <div class="content-header">
@@ -6039,35 +6042,33 @@
         </div>
       </div>
       <div id="profileContainer" class="profile-container">
-        <!-- Profile content will be dynamically loaded -->
+        
       </div>
     </div>
   </div>
 
-  <!-- About Overlay - Full Screen Android Style -->
   <div id="aboutOverlay" class="about-overlay">
     <div class="about-overlay-content">
       <div class="content-header">
         <button class="content-header-btn back-btn" onclick="closeAboutOverlay()">
           <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
         </button>
-        <h1 class="content-header-title">Sobre o App</h1>
+        <h1 class="content-header-title">Sobre </h1>
         <button class="content-header-btn help-btn" onclick="openAboutHelpModal()">
           <svg viewBox="0 0 24 24" width="24" height="24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
         </button>
       </div>
       <div class="about-container">
-        <!-- Header Card -->
+        
         <div class="about-header-card">
-          <div class="about-logo">📱</div>
+          <div class="about-logo"><img src="logo.png" alt="Logo do aplicativo" style="width: 120px; height: auto;"></div>
           <h1 class="about-title">Portal Digital</h1>
           <p class="about-subtitle">Sua plataforma de aplicativos, jogos e tutoriais</p>
           <span class="about-version">Versão 1.0</span>
         </div>
 
-        <!-- Contact Section -->
         <div class="about-contact-card">
-          <h4 class="about-contact-title"><span>📧</span> Contato e Suporte</h4>
+          <h4 class="about-contact-title"><span></span> Contato e Suporte</h4>
           <div class="about-contact-email">
             <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
             <a href="/cdn-cgi/l/email-protection#0c7c637e786d606b6d61697c60797f4c6b616d6560226f6361"><span class="__cf_email__" data-cfemail="98e8f7eaecf9f4fff9f5fde8f4edebd8fff5f9f1f4b6fbf7f5">[email&#160;protected]</span></a>
@@ -6077,52 +6078,51 @@
     </div>
   </div>
 
-  <!-- About Help Modal -->
   <div id="aboutHelpModal" class="custom-modal">
     <div class="custom-modal-content" style="max-width: 550px; max-height: 85vh; overflow-y: auto;">
       <h2 style="display: flex; align-items: center; gap: 10px;">
-        <span style="font-size: 28px;">📖</span> Guia Completo do App
+        <span style="font-size: 28px;"></span> Guia Completo do App
       </h2>
 
       <div class="about-faq-card" style="margin-top: 16px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px;">
         <div class="about-faq-item" style="padding: 16px; border-bottom: 1px solid var(--border-color);">
-          <h4 class="about-faq-question" style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px;"><span>📱</span> O que é o Portal Digital?</h4>
+          <h4 class="about-faq-question" style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px;"><span></span> O que é o Portal Digital?</h4>
           <p class="about-faq-answer" style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin: 0;">O Portal Digital é uma plataforma onde você pode encontrar e baixar aplicativos, jogos, tutoriais e muito mais. Nosso objetivo é oferecer conteúdo de qualidade para todos os usuários.</p>
         </div>
 
         <div class="about-faq-item" style="padding: 16px; border-bottom: 1px solid var(--border-color);">
-          <h4 class="about-faq-question" style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px;"><span>👤</span> Como criar uma conta?</h4>
+          <h4 class="about-faq-question" style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px;"><span></span> Como criar uma conta?</h4>
           <p class="about-faq-answer" style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin: 0;">Clique em "Criar Conta" no menu lateral, preencha seu nome, email (apenas Gmail) e senha. Sua conta ficará pendente até ser aprovada por um administrador.</p>
         </div>
 
         <div class="about-faq-item" style="padding: 16px; border-bottom: 1px solid var(--border-color);">
-          <h4 class="about-faq-question" style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px;"><span>💰</span> O que são os pontos?</h4>
-          <p class="about-faq-answer" style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin: 0;">Pontos são a moeda virtual do Portal Digital. Você pode ganhar pontos assistindo anúncios ou resgatando códigos. Use os pontos para desbloquear downloads de conteúdos premium.</p>
+          <h4 class="about-faq-question" style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px;"><span></span> O que são os pontos?</h4>
+          <p class="about-faq-answer" style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin: 0;">Pontos são a moeda virtual do Portal Digital. Você pode ganhar pontos diários, comprar pontos ou resgatando códigos. Use os pontos para desbloquear downloads de conteúdos premium.</p>
         </div>
 
         <div class="about-faq-item" style="padding: 16px; border-bottom: 1px solid var(--border-color);">
-          <h4 class="about-faq-question" style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px;"><span>📥</span> Como baixar um jogo/app?</h4>
+          <h4 class="about-faq-question" style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px;"><span></span> Como baixar um jogo/app?</h4>
           <p class="about-faq-answer" style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin: 0;">Clique no card do jogo/app desejado para ver os detalhes. Se tiver pontos suficientes, clique no botão de download. Você será redirecionado para o link de download.</p>
         </div>
 
         <div class="about-faq-item" style="padding: 16px; border-bottom: 1px solid var(--border-color);">
-          <h4 class="about-faq-question" style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px;"><span>🔔</span> Como funcionam as notificações?</h4>
+          <h4 class="about-faq-question" style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px;"><span></span> Como funcionam as notificações?</h4>
           <p class="about-faq-answer" style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin: 0;">Você receberá notificações sobre novos conteúdos, atualizações e mensagens importantes. Pode marcar como lida ou apagar as notificações a qualquer momento.</p>
         </div>
 
         <div class="about-faq-item" style="padding: 16px; border-bottom: 1px solid var(--border-color);">
-          <h4 class="about-faq-question" style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px;"><span>💬</span> Posso comentar nos jogos?</h4>
+          <h4 class="about-faq-question" style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px;"><span></span> Posso comentar nos jogos?</h4>
           <p class="about-faq-answer" style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin: 0;">Sim! Usuários com conta verificada podem deixar comentários em qualquer jogo ou aplicativo. Você também pode apagar seus próprios comentários.</p>
         </div>
 
         <div class="about-faq-item" style="padding: 16px; border-bottom: 1px solid var(--border-color);">
-          <h4 class="about-faq-question" style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px;"><span>⭐</span> Como avaliar um conteúdo?</h4>
+          <h4 class="about-faq-question" style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px;"><span></span> Como avaliar um conteúdo?</h4>
           <p class="about-faq-answer" style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin: 0;">Ao abrir um jogo ou aplicativo, você pode deixar uma avaliação de 1 a 5 estrelas. Sua avaliação ajuda outros usuários a descobrirem os melhores conteúdos.</p>
         </div>
 
         <div class="about-faq-item" style="padding: 16px;">
-          <h4 class="about-faq-question" style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px;"><span>🔒</span> Minha conta é segura?</h4>
-          <p class="about-faq-answer" style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin: 0;">Sim! Utilizamos autenticação segura via Firebase. Seus dados são protegidos e você pode alterar sua senha a qualquer momento através da opção "Esqueci a senha".</p>
+          <h4 class="about-faq-question" style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px;"><span></span> Minha conta é segura?</h4>
+          <p class="about-faq-answer" style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin: 0;">Sim! Utilizamos autenticação segura. Seus dados são protegidos e você pode alterar sua senha a qualquer momento através da opção "Esqueci a senha".</p>
         </div>
       </div>
 
@@ -6132,7 +6132,6 @@
     </div>
   </div>
 
-  <!-- Manage Users Overlay - Full Screen Android Style -->
   <div id="manageUsersOverlay" class="manage-users-overlay">
     <div class="manage-users-overlay-content">
       <div class="content-header">
@@ -6156,7 +6155,6 @@
     </div>
   </div>
 
-  <!-- Send Notification Overlay - Full Screen Android Style -->
   <div id="sendNotificationOverlay" class="send-notification-overlay">
     <div class="send-notification-overlay-content">
       <div class="content-header">
@@ -6206,7 +6204,6 @@
     </div>
   </div>
 
-  <!-- Notifications Overlay -->
   <div id="notificationsOverlay" class="notifications-overlay">
     <div class="notifications-overlay-content">
       <div class="content-header">
@@ -6226,7 +6223,6 @@
     </div>
   </div>
 
-  <!-- Modal FAQ / Sobre o App -->
   <div id="faqModal" class="custom-modal">
     <div class="custom-modal-content" style="max-width: 550px;">
       <h2> Sobre o Portal Digital</h2>
@@ -6294,7 +6290,6 @@
     </div>
   </div>
 
-  <!-- Rating Overlay - Full Screen Android Style -->
   <div id="ratingOverlay" class="rating-overlay">
     <div class="rating-overlay-content">
       <div class="content-header">
@@ -6305,12 +6300,11 @@
         <div id="ratingHeaderStars" class="rating-header-stars">⭐ 0</div>
       </div>
       <div id="ratingContent" class="rating-main-container">
-        <!-- Content will be set dynamically -->
+        
       </div>
     </div>
   </div>
 
-  <!-- Modal Confirmação de Avaliação -->
   <div id="ratingConfirmModal" class="custom-modal">
     <div class="custom-modal-content" style="max-width: 400px;">
       <h2> Confirmar Avaliação</h2>
@@ -6318,7 +6312,7 @@
         Você confirma sua avaliação de <strong id="confirmStarsText">0 estrelas</strong> para o aplicativo?
       </p>
       <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">
-        ⚠️ Essa avaliação não poderá ser alterada depois.
+         Essa avaliação não poderá ser alterada depois.
       </p>
       <div id="bonusPointsInfo" style="display: none; background: linear-gradient(135deg, rgba(33, 150, 243, 0.15) 0%, rgba(100, 181, 246, 0.15) 100%); padding: 12px; border-radius: 8px; margin-bottom: 16px; text-align: center;">
         <span style="font-size: 14px; color: #2196F3; font-weight: 600;">🎁 Você receberá <span id="bonusPointsAmount">0</span> pontos de bônus!</span>
@@ -6330,7 +6324,6 @@
     </div>
   </div>
 
-  <!-- Favorites Overlay -->
   <div id="favoritesOverlay" class="favorites-overlay">
     <div class="favorites-overlay-content">
       <div class="content-header">
@@ -6344,7 +6337,6 @@
     </div>
   </div>
 
-  <!-- Modal Dúvidas sobre Comentários -->
   <div id="commentsHelpModal" class="custom-modal">
     <div class="custom-modal-content" style="max-width: 500px;">
       <h2>
@@ -6379,7 +6371,7 @@
         </div>
 
         <div style="background: var(--bg-card); padding: 16px; border-radius: 12px; border: 1px solid var(--border-color);">
-          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;">⚠️ Atenção</h4>
+          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;"> Atenção</h4>
           <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.6;">
             Comentários que violam estas regras podem ser removidos e o usuário pode ter sua conta suspensa. Mantenha um ambiente saudável para todos!
           </p>
@@ -6392,7 +6384,6 @@
     </div>
   </div>
 
-  <!-- Report Problem Overlay - Full Screen Android Style -->
   <div id="reportProblemOverlay" class="report-overlay">
     <div class="report-overlay-content">
       <div class="content-header">
@@ -6428,7 +6419,6 @@
     </div>
   </div>
 
-  <!-- Reports Overlay (Admin) - Full Screen Android Style -->
   <div id="reportsOverlay" class="reports-overlay">
     <div class="reports-overlay-content">
       <div class="content-header">
@@ -6452,7 +6442,6 @@
     </div>
   </div>
 
-  <!-- Transfer Points Overlay - Full Screen Android Style -->
   <div id="transferOverlay" class="transfer-overlay">
     <div class="transfer-overlay-content">
       <div class="content-header">
@@ -6465,7 +6454,7 @@
 
       <form id="transferForm" onsubmit="handleTransfer(event)">
         <div class="transfer-form-container">
-          <!-- Info Card -->
+          
           <div class="transfer-info-card">
             <div class="transfer-points-display">
               <div class="transfer-points-icon">
@@ -6481,7 +6470,6 @@
             </div>
           </div>
 
-          <!-- Tipo de Transferência -->
           <div class="transfer-form-group">
             <label class="transfer-form-label">Tipo de Transferência</label>
             <div class="transfer-type-selector">
@@ -6502,13 +6490,11 @@
             </div>
           </div>
 
-          <!-- Email do Destinatário -->
           <div id="transferEmailGroup" class="transfer-form-group">
             <label class="transfer-form-label">Email do destinatário</label>
             <input type="email" class="transfer-form-input" id="transferEmail" placeholder="email@gmail.com">
           </div>
 
-          <!-- Aviso Transferência em Massa -->
           <div id="transferAllInfo" class="transfer-form-group" style="display: none;">
             <div class="transfer-all-warning">
               <div class="transfer-all-warning-header">
@@ -6519,7 +6505,6 @@
             </div>
           </div>
 
-          <!-- Quantidade de Pontos -->
           <div class="transfer-form-group">
             <label class="transfer-form-label">
               Quantidade de pontos
@@ -6529,7 +6514,6 @@
           </div>
         </div>
 
-        <!-- Footer com Botões -->
         <div class="transfer-submit-footer">
           <button type="button" class="transfer-submit-btn secondary" onclick="closeTransferModal()">
             Cancelar
@@ -6544,8 +6528,10 @@
   </div>
 
   <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-    // Theme management
+    let manualThemeOverride = false;
+
     function applyTheme() {
+      if (manualThemeOverride) return;
       const hour = new Date().getHours();
       if (hour >= 18 || hour < 6) {
         document.documentElement.classList.add('dark');
@@ -6554,10 +6540,14 @@
       }
     }
 
+    function toggleTheme() {
+      manualThemeOverride = true;
+      document.documentElement.classList.toggle('dark');
+    }
+
     applyTheme();
     setInterval(applyTheme, 60000);
 
-    // Global state
     const PUBLISHER_EMAILS = ['sibemcesar@gmail.com', 'portaldigitalao@gmail.com'];
     let currentUser = null;
     let isPublisher = false;
@@ -6573,7 +6563,6 @@
     let currentGameData = null;
     let historyData = [];
 
-    // Check URL for auth parameter
     function checkUrlForAuth() {
       const urlParams = new URLSearchParams(window.location.search);
       const authParam = urlParams.get('auth');
@@ -6591,7 +6580,6 @@
             showResetPasswordForm();
             break;
           default:
-            // 'welcome' or any other value shows the welcome screen
             authShowWelcome();
             break;
         }
@@ -6600,7 +6588,6 @@
       return false;
     }
 
-    // Firebase initialization
     window.addEventListener('load', () => {
       const { onAuthStateChanged } = window.firebaseModules;
       const auth = window.firebaseAuth;
@@ -6610,16 +6597,12 @@
           currentUser = user;
           isPublisher = PUBLISHER_EMAILS.includes(user.email);
 
-          // Only load user data if not anonymous
           if (!user.isAnonymous) {
             await loadUserData();
           }
 
-          // Check if URL has auth parameter - if so, show auth overlay
-          // This allows logged-in users to access auth overlay via URL
           const hasAuthParam = checkUrlForAuth();
 
-          // Close auth overlay if open and no auth param
           if (!hasAuthParam) {
             closeAuthOverlay();
           }
@@ -6628,10 +6611,8 @@
           loadGames();
           loadHistory();
         } else {
-          // Check if URL has specific auth screen requested
           const hasAuthParam = checkUrlForAuth();
 
-          // If no auth param, show default welcome overlay
           if (!hasAuthParam) {
             showAuthOverlay();
           }
@@ -6639,7 +6620,6 @@
       });
     });
 
-    // User points management
     async function loadUserData() {
       if (!currentUser) return;
 
@@ -6655,10 +6635,8 @@
         userStatus = userData.status || 'pending';
         userName = userData.name || '';
 
-        // Se o usuário não tem nome guardado, tenta usar o displayName do Auth
         if (!userName && currentUser.displayName) {
           userName = currentUser.displayName;
-          // Atualiza no banco de dados
           await update(userRef, { name: userName });
         }
       } else {
@@ -6677,8 +6655,7 @@
       if (userStatus === 'rejected') {
         const { signOut } = window.firebaseModules;
         await signOut(window.firebaseAuth);
-        showCustomAlert('⚠️ Sua conta foi marcada como fraude e foi bloqueada. Entre em contato com o administrador se acredita que isso é um erro.');
-        // Show welcome overlay - user must choose how to enter again
+        showCustomAlert(' Sua conta foi marcada como fraude e foi bloqueada. Entre em contato com o administrador se acredita que isso é um erro.');
         showAuthOverlay();
         return false;
       }
@@ -6689,7 +6666,6 @@
     }
 
     function updateUserInfoDisplay() {
-      // Info now displayed only in profile overlay
     }
 
     async function loadUserPoints() {
@@ -6702,17 +6678,14 @@
       throw new Error('Operação não permitida: Use as funções de transação apropriadas');
     }
 
-    // Função interna para atualizar apenas o display (chamada após transações bem-sucedidas)
     function _syncPointsDisplay(newPoints) {
       userPoints = newPoints;
       updatePointsDisplay();
     }
 
     function updatePointsDisplay() {
-      // Points now displayed only in profile overlay
     }
 
-    // UI updates
     function updateUIForUser() {
       const loginBtn = document.getElementById('loginBtn');
       const registerBtn = document.getElementById('registerBtn');
@@ -6729,7 +6702,6 @@
       const viewReportsBtn = document.getElementById('viewReportsBtn');
 
       if (!currentUser || currentUser.isAnonymous) {
-        // Anonymous mode - viewing only
         loginBtn.style.display = 'flex';
         registerBtn.style.display = 'flex';
         publishBtn.style.display = 'none';
@@ -6744,15 +6716,12 @@
         reportProblemBtn.style.display = 'none';
         viewReportsBtn.style.display = 'none';
       } else {
-        // Logged in user
         loginBtn.style.display = 'none';
         registerBtn.style.display = 'none';
 
-        // Show daily reward and favorites for approved users or publishers
         if (userStatus === 'approved' || isPublisher) {
           dailyRewardBtn.style.display = 'flex';
           profileFavoritesBtn.style.display = 'flex';
-          // Load favorites, likes and check daily reward
           loadUserFavorites();
           loadUserLikes();
           checkDailyReward();
@@ -6761,14 +6730,12 @@
           profileFavoritesBtn.style.display = 'none';
         }
 
-        // Show transfer button only for ADMs
         if (isPublisher) {
           transferBtn.style.display = 'flex';
         } else {
           transferBtn.style.display = 'none';
         }
 
-        // Show notifications for all logged in users
         viewNotificationsBtn.style.display = 'flex';
 
         if (isPublisher) {
@@ -6785,7 +6752,6 @@
           generateCodeBtn.style.display = 'none';
           manageUsersBtn.style.display = 'none';
           sendNotificationBtn.style.display = 'none';
-          // Mostrar botão de reportar e ver reports para usuários aprovados
           if (userStatus === 'approved') {
             reportProblemBtn.style.display = 'flex';
             viewReportsBtn.style.display = 'flex';
@@ -6798,47 +6764,38 @@
         updateUserInfoDisplay();
         loadNotifications();
 
-        // Update reports badge for admins and verified users
         if (isPublisher || userStatus === 'approved') {
           updateReportsBadge();
         }
       }
     }
 
-    // Load games
     async function loadGames() {
       const { collection, getDocs, onSnapshot, query, orderBy } = window.firebaseModules;
       const firestore = window.firebaseFirestore;
 
-      // Show skeleton loading initially
       renderSkeletonLoading();
 
-      // Use Firestore for games (cached, less bandwidth)
       const gamesRef = collection(firestore, 'games');
       const gamesQuery = query(gamesRef, orderBy('downloads', 'desc'));
 
-      // Use onSnapshot for real-time updates but with Firestore's built-in caching
       onSnapshot(gamesQuery, async (snapshot) => {
         allGames = {};
         snapshot.forEach((doc) => {
           allGames[doc.id] = doc.data();
         });
 
-        // Carregar contagem de downloads da coleção separada
         await loadDownloadCounts();
 
         gamesLoaded = true;
         renderGrid();
-        // Check if URL has game ID to auto-open content
         checkUrlForGameId();
       }, (error) => {
         console.error('Erro ao carregar jogos:', error);
-        // Fallback: try to load once without listener
         loadGamesOnce();
       });
     }
 
-    // Função para carregar contagens de downloads da coleção separada
     async function loadDownloadCounts() {
       try {
         const { collection, getDocs } = window.firebaseModules;
@@ -6850,7 +6807,6 @@
           const gameId = doc.id;
           const downloadCount = doc.data().count || 0;
           if (allGames[gameId]) {
-            // Combinar: usar o maior valor entre games.downloads e gameDownloads.count
             const existingDownloads = allGames[gameId].downloads || 0;
             allGames[gameId].downloads = Math.max(existingDownloads, downloadCount);
           }
@@ -6860,7 +6816,6 @@
       }
     }
 
-    // Fallback function to load games once (without real-time)
     async function loadGamesOnce() {
       const { collection, getDocs, query, orderBy } = window.firebaseModules;
       const firestore = window.firebaseFirestore;
@@ -6875,7 +6830,6 @@
           allGames[doc.id] = doc.data();
         });
 
-        // Carregar contagem de downloads da coleção separada
         await loadDownloadCounts();
 
         gamesLoaded = true;
@@ -6886,7 +6840,6 @@
       }
     }
 
-    // History management with localStorage (via window)
     function loadHistory() {
       try {
         const storage = window['localStorage'];
@@ -6929,7 +6882,6 @@
       saveHistory();
     }
 
-    // Render grid
     function renderSkeletonLoading() {
       const grid = document.getElementById('contentGrid');
       grid.style.display = 'grid';
@@ -6959,7 +6911,6 @@
       const noResults = document.getElementById('noResults');
       const paginationControls = document.getElementById('paginationControls');
 
-      // Show skeleton loading if games haven't loaded yet
       if (!gamesLoaded) {
         renderSkeletonLoading();
         noResults.style.display = 'none';
@@ -6974,7 +6925,6 @@
         ...game
       }));
 
-      // Sort by downloads
       gamesArray.sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
 
       const filtered = gamesArray.filter((game) => {
@@ -6991,11 +6941,9 @@
         return;
       }
 
-      // Pagination logic
       const totalGames = filtered.length;
       const totalPages = Math.ceil(totalGames / gamesPerPage);
 
-      // Ensure currentPage is within valid range
       if (currentPage >= totalPages) {
         currentPage = totalPages - 1;
       }
@@ -7007,7 +6955,6 @@
       const endIndex = Math.min(startIndex + gamesPerPage, totalGames);
       const paginatedGames = filtered.slice(startIndex, endIndex);
 
-      // Update pagination UI
       updatePaginationUI(startIndex, endIndex, totalGames, totalPages);
 
       grid.style.display = 'grid';
@@ -7049,19 +6996,16 @@
       });
     }
 
-    // Pagination functions
     function updatePaginationUI(startIndex, endIndex, totalGames, totalPages) {
       const paginationControls = document.getElementById('paginationControls');
       const paginationText = document.getElementById('paginationText');
       const prevBtn = document.getElementById('prevPageBtn');
       const nextBtn = document.getElementById('nextPageBtn');
 
-      // Show pagination only if there are more than gamesPerPage games
       if (totalGames > gamesPerPage) {
         paginationControls.style.display = 'flex';
         paginationText.textContent = `${startIndex + 1} - ${endIndex} de ${totalGames}`;
 
-        // Enable/disable buttons
         prevBtn.disabled = currentPage === 0;
         nextBtn.disabled = currentPage >= totalPages - 1;
       } else {
@@ -7073,7 +7017,6 @@
       if (currentPage > 0) {
         currentPage--;
         renderGrid();
-        // Scroll to top of content
         document.querySelector('.content-wrapper').scrollTo({ top: 0, behavior: 'smooth' });
       }
     }
@@ -7081,11 +7024,9 @@
     function goToNextPage() {
       currentPage++;
       renderGrid();
-      // Scroll to top of content
       document.querySelector('.content-wrapper').scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Filter buttons
     document.querySelectorAll('.filter-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -7096,14 +7037,12 @@
       });
     });
 
-    // Search input
     document.getElementById('searchInput').addEventListener('input', (e) => {
       searchTerm = e.target.value;
       currentPage = 0; // Reset to first page on search
       renderGrid();
     });
 
-    // Comment input - show/hide send button based on text content
     document.getElementById('commentInput').addEventListener('input', (e) => {
       const commentBtnRow = document.getElementById('commentBtnRow');
       if (e.target.value.trim().length > 0) {
@@ -7113,7 +7052,6 @@
       }
     });
 
-    // Open game detail
     async function openGameDetail(id) {
       const game = allGames[id];
       if (!game) return;
@@ -7121,11 +7059,9 @@
       addToHistory(id);
       currentGameData = { ...game, id: id };
 
-      // Update URL with game ID
       const newUrl = window.location.pathname + '?id=' + id;
       window.history.pushState({ gameId: id }, game.titulo, newUrl);
 
-      // Update header title
       document.getElementById('contentHeaderTitle').textContent = game.titulo;
       document.getElementById('modalTitle').textContent = game.titulo;
       document.getElementById('modalMeta').innerHTML = `
@@ -7153,7 +7089,6 @@
 
       document.getElementById('modalDescription').textContent = game.descricao;
 
-      // YouTube video
       const videoContainer = document.getElementById('videoContainer');
       if (game.videoUrl) {
         const videoId = extractYoutubeId(game.videoUrl);
@@ -7167,7 +7102,6 @@
         videoContainer.style.display = 'none';
       }
 
-      // Check points
       const cost = game.cost || 0;
       const downloadsInsufficientWarning = document.getElementById('downloadsInsufficientWarning');
       if (currentUser && userPoints < cost) {
@@ -7176,17 +7110,14 @@
         downloadsInsufficientWarning.style.display = 'none';
       }
 
-      // Update downloads overlay cost badge
       document.getElementById('downloadsCostValue').textContent = cost + ' pontos';
 
-      // Setup download buttons - support both new and legacy format
       const downloadContainer = document.getElementById('downloadSectionsContainer');
       let links = [];
 
       if (game.downloadLinks && game.downloadLinks.length > 0) {
         links = game.downloadLinks;
       } else {
-        // Legacy format
         links = [{
           desc: 'Download',
           linkGA: game.linkGA || '',
@@ -7198,7 +7129,6 @@
         const hasGA = link.linkGA && link.linkGA.trim() !== '';
         const hasADM = link.linkADM && link.linkADM.trim() !== '';
 
-        // Se nenhum link disponível, mostrar mensagem
         if (!hasGA && !hasADM) {
           return `
             <div class="download-section">
@@ -7221,10 +7151,8 @@
         `;
       }).join('');
 
-      // Store links data for download buttons
       window.currentDownloadLinks = links;
 
-      // Add event listeners to download buttons
       downloadContainer.querySelectorAll('.download-btn').forEach(btn => {
         btn.addEventListener('click', function() {
           const gameId = this.dataset.gameId;
@@ -7237,10 +7165,8 @@
         });
       });
 
-      // Load comments
       loadComments(id);
 
-      // Show comment input if logged in (not anonymous)
       const commentInputWrapper = document.getElementById('commentInputWrapper');
       if (currentUser && !currentUser.isAnonymous) {
         commentInputWrapper.style.display = 'block';
@@ -7248,7 +7174,6 @@
         commentInputWrapper.style.display = 'none';
       }
 
-      // Load likes for this game and update buttons
       await loadGameLikes(id);
       updateLikeButton();
       updateFavoriteButton();
@@ -7279,14 +7204,12 @@
         return;
       }
 
-      // Verificar se a URL é válida ANTES de deduzir pontos
       if (!url || url.trim() === '') {
-        showCustomAlert('Erro: Link de download não disponível. Por favor, tente o outro botão ou entre em contato com o administrador.');
+        showCustomAlert('Erro: Link de download não disponível. Por favor, tente o outro bot��o ou entre em contato com o administrador.');
         return;
       }
 
       try {
-        // 1. Obter pontos atuais do usuário do servidor (não confiar no valor local)
         const { ref, get, update } = window.firebaseModules;
         const database = window.firebaseDatabase;
 
@@ -7295,7 +7218,6 @@
         const userData = userSnapshot.val() || {};
         const currentPoints = userData.points || 0;
 
-        // Validar novamente com valor do servidor
         if (currentPoints < cost) {
           showCustomAlert('Você não tem pontos suficientes! Resgate um código para obter mais pontos.');
           return;
@@ -7303,14 +7225,10 @@
 
         const newPointsTotal = currentPoints - cost;
 
-        // 2. Obter timestamp do servidor
         const serverTime = await getServerTimestamp();
 
-        // 3. Gerar ID único para o registro de download
         const downloadId = `${gameId}_${Date.now()}`;
 
-        // 4. TRANSA��ÃO ATÔMICA: Multi-location update no Realtime Database
-        // Segue o padrão: downloadClaims/{userId}/{downloadId}
         const updates = {};
         updates[`users/${currentUser.uid}/points`] = newPointsTotal;
         updates[`downloadClaims/${currentUser.uid}/${downloadId}`] = {
@@ -7324,10 +7242,8 @@
 
         await update(ref(database), updates);
 
-        // 5. Transação bem-sucedida - atualizar estado local
         _syncPointsDisplay(newPointsTotal);
 
-        // 6. Incrementar contador de downloads na coleção separada (gameDownloads)
         try {
           const { doc: firestoreDoc, getDoc: fsGetDoc, setDoc } = window.firebaseModules;
           const firestore = window.firebaseFirestore;
@@ -7345,10 +7261,8 @@
           console.error('Erro ao incrementar downloads:', error.message || error);
         }
 
-        // 7. AGORA abrir o link (depois que todas as operações de banco terminaram)
         const downloadWindow = window.open(url, '_blank');
 
-        // Fallback: criar link temporário para download
         if (!downloadWindow || downloadWindow.closed || typeof downloadWindow.closed === 'undefined') {
           const tempLink = document.createElement('a');
           tempLink.href = url;
@@ -7359,7 +7273,6 @@
           document.body.removeChild(tempLink);
         }
 
-        // 8. Chamar Android interface se disponível
         setTimeout(function(){
           if (typeof Android !== "undefined" && Android.openApp) {
             Android.openApp(appType);
@@ -7381,41 +7294,34 @@
       document.body.style.overflow = '';
       currentGameData = null;
 
-      // Stop video player - clear iframe to stop audio
       const videoContainer = document.getElementById('videoContainer');
       if (videoContainer) {
         videoContainer.innerHTML = '';
         videoContainer.style.display = 'none';
       }
 
-      // Remove ID from URL
       const newUrl = window.location.pathname;
       window.history.pushState({}, document.title, newUrl);
     }
 
-    // Alias for closeOverlay (used by header back button)
     function closeModal() {
       closeOverlay();
     }
 
-    // Share content function
     function shareContent() {
       if (!currentGameData) return;
 
       const shareUrl = window.location.href;
 
-      // Try to use native share API first (mobile)
       if (navigator.share) {
         navigator.share({
           title: currentGameData.titulo,
           text: `Confira ${currentGameData.titulo} no Portal Digital!`,
           url: shareUrl
         }).catch(err => {
-          // If share fails, copy to clipboard
           copyToClipboard(shareUrl);
         });
       } else {
-        // Fallback: copy to clipboard
         copyToClipboard(shareUrl);
       }
     }
@@ -7448,7 +7354,6 @@
       document.body.removeChild(textArea);
     }
 
-    // Check URL for game ID on page load
     function checkUrlForGameId() {
       const urlParams = new URLSearchParams(window.location.search);
       const gameId = urlParams.get('id');
@@ -7458,7 +7363,6 @@
       }
     }
 
-    // Comments
     function showGameInfo() {
       document.getElementById('gameInfo').classList.add('active');
       updateFooterActive('info');
@@ -7542,7 +7446,6 @@
         `;
       }).join('');
 
-      // Scroll to bottom to show latest comments
       commentsList.scrollTop = commentsList.scrollHeight;
     }
 
@@ -7597,7 +7500,6 @@
       await set(newCommentRef, commentData);
 
       commentInput.value = '';
-      // Hide the send button after posting
       document.getElementById('commentBtnRow').style.display = 'none';
       showCustomAlert('Comentário publicado!');
     }
@@ -7615,24 +7517,20 @@
       return `${days}d atrás`;
     }
 
-    // Auth functions
     async function handleLogin(e) {
       e.preventDefault();
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
 
-      // Show loading animation
       showAuthLoading('A entrar...', 'Verificando credenciais');
 
       try {
         const { signInWithEmailAndPassword } = window.firebaseModules;
         await signInWithEmailAndPassword(window.firebaseAuth, email, password);
 
-        // Update loading text for success
         document.getElementById('authLoadingText').textContent = 'Bem-vindo!';
         document.getElementById('authLoadingSubtext').textContent = 'Carregando seus dados...';
 
-        // Short delay to show success message
         await new Promise(resolve => setTimeout(resolve, 800));
 
         hideAuthLoading();
@@ -7650,14 +7548,12 @@
           const { signOut } = window.firebaseModules;
           await signOut(window.firebaseAuth);
 
-          // Reset user state
           currentUser = null;
           isPublisher = false;
           userPoints = 0;
           userStatus = 'pending';
           userName = '';
 
-          // Show welcome overlay - user must choose how to enter again
           showAuthOverlay();
         } catch (error) {
           showCustomAlert('Erro ao sair: ' + error.message);
@@ -7665,7 +7561,6 @@
       });
     }
 
-    // Publish game
     async function handlePublish(e) {
       e.preventDefault();
 
@@ -7674,7 +7569,6 @@
         return;
       }
 
-      // Get download links data
       const downloadLinks = getDownloadLinksData();
 
       if (downloadLinks.length === 0) {
@@ -7692,7 +7586,6 @@
         poster: document.getElementById('gamePoster').value,
         videoUrl: document.getElementById('gameVideo').value || '',
         downloadLinks: downloadLinks, // New: Array of download links
-        // Keep legacy fields for backwards compatibility
         linkGA: downloadLinks[0]?.linkGA || '',
         linkADM: downloadLinks[0]?.linkADM || '',
         cost: parseInt(document.getElementById('gameCost').value),
@@ -7725,7 +7618,6 @@
       }
     }
 
-    // Manage games
     async function openManageModal() {
       if (!isPublisher) {
         showCustomAlert('Apenas publicadores podem gerenciar jogos.');
@@ -7773,11 +7665,9 @@
       document.getElementById('gameVideo').value = game.videoUrl || '';
       document.getElementById('gameCost').value = game.cost;
 
-      // Load download links - support both new and legacy format
       if (game.downloadLinks && game.downloadLinks.length > 0) {
         setDownloadLinksData(game.downloadLinks);
       } else {
-        // Legacy format: convert to new format
         setDownloadLinksData([{
           desc: 'Download Principal',
           linkGA: game.linkGA || '',
@@ -7802,7 +7692,6 @@
       });
     }
 
-    // Generate code
     async function generateCode() {
       if (!isPublisher) {
         showCustomAlert('Apenas publicadores podem gerar códigos.');
@@ -7834,7 +7723,6 @@
       document.getElementById('generatedCodeResult').classList.add('active');
     }
 
-    // ===== FUNÇÃO SEGURA: redeemCode com multi-location update atômico =====
     async function redeemCode() {
       if (!currentUser || currentUser.isAnonymous) {
         showCustomAlert('Você precisa fazer login com uma conta para resgatar códigos.');
@@ -7856,7 +7744,6 @@
       const database = window.firebaseDatabase;
 
       try {
-        // 1. Verificar se código existe
         const codeRef = ref(database, `codes/${code}`);
         const codeSnapshot = await get(codeRef);
 
@@ -7871,7 +7758,6 @@
           return;
         }
 
-        // 2. Verificar se usuário já resgatou este código
         const redemptionRef = ref(database, `codeRedemptions/${currentUser.uid}/${code}`);
         const redemptionSnapshot = await get(redemptionRef);
         if (redemptionSnapshot.exists()) {
@@ -7879,7 +7765,6 @@
           return;
         }
 
-        // 3. Obter pontos atuais do usuário
         const userRef = ref(database, `users/${currentUser.uid}`);
         const userSnapshot = await get(userRef);
         const userData = userSnapshot.val() || {};
@@ -7887,14 +7772,8 @@
         const codePoints = codeData.points;
         const newPointsTotal = currentPoints + codePoints;
 
-        // 4. Obter timestamp do servidor
         const serverTime = await getServerTimestamp();
 
-        // 5. TRANSAÇÃO ATÔMICA: Multi-location update
-        // O Firebase valida que:
-        // - codeRedemptions/{uid}/{code} não existe (previne resgate duplicado)
-        // - codes/{code}.used == false (código não foi usado)
-        // - newPointsTotal == currentPoints + codePoints (validado pelo servidor)
         const updates = {};
         updates[`codeRedemptions/${currentUser.uid}/${code}`] = {
           redeemedAt: serverTime,
@@ -7908,7 +7787,6 @@
 
         await update(ref(database), updates);
 
-        // 6. Transação bem-sucedida - atualizar estado local
         _syncPointsDisplay(newPointsTotal);
 
         document.getElementById('redeemCodeInput').value = '';
@@ -7921,7 +7799,6 @@
       }
     }
 
-    // Modal functions
     function toggleSidebar() {
       document.getElementById('sidebar').classList.toggle('open');
     }
@@ -7930,12 +7807,10 @@
       document.getElementById('sidebar').classList.remove('open');
     }
 
-    // Close sidebar when clicking outside
     document.addEventListener('click', function(event) {
       const sidebar = document.getElementById('sidebar');
       const menuBtn = document.querySelector('.menu-btn');
 
-      // Check if sidebar is open and click is outside sidebar and menu button
       if (sidebar.classList.contains('open')) {
         if (!sidebar.contains(event.target) && !menuBtn.contains(event.target)) {
           closeSidebar();
@@ -7953,7 +7828,6 @@
       box.style.display = box.style.display === 'none' || box.style.display === '' ? 'flex' : 'none';
     }
 
-    // Auth Loading Functions
     function showAuthLoading(text = 'A entrar...', subtext = 'Por favor aguarde') {
       document.getElementById('authLoadingText').textContent = text;
       document.getElementById('authLoadingSubtext').textContent = subtext;
@@ -7966,7 +7840,6 @@
       document.body.style.overflow = '';
     }
 
-    // Auth Overlay Functions
     function showAuthOverlay() {
       document.getElementById('authOverlay').classList.add('active');
       document.body.style.overflow = 'hidden';
@@ -7976,7 +7849,6 @@
     function closeAuthOverlay() {
       document.getElementById('authOverlay').classList.remove('active');
       document.body.style.overflow = '';
-      // Clear URL auth parameter when closing overlay
       clearAuthUrlParam();
     }
 
@@ -8033,14 +7905,12 @@
     }
 
     async function enterAsVisitor() {
-      // Show loading animation
       showAuthLoading('Modo Visitante', 'A preparar o catálogo...');
 
       try {
         const { signInAnonymously } = window.firebaseModules;
         await signInAnonymously(window.firebaseAuth);
 
-        // Short delay for smooth transition
         await new Promise(resolve => setTimeout(resolve, 500));
 
         hideAuthLoading();
@@ -8066,7 +7936,6 @@
       }
     }
 
-    // Legacy functions for compatibility
     function openLoginModal() {
       closeSidebar();
       showAuthOverlay();
@@ -8087,7 +7956,6 @@
       closeAuthOverlay();
     }
 
-    // Email Verification System with Firebase Link
     let verificationCheckInterval = null;
 
     function showEmailVerificationOptions(email) {
@@ -8110,7 +7978,7 @@
               Enviaremos um link de verificação para seu email.
             </p>
             <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 16px;">
-              🎁 Verificação por email: +10 pontos<br>
+               Verificação por email: +10 pontos<br>
               👑 Aprovação pelo ADM: +100 pontos
             </p>
             <button class="custom-modal-btn primary" onclick="sendVerificationLink()" style="width: 100%;">
@@ -8268,11 +8136,9 @@
       }
 
       try {
-        // Reload user to get updated emailVerified status
         await user.reload();
 
         if (user.emailVerified) {
-          // Email verified! Auto-approve the account
           await approveAccountAfterEmailVerification();
         } else {
           showCustomAlert('Email ainda não verificado. Clique no link enviado para seu email e tente novamente.');
@@ -8291,7 +8157,6 @@
       }
     }
 
-    // ===== FUNÇÃO SEGURA: approveAccountAfterEmailVerification com multi-location update =====
     async function approveAccountAfterEmailVerification() {
       const auth = window.firebaseAuth;
       const user = auth.currentUser;
@@ -8299,16 +8164,13 @@
       const database = window.firebaseDatabase;
 
       try {
-        // Force token refresh to get updated email_verified claim
         await user.getIdToken(true);
 
-        // Get current user data to check points
         const userRef = ref(database, `users/${user.uid}`);
         const snapshot = await get(userRef);
         const userData = snapshot.val() || {};
         const currentPoints = userData.points || 0;
 
-        // Check if bonus was already claimed
         const bonusRef = ref(database, `emailVerificationBonus/${user.uid}`);
         const bonusSnapshot = await get(bonusRef);
         const bonusAlreadyClaimed = bonusSnapshot.exists();
@@ -8316,7 +8178,6 @@
         let bonusPoints = 0;
         const serverTime = await getServerTimestamp();
 
-        // TRANSAÇÃO ATÔMICA: Multi-location update para bônus + aprovação
         if (!bonusAlreadyClaimed) {
           try {
             const newPointsTotal = currentPoints + 10;
@@ -8337,7 +8198,6 @@
             bonusPoints = 10;
 
           } catch (bonusError) {
-            // Bonus claim failed - ainda aprovar a conta sem bônus
             console.log('[SEGURANÇA] Bonus já foi reivindicado ou validação falhou:', bonusError);
             await update(ref(database, `users/${user.uid}`), {
               status: 'approved',
@@ -8347,7 +8207,6 @@
             });
           }
         } else {
-          // Bonus already claimed, just approve account
           await update(ref(database, `users/${user.uid}`), {
             status: 'approved',
             emailVerified: true,
@@ -8359,11 +8218,9 @@
         userStatus = 'approved';
         _syncPointsDisplay(currentPoints + bonusPoints);
 
-        // Update UI
         updateUIForUser();
         updateUserInfoDisplay();
 
-        // Show success
         const container = document.getElementById('emailVerificationContent');
         const bonusMessage = bonusPoints > 0
           ? `<div style="background: linear-gradient(135deg, rgba(33, 150, 243, 0.15) 0%, rgba(100, 181, 246, 0.15) 100%); padding: 12px; border-radius: 8px; margin-bottom: 20px;">
@@ -8401,7 +8258,6 @@
       }
     }
 
-    // Function to show verification option for pending users
     function showVerifyEmailOption() {
       const auth = window.firebaseAuth;
       const user = auth.currentUser;
@@ -8410,14 +8266,11 @@
         return;
       }
 
-      // Check if already email verified
       if (user.emailVerified) {
-        // Auto-approve if email is verified but status is still pending
         approveAccountAfterEmailVerification();
         return;
       }
 
-      // Show the verification options
       showEmailVerificationOptions(user.email);
     }
 
@@ -8429,19 +8282,16 @@
       const password = document.getElementById('registerPassword').value;
       const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
 
-      // Validate Gmail
       if (!email.endsWith('@gmail.com')) {
         showCustomAlert('Por favor, use um email do Gmail (@gmail.com).');
         return;
       }
 
-      // Validate passwords match
       if (password !== passwordConfirm) {
         showCustomAlert('As senhas não coincidem.');
         return;
       }
 
-      // Show loading animation
       showAuthLoading('A criar conta...', 'Preparando tudo para você');
 
       try {
@@ -8449,18 +8299,14 @@
         const { ref, set } = window.firebaseModules;
         const database = window.firebaseDatabase;
 
-        // Create user in Firebase Auth
         const userCredential = await createUserWithEmailAndPassword(window.firebaseAuth, email, password);
         const user = userCredential.user;
 
-        // Update loading text
         document.getElementById('authLoadingText').textContent = 'Configurando perfil...';
         document.getElementById('authLoadingSubtext').textContent = 'Quase pronto!';
 
-        // Update Firebase Auth profile with display name
         await updateProfile(user, { displayName: name });
 
-        // Create user data in Realtime Database
         await set(ref(database, `users/${user.uid}`), {
           name: name,
           email: email,
@@ -8475,11 +8321,9 @@
         currentUser = user;
         isPublisher = PUBLISHER_EMAILS.includes(email);
 
-        // Success message
         document.getElementById('authLoadingText').textContent = 'Conta criada!';
         document.getElementById('authLoadingSubtext').textContent = 'Bem-vindo, ' + name + '!';
 
-        // Short delay to show success message
         await new Promise(resolve => setTimeout(resolve, 1000));
 
         hideAuthLoading();
@@ -8489,7 +8333,6 @@
         updateUserInfoDisplay();
         updatePointsDisplay();
 
-        // Show verification options modal instead of simple alert
         showEmailVerificationOptions(email);
       } catch (error) {
         hideAuthLoading();
@@ -8511,7 +8354,6 @@
       }
     }
 
-    // Download Links Counter
     let downloadLinksCount = 1;
 
     function openPublishModal() {
@@ -8570,7 +8412,6 @@
 
       container.insertAdjacentHTML('beforeend', newLinkHTML);
 
-      // Show remove button on first link if there are multiple links
       if (downloadLinksCount > 1) {
         const firstRemoveBtn = container.querySelector('[data-link-index="1"] .remove-link-btn');
         if (firstRemoveBtn) firstRemoveBtn.style.display = 'flex';
@@ -8584,10 +8425,8 @@
       if (linkGroup) {
         linkGroup.remove();
 
-        // Count remaining links
         const remainingLinks = container.querySelectorAll('.download-link-group');
 
-        // Hide remove button if only one link remains
         if (remainingLinks.length === 1) {
           const removeBtn = remainingLinks[0].querySelector('.remove-link-btn');
           if (removeBtn) removeBtn.style.display = 'none';
@@ -8619,14 +8458,12 @@
 
       if (!links || links.length === 0) return;
 
-      // Set first link
       if (links[0]) {
         document.getElementById('linkDesc1').value = links[0].desc || '';
         document.getElementById('linkGA1').value = links[0].linkGA || '';
         document.getElementById('linkADM1').value = links[0].linkADM || '';
       }
 
-      // Add additional links
       for (let i = 1; i < links.length; i++) {
         addDownloadLink();
         const index = i + 1;
@@ -8727,7 +8564,6 @@
       });
     }
 
-    // Load ads
     async function loadAds() {
       const { ref, onValue } = window.firebaseModules;
       const database = window.firebaseDatabase;
@@ -8738,7 +8574,6 @@
       });
     }
 
-    // Update ad content fields hints based on content type
     function updateAdContentFields() {
       const contentType = document.getElementById('adContentType').value;
       const urlLabel = document.getElementById('adUrlLabel');
@@ -8764,7 +8599,6 @@
       }
     }
 
-    // Publish ad
     async function handlePublishAd(e) {
       e.preventDefault();
 
@@ -8807,7 +8641,6 @@
       }
     }
 
-    // Manage ads
     async function openManageAdModal() {
       if (!isPublisher) {
         showCustomAlert('Apenas publicadores podem gerenciar anúncios.');
@@ -8850,14 +8683,12 @@
       document.getElementById('editAdId').value = id;
       document.getElementById('adTitle').value = ad.title;
 
-      // Handle both old and new ad formats
       if (ad.contentType) {
         document.getElementById('adContentType').value = ad.contentType;
         document.getElementById('adContentUrl').value = ad.contentUrl;
         document.getElementById('adExternalUrl').value = ad.externalUrl;
         document.getElementById('adDuration').value = ad.duration;
       } else {
-        // Old format - set defaults
         document.getElementById('adContentType').value = 'website';
         document.getElementById('adContentUrl').value = ad.url;
         document.getElementById('adExternalUrl').value = ad.url;
@@ -8883,7 +8714,6 @@
       });
     }
 
-    // Earn points modal
     async function openEarnPointsModal() {
       if (!currentUser || currentUser.isAnonymous) {
         showCustomAlert('Você precisa fazer login com uma conta para ganhar pontos.');
@@ -8895,7 +8725,6 @@
         return;
       }
 
-      // Check daily limit
       const canWatch = await checkDailyAdLimit();
       if (!canWatch) {
         showCustomAlert('Você atingiu o limite diário de 5 anúncios. Volte amanhã para ganhar mais pontos!');
@@ -8908,7 +8737,6 @@
         return;
       }
 
-      // Pick random ad
       const randomIndex = Math.floor(Math.random() * adsArray.length);
       const [adId, ad] = adsArray[randomIndex];
 
@@ -8916,7 +8744,6 @@
       startAdInterstitial();
     }
 
-    // Check if user can watch more ads today
     async function checkDailyAdLimit() {
       const { ref, get } = window.firebaseModules;
       const database = window.firebaseDatabase;
@@ -8937,7 +8764,6 @@
       return data.count < 5; // Check if under limit
     }
 
-    // Increment ad watch count
     async function incrementAdWatchCount() {
       const { ref, set } = window.firebaseModules;
       const database = window.firebaseDatabase;
@@ -8964,15 +8790,12 @@
     function startAdInterstitial() {
       if (!currentAd) return;
 
-      // Reset timer - use custom duration or default to 30
       adTimeRemaining = currentAd.duration || 30;
 
-      // Update UI
       document.getElementById('adDisplayTitle').textContent = currentAd.title;
       document.getElementById('adTimer').textContent = `${adTimeRemaining}s`;
       document.getElementById('adTimer').classList.remove('complete');
 
-      // Render content based on type
       const container = document.getElementById('adIframeContainer');
       const contentType = currentAd.contentType || 'website';
       const contentUrl = currentAd.contentUrl || currentAd.url; // Fallback to old 'url' field
@@ -9028,10 +8851,8 @@
       claimBtn.disabled = true;
       claimBtn.textContent = `Aguarde ${adTimeRemaining}s para receber pontos`;
 
-      // Show overlay
       document.getElementById('adOverlay').classList.add('active');
 
-      // Start countdown
       if (adTimer) clearInterval(adTimer);
       adTimer = setInterval(() => {
         adTimeRemaining--;
@@ -9057,7 +8878,6 @@
       }
     }
 
-    // ===== FUNÇÃO SEGURA: claimAdPoints com multi-location update =====
     async function claimAdPoints() {
       if (!currentAd || adTimeRemaining > 0) return;
       if (!currentUser || currentUser.isAnonymous) return;
@@ -9066,7 +8886,6 @@
       const database = window.firebaseDatabase;
 
       try {
-        // 1. Verificar se anúncio ainda existe
         const adRef = ref(database, `ads/${currentAd.id}`);
         const adSnapshot = await get(adRef);
 
@@ -9079,7 +8898,6 @@
         const adData = adSnapshot.val();
         const adPoints = adData.points;
 
-        // 2. Verificar contagem de anúncios hoje
         const today = new Date().toISOString().split('T')[0];
         const adsWatchedRef = ref(database, `users/${currentUser.uid}/adsWatched`);
         const adsSnapshot = await get(adsWatchedRef);
@@ -9098,24 +8916,16 @@
           return;
         }
 
-        // 3. Obter pontos atuais do usuário
         const userRef = ref(database, `users/${currentUser.uid}`);
         const userSnapshot = await get(userRef);
         const userData = userSnapshot.val() || {};
         const currentPoints = userData.points || 0;
         const newPointsTotal = currentPoints + adPoints;
 
-        // 4. Obter timestamp do servidor
         const serverTime = await getServerTimestamp();
 
-        // 5. Criar ID único para o claim
         const claimId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-        // 6. TRANSAÇÃO ATÔMICA: Multi-location update
-        // O Firebase valida que:
-        // - adViewClaims não existe ainda (previne duplicação)
-        // - newPointsTotal == currentPoints + adPoints (validado pelo servidor)
-        // - count < 5 (validado pelo servidor)
         const updates = {};
         updates[`adViewClaims/${currentUser.uid}/${claimId}`] = {
           adId: currentAd.id,
@@ -9131,13 +8941,10 @@
 
         await update(ref(database), updates);
 
-        // 7. Atualizar estado local
         _syncPointsDisplay(newPointsTotal);
 
-        // 8. Calcular restantes
         const remaining = 5 - (currentCount + 1);
 
-        // 9. Fechar e atualizar UI
         closeAdInterstitial();
         updateEarnPointsButton();
 
@@ -9150,7 +8957,6 @@
       }
     }
 
-    // Get today's ad watch count
     async function getAdWatchCountToday() {
       if (!currentUser || currentUser.isAnonymous) {
         return 0;
@@ -9175,7 +8981,6 @@
       return data.count;
     }
 
-    // Update earn points button text
     async function updateEarnPointsButton() {
       const btn = document.getElementById('earnPointsBtn');
       if (!btn || !currentUser || currentUser.isAnonymous) return;
@@ -9206,7 +9011,6 @@
       adTimeRemaining = 30;
     }
 
-    // Reset password
     async function handleResetPassword(e) {
       e.preventDefault();
 
@@ -9222,7 +9026,6 @@
       }
     }
 
-    // Modal functions for ads and reset password
     function openPublishAdModal() {
       if (!isPublisher) {
         showCustomAlert('Apenas publicadores podem publicar anúncios.');
@@ -9243,11 +9046,9 @@
       document.getElementById('manageAdModal').classList.remove('active');
     }
 
-    // User management functions
     let currentUserFilter = 'pending';
     let allUsers = {};
 
-    // Notification functions
     let userNotifications = [];
     let dismissedNotifications = {};
 
@@ -9285,7 +9086,6 @@
     function filterUsers(status) {
       currentUserFilter = status;
 
-      // Update filter button states
       const filterBtns = document.querySelectorAll('.manage-users-filter-btn');
       filterBtns.forEach(btn => btn.classList.remove('active'));
       document.getElementById('filter' + status.charAt(0).toUpperCase() + status.slice(1)).classList.add('active');
@@ -9391,13 +9191,11 @@
           const { ref, update, get } = window.firebaseModules;
           const database = window.firebaseDatabase;
 
-          // Get current points
           const userRef = ref(database, `users/${userId}`);
           const snapshot = await get(userRef);
           const userData = snapshot.val() || {};
           const currentPoints = userData.points || 0;
 
-          // Approve and give 100 bonus points
           await update(ref(database, `users/${userId}`), {
             status: 'approved',
             points: currentPoints + 100,
@@ -9433,13 +9231,11 @@
     }
 
     function openResetPasswordModal() {
-      // If auth overlay is open, use the new reset form
       const authOverlay = document.getElementById('authOverlay');
       if (authOverlay && authOverlay.classList.contains('active')) {
         showResetPasswordForm();
         return;
       }
-      // Otherwise use the old modal
       document.getElementById('resetPasswordModal').classList.add('active');
     }
 
@@ -9448,7 +9244,6 @@
       document.getElementById('resetPasswordForm').reset();
     }
 
-    // Custom alert/confirm
     function showCustomAlert(message) {
       const modal = document.createElement('div');
       modal.className = 'custom-modal active';
@@ -9463,7 +9258,6 @@
       document.body.appendChild(modal);
     }
 
-    // Custom confirm modal with callback
     function showConfirmModal(title, message, onConfirm) {
       const modal = document.createElement('div');
       modal.className = 'custom-modal active';
@@ -9478,7 +9272,6 @@
         </div>
       `;
 
-      // Add event listeners
       const cancelBtn = modal.querySelector('.confirm-cancel-btn');
       const confirmBtn = modal.querySelector('.confirm-ok-btn');
 
@@ -9496,8 +9289,6 @@
       document.body.appendChild(modal);
     }
 
-    // ===== NOTIFICATION FUNCTIONS =====
-
     let readNotifications = {};
     let previousNotificationIds = [];
     let notificationsInitialized = false;
@@ -9508,30 +9299,22 @@
       const { ref, onValue, get } = window.firebaseModules;
       const database = window.firebaseDatabase;
 
-      // Load dismissed notifications for current user
       const dismissedRef = ref(database, `dismissedNotifications/${currentUser.uid}`);
       const dismissedSnapshot = await get(dismissedRef);
       dismissedNotifications = dismissedSnapshot.exists() ? dismissedSnapshot.val() : {};
 
-      // Load read notifications for current user
       const readRef = ref(database, `readNotifications/${currentUser.uid}`);
       const readSnapshot = await get(readRef);
       readNotifications = readSnapshot.exists() ? readSnapshot.val() : {};
 
-      // Listen to notifications
       const notificationsRef = ref(database, 'notifications');
       onValue(notificationsRef, (snapshot) => {
         const allNotifications = snapshot.val() || {};
 
-        // Filter notifications:
-        // 1. Not dismissed
-        // 2. Either global (no targetUserId) OR targeted to this user
         const filteredNotifications = Object.entries(allNotifications)
           .filter(([id, notif]) => {
-            // Skip dismissed notifications
             if (dismissedNotifications[id]) return false;
 
-            // Include if: no target (global) OR target matches current user
             if (!notif.targetUserId || notif.targetUserId === currentUser.uid) {
               return true;
             }
@@ -9546,14 +9329,12 @@
           }))
           .sort((a, b) => b.createdAt - a.createdAt);
 
-        // Detect new notifications for toast
         const currentIds = filteredNotifications.map(n => n.id);
         if (notificationsInitialized) {
           const newNotifications = filteredNotifications.filter(
             n => !previousNotificationIds.includes(n.id)
           );
 
-          // Show toast for new notifications
           newNotifications.forEach(notif => {
             showNotificationToast(notif.title, notif.message);
           });
@@ -9565,7 +9346,6 @@
 
         updateNotificationBadge();
 
-        // Check for unread notifications and trigger Android notification
         checkUnreadNotifications();
       });
     }
@@ -9574,7 +9354,6 @@
       const unreadCount = userNotifications.filter(n => !n.isRead).length;
 
       if (unreadCount > 0) {
-        // Trigger Android notification if available
         try {
           if (typeof Android !== 'undefined' && Android.showNotification) {
             Android.showNotification();
@@ -9586,7 +9365,6 @@
     }
 
     function showNotificationToast(title, message) {
-      // Remove existing toast if any
       const existingToast = document.querySelector('.toast-notification');
       if (existingToast) {
         existingToast.remove();
@@ -9595,7 +9373,7 @@
       const toast = document.createElement('div');
       toast.className = 'toast-notification';
       toast.innerHTML = `
-        <div class="toast-title">🔔 ${title}</div>
+        <div class="toast-title"> ${title}</div>
         <div class="toast-message">${message.length > 80 ? message.substring(0, 80) + '...' : message}</div>
       `;
 
@@ -9606,7 +9384,6 @@
 
       document.body.appendChild(toast);
 
-      // Auto remove after 5 seconds
       setTimeout(() => {
         if (toast.parentNode) {
           toast.remove();
@@ -9633,10 +9410,8 @@
       }
       document.getElementById('sendNotificationForm').reset();
 
-      // Reset to "All users" target
       selectNotificationTarget('all');
 
-      // Load users for the selector
       await loadUsersForNotification();
 
       document.getElementById('sendNotificationOverlay').classList.add('active');
@@ -9675,7 +9450,6 @@
     }
 
     function toggleUserSelector() {
-      // Legacy function - redirects to new implementation
       const target = document.getElementById('notificationTargetInput').value;
       selectNotificationTarget(target === 'individual' ? 'all' : 'individual');
     }
@@ -9692,7 +9466,6 @@
           const users = snapshot.val();
           const select = document.getElementById('notificationTargetUser');
 
-          // Filter only approved users and sort by name
           const userList = Object.entries(users)
             .filter(([id, user]) => user.status === 'approved' || user.status === 'pending')
             .map(([id, user]) => ({
@@ -9746,11 +9519,9 @@
           createdBy: currentUser.email
         };
 
-        // If individual, add target user ID
         if (targetType === 'individual') {
           notificationData.targetUserId = targetUserId;
 
-          // Get target user name for confirmation
           const targetUserSelect = document.getElementById('notificationTargetUser');
           const targetUserName = targetUserSelect.options[targetUserSelect.selectedIndex].text;
           notificationData.targetUserName = targetUserName.split(' (')[0]; // Extract just the name
@@ -9789,7 +9560,6 @@
       document.body.style.overflow = '';
     }
 
-    // FAQ Modal functions (legacy - redirects to new overlay)
     function openFaqModal() {
       openAboutOverlay();
     }
@@ -9798,7 +9568,6 @@
       closeAboutOverlay();
     }
 
-    // ========== Profile Overlay Functions ==========
     function openProfileOverlay() {
       closeSidebar();
       const container = document.getElementById('profileContainer');
@@ -9806,7 +9575,6 @@
       const user = auth.currentUser;
 
       if (!user || user.isAnonymous) {
-        // User not logged in
         container.innerHTML = `
           <div class="profile-not-logged">
             <div class="profile-not-logged-icon">
@@ -9821,7 +9589,6 @@
           </div>
         `;
       } else {
-        // User is logged in - load profile data
         loadProfileData(user, container);
       }
 
@@ -9829,7 +9596,6 @@
       document.body.style.overflow = 'hidden';
     }
 
-    // Facebook-style default avatar SVG
     function getDefaultAvatarSVG() {
       return `<svg viewBox="0 0 212 212" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect width="212" height="212" fill="#D8D8D8"/>
@@ -9838,7 +9604,6 @@
       </svg>`;
     }
 
-    // Skeleton loading HTML for profile
     function getProfileSkeletonHTML() {
       return `
         <div class="profile-loading-skeleton">
@@ -9890,18 +9655,15 @@
     }
 
     async function loadProfileData(user, container) {
-      // Show skeleton loading animation
       container.innerHTML = getProfileSkeletonHTML();
 
       try {
-        // Usar dados já carregados globalmente para evitar erros de permissão
         const displayName = userName || user.displayName || user.email?.split('@')[0] || 'Usuário';
         const email = user.email || '';
         const points = userPoints || 0;
         const status = userStatus || 'pending';
         const role = isPublisher ? 'admin' : 'user';
 
-        // Tentar buscar data de criação do banco
         let createdAt = 'N/A';
         try {
           const { ref, get } = window.firebaseModules;
@@ -9915,7 +9677,6 @@
           console.log('Não foi possível buscar data de criação');
         }
 
-        // Get status badge and avatar class
         let statusBadgeClass = 'pending';
         let statusBadgeText = '⏳ Pendente';
         let avatarStatusClass = 'status-pending';
@@ -9933,7 +9694,6 @@
           avatarStatusClass = 'status-rejected';
         }
 
-        // Update points in header
         document.getElementById('profileHeaderPointsValue').textContent = points;
 
         container.innerHTML = `
@@ -9985,11 +9745,9 @@
         `;
       } catch (error) {
         console.error('Error loading profile:', error);
-        // Mostrar perfil básico mesmo em caso de erro
         const displayName = userName || user.displayName || user.email?.split('@')[0] || 'Usuário';
         const email = user.email || '';
 
-        // Update points in header (fallback)
         document.getElementById('profileHeaderPointsValue').textContent = userPoints || 0;
 
         container.innerHTML = `
@@ -10009,7 +9767,6 @@
       }
     }
 
-    // Escape HTML to prevent XSS
     function escapeHtml(text) {
       if (!text) return '';
       const div = document.createElement('div');
@@ -10022,7 +9779,6 @@
       document.body.style.overflow = '';
     }
 
-    // ========== About Overlay Functions ==========
     function openAboutOverlay() {
       closeSidebar();
       document.getElementById('aboutOverlay').classList.add('active');
@@ -10034,7 +9790,6 @@
       document.body.style.overflow = '';
     }
 
-    // About Help Modal functions
     function openAboutHelpModal() {
       document.getElementById('aboutHelpModal').classList.add('active');
     }
@@ -10043,7 +9798,6 @@
       document.getElementById('aboutHelpModal').classList.remove('active');
     }
 
-    // Comments Help Modal functions
     function openCommentsHelpModal() {
       document.getElementById('commentsHelpModal').classList.add('active');
     }
@@ -10052,7 +9806,6 @@
       document.getElementById('commentsHelpModal').classList.remove('active');
     }
 
-    // ========== Report Problem System ==========
     let allReports = [];
     let currentReportFilter = 'all';
 
@@ -10071,20 +9824,17 @@
       document.getElementById('reportCharCount').textContent = '0';
       document.getElementById('reportProblemOverlay').classList.add('active');
 
-      // Add character counter
       document.getElementById('reportDescription').oninput = function() {
         document.getElementById('reportCharCount').textContent = this.value.length;
       };
     }
 
-    // Open report modal from game detail with pre-filled URL
     function openReportFromGame() {
       if (!currentGameData) {
         showCustomAlert('Nenhum jogo selecionado.');
         return;
       }
 
-      // Build the game URL
       const gameUrl = window.location.origin + window.location.pathname + '?id=' + currentGameData.id;
       openReportProblemModal(gameUrl);
     }
@@ -10120,7 +9870,6 @@
         const { ref, push, set, get } = window.firebaseModules;
         const database = window.firebaseDatabase;
 
-        // Get user data
         const userRef = ref(database, `users/${user.uid}`);
         const userSnapshot = await get(userRef);
         const userData = userSnapshot.val() || {};
@@ -10152,7 +9901,6 @@
       }
     }
 
-    // Admin - View Reports
     async function openViewReportsModal() {
       closeSidebar();
       document.getElementById('reportsOverlay').classList.add('active');
@@ -10163,7 +9911,6 @@
       document.getElementById('reportsOverlay').classList.remove('active');
     }
 
-    // Function to update reports badge for admin and verified users
     async function updateReportsBadge() {
       if (!isPublisher && userStatus !== 'approved') return;
 
@@ -10234,7 +9981,6 @@
           allReports.push({ id: child.key, ...child.val() });
         });
 
-        // Sort by createdAt descending (newest first)
         allReports.sort((a, b) => b.createdAt - a.createdAt);
 
         renderReports();
@@ -10252,7 +9998,6 @@
     function filterReports(filter) {
       currentReportFilter = filter;
 
-      // Update active button
       document.getElementById('reportFilterAll').classList.remove('active');
       document.getElementById('reportFilterPending').classList.remove('active');
       document.getElementById('reportFilterResolved').classList.remove('active');
@@ -10289,7 +10034,7 @@
 
         const statusClass = report.status === 'pending' ? 'pending' : 'resolved';
         const statusText = report.status === 'pending' ? 'Pendente' : 'Resolvido';
-        const statusIcon = report.status === 'pending' ? '⏳' : '✅';
+        const statusIcon = report.status === 'pending' ? '⏳' : '';
 
         return `
           <div class="report-card">
@@ -10326,7 +10071,7 @@
               ` : ''}
             ` : `
               <div class="report-resolved-info">
-                ✅ Resolvido em ${report.resolvedAt ? new Date(report.resolvedAt).toLocaleDateString('pt-BR') : 'N/A'}
+                 Resolvido em ${report.resolvedAt ? new Date(report.resolvedAt).toLocaleDateString('pt-BR') : 'N/A'}
               </div>
               ${isPublisher ? `
               <button onclick="confirmDeleteReport('${report.id}')" class="report-delete-btn full-width">
@@ -10354,7 +10099,6 @@
           resolvedBy: user.email
         });
 
-        // Update local data and re-render
         const report = allReports.find(r => r.id === reportId);
         if (report) {
           report.status = 'resolved';
@@ -10384,7 +10128,6 @@
         const reportRef = ref(database, `problemReports/${reportId}`);
         await remove(reportRef);
 
-        // Remove from local data and re-render
         allReports = allReports.filter(r => r.id !== reportId);
         renderReports();
         updateReportsBadge();
@@ -10395,7 +10138,6 @@
       }
     }
 
-    // Rating System
     let selectedRating = 0;
     let totalAppStars = 0;
     let userHasRated = false;
@@ -10407,7 +10149,6 @@
       const auth = window.firebaseAuth;
       const user = auth.currentUser;
 
-      // Load total stars
       try {
         const ratingsRef = ref(database, 'appRatings/totalStars');
         const snapshot = await get(ratingsRef);
@@ -10416,7 +10157,6 @@
         totalAppStars = 0;
       }
 
-      // Check if user has already rated
       if (user && !user.isAnonymous) {
         try {
           const userRatingRef = ref(database, `appRatings/users/${user.uid}`);
@@ -10439,13 +10179,11 @@
       const auth = window.firebaseAuth;
       const user = auth.currentUser;
 
-      // Check if user is verified
       if (!user || user.isAnonymous) {
         showCustomAlert('Você precisa ter uma conta verificada para avaliar o aplicativo.');
         return;
       }
 
-      // Check if user is verified (status approved)
       const { ref, get } = window.firebaseModules;
       const database = window.firebaseDatabase;
 
@@ -10472,28 +10210,24 @@
       const container = document.getElementById('ratingContent');
       const overlayContent = document.querySelector('.rating-overlay-content');
 
-      // Remove existing action buttons if any
       const existingActions = overlayContent.querySelector('.rating-action-buttons');
       if (existingActions) existingActions.remove();
 
-      // Update header stars with total
       const headerStars = document.getElementById('ratingHeaderStars');
       if (headerStars) {
         headerStars.textContent = `⭐ ${totalAppStars}`;
       }
 
       if (userHasRated) {
-        // User already rated
         const starsDisplay = '⭐'.repeat(userPreviousRating);
         container.innerHTML = `
           <div class="rating-already-rated">
-            <span class="check-icon">✅</span>
+            <span class="check-icon"></span>
             <div class="message">Você já avaliou o aplicativo!</div>
             <div class="your-rating">Sua avaliação: ${starsDisplay}</div>
           </div>
         `;
       } else {
-        // User can rate
         selectedRating = 0;
         container.innerHTML = `
           <p class="rating-instruction-text">Clique nas estrelas para avaliar:</p>
@@ -10511,7 +10245,6 @@
           </div>
         `;
 
-        // Add action buttons at bottom
         const actionsHtml = `
           <div class="rating-action-buttons">
             <button class="rating-action-btn primary" id="submitRatingBtn" onclick="submitRating()" disabled>Enviar Avaliação</button>
@@ -10561,7 +10294,6 @@
         }
       });
 
-      // Enable submit button
       const btn = document.getElementById('submitRatingBtn');
       if (btn) {
         btn.disabled = false;
@@ -10575,11 +10307,9 @@
         return;
       }
 
-      // Show confirmation modal
       const starsText = selectedRating === 1 ? '1 estrela' : `${selectedRating} estrelas`;
       document.getElementById('confirmStarsText').textContent = starsText;
 
-      // Show bonus points info if applicable
       const bonusInfo = document.getElementById('bonusPointsInfo');
       const bonusAmount = document.getElementById('bonusPointsAmount');
 
@@ -10612,7 +10342,6 @@
       }
 
       try {
-        // Calculate bonus points
         let bonusPoints = 0;
         if (selectedRating === 4) {
           bonusPoints = 5;
@@ -10620,19 +10349,16 @@
           bonusPoints = 10;
         }
 
-        // Get current total stars
         const totalRef = ref(database, 'appRatings/totalStars');
         const totalSnapshot = await get(totalRef);
         const currentTotal = totalSnapshot.val() || 0;
         const newTotal = currentTotal + selectedRating;
 
-        // Get current user points
         const userRef = ref(database, `users/${user.uid}`);
         const userSnapshot = await get(userRef);
         const userData = userSnapshot.val() || {};
         const currentPoints = userData.points || 0;
 
-        // Update everything
         const updates = {};
         updates[`appRatings/totalStars`] = newTotal;
         updates[`appRatings/users/${user.uid}`] = {
@@ -10646,7 +10372,6 @@
 
         await update(ref(database), updates);
 
-        // Update local state
         totalAppStars = newTotal;
         userHasRated = true;
         userPreviousRating = selectedRating;
@@ -10656,10 +10381,8 @@
           updatePointsDisplay();
         }
 
-        // Close confirmation modal
         document.getElementById('ratingConfirmModal').classList.remove('active');
 
-        // Show success and re-render
         const starsDisplay = '⭐'.repeat(selectedRating);
         let successMsg = `Obrigado pela sua avaliação! ${starsDisplay}`;
         if (bonusPoints > 0) {
@@ -10667,7 +10390,6 @@
         }
         showCustomAlert(successMsg);
 
-        // Re-render the rating overlay to show "already rated" state
         renderRatingOverlay();
 
       } catch (e) {
@@ -10698,7 +10420,6 @@
         return;
       }
 
-      // Check if there are unread notifications
       const hasUnread = userNotifications.some(n => !n.isRead);
       notificationsFooter.style.display = hasUnread ? 'block' : 'none';
 
@@ -10708,7 +10429,6 @@
         const itemClass = isUnread ? 'notification-item unread' : 'notification-item read';
         const unreadIndicator = isUnread ? '<span class="notification-unread-indicator"></span>' : '';
 
-        // Personal notification indicator
         const personalBadge = notif.isPersonal
           ? '<span style="background: #9c27b0; color: white; font-size: 11px; padding: 3px 8px; border-radius: 6px; margin-left: 8px;">Para você</span>'
           : '';
@@ -10731,7 +10451,7 @@
             <div class="notification-actions">
               ${markReadBtn}
               <button class="notification-action-btn delete" onclick="dismissNotification('${notif.id}')">
-                🗑️ Apagar
+                 Apagar
               </button>
             </div>
           </div>
@@ -10744,10 +10464,8 @@
         const { ref, set } = window.firebaseModules;
         const database = window.firebaseDatabase;
 
-        // Mark notification as read for this user
         await set(ref(database, `readNotifications/${currentUser.uid}/${notificationId}`), true);
 
-        // Update local state
         readNotifications[notificationId] = true;
         const notifIndex = userNotifications.findIndex(n => n.id === notificationId);
         if (notifIndex !== -1) {
@@ -10786,10 +10504,8 @@
         const { ref, set } = window.firebaseModules;
         const database = window.firebaseDatabase;
 
-        // Mark notification as dismissed for this user
         await set(ref(database, `dismissedNotifications/${currentUser.uid}/${notificationId}`), true);
 
-        // Update local state
         dismissedNotifications[notificationId] = true;
         userNotifications = userNotifications.filter(n => n.id !== notificationId);
 
@@ -10800,15 +10516,11 @@
       }
     }
 
-    // ===== END NOTIFICATION FUNCTIONS =====
-
-    // ===== FAVORITES, LIKES & DAILY REWARD SYSTEM =====
     let userFavorites = {};
     let userLikes = {};
     let currentGameLikes = 0;
     let dailyRewardClaimed = false;
 
-    // Load user favorites from Firestore
     async function loadUserFavorites() {
       if (!currentUser || currentUser.isAnonymous) return;
 
@@ -10828,7 +10540,6 @@
       }
     }
 
-    // Load user likes from Firestore
     async function loadUserLikes() {
       if (!currentUser || currentUser.isAnonymous) return;
 
@@ -10848,7 +10559,6 @@
       }
     }
 
-    // Toggle favorite
     async function toggleFavorite() {
       if (!currentUser || currentUser.isAnonymous) {
         showCustomAlert('Você precisa fazer login para adicionar favoritos.');
@@ -10866,10 +10576,8 @@
         const isFavorite = userFavorites[gameId];
 
         if (isFavorite) {
-          // Remove from favorites
           delete userFavorites[gameId];
         } else {
-          // Add to favorites
           userFavorites[gameId] = {
             addedAt: Date.now(),
             titulo: currentGameData.titulo,
@@ -10910,7 +10618,6 @@
       }
     }
 
-    // Toggle like
     async function toggleLike() {
       if (!currentUser || currentUser.isAnonymous) {
         showCustomAlert('Você precisa fazer login para curtir.');
@@ -10933,7 +10640,6 @@
         const gameLikesRef = doc(firestore, 'gameLikes', gameId);
         const isLiked = userLikes[gameId];
 
-        // Get current game likes count
         let currentLikes = 0;
         try {
           const gameLikesDoc = await getDoc(gameLikesRef);
@@ -10943,19 +10649,15 @@
         } catch (e) {}
 
         if (isLiked) {
-          // Remove like
           delete userLikes[gameId];
           currentLikes = Math.max(0, currentLikes - 1);
         } else {
-          // Add like
           userLikes[gameId] = Date.now();
           currentLikes += 1;
         }
 
-        // Update user likes
         await setDoc(userLikesRef, { games: userLikes }, { merge: true });
 
-        // Update game likes count
         await setDoc(gameLikesRef, { count: currentLikes }, { merge: true });
 
         currentGameLikes = currentLikes;
@@ -10993,12 +10695,10 @@
 
       const isLiked = userLikes[currentGameData.id];
 
-      // Atualiza contagem na área de meta informações
       if (countMeta) {
         countMeta.textContent = currentGameLikes;
       }
 
-      // Atualiza botão antigo (se existir)
       if (btn && icon) {
         if (isLiked) {
           icon.style.fill = '#e91e63';
@@ -11009,7 +10709,6 @@
         }
       }
 
-      // Atualiza botão do footer
       if (footerBtn && footerIcon) {
         if (isLiked) {
           footerBtn.classList.add('like-active');
@@ -11026,7 +10725,6 @@
       const commentsBtn = document.getElementById('footerCommentsBtn');
       const downloadsBtn = document.getElementById('footerDownloadsBtn');
 
-      // Remove active from all
       infoBtn.classList.remove('active');
       commentsBtn.classList.remove('active');
       downloadsBtn.classList.remove('active');
@@ -11040,7 +10738,6 @@
       }
     }
 
-    // Favorites Overlay
     function openFavoritesModal() {
       openFavoritesOverlay();
     }
@@ -11091,7 +10788,9 @@
               <div class="favorites-item-title">${fav.titulo}</div>
               <div class="favorites-item-meta">${typeLabels[fav.type] || fav.type}</div>
             </div>
-            <button class="favorites-item-remove" onclick="event.stopPropagation(); removeFavorite('${gameId}')" title="Remover">🗑️</button>
+            <button class="favorites-item-remove" onclick="event.stopPropagation(); removeFavorite('${gameId}')" title="Remover"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+  <path fill="#808080" d="M9 3h6v2h5v2H4V5h5V3zm-3 6h12l-1.2 10.2c-.1.9-.8 1.8-1.8 1.8H8c-1 0-1.7-.9-1.8-1.8L6 9zm3 2v8h2v-8H9zm4 0v8h2v-8h-2z"/>
+</svg></button>
           </div>
         `;
       }).join('');
@@ -11103,7 +10802,6 @@
         openGameDetail(gameId);
       } else {
         showCustomAlert('Este conteúdo não está mais disponível.');
-        // Remove from favorites
         removeFavorite(gameId);
       }
     }
@@ -11122,8 +10820,6 @@
         console.error('Erro ao remover favorito:', e);
       }
     }
-
-    // ===== TRANSFER POINTS SYSTEM (ADM ONLY) =====
 
     let allUsersForTransfer = [];
 
@@ -11146,7 +10842,6 @@
         perUserLabel.style.display = 'inline';
         submitBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg> Transferir para Todos';
         document.getElementById('transferEmail').required = false;
-        // Update user count
         updateTransferUsersCount();
       }
     }
@@ -11163,7 +10858,6 @@
           allUsersForTransfer = [];
           usersSnapshot.forEach((child) => {
             const userData = child.val();
-            // Exclude current user (ADM) from the list
             if (child.key !== currentUser.uid) {
               allUsersForTransfer.push({
                 uid: child.key,
@@ -11186,7 +10880,6 @@
         return;
       }
 
-      // Only ADMs can transfer points
       if (!isPublisher) {
         showCustomAlert('Apenas administradores podem transferir pontos.');
         return;
@@ -11194,14 +10887,11 @@
 
       closeSidebar();
 
-      // Update modal info
       document.getElementById('transferCurrentPoints').textContent = userPoints;
 
-      // Reset form
       document.getElementById('transferEmail').value = '';
       document.getElementById('transferAmount').value = '';
 
-      // Reset to individual transfer type
       selectTransferType('individual');
 
       document.getElementById('transferOverlay').classList.add('active');
@@ -11239,7 +10929,6 @@
         return;
       }
 
-      // Only ADMs can transfer points
       if (!isPublisher) {
         showCustomAlert('Apenas administradores podem transferir pontos.');
         return;
@@ -11263,7 +10952,6 @@
     async function handleTransferToIndividual(amount) {
       const recipientEmail = document.getElementById('transferEmail').value.trim().toLowerCase();
 
-      // Validations
       if (!recipientEmail) {
         showCustomAlert('Por favor, preencha o email do destinatário.');
         return;
@@ -11274,12 +10962,10 @@
         return;
       }
 
-      // ===== TRANSFERÊNCIA SEGURA com multi-location update atômico =====
       try {
         const { ref, get, update, push, set } = window.firebaseModules;
         const database = window.firebaseDatabase;
 
-        // 1. Buscar destinatário por email
         const usersRef = ref(database, 'users');
         const usersSnapshot = await get(usersRef);
 
@@ -11304,23 +10990,15 @@
           return;
         }
 
-        // 2. Obter pontos atuais do destinatário
         const recipientCurrentPoints = recipientData.points || 0;
 
-        // 3. Calcular novo valor do destinatário (ADM não perde pontos)
         const recipientNewPoints = recipientCurrentPoints + amount;
 
-        // 4. Obter timestamp do servidor
         const serverTime = await getServerTimestamp();
 
-        // 5. ADM TRANSFER: O ADM pode dar pontos sem limite
-        // ADM não perde pontos - apenas adiciona ao destinatário
-
-        // 5.1 Atualizar pontos do destinatário (ADM tem permissão para escrever em users)
         const recipientPointsRef = ref(database, `users/${recipientUid}/points`);
         await set(recipientPointsRef, recipientNewPoints);
 
-        // 7. Enviar notificação para o destinatário
         const senderName = currentUser.displayName || currentUser.email.split('@')[0];
         const notificationData = {
           title: '🎁 Você recebeu pontos!',
@@ -11337,7 +11015,6 @@
         const newNotificationRef = push(notificationsRef);
         await set(newNotificationRef, notificationData);
 
-        // 6. Transação bem-sucedida - atualizar estado local
         updateUserInfoDisplay();
 
         showCustomAlert(`Transferência realizada com sucesso!\n${amount} pontos enviados para ${recipientEmail}.\nNovo saldo do destinatário: ${recipientNewPoints} pontos.`);
@@ -11350,9 +11027,8 @@
     }
 
     async function handleTransferToAll(amount) {
-      // Confirm the mass transfer
       showConfirmModal(
-        `⚠️ Confirmar Transferência em Massa`,
+        ` Confirmar Transferência em Massa`,
         `Você está prestes a transferir <strong>${amount} pontos</strong> para <strong>${allUsersForTransfer.length} usuários</strong>.\n\nTotal de pontos a serem distribuídos: <strong>${amount * allUsersForTransfer.length}</strong>\n\nDeseja continuar?`,
         async () => {
           await executeMassTransfer(amount);
@@ -11370,7 +11046,6 @@
         const { ref, get, set, push } = window.firebaseModules;
         const database = window.firebaseDatabase;
 
-        // Refresh user list before transfer
         await updateTransferUsersCount();
 
         if (allUsersForTransfer.length === 0) {
@@ -11384,15 +11059,12 @@
         let successCount = 0;
         let errorCount = 0;
 
-        // Process users in batches to avoid timeout
         for (const user of allUsersForTransfer) {
           try {
-            // Update points
             const newPoints = user.points + amount;
             const userPointsRef = ref(database, `users/${user.uid}/points`);
             await set(userPointsRef, newPoints);
 
-            // Create notification
             const notificationData = {
               title: '🎁 Você recebeu pontos!',
               message: `${senderName} distribuiu ${amount} pontos para todos os usuários. Novo saldo: ${newPoints} pontos.`,
@@ -11410,7 +11082,6 @@
 
             successCount++;
 
-            // Update button text with progress
             submitBtn.textContent = `Transferindo... (${successCount}/${allUsersForTransfer.length})`;
           } catch (err) {
             console.error(`Erro ao transferir para ${user.email}:`, err);
@@ -11437,8 +11108,6 @@
       }
     }
 
-    // ===== DAILY REWARD SYSTEM (20 points) - SECURED BY SERVER TIMESTAMP =====
-    // Uses server timestamp to prevent device date manipulation
     const DAILY_REWARD_COOLDOWN = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
     let nextRewardTime = 0; // When the next reward becomes available
 
@@ -11449,7 +11118,6 @@
       const database = window.firebaseDatabase;
 
       try {
-        // Get last claim timestamp from server
         const rewardRef = ref(database, `dailyRewardClaims/${currentUser.uid}`);
         const snapshot = await get(rewardRef);
 
@@ -11457,7 +11125,6 @@
           const data = snapshot.val();
           const lastClaimedAt = data.lastClaimedAt || 0;
 
-          // Get server time by writing a timestamp and reading it back
           const serverTime = await getServerTimestamp();
           const timeSinceClaim = serverTime - lastClaimedAt;
 
@@ -11469,7 +11136,6 @@
             nextRewardTime = 0;
           }
         } else {
-          // Never claimed before
           dailyRewardClaimed = false;
           nextRewardTime = 0;
         }
@@ -11481,13 +11147,11 @@
       }
     }
 
-    // Get server timestamp using Firebase offset
     async function getServerTimestamp() {
       const { ref, get } = window.firebaseModules;
       const database = window.firebaseDatabase;
 
       try {
-        // Firebase provides server time offset at .info/serverTimeOffset
         const offsetRef = ref(database, '.info/serverTimeOffset');
         const snapshot = await get(offsetRef);
         const offset = snapshot.val() || 0;
@@ -11498,7 +11162,6 @@
       }
     }
 
-    // Format remaining time as HH:MM:SS
     function formatTimeRemaining(ms) {
       if (ms <= 0) return '';
       const hours = Math.floor(ms / 3600000);
@@ -11551,7 +11214,6 @@
       }
     }
 
-    // ===== FUNÇÃO SEGURA: claimDailyReward com multi-location update atômico =====
     async function claimDailyReward() {
       closeSidebar();
 
@@ -11569,9 +11231,9 @@
         const serverTime = await getServerTimestamp();
         const remaining = nextRewardTime - serverTime;
         if (remaining > 0) {
-          showCustomAlert(`Você já resgatou sua recompensa!\n\nVolte em ${formatTimeRemaining(remaining)} 🎁`);
+          showCustomAlert(`Você já resgatou sua recompensa!\n\nVolte em ${formatTimeRemaining(remaining)} `);
         } else {
-          showCustomAlert('Você já resgatou sua recompensa! Volte mais tarde. 🎁');
+          showCustomAlert('Você já resgatou sua recompensa! Volte mais tarde. ');
         }
         return;
       }
@@ -11583,7 +11245,6 @@
         const serverTime = await getServerTimestamp();
         const claimRef = ref(database, `dailyRewardClaims/${currentUser.uid}`);
 
-        // Check current state before claiming
         const currentSnapshot = await get(claimRef);
         if (currentSnapshot.exists()) {
           const data = currentSnapshot.val();
@@ -11595,23 +11256,17 @@
             nextRewardTime = lastClaimedAt + DAILY_REWARD_COOLDOWN;
             updateDailyRewardButton();
             startRewardCountdown();
-            showCustomAlert(`Você precisa esperar 24 horas entre resgates!\n\nVolte em ${formatTimeRemaining(nextRewardTime - serverTime)} 🎁`);
+            showCustomAlert(`Você precisa esperar 24 horas entre resgates!\n\nVolte em ${formatTimeRemaining(nextRewardTime - serverTime)} `);
             return;
           }
         }
 
-        // Obter pontos atuais do usuário
         const userRef = ref(database, `users/${currentUser.uid}`);
         const userSnapshot = await get(userRef);
         const userData = userSnapshot.val() || {};
         const currentPoints = userData.points || 0;
         const newPointsTotal = currentPoints + 20;
 
-        // TRANSAÇÃO ATÔMICA: Multi-location update
-        // O Firebase valida que:
-        // - Passou 24h desde o último resgate (now - lastClaimedAt >= 86400000)
-        // - newPointsTotal == currentPoints + 20 (validado pelo servidor)
-        // - pointsAwarded == 20 (validado pelo servidor)
         const updates = {};
         updates[`dailyRewardClaims/${currentUser.uid}`] = {
           lastClaimedAt: serverTime,
@@ -11629,11 +11284,10 @@
           console.log('[SEGURANÇA] Recompensa bloqueada pelo servidor:', claimError);
           dailyRewardClaimed = true;
           await checkDailyReward();
-          showCustomAlert('Você precisa esperar 24 horas entre resgates! 🎁');
+          showCustomAlert('Você precisa esperar 24 horas entre resgates! ');
           return;
         }
 
-        // Transação bem-sucedida - atualizar estado local
         _syncPointsDisplay(newPointsTotal);
         dailyRewardClaimed = true;
         nextRewardTime = serverTime + DAILY_REWARD_COOLDOWN;
@@ -11647,8 +11301,6 @@
         showCustomAlert('Erro ao resgatar recompensa. Tente novamente.');
       }
     }
-
-    // ===== END FAVORITES, LIKES & DAILY REWARD =====
 
     function showCustomConfirm(message, onConfirm) {
       const modal = document.createElement('div');
@@ -11670,14 +11322,12 @@
       });
     }
 
-    // Close modals on outside click
     document.addEventListener('click', (e) => {
       if (e.target.id === 'overlay') {
         closeOverlay();
       }
     });
 
-    // Sidebar swipe to close
     const sidebar = document.getElementById('sidebar');
     let startX = 0;
     let endX = 0;
@@ -11697,10 +11347,8 @@
       }
     });
 
-    // Handle Escape key for overlays
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
-        // Close overlays in order of priority (top-most first)
         const authOverlay = document.getElementById('authOverlay');
         const historyOverlay = document.getElementById('historyOverlay');
         const reportOverlay = document.getElementById('reportProblemOverlay');
@@ -11712,14 +11360,11 @@
         const publishOverlay = document.getElementById('publishOverlay');
         const manageOverlay = document.getElementById('manageOverlay');
 
-        // Handle auth overlay - go back or close if user is already logged in
         if (authOverlay && authOverlay.classList.contains('active')) {
           const welcomeScreen = document.getElementById('authWelcomeScreen');
           if (!welcomeScreen.classList.contains('active')) {
-            // If not on welcome screen, go back
             authGoBack();
           } else if (currentUser) {
-            // If user is logged in, can close overlay
             closeAuthOverlay();
           }
           return;
@@ -11751,23 +11396,4 @@
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
