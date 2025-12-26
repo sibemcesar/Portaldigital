@@ -1198,6 +1198,45 @@
       padding: 8px 0;
     }
 
+    .report-card-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    .report-card-actions .report-resolve-btn,
+    .report-card-actions .report-delete-btn {
+      flex: 1;
+    }
+
+    .report-delete-btn {
+      background: transparent;
+      color: #f44336;
+      border: 1.5px solid #f44336;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .report-delete-btn:hover {
+      background: rgba(244, 67, 54, 0.1);
+    }
+
+    .report-delete-btn:active {
+      transform: scale(0.98);
+    }
+
+    .report-delete-btn.full-width {
+      width: 100%;
+    }
+
     .reports-empty {
       display: flex;
       flex-direction: column;
@@ -9785,14 +9824,24 @@
               <p class="report-card-description">${report.description}</p>
             </div>
             ${report.status === 'pending' ? `
-              <button onclick="markReportResolved('${report.id}')" class="report-resolve-btn">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                Marcar como Resolvido
-              </button>
+              <div class="report-card-actions">
+                <button onclick="markReportResolved('${report.id}')" class="report-resolve-btn">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                  Resolver
+                </button>
+                <button onclick="confirmDeleteReport('${report.id}')" class="report-delete-btn">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                  Excluir
+                </button>
+              </div>
             ` : `
               <div class="report-resolved-info">
                 ✅ Resolvido em ${report.resolvedAt ? new Date(report.resolvedAt).toLocaleDateString('pt-BR') : 'N/A'}
               </div>
+              <button onclick="confirmDeleteReport('${report.id}')" class="report-delete-btn full-width">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                Excluir Report
+              </button>
             `}
           </div>
         `;
@@ -9826,6 +9875,31 @@
       } catch (error) {
         console.error('Error resolving report:', error);
         showCustomAlert('Erro ao atualizar report.');
+      }
+    }
+
+    function confirmDeleteReport(reportId) {
+      showCustomConfirm('Tem certeza que deseja excluir este report? Esta ação não pode ser desfeita.', () => {
+        deleteReport(reportId);
+      });
+    }
+
+    async function deleteReport(reportId) {
+      try {
+        const { ref, remove } = window.firebaseModules;
+        const database = window.firebaseDatabase;
+
+        const reportRef = ref(database, `problemReports/${reportId}`);
+        await remove(reportRef);
+
+        // Remove from local data and re-render
+        allReports = allReports.filter(r => r.id !== reportId);
+        renderReports();
+        updateReportsBadge();
+        showCustomAlert('Report excluído com sucesso!');
+      } catch (error) {
+        console.error('Error deleting report:', error);
+        showCustomAlert('Erro ao excluir report.');
       }
     }
 
