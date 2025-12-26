@@ -4978,7 +4978,7 @@
 
     <button class="btn notification-btn" id="viewReportsBtn" onclick="openViewReportsModal()" style="display: none;">
       <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm3-4H6v-2h9v2zm0-4H6V7h9v2z"/></svg>
-      Ver Reports (ADM)
+      Ver Reports
       <span class="notification-badge" id="reportsBadge" style="display: none;">0</span>
     </button>
 
@@ -6333,20 +6333,21 @@
           generateCodeBtn.style.display = 'none';
           manageUsersBtn.style.display = 'none';
           sendNotificationBtn.style.display = 'none';
-          viewReportsBtn.style.display = 'none';
-          // Mostrar botão de reportar para usuários aprovados
+          // Mostrar botão de reportar e ver reports para usuários aprovados
           if (userStatus === 'approved') {
             reportProblemBtn.style.display = 'flex';
+            viewReportsBtn.style.display = 'flex';
           } else {
             reportProblemBtn.style.display = 'none';
+            viewReportsBtn.style.display = 'none';
           }
         }
 
         updateUserInfoDisplay();
         loadNotifications();
 
-        // Update reports badge for admins
-        if (isPublisher) {
+        // Update reports badge for admins and verified users
+        if (isPublisher || userStatus === 'approved') {
           updateReportsBadge();
         }
       }
@@ -7114,7 +7115,7 @@
       }
 
       if (userStatus === 'pending') {
-        showCustomAlert('Sua conta ainda está aguardando aprovação do administrador. Por favor, aguarde.');
+        showCustomAlert('Sua conta ainda está aguardando aprova��ão do administrador. Por favor, aguarde.');
         return;
       }
 
@@ -9675,9 +9676,9 @@
       document.getElementById('reportsOverlay').classList.remove('active');
     }
 
-    // Function to update reports badge for admin
+    // Function to update reports badge for admin and verified users
     async function updateReportsBadge() {
-      if (!isPublisher) return;
+      if (!isPublisher && userStatus !== 'approved') return;
 
       const badge = document.getElementById('reportsBadge');
       if (!badge) return;
@@ -9824,6 +9825,7 @@
               <p class="report-card-description">${report.description}</p>
             </div>
             ${report.status === 'pending' ? `
+              ${isPublisher ? `
               <div class="report-card-actions">
                 <button onclick="markReportResolved('${report.id}')" class="report-resolve-btn">
                   <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
@@ -9834,14 +9836,17 @@
                   Excluir
                 </button>
               </div>
+              ` : ''}
             ` : `
               <div class="report-resolved-info">
                 ✅ Resolvido em ${report.resolvedAt ? new Date(report.resolvedAt).toLocaleDateString('pt-BR') : 'N/A'}
               </div>
+              ${isPublisher ? `
               <button onclick="confirmDeleteReport('${report.id}')" class="report-delete-btn full-width">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
                 Excluir Report
               </button>
+              ` : ''}
             `}
           </div>
         `;
@@ -11257,6 +11262,7 @@
   </script>
 </body>
 </html>
+
 
 
 
