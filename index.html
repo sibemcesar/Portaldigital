@@ -446,32 +446,27 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 14px 16px;
+      padding: 12px 16px;
       background: var(--bg-primary);
       border-bottom: 1px solid var(--border-color);
       flex-shrink: 0;
       z-index: 100;
-      min-height: 56px;
     }
 
     .content-header-btn {
       background: none;
       border: none;
       cursor: pointer;
-      padding: 10px;
+      padding: 8px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: background 0.2s;
-      min-width: 44px;
-      min-height: 44px;
     }
 
     .content-header-btn svg {
       fill: var(--text-primary);
-      width: 24px;
-      height: 24px;
     }
 
     .content-header-btn:hover {
@@ -484,7 +479,7 @@
 
     .content-header-title {
       flex: 1;
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 600;
       color: var(--text-primary);
       margin: 0 12px;
@@ -1807,6 +1802,214 @@
     .contact-item a:hover {
       opacity: 0.9;
     }
+    /* Generate Code Overlay - Full Screen Android Style */
+    .generate-code-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg-primary);
+      z-index: 2000;
+      flex-direction: column;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .generate-code-overlay.active {
+      display: flex;
+    }
+
+    .generate-code-overlay-content {
+      width: 100%;
+      height: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      background: var(--bg-primary);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .generate-code-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .generate-code-header-box {
+      background: linear-gradient(135deg, rgba(76, 175, 80, 0.15) 0%, rgba(129, 199, 132, 0.1) 100%);
+      border: 1px solid rgba(76, 175, 80, 0.3);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .generate-code-header-box .icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    .generate-code-header-box h3 {
+      font-size: 20px;
+      color: var(--text-primary);
+      margin: 0 0 8px 0;
+      font-weight: 700;
+    }
+
+    .generate-code-header-box p {
+      font-size: 15px;
+      color: var(--text-secondary);
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .generate-code-input-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    .generate-code-input-section label {
+      display: block;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+
+    .generate-code-input-section input {
+      width: 100%;
+      padding: 16px 20px;
+      background: var(--bg-secondary);
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-size: 18px;
+      font-family: 'Inter', sans-serif;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .generate-code-input-section input:focus {
+      outline: none;
+      border-color: #4CAF50;
+      background: var(--bg-primary);
+    }
+
+    .generate-code-input-section input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .generate-code-btn {
+      width: 100%;
+      padding: 18px;
+      background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-size: 17px;
+      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .generate-code-btn:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .generate-code-btn:active {
+      transform: scale(0.98);
+    }
+
+    .generate-code-btn svg {
+      width: 22px;
+      height: 22px;
+      fill: white;
+    }
+
+    .generated-code-result {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      display: none;
+    }
+
+    .generated-code-result.active {
+      display: block;
+    }
+
+    .generated-code-result h4 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0 0 16px 0;
+    }
+
+    .generated-code-display {
+      background: var(--bg-secondary);
+      padding: 20px;
+      border-radius: 12px;
+      font-family: 'Courier New', monospace;
+      font-size: 24px;
+      font-weight: 700;
+      text-align: center;
+      border: 2px dashed rgba(76, 175, 80, 0.5);
+      color: #4CAF50;
+      letter-spacing: 3px;
+      word-break: break-all;
+    }
+
+    .generated-code-hint {
+      margin-top: 16px;
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .generated-code-copy-btn {
+      margin-top: 16px;
+      padding: 14px 24px;
+      background: transparent;
+      border: 2px solid #4CAF50;
+      border-radius: 10px;
+      color: #4CAF50;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .generated-code-copy-btn:hover {
+      background: rgba(76, 175, 80, 0.1);
+    }
+
+    .generated-code-copy-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: #4CAF50;
+    }
+
+
 
     .comments-overlay-content {
       width: 100%;
@@ -2718,69 +2921,68 @@
       flex: 1;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
-      padding: 24px 20px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 20px;
     }
 
     .transfer-info-card {
       background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
       border: 1px solid var(--border-color);
-      border-radius: 20px;
-      padding: 24px;
+      border-radius: 16px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
     }
 
     .transfer-points-display {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
     }
 
     .transfer-points-icon {
-      width: 56px;
-      height: 56px;
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
       background: linear-gradient(135deg, #00BCD4, #00838F);
       display: flex;
       align-items: center;
       justify-content: center;
-      flex-shrink: 0;
     }
 
     .transfer-points-icon svg {
       fill: white;
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
     }
 
     .transfer-points-value {
-      font-size: 36px;
+      font-size: 32px;
       font-weight: 700;
       color: var(--text-primary);
     }
 
     .transfer-points-label {
-      font-size: 15px;
+      font-size: 14px;
       color: var(--text-muted);
-      margin-top: 4px;
+      margin-top: 2px;
     }
 
     .transfer-info-text {
-      font-size: 15px;
+      font-size: 14px;
       color: var(--text-secondary);
-      line-height: 1.6;
-      padding: 14px 16px;
+      line-height: 1.5;
+      padding: 12px;
       background: var(--bg-secondary);
-      border-radius: 12px;
+      border-radius: 10px;
     }
 
     .transfer-type-selector {
       display: flex;
-      gap: 14px;
+      gap: 12px;
     }
 
     .transfer-type-option {
@@ -2788,9 +2990,9 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
-      padding: 22px 16px;
-      border-radius: 16px;
+      gap: 10px;
+      padding: 18px 14px;
+      border-radius: 14px;
       background: var(--bg-card);
       border: 2px solid var(--border-color);
       cursor: pointer;
@@ -2811,8 +3013,8 @@
     }
 
     .transfer-type-icon {
-      width: 52px;
-      height: 52px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
       background: var(--bg-secondary);
       display: flex;
@@ -2826,8 +3028,8 @@
     }
 
     .transfer-type-icon svg {
-      width: 28px;
-      height: 28px;
+      width: 24px;
+      height: 24px;
       fill: var(--text-secondary);
       transition: fill 0.2s ease;
     }
@@ -2837,21 +3039,20 @@
     }
 
     .transfer-type-label {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 600;
       color: var(--text-primary);
       text-align: center;
-      line-height: 1.4;
     }
 
     .transfer-form-group {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
 
     .transfer-form-label {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
       color: var(--text-primary);
       display: flex;
@@ -2862,16 +3063,16 @@
     .transfer-form-label-hint {
       font-weight: 400;
       color: var(--text-muted);
-      font-size: 14px;
+      font-size: 13px;
     }
 
     .transfer-form-input {
-      padding: 18px 20px;
-      border-radius: 16px;
+      padding: 16px 18px;
+      border-radius: 14px;
       border: 1px solid var(--border-color);
       background: var(--bg-card);
       color: var(--text-primary);
-      font-size: 17px;
+      font-size: 16px;
       font-family: 'Inter', sans-serif;
       transition: all 0.2s ease;
     }
@@ -2889,52 +3090,52 @@
     .transfer-all-warning {
       background: linear-gradient(135deg, rgba(255, 152, 0, 0.1), rgba(255, 193, 7, 0.08));
       border: 1px solid rgba(255, 152, 0, 0.3);
-      border-radius: 16px;
-      padding: 18px;
+      border-radius: 14px;
+      padding: 16px;
     }
 
     .transfer-all-warning-header {
       display: flex;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 12px;
+      gap: 10px;
+      margin-bottom: 10px;
     }
 
     .transfer-all-warning-header svg {
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
       fill: #FF9800;
     }
 
     .transfer-all-warning-header strong {
       color: #FF9800;
-      font-size: 16px;
+      font-size: 15px;
     }
 
     .transfer-all-warning p {
       margin: 0;
       color: var(--text-secondary);
-      font-size: 15px;
+      font-size: 14px;
       line-height: 1.6;
     }
 
     .transfer-submit-footer {
-      padding: 18px 20px;
-      padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+      padding: 16px 20px;
+      padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
       background: var(--bg-primary);
       border-top: 1px solid var(--border-color);
       display: flex;
-      gap: 14px;
+      gap: 12px;
       flex-shrink: 0;
     }
 
     .transfer-submit-btn {
       flex: 1;
-      padding: 18px 24px;
-      border-radius: 16px;
+      padding: 16px 24px;
+      border-radius: 14px;
       border: none;
       font-family: 'Inter', sans-serif;
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -2942,7 +3143,6 @@
       align-items: center;
       justify-content: center;
       gap: 10px;
-      min-height: 56px;
     }
 
     .transfer-submit-btn.primary {
@@ -2970,8 +3170,8 @@
     }
 
     .transfer-submit-btn svg {
-      width: 22px;
-      height: 22px;
+      width: 20px;
+      height: 20px;
       fill: currentColor;
     }
 
@@ -5692,24 +5892,47 @@
     </div>
   </div>
 
-  <div id="generateCodeModal" class="custom-modal">
-    <div class="custom-modal-content">
-      <h2>Gerar Código de Pontos</h2>
-      <p>Crie um c��digo de resgate para seus usuários.</p>
-      <div class="form-group">
-        <label class="form-label">Quantidade de Pontos</label>
-        <input type="number" class="form-input" id="codePoints" min="1" value="50" required>
+  <!-- Generate Code Overlay - Full Screen Android Style -->
+  <div id="generateCodeOverlay" class="generate-code-overlay">
+    <div class="generate-code-overlay-content">
+      <div class="content-header">
+        <button class="content-header-btn back-btn" onclick="closeGenerateCodeModal()">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <h1 class="content-header-title">Gerar Código de Pontos</h1>
+        <div style="width: 40px;"></div>
       </div>
-      <button class="custom-modal-btn primary" onclick="generateCode()">Gerar Código</button>
-      <div id="generatedCodeDisplay" style="display: none;">
-        <p style="margin-top: 16px; font-weight: 600;">Código gerado:</p>
-        <div class="code-display" id="codeDisplay"></div>
-        <p style="margin-top: 8px; font-size: 13px; color: var(--text-muted);">
-          Compartilhe este código com seus usuários. Ele pode ser usado apenas uma vez.
-        </p>
-      </div>
-      <div class="custom-modal-buttons" style="margin-top: 16px;">
-        <button class="custom-modal-btn secondary" onclick="closeGenerateCodeModal()">Fechar</button>
+
+      <div class="generate-code-container">
+        <!-- Header Box -->
+        <div class="generate-code-header-box">
+          <div class="icon">🎫</div>
+          <h3>Criar Código de Resgate</h3>
+          <p>Gere um código único para que seus usuários possam resgatar pontos na plataforma</p>
+        </div>
+
+        <!-- Input Section -->
+        <div class="generate-code-input-section">
+          <label>Quantidade de Pontos</label>
+          <input type="number" id="codePoints" min="1" value="50" placeholder="Digite a quantidade" required>
+          <button class="generate-code-btn" onclick="generateCode()">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+            Gerar Código
+          </button>
+        </div>
+
+        <!-- Result Section -->
+        <div id="generatedCodeResult" class="generated-code-result">
+          <h4>✅ Código Gerado com Sucesso!</h4>
+          <div id="codeDisplay" class="generated-code-display"></div>
+          <p class="generated-code-hint">
+            Compartilhe este código com seus usuários. Cada código pode ser usado apenas uma vez.
+          </p>
+          <button class="generated-code-copy-btn" onclick="copyGeneratedCode()">
+            <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+            Copiar Código
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -7602,7 +7825,7 @@
 
       const codeId = newCodeRef.key;
       document.getElementById('codeDisplay').textContent = codeId;
-      document.getElementById('generatedCodeDisplay').style.display = 'block';
+      document.getElementById('generatedCodeResult').classList.add('active');
     }
 
     // ===== FUNÇÃO SEGURA: redeemCode com multi-location update atômico =====
@@ -8412,13 +8635,27 @@
     }
 
     function openGenerateCodeModal() {
-      document.getElementById('generatedCodeDisplay').style.display = 'none';
+      closeSidebar();
+      document.getElementById('generatedCodeResult').classList.remove('active');
       document.getElementById('codePoints').value = '50';
-      document.getElementById('generateCodeModal').classList.add('active');
+      document.getElementById('generateCodeOverlay').classList.add('active');
+      document.body.style.overflow = 'hidden';
     }
 
     function closeGenerateCodeModal() {
-      document.getElementById('generateCodeModal').classList.remove('active');
+      document.getElementById('generateCodeOverlay').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function copyGeneratedCode() {
+      const code = document.getElementById('codeDisplay').textContent;
+      if (navigator.clipboard && code) {
+        navigator.clipboard.writeText(code).then(() => {
+          showCustomAlert('Código copiado!');
+        }).catch(() => {
+          showCustomAlert('Não foi possível copiar o código.');
+        });
+      }
     }
 
     function openRedeemCodeModal() {
@@ -11496,6 +11733,8 @@
           closeNotificationsOverlay();
         } else if (favoritesOverlay && favoritesOverlay.classList.contains('active')) {
           closeFavoritesOverlay();
+        } else if (document.getElementById('generateCodeOverlay') && document.getElementById('generateCodeOverlay').classList.contains('active')) {
+          closeGenerateCodeModal();
         } else if (commentsOverlay && commentsOverlay.classList.contains('active')) {
           closeCommentsOverlay();
         } else if (downloadsOverlay && downloadsOverlay.classList.contains('active')) {
