@@ -5,6 +5,61 @@
   <title>Portal Digital</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
    <script>
+    // Variável global para armazenar o ID do jogo pendente (para WebViews)
+    window.pendingGameId = null;
+
+    // Função para extrair o ID do jogo de várias fontes possíveis
+    function extractGameIdFromUrl() {
+      // 1. Tenta window.location.search (método padrão)
+      if (window.location.search) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+        if (id) return id;
+      }
+
+      // 2. Tenta extrair do href completo (para WebViews que perdem o search)
+      const href = window.location.href || '';
+      const match = href.match(/[?&]id=([^&]+)/);
+      if (match) return match[1];
+
+      // 3. Verifica se há hash com id (fallback alternativo)
+      if (window.location.hash) {
+        const hashMatch = window.location.hash.match(/id=([^&]+)/);
+        if (hashMatch) return hashMatch[1];
+      }
+
+      // 4. Verifica variável global definida pelo WebView Android
+      if (window.GAME_ID) return window.GAME_ID;
+
+      // 5. Verifica pendingGameId
+      if (window.pendingGameId) return window.pendingGameId;
+
+      return null;
+    }
+
+    // Função global para Android WebView abrir jogo diretamente
+    window.openGameById = function(gameId) {
+      console.log("openGameById chamado com ID:", gameId);
+      window.pendingGameId = gameId;
+
+      // Se o app já está carregado, abre o jogo diretamente
+      if (window.allGames && window.allGames[gameId]) {
+        if (typeof window.openGameDetail === 'function') {
+          window.openGameDetail(gameId);
+        }
+      }
+      // Caso contrário, será tratado quando os jogos carregarem
+    };
+
+    // Captura o ID imediatamente na carga da página
+    (function() {
+      const initialGameId = extractGameIdFromUrl();
+      if (initialGameId) {
+        window.pendingGameId = initialGameId;
+        console.log("ID do jogo capturado na inicialização:", initialGameId);
+      }
+    })();
+
     function isWebView() {
       const ua = navigator.userAgent || navigator.vendor || window.opera;
       if (/wv/.test(ua)) return true;
@@ -7367,13 +7422,24 @@
     }
 
     function checkUrlForGameId() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const gameId = urlParams.get('id');
+      // Usa a função global que verifica múltiplas fontes (URL, hash, variáveis globais)
+      const gameId = window.extractGameIdFromUrl ? window.extractGameIdFromUrl() : null;
+
+      console.log("checkUrlForGameId - ID encontrado:", gameId);
 
       if (gameId && allGames[gameId]) {
+        console.log("Abrindo jogo:", gameId);
         openGameDetail(gameId);
+        // Limpa o pendingGameId após abrir
+        window.pendingGameId = null;
+      } else if (gameId) {
+        console.log("Jogo não encontrado na lista:", gameId);
       }
     }
+
+    // Expor allGames e openGameDetail globalmente para que openGameById funcione
+    window.allGames = allGames;
+    window.openGameDetail = openGameDetail;
 
     function showGameInfo() {
       document.getElementById('gameInfo').classList.add('active');
@@ -11408,6 +11474,7 @@
   </script>
 </body>
 </html>
+
 
 
 
