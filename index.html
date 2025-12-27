@@ -7154,7 +7154,7 @@
           <div class="download-section">
             <div class="download-section-title">${link.desc || 'Download'}</div>
             <div class="download-section-buttons">
-              ${hasGA ? `<button class="btn-main download-btn" data-game-id="${id}" data-app-type="GA" data-link-index="${index}" data-cost="${cost}">Baixar G.A</button>` : ''}
+              ${hasGA ? `<button class="btn-main download-btn" data-game-id="${id}" data-app-type="GA" data-link-index="${index}" data-cost="${cost}">Baixar </button>` : ''}
               ${hasADM ? `<button class="btn-main download-btn" data-game-id="${id}" data-app-type="ADM" data-link-index="${index}" data-cost="${cost}">Baixar ADM</button>` : ''}
             </div>
           </div>
@@ -9692,15 +9692,15 @@
         let avatarStatusClass = 'status-pending';
         if (role === 'admin') {
           statusBadgeClass = 'admin';
-          statusBadgeText = '? Administrador';
+          statusBadgeText = ' Administrador';
           avatarStatusClass = 'status-admin';
         } else if (status === 'approved') {
           statusBadgeClass = 'verified';
-          statusBadgeText = '✓ Verificado';
+          statusBadgeText = ' Verificado';
           avatarStatusClass = 'status-verified';
         } else if (status === 'rejected') {
           statusBadgeClass = 'pending';
-          statusBadgeText = '✗ Rejeitado';
+          statusBadgeText = ' Rejeitado';
           avatarStatusClass = 'status-rejected';
         }
 
