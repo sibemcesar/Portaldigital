@@ -1567,6 +1567,157 @@
       opacity: 1;
     }
 
+    
+    .auth-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-primary);
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 3000;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .auth-overlay.active {
+      display: flex;
+      opacity: 1;
+      visibility: visible;
+    }
+    .auth-overlay-content {
+      width: 100%;
+      max-width: 400px;
+      background: var(--bg-secondary);
+      border-radius: 20px;
+      padding: 40px 32px;
+      box-shadow: var(--shadow-overlay);
+      border: 1px solid var(--border-color);
+      transform: translateY(30px) scale(0.95);
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .auth-overlay.active .auth-overlay-content {
+      transform: translateY(0) scale(1);
+    }
+    .auth-overlay-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .auth-overlay-logo {
+      width: 80px;
+      height: 80px;
+      background: transparent;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+    }
+    .auth-overlay-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .auth-overlay-header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+    .auth-overlay-header p {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    .auth-overlay-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .auth-overlay-btn {
+      width: 100%;
+      padding: 16px 24px;
+      border-radius: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border: none;
+    }
+    .auth-overlay-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+    .auth-overlay-btn.primary {
+      background: var(--accent-primary);
+      color: var(--bg-primary);
+    }
+    .auth-overlay-btn.primary:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    .auth-overlay-btn.primary:active {
+      transform: translateY(0);
+    }
+    .auth-overlay-btn.secondary {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+    .auth-overlay-btn.secondary:hover {
+      background: var(--bg-primary);
+      border-color: var(--accent-primary);
+    }
+    .auth-overlay-btn.guest {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px dashed var(--border-color);
+    }
+    .auth-overlay-btn.guest:hover {
+      color: var(--text-primary);
+      border-color: var(--text-muted);
+      background: var(--bg-card);
+    }
+    .auth-overlay-divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 20px 0;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+    .auth-overlay-divider::before,
+    .auth-overlay-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border-color);
+    }
+    @media (max-width: 480px) {
+      .auth-overlay-content {
+        padding: 32px 24px;
+        border-radius: 16px;
+      }
+      .auth-overlay-header h1 {
+        font-size: 1.5rem;
+      }
+      .auth-overlay-logo {
+        width: 64px;
+        height: 64px;
+      }
+    }
+
     .overlay1 {
       position: fixed;
       top: 0;
@@ -1838,6 +1989,40 @@
   </style>
 </head>
 <body>
+
+  
+  <div class="auth-overlay" id="auth-overlay">
+    <div class="auth-overlay-content">
+      <div class="auth-overlay-header">
+        <div class="auth-overlay-logo">
+          <img src="logo.png" alt="Portal Digital Logo">
+        </div>
+        <h1>Portal Digital</h1>
+        <p>Bem-vindo! Escolha como deseja continuar.</p>
+      </div>
+      <div class="auth-overlay-buttons">
+        <button class="auth-overlay-btn primary" onclick="closeAuthOverlay(); openLoginModal();">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+          </svg>
+          Entrar
+        </button>
+        <button class="auth-overlay-btn secondary" onclick="closeAuthOverlay(); openRegisterModal();">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+          </svg>
+          Criar Conta
+        </button>
+        <div class="auth-overlay-divider">ou</div>
+        <button class="auth-overlay-btn guest" onclick="enterAsGuest();">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+          </svg>
+          Entrar como Convidado
+        </button>
+      </div>
+    </div>
+  </div>
 
   <div class="overlay1" id="external-overlay1">
     <div class="overlay1-content">
@@ -2673,7 +2858,7 @@
     let currentGameData = null;
     let historyData = [];
     window.addEventListener('load', () => {
-      const { onAuthStateChanged, signInAnonymously } = window.firebaseModules;
+      const { onAuthStateChanged } = window.firebaseModules;
       const auth = window.firebaseAuth;
       onAuthStateChanged(auth, async (user) => {
         if (user) {
@@ -2685,13 +2870,11 @@
           updateUIForUser();
           loadGames();
           loadHistory();
+          closeAuthOverlay();
         } else {
-          try {
-            await signInAnonymously(auth);
-          } catch (error) {
-            console.error('Erro no login anônimo:', error);
-            showCustomAlert('Erro ao conectar. Tente novamente.');
-          }
+
+          showAuthOverlay();
+          loadGames();
         }
       });
     });
@@ -2723,10 +2906,10 @@
         });
       }
       if (userStatus === 'rejected') {
-        const { signOut, signInAnonymously } = window.firebaseModules;
+        const { signOut } = window.firebaseModules;
         await signOut(window.firebaseAuth);
-        await signInAnonymously(window.firebaseAuth);
         showCustomAlert('⚠️ Sua conta foi marcada como fraude e foi bloqueada. Entre em contato com o administrador se acredita que isso é um erro.');
+        showAuthOverlay();
         return false;
       }
       updatePointsDisplay();
@@ -3447,14 +3630,14 @@
     async function logout() {
       showCustomConfirm('Deseja realmente sair?', async () => {
         try {
-          const { signOut, signInAnonymously } = window.firebaseModules;
+          const { signOut } = window.firebaseModules;
           await signOut(window.firebaseAuth);
-          await signInAnonymously(window.firebaseAuth);
           currentUser = null;
           isPublisher = false;
           userPoints = 0;
           updateUIForUser();
-          showCustomAlert('Você saiu da conta. Modo visualização ativado.');
+          showAuthOverlay();
+          showCustomAlert('Você saiu da conta.');
         } catch (error) {
           showCustomAlert('Erro ao sair: ' + error.message);
         }
@@ -3526,7 +3709,7 @@
         <div style="background: var(--bg-card); padding: 12px; border-radius: 8px; margin-bottom: 12px; border: 1px solid var(--border-color);">
           <h3 style="margin: 0 0 8px 0; font-size: 16px;">${game.titulo}</h3>
           <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 12px;">
-            ${game.genero} • ${game.size} • ${game.downloads || 0} downloads
+            ${game.genero} • ${game.size} ��� ${game.downloads || 0} downloads
           </p>
           <div style="display: flex; gap: 8px;">
             <button class="custom-modal-btn primary" onclick="editGame('${id}')" style="font-size: 14px; padding: 8px 16px;">Editar</button>
@@ -3682,12 +3865,43 @@
       const box = document.getElementById('filter-tabs');
       box.style.display = box.style.display === 'none' || box.style.display === '' ? 'flex' : 'none';
     }
+
+    function showAuthOverlay() {
+      const overlay = document.getElementById('auth-overlay');
+      if (overlay) {
+        overlay.style.display = 'flex';
+        setTimeout(() => {
+          overlay.classList.add('active');
+        }, 10);
+      }
+    }
+    function closeAuthOverlay() {
+      const overlay = document.getElementById('auth-overlay');
+      if (overlay) {
+        overlay.classList.remove('active');
+        setTimeout(() => {
+          overlay.style.display = 'none';
+        }, 400);
+      }
+    }
+    async function enterAsGuest() {
+      try {
+        const { signInAnonymously } = window.firebaseModules;
+        const auth = window.firebaseAuth;
+        await signInAnonymously(auth);
+        closeAuthOverlay();
+      } catch (error) {
+        console.error('Erro no login anônimo:', error);
+        showCustomAlert('Erro ao conectar. Tente novamente.');
+      }
+    }
     function openLoginModal() {
       document.getElementById('loginModal').classList.add('active');
     }
     function closeLoginModal() {
       document.getElementById('loginModal').classList.remove('active');
       document.getElementById('loginForm').reset();
+      showAuthOverlay();
     }
     function openRegisterModal() {
       document.getElementById('registerModal').classList.add('active');
@@ -3695,6 +3909,7 @@
     function closeRegisterModal() {
       document.getElementById('registerModal').classList.remove('active');
       document.getElementById('registerForm').reset();
+      showAuthOverlay();
     }
     let verificationCheckInterval = null;
     function showEmailVerificationOptions(email) {
@@ -3770,7 +3985,7 @@
       const container = document.getElementById('emailVerificationContent');
       container.innerHTML = `
         <div style="text-align: center; padding: 16px 0;">
-          <div style="font-size: 48px; margin-bottom: 16px;">📬</div>
+          <div style="font-size: 48px; margin-bottom: 16px;">����</div>
           <p style="color: var(--text-primary); font-size: 16px; font-weight: 600; margin-bottom: 8px;">
             Email Enviado!
           </p>
@@ -6141,3 +6356,5 @@
   </script>
 </body>
 </html>
+
+
