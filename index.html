@@ -6821,6 +6821,7 @@
         gamesLoaded = true;
         renderGrid();
         checkUrlForGameId();
+        checkPendingGameId();
       }, (error) => {
         console.error('Erro ao carregar jogos:', error);
         loadGamesOnce();
@@ -6866,6 +6867,7 @@
         gamesLoaded = true;
         renderGrid();
         checkUrlForGameId();
+        checkPendingGameId();
       } catch (error) {
         console.error('Erro ao carregar jogos (fallback):', error);
       }
@@ -7385,14 +7387,69 @@
       document.body.removeChild(textArea);
     }
 
+    // Armazena o ID do jogo pendente para abrir quando os jogos carregarem
+    let pendingGameId = null;
+
     function checkUrlForGameId() {
       const urlParams = new URLSearchParams(window.location.search);
       const gameId = urlParams.get('id');
 
-      if (gameId && allGames[gameId]) {
-        openGameDetail(gameId);
+      console.log('[DeepLink] Verificando URL:', window.location.href);
+      console.log('[DeepLink] Game ID encontrado:', gameId);
+
+      if (gameId) {
+        if (allGames[gameId]) {
+          console.log('[DeepLink] Jogo encontrado, abrindo:', gameId);
+          openGameDetail(gameId);
+          pendingGameId = null;
+        } else if (!gamesLoaded) {
+          // Jogos ainda não carregaram, salva para abrir depois
+          console.log('[DeepLink] Jogos não carregados, salvando ID pendente:', gameId);
+          pendingGameId = gameId;
+        } else {
+          console.log('[DeepLink] Jogo não encontrado:', gameId);
+          showCustomAlert('O jogo solicitado não foi encontrado.');
+        }
       }
     }
+
+    // Verifica se há um jogo pendente para abrir após carregar os jogos
+    function checkPendingGameId() {
+      if (pendingGameId && allGames[pendingGameId]) {
+        console.log('[DeepLink] Abrindo jogo pendente:', pendingGameId);
+        openGameDetail(pendingGameId);
+        pendingGameId = null;
+      } else if (pendingGameId) {
+        console.log('[DeepLink] Jogo pendente não encontrado:', pendingGameId);
+        showCustomAlert('O jogo compartilhado não foi encontrado.');
+        pendingGameId = null;
+      }
+    }
+
+    // Listener para quando o histórico muda (navegação com botão voltar)
+    window.addEventListener('popstate', function(event) {
+      console.log('[DeepLink] PopState event:', event.state);
+      if (event.state && event.state.gameId) {
+        if (allGames[event.state.gameId]) {
+          openGameDetail(event.state.gameId);
+        }
+      } else {
+        closeModal();
+        checkUrlForGameId();
+      }
+    });
+
+    // Verifica o URL no carregamento inicial (para deep links)
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('[DeepLink] DOMContentLoaded - URL:', window.location.href);
+      // Verifica se há ID na URL e salva como pendente
+      const urlParams = new URLSearchParams(window.location.search);
+      const gameId = urlParams.get('id');
+      if (gameId) {
+        pendingGameId = gameId;
+        console.log('[DeepLink] ID pendente salvo no DOMContentLoaded:', gameId);
+      }
+    });
 
     function showGameInfo() {
       document.getElementById('gameInfo').classList.add('active');
@@ -11517,6 +11574,7 @@
   </script>
 </body>
 </html>
+
 
 
 
