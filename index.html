@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <title>Portal Digital</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script>
+   <script>
     function isWebView() {
       const ua = navigator.userAgent || navigator.vendor || window.opera;
       if (/wv/.test(ua)) return true;
@@ -775,11 +775,17 @@
       width: 80px;
       height: 80px;
       margin: 0 auto 20px;
-      background: var(--accent-primary);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
+      overflow: hidden;
+    }
+
+    .auth-welcome-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     .auth-welcome-icon svg {
@@ -3604,11 +3610,12 @@
     }
 
     .transfer-btn {
-      background: linear-gradient(135deg, #00BCD4 0%, #0097A7 100%) !important;
+      background: transparent !important;
     }
 
     .transfer-btn:hover {
-      background: linear-gradient(135deg, #00ACC1 0%, #00838F 100%) !important;
+      background: var(--bg-card) !important;
+      box-shadow: var(--shadow-sm);
     }
 
     .like-btn {
@@ -4129,7 +4136,10 @@
     }
 
     .profile-header-card {
-      background: linear-gradient(135deg, var(--accent-primary) 0%, rgba(100, 100, 100, 0.8) 100%);
+      background: linear-gradient(135deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.4) 100%),
+                  url('image.jpeg');
+      background-size: cover;
+      background-position: center;
       border-radius: 20px;
       padding: 24px 16px;
       text-align: center;
@@ -4256,7 +4266,7 @@
 
     .profile-status-badge.admin {
       background: rgba(156, 39, 176, 0.2);
-      color: #9C27B0;
+      color: #ff00faff;
       border: 1px solid rgba(156, 39, 176, 0.4);
     }
 
@@ -5624,8 +5634,7 @@
 
   <div id="authLoadingOverlay" class="auth-loading-overlay">
     <div class="auth-loading-icon">
-      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-    </div>
+     <img src="logo.png" alt="Logo do aplicativo" style="width: 80px; height: auto;"> </div>
     <div class="auth-loading-spinner"></div>
     <div class="auth-loading-text" id="authLoadingText">A entrar...</div>
     <div class="auth-loading-subtext" id="authLoadingSubtext">Por favor aguarde</div>
@@ -5646,7 +5655,7 @@
         <div id="authWelcomeScreen" class="auth-form-container active">
           <div class="auth-welcome">
             <div class="auth-welcome-icon">
-              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+              <img src="logo.png" alt="Portal Digital Logo">
             </div>
             <h1>Portal Digital</h1>
             <p>Baixe jogos, apps e tutoriais exclusivos. Escolha como deseja continuar.</p>
@@ -6061,7 +6070,7 @@
       <div class="about-container">
         
         <div class="about-header-card">
-          <div class="about-logo"><img src="logo.png" alt="Logo do aplicativo" style="width: 120px; height: auto;"></div>
+          <div class="about-logo"><img src="logo.png" alt="Logo do aplicativo" style="width: 80px; height: auto;"></div>
           <h1 class="about-title">Portal Digital</h1>
           <p class="about-subtitle">Sua plataforma de aplicativos, jogos e tutoriais</p>
           <span class="about-version">Versão 1.0</span>
@@ -6071,7 +6080,7 @@
           <h4 class="about-contact-title"><span></span> Contato e Suporte</h4>
           <div class="about-contact-email">
             <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
-            <a href="/cdn-cgi/l/email-ion#0c7c637e786d606b6d61697c60797f4c6b616d6560226f6361"><span class="__cf_email__" data-cfemail="98e8f7eaecf9f4fff9f5fde8f4edebd8fff5f9f1f4b6fbf7f5">portaldigitalao@gmail.com</span></a>
+            <a href="/cdn-cgi/l/email-ion#0c7c637e786d606b6d61697c60797f4c6b616d6560226f6361"><span class="__cf_email__" data-cfemail="98e8f7eaecf9f4fff9f5fde8f4edebd8fff5f9f1f4b6fbf7f5"><span class="__cf_email__" data-cfemail="99e9f6ebedf8f5fdf0fef0edf8f5f8f6d9fef4f8f0f5b7faf6f4">portaldigitalao@gmail.com</span></span></a>
           </div>
         </div>
       </div>
@@ -6280,7 +6289,7 @@
           <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;"> Contato e Suporte</h4>
           <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.5;">
             Para dúvidas, sugestões ou problemas, entre em contato com os administradores através do nosso gmail <strong><a href="/cdn-cgi/l/email-
-                ion" class="__cf_email__" data-cfemail="50203f2224313c3439373924313c313f10373d31393c7e333f3d">[portaldigitalao@gmail.com]</a> </strong>  ou aguarde uma notificação com informações de contato.
+                ion" class="__cf_email__" data-cfemail="50203f2224313c3439373924313c313f10373d31393c7e333f3d">[<span class="__cf_email__" data-cfemail="d5a5baa7a1b4b9b1bcb2bca1b4b9b4ba95b2b8b4bcb9fbb6bab8">[email&#160;protected]</span>]</a> </strong>  ou aguarde uma notificação com informações de contato.
           </p>
         </div>
 
@@ -6528,7 +6537,7 @@
     </div>
   </div>
 
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     let manualThemeOverride = false;
 
     function applyTheme() {
@@ -9679,11 +9688,11 @@
         }
 
         let statusBadgeClass = 'pending';
-        let statusBadgeText = '⏳ Pendente';
+        let statusBadgeText = ' Pendente';
         let avatarStatusClass = 'status-pending';
         if (role === 'admin') {
           statusBadgeClass = 'admin';
-          statusBadgeText = '👑 Administrador';
+          statusBadgeText = '? Administrador';
           avatarStatusClass = 'status-admin';
         } else if (status === 'approved') {
           statusBadgeClass = 'verified';
@@ -11397,4 +11406,5 @@
   </script>
 </body>
 </html>
+
 
