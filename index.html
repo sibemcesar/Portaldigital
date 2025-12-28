@@ -7847,7 +7847,7 @@
     function shareContent() {
       if (!currentGameData) return;
 
-      const shareUrl = `https://portaldigital.vercel.app/web.html/+?id=${currentGameData.id}`;
+      const shareUrl = `https://portaldigital.vercel.app/web.html/?id=${currentGameData.id}`;
 
       if (navigator.share) {
         navigator.share({
