@@ -4223,19 +4223,76 @@
       position: absolute;
       inset: 0;
       border-radius: 50%;
-      background: rgba(0,0,0,0.7);
+      background: linear-gradient(135deg, rgba(0,0,0,0.85) 0%, rgba(30,30,30,0.9) 100%);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
+      gap: 8px;
+      animation: avatarUploadFadeIn 0.3s ease;
+    }
+
+    @keyframes avatarUploadFadeIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
     }
 
     .avatar-uploading-spinner {
-      width: 30px;
-      height: 30px;
-      border: 3px solid rgba(255,255,255,0.3);
-      border-top-color: white;
+      width: 32px;
+      height: 32px;
+      position: relative;
+    }
+
+    .avatar-uploading-spinner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 3px solid rgba(255,255,255,0.15);
       border-radius: 50%;
-      animation: authSpin 0.8s linear infinite;
+    }
+
+    .avatar-uploading-spinner::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 3px solid transparent;
+      border-top-color: #fff;
+      border-right-color: #fff;
+      border-radius: 50%;
+      animation: avatarSpinnerRotate 0.8s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    }
+
+    @keyframes avatarSpinnerRotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .avatar-uploading-text {
+      font-size: 9px;
+      color: rgba(255,255,255,0.9);
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      animation: avatarTextPulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes avatarTextPulse {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+
+    .avatar-uploading-progress {
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      border-top-color: #4CAF50;
+      animation: avatarProgressRotate 1.5s linear infinite;
+    }
+
+    @keyframes avatarProgressRotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
     .profile-avatar-svg.status-verified {
@@ -8496,7 +8553,13 @@
 
         const avatarElement = document.querySelector('.profile-avatar-svg');
         if (avatarElement) {
-          avatarElement.innerHTML = '<div class="avatar-uploading"><div class="avatar-uploading-spinner"></div></div>';
+          avatarElement.innerHTML = `
+            <div class="avatar-uploading">
+              <div class="avatar-uploading-progress"></div>
+              <div class="avatar-uploading-spinner"></div>
+              <span class="avatar-uploading-text">Enviando...</span>
+            </div>
+          `;
         }
 
         try {
@@ -11682,6 +11745,7 @@
   </script>
 </body>
 </html>
+
 
 
 
