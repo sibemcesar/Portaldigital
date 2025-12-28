@@ -3667,86 +3667,44 @@
       margin: 0;
     }
 
-    /* View User Profile Modal */
+    /* View User Profile Overlay (Full Screen) */
     .view-user-profile-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(4px);
       display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg-primary);
       z-index: 2000;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      animation: fadeIn 0.2s ease;
+      flex-direction: column;
+      animation: fadeIn 0.25s ease;
     }
 
     .view-user-profile-overlay.active {
       display: flex;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
     .view-user-profile-content {
-      background: var(--bg-secondary);
-      border-radius: 20px;
       width: 100%;
-      max-width: 420px;
-      max-height: 85vh;
-      overflow-y: auto;
-      animation: slideUp 0.3s ease;
-      border: 1px solid var(--border-color);
-    }
-
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .view-user-profile-header {
-      padding: 16px 20px;
+      height: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      background: var(--bg-primary);
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .view-user-profile-header h2 {
-      margin: 0;
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-
-    .view-user-profile-close-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      border: none;
-      background: var(--bg-card);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
-    }
-
-    .view-user-profile-close-btn:hover {
-      background: var(--border-color);
-      transform: scale(1.05);
-    }
-
-    .view-user-profile-close-btn svg {
-      width: 20px;
-      height: 20px;
-      fill: var(--text-primary);
+      flex-direction: column;
+      overflow: hidden;
     }
 
     .view-user-profile-body {
-      padding: 24px 20px;
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
     }
 
     .view-user-profile-avatar {
@@ -3833,7 +3791,7 @@
     }
 
     .view-user-profile-info {
-      background: var(--bg-card);
+      background: var(--bg-secondary);
       border-radius: 16px;
       padding: 4px 0;
       border: 1px solid var(--border-color);
@@ -3856,7 +3814,7 @@
       height: 42px;
       min-width: 42px;
       border-radius: 12px;
-      background: var(--bg-secondary);
+      background: var(--bg-card);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -6811,14 +6769,15 @@
     </div>
   </div>
 
-  <!-- View User Profile Modal -->
-  <div id="viewUserProfileOverlay" class="view-user-profile-overlay" onclick="if(event.target === this) closeViewUserProfile()">
+  <!-- View User Profile Overlay (Full Screen) -->
+  <div id="viewUserProfileOverlay" class="view-user-profile-overlay">
     <div class="view-user-profile-content">
-      <div class="view-user-profile-header">
-        <h2>Perfil do Usuário</h2>
-        <button class="view-user-profile-close-btn" onclick="closeViewUserProfile()">
-          <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      <div class="content-header">
+        <button class="content-header-btn back-btn" onclick="closeViewUserProfile()">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
         </button>
+        <h1 class="content-header-title">Perfil do Usuário</h1>
+        <div style="width: 40px;"></div>
       </div>
       <div class="view-user-profile-body" id="viewUserProfileBody">
         <!-- Content will be dynamically populated -->
@@ -12422,6 +12381,7 @@
   </script>
 </body>
 </html>
+
 
 
 
