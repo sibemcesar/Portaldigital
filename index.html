@@ -163,7 +163,8 @@
       position: fixed;
       top: 0;
       left: -100%;
-      width: 260px;
+      width: 80%;
+      max-width: 320px;
       height: 100%;
       background: var(--bg-secondary);
       box-shadow: 2px 0 8px rgba(0,0,0,0.3);
@@ -229,6 +230,31 @@
       flex-shrink: 0;
     }
     .btn:active { transform: scale(0.96); }
+
+    .profile-btn-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--bg-secondary);
+      border: 2px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .profile-btn-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .profile-btn-avatar svg {
+      width: 16px;
+      height: 16px;
+      fill: var(--text-muted);
+    }
 
     .search-container {
       max-width: 600px;
@@ -5957,7 +5983,9 @@
     </div>
 
     <button class="btn" id="myProfileBtn" onclick="openProfileOverlay()" style="margin-bottom: 8px;">
-      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+      <div class="profile-btn-avatar" id="sidebarProfileAvatar">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+      </div>
       Meu Perfil
     </button>
 
@@ -7409,6 +7437,19 @@
         if (isPublisher || userStatus === 'approved') {
           updateReportsBadge();
         }
+      }
+
+      updateSidebarProfileAvatar();
+    }
+
+    function updateSidebarProfileAvatar() {
+      const avatarContainer = document.getElementById('sidebarProfileAvatar');
+      if (!avatarContainer) return;
+
+      if (userAvatar) {
+        avatarContainer.innerHTML = '<img src="' + userAvatar + '" alt="Avatar">';
+      } else {
+        avatarContainer.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>';
       }
     }
 
@@ -9014,6 +9055,7 @@
           });
 
           userAvatar = imageUrl;
+          updateSidebarProfileAvatar();
 
           if (avatarElement) {
             const statusClass = avatarElement.className.split(' ').find(c => c.startsWith('status-')) || 'status-pending';
@@ -12322,6 +12364,8 @@
     const sidebar = document.getElementById('sidebar');
     let startX = 0;
     let endX = 0;
+    let startY = 0;
+    let endY = 0;
 
     sidebar.addEventListener('touchstart', (e) => {
       startX = e.touches[0].clientX;
@@ -12335,6 +12379,27 @@
       const diffX = endX - startX;
       if (diffX < -50) {
         sidebar.classList.remove('open');
+      }
+    });
+
+    // Swipe da borda esquerda para abrir o sidebar
+    document.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    });
+
+    document.addEventListener('touchmove', (e) => {
+      endX = e.touches[0].clientX;
+      endY = e.touches[0].clientY;
+    });
+
+    document.addEventListener('touchend', () => {
+      const diffX = endX - startX;
+      const diffY = Math.abs(endY - startY);
+
+      // Swipe para direita começando da borda esquerda (primeiros 30px)
+      if (startX < 30 && diffX > 80 && diffY < 100 && !sidebar.classList.contains('open')) {
+        sidebar.classList.add('open');
       }
     });
 
@@ -12387,6 +12452,7 @@
   </script>
 </body>
 </html>
+
 
 
 
