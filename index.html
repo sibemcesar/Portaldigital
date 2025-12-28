@@ -2379,6 +2379,147 @@
       white-space: pre-wrap;
     }
 
+    .notification-message a.notification-link {
+      color: #2196F3;
+      text-decoration: underline;
+      cursor: pointer;
+      word-break: break-all;
+      transition: color 0.2s ease;
+    }
+
+    .notification-message a.notification-link:hover {
+      color: #1976D2;
+    }
+
+    .dark .notification-message a.notification-link {
+      color: #64B5F6;
+    }
+
+    .dark .notification-message a.notification-link:hover {
+      color: #90CAF9;
+    }
+
+    /* Modal de escolha de link */
+    .link-choice-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10002;
+      opacity: 0;
+      animation: fadeInModal 0.2s ease forwards;
+      padding: 20px;
+    }
+
+    @keyframes fadeInModal {
+      to { opacity: 1; }
+    }
+
+    .link-choice-modal {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 360px;
+      width: 100%;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      animation: scaleInModal 0.25s ease forwards;
+      border: 1px solid var(--border-color);
+    }
+
+    @keyframes scaleInModal {
+      from {
+        transform: scale(0.9);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .link-choice-modal-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .link-choice-modal-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      text-align: center;
+      word-break: break-all;
+      line-height: 1.4;
+    }
+
+    .link-choice-modal-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .link-choice-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .link-choice-btn svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .link-choice-btn.browser-btn {
+      background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+      color: white;
+    }
+
+    .link-choice-btn.browser-btn:hover {
+      background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+    }
+
+    .link-choice-btn.ga-btn {
+      background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+      color: white;
+    }
+
+    .link-choice-btn.ga-btn:hover {
+      background: linear-gradient(135deg, #388E3C 0%, #2E7D32 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+    }
+
+    .link-choice-btn.cancel-btn {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+    }
+
+    .link-choice-btn.cancel-btn:hover {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+
+    .link-choice-btn:active {
+      transform: scale(0.98);
+    }
+
     .notification-actions {
       display: flex;
       gap: 8px;
@@ -11202,6 +11343,93 @@
       selectedRating = 0;
     }
 
+    // Funções para links clicáveis nas notificações
+    function convertUrlsToLinks(text) {
+      const urlRegex = /(https?:\/\/[^\s<>"']+)/gi;
+      return text.replace(urlRegex, function(url) {
+        const escapedUrl = url.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        return `<a href="#" class="notification-link" onclick="showLinkChoiceModal('${escapedUrl}'); return false;">${url}</a>`;
+      });
+    }
+
+    function showLinkChoiceModal(url) {
+      const existingModal = document.querySelector('.link-choice-modal-overlay');
+      if (existingModal) {
+        existingModal.remove();
+      }
+
+      const truncatedUrl = url.length > 50 ? url.substring(0, 50) + '...' : url;
+
+      const modalHtml = `
+        <div class="link-choice-modal-overlay" onclick="closeLinkChoiceModal(event)">
+          <div class="link-choice-modal" onclick="event.stopPropagation()">
+            <div class="link-choice-modal-title">Como deseja abrir o link?</div>
+            <div class="link-choice-modal-subtitle">${truncatedUrl}</div>
+            <div class="link-choice-modal-buttons">
+              <button class="link-choice-btn browser-btn" onclick="openLinkInBrowser('${url.replace(/'/g, "\\'")}')">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                </svg>
+                Abrir no Navegador
+              </button>
+              <button class="link-choice-btn ga-btn" onclick="openLinkInGA('${url.replace(/'/g, "\\'")}')">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/>
+                </svg>
+                Abrir no G.A
+              </button>
+              <button class="link-choice-btn cancel-btn" onclick="closeLinkChoiceModal()">
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+
+    function closeLinkChoiceModal(event) {
+      if (event && event.target !== event.currentTarget) return;
+      const modal = document.querySelector('.link-choice-modal-overlay');
+      if (modal) {
+        modal.remove();
+      }
+    }
+
+    function openLinkInBrowser(url) {
+      closeLinkChoiceModal();
+      const downloadWindow = window.open(url, '_blank');
+      if (!downloadWindow || downloadWindow.closed || typeof downloadWindow.closed === 'undefined') {
+        const tempLink = document.createElement('a');
+        tempLink.href = url;
+        tempLink.target = '_blank';
+        tempLink.rel = 'noopener noreferrer';
+        document.body.appendChild(tempLink);
+        tempLink.click();
+        document.body.removeChild(tempLink);
+      }
+    }
+
+    function openLinkInGA(url) {
+      closeLinkChoiceModal();
+      const downloadWindow = window.open(url, '_blank');
+      if (!downloadWindow || downloadWindow.closed || typeof downloadWindow.closed === 'undefined') {
+        const tempLink = document.createElement('a');
+        tempLink.href = url;
+        tempLink.target = '_blank';
+        tempLink.rel = 'noopener noreferrer';
+        document.body.appendChild(tempLink);
+        tempLink.click();
+        document.body.removeChild(tempLink);
+      }
+      setTimeout(function(){
+        if (typeof Android !== "undefined" && Android.openApp) {
+          Android.openApp('GA');
+        }
+      }, 200);
+    }
+
     function renderNotifications() {
       const notificationsList = document.getElementById('notificationsList');
       const notificationsFooter = document.getElementById('notificationsFooter');
@@ -11245,7 +11473,7 @@
                 <div class="notification-time">${timeAgo}</div>
               </div>
             </div>
-            <div class="notification-message">${notif.message}</div>
+            <div class="notification-message">${convertUrlsToLinks(notif.message)}</div>
             <div class="notification-actions">
               ${markReadBtn}
               <button class="notification-action-btn delete" onclick="dismissNotification('${notif.id}')">
@@ -12194,6 +12422,7 @@
   </script>
 </body>
 </html>
+
 
 
 
