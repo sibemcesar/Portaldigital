@@ -6715,7 +6715,7 @@
           <h4 class="about-contact-title"><span></span> Contato e Suporte</h4>
           <div class="about-contact-email" style="cursor: pointer;">
             <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
-            <span style="color: inherit;"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="72021d0006131e161b151b06131e32151f131b1e5c111d1f"><span class="__cf_email__" data-cfemail="f1819e8385909d9598969885909d909eb1969c90989ddf929e9c">portaldigitalao@gmail.com</span></a></span>
+            <span style="color: inherit;"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="72021d0006131e161b151b06131e32151f131b1e5c111d1f"><span class="__cf_email__" data-cfemail="f1819e8385909d9598969885909d909eb1969c90989ddf929e9c"><span class="__cf_email__" data-cfemail="adddc2dfd9ccc1c9c4cac4d9ccc1ccc2edcac0ccc4c183cec2c0">[email&#160;protected]</span></span></a></span>
           </div>
         </div>
       </div>
@@ -7186,7 +7186,7 @@
     </div>
   </div>
 
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     let manualThemeOverride = false;
 
     function applyTheme() {
@@ -12340,9 +12340,32 @@
           await update(ref(database), updates);
         } catch (claimError) {
           console.log('[SEGURANÇA] Recompensa bloqueada pelo servidor:', claimError);
-          dailyRewardClaimed = true;
-          await checkDailyReward();
-          showCustomAlert('Você precisa esperar 24 horas entre resgates! ');
+
+          // Recarregar dados do servidor para obter o estado real
+          const freshSnapshot = await get(claimRef);
+          if (freshSnapshot.exists()) {
+            const freshData = freshSnapshot.val();
+            const freshLastClaimedAt = freshData.lastClaimedAt || 0;
+            const freshServerTime = await getServerTimestamp();
+            const freshTimeSinceClaim = freshServerTime - freshLastClaimedAt;
+
+            if (freshTimeSinceClaim < DAILY_REWARD_COOLDOWN) {
+              // Realmente precisa esperar
+              dailyRewardClaimed = true;
+              nextRewardTime = freshLastClaimedAt + DAILY_REWARD_COOLDOWN;
+              updateDailyRewardButton();
+              startRewardCountdown();
+              showCustomAlert(`Você precisa esperar 24 horas entre resgates!\n\nVolte em ${formatTimeRemaining(nextRewardTime - freshServerTime)}`);
+            } else {
+              // Já passou 24h mas deu erro - pode ser problema de permissão
+              console.error('[DEBUG] 24h passou mas update falhou. Erro:', claimError.code, claimError.message);
+              showCustomAlert('Erro ao resgatar recompensa. Tente recarregar a página e tentar novamente.');
+            }
+          } else {
+            // Nunca resgatou antes mas deu erro - problema de permissão
+            console.error('[DEBUG] Primeiro resgate falhou. Erro:', claimError.code, claimError.message);
+            showCustomAlert('Erro ao resgatar recompensa. Verifique sua conexão e tente novamente.');
+          }
           return;
         }
 
@@ -12475,6 +12498,7 @@
   </script>
 </body>
 </html>
+
 
 
 
