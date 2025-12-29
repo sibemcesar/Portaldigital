@@ -6715,7 +6715,7 @@
           <h4 class="about-contact-title"><span></span> Contato e Suporte</h4>
           <div class="about-contact-email" style="cursor: pointer;">
             <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
-            <span style="color: inherit;"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="72021d0006131e161b151b06131e32151f131b1e5c111d1f">portaldigitalao@gmail.com</a></span>
+            <span style="color: inherit;"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="72021d0006131e161b151b06131e32151f131b1e5c111d1f"><span class="__cf_email__" data-cfemail="f1819e8385909d9598969885909d909eb1969c90989ddf929e9c">[email&#160;protected]</span></a></span>
           </div>
         </div>
       </div>
@@ -7186,7 +7186,7 @@
     </div>
   </div>
 
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     let manualThemeOverride = false;
 
     function applyTheme() {
@@ -8226,7 +8226,39 @@
         closeAuthOverlay();
       } catch (error) {
         hideAuthLoading();
-        showCustomAlert('Erro ao fazer login: ' + error.message);
+        let errorMessage = 'Erro ao fazer login: ';
+        switch (error.code) {
+          case 'auth/invalid-email':
+            errorMessage = 'O email digitado não é válido. Verifique e tente novamente.';
+            break;
+          case 'auth/user-disabled':
+            errorMessage = 'Esta conta foi desativada. Entre em contato com o suporte.';
+            break;
+          case 'auth/user-not-found':
+            errorMessage = 'Não encontramos uma conta com este email. Verifique ou crie uma nova conta.';
+            break;
+          case 'auth/wrong-password':
+            errorMessage = 'Senha incorreta. Verifique e tente novamente.';
+            break;
+          case 'auth/invalid-credential':
+            errorMessage = 'Email ou senha incorretos. Verifique suas credenciais e tente novamente.';
+            break;
+          case 'auth/too-many-requests':
+            errorMessage = 'Muitas tentativas de login. Aguarde alguns minutos antes de tentar novamente.';
+            break;
+          case 'auth/network-request-failed':
+            errorMessage = 'Erro de conexão. Verifique sua internet e tente novamente.';
+            break;
+          case 'auth/operation-not-allowed':
+            errorMessage = 'Login com email/senha não está habilitado. Entre em contato com o suporte.';
+            break;
+          case 'auth/internal-error':
+            errorMessage = 'Ocorreu um erro interno. Tente novamente mais tarde.';
+            break;
+          default:
+            errorMessage += error.message;
+        }
+        showCustomAlert(errorMessage);
       }
     }
 
@@ -12443,6 +12475,7 @@
   </script>
 </body>
 </html>
+
 
 
 

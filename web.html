@@ -694,17 +694,17 @@
     .comment-item.own-comment {
       align-self: flex-end;
       border-radius: 18px 18px 4px 18px;
-      background: var(--accent-primary);
-      border-color: var(--accent-primary);
+      background: #2196F3;
+      border-color: #2196F3;
     }
     .comment-item.own-comment .comment-author {
-      color: rgba(0, 0, 0, 0.8);
+      color: rgba(255, 255, 255, 0.9);
     }
     .comment-item.own-comment .comment-text {
-      color: var(--bg-primary);
+      color: #ffffff;
     }
     .comment-item.own-comment .comment-time {
-      color: rgba(0, 0, 0, 0.6);
+      color: rgba(255, 255, 255, 0.7);
     }
     .comment-header {
       display: flex;
@@ -811,6 +811,14 @@
       margin-bottom: 14px;
       line-height: 1.5;
       white-space: pre-wrap;
+    }
+    .notification-message a {
+      color: #2196F3;
+      text-decoration: underline;
+      word-break: break-all;
+    }
+    .notification-message a:hover {
+      color: #1976D2;
     }
     .notification-actions {
       display: flex;
@@ -1241,6 +1249,126 @@
     .user-info p {
       margin: 4px 0;
       font-size: 14px;
+    }
+    .profile-avatar-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .profile-avatar-wrapper {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      cursor: pointer;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 3px solid var(--accent-primary);
+      transition: all 0.3s ease;
+    }
+    .profile-avatar-wrapper:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .profile-avatar-wrapper:hover .avatar-edit-overlay {
+      opacity: 1;
+    }
+    .profile-avatar {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: var(--bg-secondary);
+    }
+    .profile-avatar-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-size: 32px;
+      font-weight: 700;
+    }
+    .avatar-edit-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .avatar-edit-overlay svg {
+      width: 24px;
+      height: 24px;
+      fill: white;
+    }
+    .avatar-upload-area {
+      border: 2px dashed var(--border-color);
+      border-radius: 12px;
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: var(--bg-card);
+    }
+    .avatar-upload-area:hover {
+      border-color: var(--accent-primary);
+      background: var(--accent-light);
+    }
+    .avatar-upload-area.dragover {
+      border-color: var(--accent-primary);
+      background: var(--accent-light);
+    }
+    .avatar-upload-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 12px;
+      fill: var(--text-muted);
+    }
+    .avatar-upload-text {
+      color: var(--text-secondary);
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+    .avatar-upload-hint {
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+    .avatar-preview-container {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .avatar-preview-img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--accent-primary);
+      margin-bottom: 12px;
+    }
+    .avatar-upload-progress {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 20px;
+    }
+    .avatar-upload-progress.active {
+      display: flex;
+    }
+    .avatar-progress-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border-color);
+      border-top-color: var(--accent-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
     .points-display {
       background: var(--accent-primary);
@@ -2079,6 +2207,16 @@
   <div id="sidebar" class="sidebar">
     <h2>Portal Digital</h2>
     <div id="userInfoSection" style="display: none;">
+      <div class="profile-avatar-container">
+        <div class="profile-avatar-wrapper" onclick="openAvatarModal()" title="Clique para alterar foto">
+          <div id="profileAvatarContent">
+            <div class="profile-avatar-placeholder" id="avatarPlaceholder">?</div>
+          </div>
+          <div class="avatar-edit-overlay">
+            <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+          </div>
+        </div>
+      </div>
       <div class="user-info">
         <p><strong>Nome:</strong> <span id="userName">-</span></p>
         <p><strong>Conta:</strong> <span id="userEmail">-</span></p>
@@ -2327,6 +2465,33 @@
         </div>
 
         <div id="downloadSectionsContainer"></div>
+      </div>
+    </div>
+  </div>
+  <div id="avatarModal" class="custom-modal">
+    <div class="custom-modal-content">
+      <h2>Alterar Foto do Perfil</h2>
+      <div id="avatarUploadSection">
+        <div id="avatarUploadArea" class="avatar-upload-area">
+          <svg class="avatar-upload-icon" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          <p class="avatar-upload-text">Clique ou arraste uma imagem</p>
+          <p class="avatar-upload-hint">JPG, PNG ou GIF (máx. 5MB)</p>
+          <input type="file" id="avatarFileInput" accept="image/*" style="display: none;">
+        </div>
+        <div id="avatarPreviewSection" style="display: none;">
+          <div class="avatar-preview-container">
+            <img id="avatarPreviewImg" class="avatar-preview-img" src="" alt="Preview">
+            <p style="color: var(--text-secondary); font-size: 14px;">Pré-visualização da nova foto</p>
+          </div>
+        </div>
+        <div id="avatarUploadProgress" class="avatar-upload-progress">
+          <div class="avatar-progress-spinner"></div>
+          <p style="color: var(--text-secondary);">Enviando imagem...</p>
+        </div>
+      </div>
+      <div class="custom-modal-buttons">
+        <button type="button" class="custom-modal-btn secondary" onclick="closeAvatarModal()">Cancelar</button>
+        <button type="button" class="custom-modal-btn primary" id="saveAvatarBtn" onclick="saveAvatar()" style="display: none;">Salvar Foto</button>
       </div>
     </div>
   </div>
@@ -2855,8 +3020,11 @@
     let userStatus = 'pending';
     let gamesLoaded = false;
     let userName = '';
+    let userAvatar = '';
+    let pendingAvatarFile = null;
     let currentGameData = null;
     let historyData = [];
+    const IMGBB_API_KEY = '096a5bd00db7faa4ecd809727e38ef4a';
     window.addEventListener('load', () => {
       const { onAuthStateChanged } = window.firebaseModules;
       const auth = window.firebaseAuth;
@@ -2889,6 +3057,7 @@
         userPoints = userData.points || 0;
         userStatus = userData.status || 'pending';
         userName = userData.name || '';
+        userAvatar = userData.avatar || '';
         if (!userName && currentUser.displayName) {
           userName = currentUser.displayName;
           await update(userRef, { name: userName });
@@ -2897,6 +3066,7 @@
         userPoints = 0;
         userStatus = 'pending';
         userName = currentUser.displayName || '';
+        userAvatar = '';
         await set(userRef, {
           points: 0,
           status: 'pending',
@@ -2919,8 +3089,16 @@
     function updateUserInfoDisplay() {
       const userNameEl = document.getElementById('userName');
       const userStatusEl = document.getElementById('userStatus');
+      const profileAvatarContent = document.getElementById('profileAvatarContent');
       if (userNameEl) {
         userNameEl.textContent = userName || 'Não definido';
+      }
+      if (profileAvatarContent) {
+        if (userAvatar) {
+          profileAvatarContent.innerHTML = `<img class="profile-avatar" src="${userAvatar}" alt="Avatar" onerror="this.parentElement.innerHTML='<div class=\\'profile-avatar-placeholder\\'>${getAvatarInitial()}</div>'">`;
+        } else {
+          profileAvatarContent.innerHTML = `<div class="profile-avatar-placeholder">${getAvatarInitial()}</div>`;
+        }
       }
       if (userStatusEl) {
         if (isPublisher) {
@@ -2933,6 +3111,14 @@
           userStatusEl.innerHTML = '<span style="color: #f44336; font-weight: 600;">✗ Bloqueado</span>';
         }
       }
+    }
+    function getAvatarInitial() {
+      if (userName && userName.length > 0) {
+        return userName.charAt(0).toUpperCase();
+      } else if (currentUser && currentUser.email) {
+        return currentUser.email.charAt(0).toUpperCase();
+      }
+      return '?';
     }
     async function loadUserPoints() {
       return await loadUserData();
@@ -5599,6 +5785,10 @@
       document.getElementById('ratingConfirmModal').classList.remove('active');
       selectedRating = 0;
     }
+    function linkifyText(text) {
+      const urlPattern = /(https?:\/\/[^\s<>"{}|\\^`\[\]]+)/gi;
+      return text.replace(urlPattern, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+    }
     function renderNotifications() {
       const notificationsList = document.getElementById('notificationsList');
       if (userNotifications.length === 0) {
@@ -5618,6 +5808,7 @@
                ✓ Marcar como lida
              </button>`
           : '';
+        const linkedMessage = linkifyText(notif.message);
         return `
           <div class="${itemClass}">
             <div class="notification-header">
@@ -5626,7 +5817,7 @@
                 <div class="notification-time">${timeAgo}</div>
               </div>
             </div>
-            <div class="notification-message">${notif.message}</div>
+            <div class="notification-message">${linkedMessage}</div>
             <div class="notification-actions">
               ${markReadBtn}
               <button class="notification-action-btn delete" onclick="dismissNotification('${notif.id}')">
@@ -6353,8 +6544,143 @@
     }
 
     window.addEventListener('resize', handleOverlay1Resize);
+
+    // Avatar Modal Functions
+    function openAvatarModal() {
+      if (!currentUser) {
+        showCustomAlert('Você precisa estar logado para alterar sua foto.');
+        return;
+      }
+      pendingAvatarFile = null;
+      document.getElementById('avatarUploadArea').style.display = 'block';
+      document.getElementById('avatarPreviewSection').style.display = 'none';
+      document.getElementById('avatarUploadProgress').classList.remove('active');
+      document.getElementById('saveAvatarBtn').style.display = 'none';
+      document.getElementById('avatarModal').classList.add('active');
+      document.getElementById('sidebar').classList.remove('open');
+    }
+
+    function closeAvatarModal() {
+      document.getElementById('avatarModal').classList.remove('active');
+      pendingAvatarFile = null;
+    }
+
+    // Avatar Upload Area Events
+    document.addEventListener('DOMContentLoaded', function() {
+      const uploadArea = document.getElementById('avatarUploadArea');
+      const fileInput = document.getElementById('avatarFileInput');
+
+      if (uploadArea && fileInput) {
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        uploadArea.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+          uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+          e.preventDefault();
+          uploadArea.classList.remove('dragover');
+          const files = e.dataTransfer.files;
+          if (files.length > 0) {
+            handleAvatarFile(files[0]);
+          }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+          if (e.target.files.length > 0) {
+            handleAvatarFile(e.target.files[0]);
+          }
+        });
+      }
+    });
+
+    function handleAvatarFile(file) {
+      const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+      if (!validTypes.includes(file.type)) {
+        showCustomAlert('Por favor, selecione uma imagem válida (JPG, PNG, GIF ou WebP).');
+        return;
+      }
+
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        showCustomAlert('A imagem deve ter no máximo 5MB.');
+        return;
+      }
+
+      pendingAvatarFile = file;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById('avatarPreviewImg').src = e.target.result;
+        document.getElementById('avatarUploadArea').style.display = 'none';
+        document.getElementById('avatarPreviewSection').style.display = 'block';
+        document.getElementById('saveAvatarBtn').style.display = 'inline-block';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function uploadToImgBB(file) {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao fazer upload da imagem');
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        return data.data.url;
+      } else {
+        throw new Error(data.error?.message || 'Erro ao fazer upload');
+      }
+    }
+
+    async function saveAvatar() {
+      if (!pendingAvatarFile || !currentUser) {
+        showCustomAlert('Selecione uma imagem primeiro.');
+        return;
+      }
+
+      document.getElementById('avatarPreviewSection').style.display = 'none';
+      document.getElementById('saveAvatarBtn').style.display = 'none';
+      document.getElementById('avatarUploadProgress').classList.add('active');
+
+      try {
+        const imageUrl = await uploadToImgBB(pendingAvatarFile);
+
+        const { ref, update } = window.firebaseModules;
+        const database = window.firebaseDatabase;
+        const userRef = ref(database, `users/${currentUser.uid}`);
+
+        await update(userRef, { avatar: imageUrl });
+
+        userAvatar = imageUrl;
+        updateUserInfoDisplay();
+
+        closeAvatarModal();
+        showCustomAlert('Foto do perfil atualizada com sucesso!');
+
+      } catch (error) {
+        console.error('Erro ao salvar avatar:', error);
+        document.getElementById('avatarUploadProgress').classList.remove('active');
+        document.getElementById('avatarPreviewSection').style.display = 'block';
+        document.getElementById('saveAvatarBtn').style.display = 'inline-block';
+        showCustomAlert('Erro ao atualizar foto: ' + error.message);
+      }
+    }
   </script>
 </body>
 </html>
+
 
 
