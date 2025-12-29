@@ -1166,9 +1166,26 @@
       justify-content: center;
       z-index: 9999;
       padding: 20px;
+      opacity: 0;
+      backdrop-filter: blur(0px);
+      transition: opacity 0.3s ease, backdrop-filter 0.3s ease;
     }
     .custom-modal.active {
       display: flex;
+      opacity: 1;
+      backdrop-filter: blur(4px);
+      animation: modalFadeIn 0.3s ease forwards;
+    }
+    .custom-modal.closing {
+      animation: modalFadeOut 0.3s ease forwards;
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes modalFadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
     }
     .custom-modal-content {
       background: var(--bg-secondary);
@@ -1178,6 +1195,96 @@
       width: 100%;
       max-height: 80vh;
       overflow-y: auto;
+      transform: scale(0.9) translateY(20px);
+      opacity: 0;
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .custom-modal.active .custom-modal-content {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+    .custom-modal.closing .custom-modal-content {
+      transform: scale(0.9) translateY(-20px);
+      opacity: 0;
+      transition: all 0.25s ease-in;
+    }
+    .custom-modal.success .custom-modal-content {
+      animation: successPulse 0.5s ease;
+    }
+    @keyframes successPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.02); box-shadow: 0 0 30px rgba(34, 197, 94, 0.4); }
+      100% { transform: scale(1); }
+    }
+    .success-checkmark {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: checkmarkBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes checkmarkBounce {
+      0% { transform: scale(0); opacity: 0; }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .success-checkmark svg {
+      width: 40px;
+      height: 40px;
+      fill: white;
+      animation: checkDraw 0.4s ease 0.2s both;
+    }
+    @keyframes checkDraw {
+      0% { stroke-dashoffset: 50; opacity: 0; }
+      100% { stroke-dashoffset: 0; opacity: 1; }
+    }
+    .form-input-animated {
+      transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+    }
+    .form-input-animated:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-light);
+      transform: translateY(-1px);
+    }
+    .btn-loading {
+      position: relative;
+      color: transparent !important;
+      pointer-events: none;
+    }
+    .btn-loading::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border: 2px solid transparent;
+      border-top-color: currentColor;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      top: 50%;
+      left: 50%;
+      margin: -10px 0 0 -10px;
+      border-top-color: white;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+    .auth-overlay-btn {
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .auth-overlay-btn:hover {
+      transform: translateY(-3px) scale(1.02);
+    }
+    .auth-overlay-btn:active {
+      transform: translateY(0) scale(0.98);
     }
     .custom-modal h2 {
       margin-top: 0;
@@ -1201,16 +1308,46 @@
       font-family: 'Inter', sans-serif;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .custom-modal-btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+    .custom-modal-btn:active::before {
+      width: 300px;
+      height: 300px;
     }
     .custom-modal-btn.primary {
       background: var(--accent-primary);
       color: var(--bg-primary);
     }
+    .custom-modal-btn.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    .custom-modal-btn.primary:active {
+      transform: translateY(0) scale(0.98);
+    }
     .custom-modal-btn.secondary {
       background: transparent;
       border: 1px solid var(--border-color);
       color: var(--text-secondary);
+    }
+    .custom-modal-btn.secondary:hover {
+      border-color: var(--accent-primary);
+      color: var(--text-primary);
+      background: var(--bg-card);
     }
     .form-group {
       margin-bottom: 16px;
@@ -1837,12 +1974,20 @@
       padding: 20px;
       opacity: 0;
       visibility: hidden;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .auth-overlay.active {
       display: flex;
       opacity: 1;
       visibility: visible;
+    }
+    .auth-overlay.closing {
+      opacity: 0;
+      visibility: hidden;
+    }
+    .auth-overlay.closing .auth-overlay-content {
+      transform: translateY(-30px) scale(0.9);
+      opacity: 0;
     }
     .auth-overlay-content {
       width: 100%;
@@ -1853,10 +1998,12 @@
       box-shadow: var(--shadow-overlay);
       border: 1px solid var(--border-color);
       transform: translateY(30px) scale(0.95);
-      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      opacity: 0;
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     .auth-overlay.active .auth-overlay-content {
       transform: translateY(0) scale(1);
+      opacity: 1;
     }
     .auth-overlay-header {
       text-align: center;
@@ -2660,11 +2807,11 @@
       <form id="loginForm" onsubmit="handleLogin(event)">
         <div class="form-group">
           <label class="form-label">Email</label>
-          <input type="email" class="form-input" id="loginEmail" required>
+          <input type="email" class="form-input form-input-animated" id="loginEmail" required>
         </div>
         <div class="form-group">
           <label class="form-label">Senha</label>
-          <input type="password" class="form-input" id="loginPassword" required>
+          <input type="password" class="form-input form-input-animated" id="loginPassword" required>
         </div>
         <div style="text-align: right; margin-bottom: 16px;">
           <a href="#" onclick="openResetPasswordModal(); return false;" style="color: var(--accent-primary); font-size: 14px; text-decoration: none;">Esqueceu a senha?</a>
@@ -2682,20 +2829,20 @@
       <form id="registerForm" onsubmit="handleRegister(event)">
         <div class="form-group">
           <label class="form-label">Nome Completo</label>
-          <input type="text" class="form-input" id="registerName" placeholder="Seu nome" required>
+          <input type="text" class="form-input form-input-animated" id="registerName" placeholder="Seu nome" required>
         </div>
         <div class="form-group">
           <label class="form-label">Email (Gmail)</label>
-          <input type="email" class="form-input" id="registerEmail" placeholder="seuemail@gmail.com" pattern="[a-zA-Z0-9._%+-]+@gmail\.com$" title="Por favor, use um email do Gmail" required>
+          <input type="email" class="form-input form-input-animated" id="registerEmail" placeholder="seuemail@gmail.com" pattern="[a-zA-Z0-9._%+-]+@gmail\.com$" title="Por favor, use um email do Gmail" required>
           <small style="color: var(--text-muted); font-size: 12px;">Apenas emails @gmail.com são aceitos</small>
         </div>
         <div class="form-group">
           <label class="form-label">Senha</label>
-          <input type="password" class="form-input" id="registerPassword" placeholder="Mínimo 6 caracteres" minlength="6" required>
+          <input type="password" class="form-input form-input-animated" id="registerPassword" placeholder="Mínimo 6 caracteres" minlength="6" required>
         </div>
         <div class="form-group">
           <label class="form-label">Confirmar Senha</label>
-          <input type="password" class="form-input" id="registerPasswordConfirm" placeholder="Repita a senha" minlength="6" required>
+          <input type="password" class="form-input form-input-animated" id="registerPasswordConfirm" placeholder="Repita a senha" minlength="6" required>
         </div>
         <div class="custom-modal-buttons">
           <button type="button" class="custom-modal-btn secondary" onclick="closeRegisterModal()">Cancelar</button>
@@ -3959,18 +4106,48 @@
       if (hours < 24) return `${hours}h atrás`;
       return `${days}d atrás`;
     }
+    let loginSuccess = false;
+    let registerSuccess = false;
     async function handleLogin(e) {
       e.preventDefault();
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      submitBtn.classList.add('btn-loading');
       try {
         const { signInWithEmailAndPassword } = window.firebaseModules;
         await signInWithEmailAndPassword(window.firebaseAuth, email, password);
-        closeLoginModal();
-        showCustomAlert('Login realizado com sucesso!');
+        loginSuccess = true;
+        showLoginSuccess();
       } catch (error) {
+        submitBtn.classList.remove('btn-loading');
+        shakeModal('loginModal');
         showCustomAlert('Erro ao fazer login: ' + error.message);
       }
+    }
+    function showLoginSuccess() {
+      const modal = document.getElementById('loginModal');
+      const content = modal.querySelector('.custom-modal-content');
+      content.innerHTML = `
+        <div style="text-align: center; padding: 20px 0;">
+          <div class="success-checkmark">
+            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+          </div>
+          <h2 style="color: var(--text-primary); margin-bottom: 8px;">Login realizado!</h2>
+          <p style="color: var(--text-secondary);">Bem-vindo de volta!</p>
+        </div>
+      `;
+      modal.classList.add('success');
+      setTimeout(() => {
+        closeModalWithAnimation('loginModal', true);
+        closeAuthOverlay();
+      }, 1500);
+    }
+    function shakeModal(modalId) {
+      const modal = document.getElementById(modalId);
+      const content = modal.querySelector('.custom-modal-content');
+      content.style.animation = 'shake 0.5s ease';
+      setTimeout(() => { content.style.animation = ''; }, 500);
     }
     async function logout() {
       showCustomConfirm('Deseja realmente sair?', async () => {
@@ -4223,10 +4400,11 @@
     function closeAuthOverlay() {
       const overlay = document.getElementById('auth-overlay');
       if (overlay) {
-        overlay.classList.remove('active');
+        overlay.classList.add('closing');
         setTimeout(() => {
+          overlay.classList.remove('active', 'closing');
           overlay.style.display = 'none';
-        }, 400);
+        }, 500);
       }
     }
     async function enterAsGuest() {
@@ -4241,20 +4419,96 @@
       }
     }
     function openLoginModal() {
+      loginSuccess = false;
+      resetLoginModalContent();
       document.getElementById('loginModal').classList.add('active');
     }
     function closeLoginModal() {
-      document.getElementById('loginModal').classList.remove('active');
-      document.getElementById('loginForm').reset();
-      showAuthOverlay();
+      if (loginSuccess) {
+        closeModalWithAnimation('loginModal', true);
+      } else {
+        closeModalWithAnimation('loginModal', false);
+        showAuthOverlay();
+      }
+    }
+    function closeModalWithAnimation(modalId, skipAuthOverlay) {
+      const modal = document.getElementById(modalId);
+      modal.classList.add('closing');
+      setTimeout(() => {
+        modal.classList.remove('active', 'closing', 'success');
+        if (modalId === 'loginModal') {
+          resetLoginModalContent();
+        } else if (modalId === 'registerModal') {
+          resetRegisterModalContent();
+        }
+      }, 300);
+    }
+    function resetLoginModalContent() {
+      const modal = document.getElementById('loginModal');
+      const content = modal.querySelector('.custom-modal-content');
+      content.innerHTML = `
+        <h2>Entrar</h2>
+        <form id="loginForm" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input form-input-animated" id="loginEmail" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Senha</label>
+            <input type="password" class="form-input form-input-animated" id="loginPassword" required>
+          </div>
+          <div style="text-align: right; margin-bottom: 16px;">
+            <a href="#" onclick="openResetPasswordModal(); return false;" style="color: var(--accent-primary); font-size: 14px; text-decoration: none;">Esqueceu a senha?</a>
+          </div>
+          <div class="custom-modal-buttons">
+            <button type="button" class="custom-modal-btn secondary" onclick="closeLoginModal()">Cancelar</button>
+            <button type="submit" class="custom-modal-btn primary">Entrar</button>
+          </div>
+        </form>
+      `;
     }
     function openRegisterModal() {
+      registerSuccess = false;
+      resetRegisterModalContent();
       document.getElementById('registerModal').classList.add('active');
     }
     function closeRegisterModal() {
-      document.getElementById('registerModal').classList.remove('active');
-      document.getElementById('registerForm').reset();
-      showAuthOverlay();
+      if (registerSuccess) {
+        closeModalWithAnimation('registerModal', true);
+      } else {
+        closeModalWithAnimation('registerModal', false);
+        showAuthOverlay();
+      }
+    }
+    function resetRegisterModalContent() {
+      const modal = document.getElementById('registerModal');
+      const content = modal.querySelector('.custom-modal-content');
+      content.innerHTML = `
+        <h2>Criar Conta</h2>
+        <form id="registerForm" onsubmit="handleRegister(event)">
+          <div class="form-group">
+            <label class="form-label">Nome Completo</label>
+            <input type="text" class="form-input form-input-animated" id="registerName" placeholder="Seu nome" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email (Gmail)</label>
+            <input type="email" class="form-input form-input-animated" id="registerEmail" placeholder="seuemail@gmail.com" pattern="[a-zA-Z0-9._%+-]+@gmail\\.com$" title="Por favor, use um email do Gmail" required>
+            <small style="color: var(--text-muted); font-size: 12px;">Apenas emails @gmail.com são aceitos</small>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Senha</label>
+            <input type="password" class="form-input form-input-animated" id="registerPassword" placeholder="Mínimo 6 caracteres" minlength="6" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirmar Senha</label>
+            <input type="password" class="form-input form-input-animated" id="registerPasswordConfirm" placeholder="Repita a senha" minlength="6" required>
+          </div>
+          <div class="custom-modal-buttons">
+            <button type="button" class="custom-modal-btn secondary" onclick="closeRegisterModal()">Cancelar</button>
+            <button type="submit" class="custom-modal-btn primary">Criar Conta</button>
+          </div>
+        </form>
+      `;
     }
     let verificationCheckInterval = null;
     function showEmailVerificationOptions(email) {
@@ -4537,14 +4791,18 @@
       const email = document.getElementById('registerEmail').value.trim();
       const password = document.getElementById('registerPassword').value;
       const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
+      const submitBtn = e.target.querySelector('button[type="submit"]');
       if (!email.endsWith('@gmail.com')) {
+        shakeModal('registerModal');
         showCustomAlert('Por favor, use um email do Gmail (@gmail.com).');
         return;
       }
       if (password !== passwordConfirm) {
+        shakeModal('registerModal');
         showCustomAlert('As senhas não coincidem.');
         return;
       }
+      submitBtn.classList.add('btn-loading');
       try {
         const { createUserWithEmailAndPassword, updateProfile } = window.firebaseModules;
         const { ref, set } = window.firebaseModules;
@@ -4564,12 +4822,11 @@
         userPoints = 0;
         currentUser = user;
         isPublisher = PUBLISHER_EMAILS.includes(email);
-        closeRegisterModal();
-        updateUIForUser();
-        updateUserInfoDisplay();
-        updatePointsDisplay();
-        showEmailVerificationOptions(email);
+        registerSuccess = true;
+        showRegisterSuccess(name, email);
       } catch (error) {
+        submitBtn.classList.remove('btn-loading');
+        shakeModal('registerModal');
         let errorMessage = 'Erro ao criar conta: ';
         switch (error.code) {
           case 'auth/email-already-in-use':
@@ -4586,6 +4843,28 @@
         }
         showCustomAlert(errorMessage);
       }
+    }
+    function showRegisterSuccess(name, email) {
+      const modal = document.getElementById('registerModal');
+      const content = modal.querySelector('.custom-modal-content');
+      content.innerHTML = `
+        <div style="text-align: center; padding: 20px 0;">
+          <div class="success-checkmark">
+            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+          </div>
+          <h2 style="color: var(--text-primary); margin-bottom: 8px;">Conta criada!</h2>
+          <p style="color: var(--text-secondary);">Bem-vindo, ${name}!</p>
+        </div>
+      `;
+      modal.classList.add('success');
+      setTimeout(() => {
+        closeModalWithAnimation('registerModal', true);
+        closeAuthOverlay();
+        updateUIForUser();
+        updateUserInfoDisplay();
+        updatePointsDisplay();
+        showEmailVerificationOptions(email);
+      }, 1500);
     }
     let downloadLinksCount = 1;
     function openPublishModal() {
