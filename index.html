@@ -7417,7 +7417,7 @@
                 <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
                 <strong>Transferência em Massa</strong>
               </div>
-              <p>Os pontos serão enviados para <strong id="totalUsersCount">todos os usuários</strong> registrados no sistema. Esta aç����o pode levar alguns segundos.</p>
+              <p>Os pontos serão enviados para <strong id="totalUsersCount">todos os usuários</strong> registrados no sistema. Esta aç������o pode levar alguns segundos.</p>
             </div>
           </div>
 
@@ -9714,6 +9714,15 @@
       const database = window.firebaseDatabase;
 
       try {
+        // Esperar os jogos carregarem se ainda não carregaram
+        if (!gamesLoaded) {
+          let attempts = 0;
+          while (!gamesLoaded && attempts < 50) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+          }
+        }
+
         const commentsRef = ref(database, 'comments');
         const snapshot = await get(commentsRef);
         const allComments = snapshot.val() || {};
@@ -9727,6 +9736,8 @@
         renderCommunityList();
       } catch (error) {
         console.log('Erro ao carregar contagem de comentários:', error);
+        // Mesmo com erro, tentar renderizar a lista de comunidades
+        renderCommunityList();
       }
     }
 
@@ -12916,6 +12927,7 @@
   </script>
 </body>
 </html>
+
 
 
 
