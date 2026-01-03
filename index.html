@@ -7417,7 +7417,7 @@
                 <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
                 <strong>Transferência em Massa</strong>
               </div>
-              <p>Os pontos serão enviados para <strong id="totalUsersCount">todos os usuários</strong> registrados no sistema. Esta aç��o pode levar alguns segundos.</p>
+              <p>Os pontos serão enviados para <strong id="totalUsersCount">todos os usuários</strong> registrados no sistema. Esta aç����o pode levar alguns segundos.</p>
             </div>
           </div>
 
@@ -9686,13 +9686,23 @@
     let communitySearchTerm = '';
     let communityCommentsCount = {};
 
-    function openCommunityModal() {
+    async function openCommunityModal() {
       closeSidebar();
       document.getElementById('communitySearchInput').value = '';
       communitySearchTerm = '';
-      loadCommunityCommentsCount();
-      renderCommunityList();
       document.getElementById('communityOverlay').classList.add('active');
+
+      // Mostrar loading enquanto carrega os comentários
+      const communityGrid = document.getElementById('communityGrid');
+      communityGrid.innerHTML = `
+        <div class="community-loading" style="grid-column: 1 / -1;">
+          <div class="community-loading-spinner"></div>
+          <p style="color: var(--text-muted);">Carregando comunidades...</p>
+        </div>
+      `;
+
+      // Aguardar o carregamento da contagem de comentários antes de renderizar
+      await loadCommunityCommentsCount();
     }
 
     function closeCommunityOverlay() {
@@ -12906,6 +12916,7 @@
   </script>
 </body>
 </html>
+
 
 
 
