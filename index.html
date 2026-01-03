@@ -4150,6 +4150,36 @@
       animation: likeAnimation 0.3s ease;
     }
 
+    .footer-btn-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .footer-comment-badge {
+      position: absolute;
+      top: -6px;
+      right: 12px;
+      background: #e53935;
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 700;
+      min-width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+      box-shadow: 0 2px 4px rgba(229, 57, 53, 0.4);
+      z-index: 2;
+    }
+
+    .footer-comment-badge:empty {
+      display: none;
+    }
+
     .modal-body {
       padding-bottom: 100px;
     }
@@ -6049,10 +6079,11 @@
 
     .community-item img {
       width: 60px;
-      height: 85px;
+      height: 60px;
       object-fit: cover;
-      border-radius: 8px;
+      border-radius: 50%;
       flex-shrink: 0;
+      border: 2px solid var(--border-color);
     }
 
     .community-item-info {
@@ -6405,7 +6436,10 @@
           <span>Curtir</span>
         </button>
         <button class="footer-btn" id="footerCommentsBtn" onclick="showComments(); updateFooterActive('comments')">
-          <svg viewBox="0 0 24 24"><path d="M21 6h-2V3c0-.55-.45-1-1-1H2c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1v-2h2c.55 0 1-.45 1-1V7c0-.55-.45-1-1-1zm-4 6H6.83L5 13.83V4h12v8zm4-2h-2V7h-9v-.5c0-.28.22-.5.5-.5h9c.28 0 .5.22.5.5V10z"/></svg>
+          <div class="footer-btn-wrapper">
+            <span class="footer-comment-badge" id="footerCommentBadge"></span>
+            <svg viewBox="0 0 24 24"><path d="M21 6h-2V3c0-.55-.45-1-1-1H2c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1v-2h2c.55 0 1-.45 1-1V7c0-.55-.45-1-1-1zm-4 6H6.83L5 13.83V4h12v8zm4-2h-2V7h-9v-.5c0-.28.22-.5.5-.5h9c.28 0 .5.22.5.5V10z"/></svg>
+          </div>
           <span>Comentários</span>
         </button>
       </div>
@@ -7383,7 +7417,7 @@
                 <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
                 <strong>Transferência em Massa</strong>
               </div>
-              <p>Os pontos serão enviados para <strong id="totalUsersCount">todos os usuários</strong> registrados no sistema. Esta ação pode levar alguns segundos.</p>
+              <p>Os pontos serão enviados para <strong id="totalUsersCount">todos os usuários</strong> registrados no sistema. Esta aç��o pode levar alguns segundos.</p>
             </div>
           </div>
 
@@ -8302,7 +8336,19 @@
       onValue(commentsRef, (snapshot) => {
         const comments = snapshot.val() || {};
         renderComments(comments);
+        updateCommentBadge(Object.keys(comments).length);
       });
+    }
+
+    function updateCommentBadge(count) {
+      const badge = document.getElementById('footerCommentBadge');
+      if (badge) {
+        if (count > 0) {
+          badge.textContent = count > 99 ? '99+' : count;
+        } else {
+          badge.textContent = '';
+        }
+      }
     }
 
     function renderComments(comments) {
@@ -12860,6 +12906,7 @@
   </script>
 </body>
 </html>
+
 
 
 
