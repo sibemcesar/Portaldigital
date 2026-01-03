@@ -9692,7 +9692,7 @@
       communitySearchTerm = '';
       document.getElementById('communityOverlay').classList.add('active');
 
-      // Mostrar loading enquanto carrega os comentários
+      // Mostrar loading enquanto carrega
       const communityGrid = document.getElementById('communityGrid');
       communityGrid.innerHTML = `
         <div class="community-loading" style="grid-column: 1 / -1;">
@@ -9701,7 +9701,7 @@
         </div>
       `;
 
-      // Aguardar o carregamento da contagem de comentários antes de renderizar
+      // Aguardar carregar a contagem de comentários antes de renderizar
       await loadCommunityCommentsCount();
     }
 
