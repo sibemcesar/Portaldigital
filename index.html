@@ -8195,23 +8195,57 @@
           console.error('Erro ao incrementar downloads:', error.message || error);
         }
 
-        const downloadWindow = window.open(url, '_blank');
-
-        if (!downloadWindow || downloadWindow.closed || typeof downloadWindow.closed === 'undefined') {
+        // Abrir no app correto baseado no tipo
+        // Método principal: Android.openApp (se disponível no WebView)
+        if (typeof Android !== "undefined" && Android.openApp) {
+          // Primeiro configura o link para download
           const tempLink = document.createElement('a');
           tempLink.href = url;
           tempLink.target = '_blank';
           tempLink.rel = 'noopener noreferrer';
+          tempLink.style.display = 'none';
           document.body.appendChild(tempLink);
           tempLink.click();
           document.body.removeChild(tempLink);
-        }
 
-        setTimeout(function(){
-          if (typeof Android !== "undefined" && Android.openApp) {
+          // Depois abre o app correto
+          setTimeout(function(){
             Android.openApp(appType);
+          }, 200);
+        } else {
+          // Fallback: usar Android Intent se Android.openApp não existir
+          if (appType === 'GA') {
+            // Abrir no navegador G.A
+            const gaIntent = `intent://${url.replace(/^https?:\/\//, '')}#Intent;scheme=https;package=porg.sixtysecond.crazy.browser;end`;
+            const gaLink = document.createElement('a');
+            gaLink.href = gaIntent;
+            gaLink.style.display = 'none';
+            document.body.appendChild(gaLink);
+            gaLink.click();
+            document.body.removeChild(gaLink);
+          } else if (appType === 'ADM') {
+            // Abrir no ADM (Advanced Download Manager)
+            const admIntent = `intent://${url.replace(/^https?:\/\//, '')}#Intent;scheme=https;package=com.dv.adm;end`;
+            const admLink = document.createElement('a');
+            admLink.href = admIntent;
+            admLink.style.display = 'none';
+            document.body.appendChild(admLink);
+            admLink.click();
+            document.body.removeChild(admLink);
+          } else {
+            // Fallback final: window.open
+            const downloadWindow = window.open(url, '_blank');
+            if (!downloadWindow || downloadWindow.closed || typeof downloadWindow.closed === 'undefined') {
+              const tempLink = document.createElement('a');
+              tempLink.href = url;
+              tempLink.target = '_blank';
+              tempLink.rel = 'noopener noreferrer';
+              document.body.appendChild(tempLink);
+              tempLink.click();
+              document.body.removeChild(tempLink);
+            }
           }
-        }, 200);
+        }
 
         showCustomAlert(`Download iniciado! ${cost} pontos deduzidos. Pontos restantes: ${newPointsTotal}`);
 
