@@ -62,6 +62,29 @@
       increment
     };
   </script>
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+      await OneSignal.init({
+        appId: "8e32cbe1-ece5-49fc-9b60-41e1e69c99b0",
+        promptOptions: {
+          slidedown: {
+            prompts: [{
+              type: "push",
+              autoPrompt: false,
+              text: {
+                actionMessage: "Quer receber notificações de novos jogos e resultados?",
+                acceptButton: "Permitir",
+                cancelButton: "Agora não"
+              },
+              delay: { pageViews: 1, timeDelay: 3 }
+            }]
+          }
+        }
+      });
+    });
+  </script>
   <style>
     :root {
       --bg-primary: #ffffff;
@@ -3132,7 +3155,7 @@
         <div class="faq-item" style="margin-bottom: 16px;">
           <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px;"> Contato e Suporte</h4>
           <p style="color: var(--text-secondary); margin: 0; font-size: 14px; line-height: 1.5;">
-            Para dúvidas, sugestões ou problemas, entre em contato com os administradores através do nosso email<strong> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6d1d021f190c0109040a04190c010c022d0a000c0401430e0200">portaldigitalao@gmail.com</a> </strong> ou aguarde uma notificação com informações de contato.
+            Para dúvidas, sugestões ou problemas, entre em contato com os administradores através do nosso email<strong> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6d1d021f190c0109040a04190c010c022d0a000c0401430e0200"><span class="__cf_email__" data-cfemail="4c3c233e382d2028252b25382d202d230c2b212d2520622f2321">[email&#160;protected]</span></a> </strong> ou aguarde uma notificação com informações de contato.
           </p>
         </div>
       </div>
@@ -3305,7 +3328,7 @@
       </form>
     </div>
   </div>
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     function applyTheme() {
       const hour = new Date().getHours();
       if (hour >= 18 || hour < 6) {
@@ -3317,6 +3340,43 @@
     applyTheme();
     setInterval(applyTheme, 60000);
     const PUBLISHER_EMAILS = ['sibemcesar@gmail.com', 'portaldigitalao@gmail.com'];
+    const ONESIGNAL_APP_ID = '8e32cbe1-ece5-49fc-9b60-41e1e69c99b0';
+    const ONESIGNAL_REST_API_KEY = 'os_v2_app_gn5pyi5d5vdelm4sxmhrmzgulhiudh7kcgcioyqwudqonpsimvxe3vc4fprp5xjww357xvn54wrmgqfwmjyzmmx4wdrvpklwffaouby';
+
+    async function sendOneSignalPush(title, message, targetUserId) {
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Key ' + ONESIGNAL_REST_API_KEY
+      };
+      const payload = {
+        app_id: ONESIGNAL_APP_ID,
+        headings: { en: title },
+        contents: { en: message }
+      };
+      if (targetUserId) {
+        payload.include_aliases = { external_id: [targetUserId] };
+        payload.target_channel = 'push';
+      } else {
+        payload.included_segments = ['All'];
+      }
+      try {
+        const response = await fetch('https://api.onesignal.com/notifications', {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(payload)
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          console.log('OneSignal push error: ' + JSON.stringify(data));
+        } else {
+          console.log('OneSignal push sent: ' + JSON.stringify(data));
+        }
+        return data;
+      } catch (error) {
+        console.log('OneSignal push fetch error: ' + (error && error.message ? error.message : error));
+        return null;
+      }
+    }
     let currentUser = null;
     let isPublisher = false;
     let allGames = {};
@@ -3340,13 +3400,34 @@
           isPublisher = PUBLISHER_EMAILS.includes(user.email);
           if (!user.isAnonymous) {
             await loadUserData();
+            // OneSignal: associar External User ID com o UID do Firebase e pedir permissão
+            window.OneSignalDeferred = window.OneSignalDeferred || [];
+            OneSignalDeferred.push(async function(OneSignal) {
+              try {
+                await OneSignal.login(user.uid);
+                const permission = await OneSignal.Notifications.permission;
+                if (!permission) {
+                  await OneSignal.Slidedown.promptPush();
+                }
+              } catch (e) {
+                console.log('OneSignal login/prompt error: ' + (e && e.message ? e.message : e));
+              }
+            });
           }
           updateUIForUser();
           loadGames();
           loadHistory();
           closeAuthOverlay();
         } else {
-
+          // OneSignal: desassociar usuário ao fazer logout
+          window.OneSignalDeferred = window.OneSignalDeferred || [];
+          OneSignalDeferred.push(async function(OneSignal) {
+            try {
+              await OneSignal.logout();
+            } catch (e) {
+              console.log('OneSignal logout error: ' + (e && e.message ? e.message : e));
+            }
+          });
           showAuthOverlay();
           loadGames();
         }
@@ -5751,6 +5832,11 @@
           notificationData.targetUserName = targetUserName.split(' (')[0];
         }
         await set(newNotificationRef, notificationData);
+
+        // OneSignal: enviar notificação push
+        const pushTargetUserId = (targetType === 'individual') ? targetUserId : null;
+        const pushResult = await sendOneSignalPush(title, message, pushTargetUserId);
+
         closeSendNotificationModal();
         if (targetType === 'individual') {
           showCustomAlert('Notificação enviada com sucesso para o usuário selecionado!');
