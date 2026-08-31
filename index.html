@@ -457,10 +457,12 @@
       align-items: stretch;
       justify-content: space-around;
       background: var(--bg-secondary);
-      border-top: 1px solid var(--border-color);
-      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+      border-radius: 22px;
+      overflow: hidden;
       flex-shrink: 0;
-      padding-bottom: env(safe-area-inset-bottom, 0px);
+      margin: 0 14px calc(14px + env(safe-area-inset-bottom, 0px));
       position: relative;
       z-index: 5;
     }
@@ -522,6 +524,15 @@
       align-items: center;
       justify-content: center;
       padding: 0 3px;
+    }
+
+    .bottom-nav-badge.pulsing {
+      animation: badgePulseCalmo 2.2s ease-in-out infinite;
+    }
+
+    @keyframes badgePulseCalmo {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.55; transform: scale(0.94); }
     }
 
     @media (max-width: 600px) {
@@ -643,6 +654,87 @@
       height: 12px;
       fill: var(--text-muted);
       flex-shrink: 0;
+    }
+
+    .trending-section {
+      padding-top: 16px;
+    }
+
+    .trending-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 20px 10px;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .trending-title svg {
+      width: 19px;
+      height: 19px;
+      fill: #ff7a1a;
+      flex-shrink: 0;
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background: #ff3b30;
+      border-radius: 50%;
+      display: inline-block;
+      flex-shrink: 0;
+      animation: pulse-indicator 1.5s infinite;
+    }
+
+    .trending-scroll {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding: 0 20px 6px;
+      scroll-snap-type: x proximity;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .trending-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .trending-card {
+      flex: 0 0 calc((100% - 12px) / 2);
+      width: calc((100% - 12px) / 2);
+      scroll-snap-align: start;
+      border-radius: 10px;
+      background: var(--bg-secondary);
+    }
+
+    .trending-card .card-img-container {
+      border-radius: 10px 10px 0 0;
+      padding-top: 95%;
+    }
+
+    .trending-card .card-info {
+      padding: 7px 8px 9px;
+    }
+
+    .trending-card .card-title {
+      font-size: 12px;
+      -webkit-line-clamp: 1;
+    }
+
+    .trending-rank {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      z-index: 2;
+      background: rgba(0, 0, 0, 0.65);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 1px 6px;
+      border-radius: 20px;
+      backdrop-filter: blur(8px);
     }
 
     .overlay {
@@ -3189,6 +3281,16 @@
       position: sticky;
       bottom: 12px;
       margin: 16px 16px 0;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .pagination-controls.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
     }
 
     .pagination-btn {
@@ -3368,6 +3470,123 @@
       border: none;
       color: var(--text-muted);
       font-weight: 500;
+    }
+
+    .daily-rec-modal-content {
+      position: relative;
+      max-width: 380px;
+      padding: 0;
+      overflow: hidden;
+      text-align: left;
+    }
+    .daily-rec-modal-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 2;
+      width: 30px;
+      height: 30px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.55);
+      color: #fff;
+      font-size: 20px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .daily-rec-modal-close:active {
+      background: rgba(0, 0, 0, 0.8);
+    }
+    .daily-rec-modal-image-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      background: var(--bg-primary);
+    }
+    .daily-rec-modal-image-wrap img {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
+    .daily-rec-modal-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(0, 0, 0, 0.65);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+    }
+    .daily-rec-modal-body {
+      padding: 20px;
+    }
+    .daily-rec-modal-eyebrow {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    .daily-rec-modal-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+    .daily-rec-modal-desc {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .daily-rec-modal-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .daily-rec-modal-btn {
+      flex: 1;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 13.5px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .daily-rec-modal-btn.primary {
+      background: var(--accent-primary);
+      color: var(--bg-primary);
+    }
+    .daily-rec-modal-btn.primary:active {
+      transform: scale(0.97);
+    }
+    .daily-rec-modal-btn.secondary {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+    }
+    .daily-rec-modal-btn.secondary:active {
+      transform: scale(0.97);
     }
 
     .social-ad-modal-content {
@@ -6772,6 +6991,14 @@
   </div>
 
   <div class="content-wrapper">
+    <div class="trending-section" id="trendingSection" style="display: none;">
+      <div class="trending-title">
+        <svg viewBox="0 0 24 24"><path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"/></svg>
+        Em alta agora mesmo
+        <span class="live-dot"></span>
+      </div>
+      <div class="trending-scroll" id="trendingScroll"></div>
+    </div>
     <div class="grid" id="contentGrid">
       
       <div class="skeleton-card">
@@ -6847,15 +7074,15 @@
     <button class="bottom-nav-item" id="navNotificationsBtn" onclick="navOpenNotifications()">
       <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/></svg>
       <span id="navNotificationsBadge" class="bottom-nav-badge">0</span>
-      <span>Notificações</span>
+      <span>Alertas</span>
     </button>
     <button class="bottom-nav-item" id="navFavoritesBtn" onclick="navOpenFavorites()">
       <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-      <span>Meus Favoritos</span>
+      <span>Favoritos</span>
     </button>
     <button class="bottom-nav-item" id="navAccountBtn" onclick="navOpenAccount()">
       <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
-      <span>Minha Conta</span>
+      <span>Perfil</span>
     </button>
   </nav>
 
@@ -7938,6 +8165,7 @@
   </div>
 
   <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    const THEME_STORAGE_KEY = 'gamePlusThemePreference';
     let manualThemeOverride = false;
 
     if ('serviceWorker' in navigator) {
@@ -7955,8 +8183,37 @@
       }
     }
 
+    function getSavedThemePreference() {
+      try {
+        return localStorage.getItem(THEME_STORAGE_KEY);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function saveThemePreference(theme) {
+      try {
+        localStorage.setItem(THEME_STORAGE_KEY, theme);
+      } catch (e) {
+        console.error('Erro ao salvar preferência de tema:', e);
+      }
+    }
+
     function applyTheme() {
       if (manualThemeOverride) return;
+
+      const saved = getSavedThemePreference();
+      if (saved === 'dark') {
+        document.documentElement.classList.add('dark');
+        updateThemeColorMeta();
+        return;
+      }
+      if (saved === 'light') {
+        document.documentElement.classList.remove('dark');
+        updateThemeColorMeta();
+        return;
+      }
+
       const hour = new Date().getHours();
       if (hour >= 18 || hour < 6) {
         document.documentElement.classList.add('dark');
@@ -7969,6 +8226,7 @@
     function toggleTheme() {
       manualThemeOverride = true;
       document.documentElement.classList.toggle('dark');
+      saveThemePreference(document.documentElement.classList.contains('dark') ? 'dark' : 'light');
       updateThemeColorMeta();
     }
 
@@ -8246,6 +8504,11 @@
         gamesLoaded = true;
         renderGrid();
         checkUrlForGameId();
+
+        if (!dailyRecommendationChecked) {
+          dailyRecommendationChecked = true;
+          setTimeout(checkDailyRecommendation, 5000);
+        }
       }, (error) => {
         console.error('Erro ao carregar jogos:', error);
         loadGamesOnce();
@@ -8291,6 +8554,11 @@
         gamesLoaded = true;
         renderGrid();
         checkUrlForGameId();
+
+        if (!dailyRecommendationChecked) {
+          dailyRecommendationChecked = true;
+          setTimeout(checkDailyRecommendation, 5000);
+        }
       } catch (error) {
         console.error('Erro ao carregar jogos (fallback):', error);
       }
@@ -8362,10 +8630,79 @@
       }
     }
 
+    let gameRandomOrder = {};
+
+    function getRandomWeight(id) {
+      if (!(id in gameRandomOrder)) {
+        gameRandomOrder[id] = Math.random();
+      }
+      return gameRandomOrder[id];
+    }
+
+    function renderTrending() {
+      const section = document.getElementById('trendingSection');
+      const scroll = document.getElementById('trendingScroll');
+      if (!section || !scroll) return;
+
+      if (!gamesLoaded) {
+        section.style.display = 'none';
+        return;
+      }
+
+      const gamesArray = Object.entries(allGames).map(([id, game]) => ({
+        id,
+        ...game
+      }));
+
+      gamesArray.sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
+      const topGames = gamesArray.slice(0, 10);
+
+      if (topGames.length === 0) {
+        section.style.display = 'none';
+        return;
+      }
+
+      const typeLabels = {
+        aplicativos: 'APLICATIVOS',
+        jogos: 'JOGOS',
+        tutoriais: 'TUTORIAIS',
+        pc: 'PC',
+        outros: 'OUTROS'
+      };
+
+      section.style.display = 'block';
+      scroll.innerHTML = '';
+
+      topGames.forEach((game, index) => {
+        const card = document.createElement('div');
+        card.className = 'card trending-card';
+        card.style.animationDelay = `${index * 0.05}s`;
+
+        card.addEventListener('click', function() {
+          openGameDetail(game.id);
+        });
+
+        card.innerHTML = `
+          <div class="card-img-container">
+            <div class="trending-rank">${index + 1}</div>
+            <img src="${game.poster}" alt="${game.titulo}" loading="lazy" onload="this.classList.add('loaded')" onerror="this.classList.add('loaded','img-error');this.src='logo.png'">
+            <div class="card-type">${typeLabels[game.type] || game.type}</div>
+          </div>
+          <div class="card-info">
+            <div class="card-title">${game.titulo}</div>
+          </div>
+        `;
+
+        scroll.appendChild(card);
+      });
+    }
+
     function renderGrid() {
       const grid = document.getElementById('contentGrid');
       const noResults = document.getElementById('noResults');
       const paginationControls = document.getElementById('paginationControls');
+
+      renderTrending();
 
       if (!gamesLoaded) {
         renderSkeletonLoading();
@@ -8381,7 +8718,7 @@
         ...game
       }));
 
-      gamesArray.sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
+      gamesArray.sort((a, b) => getRandomWeight(a.id) - getRandomWeight(b.id));
 
       const filtered = gamesArray.filter((game) => {
         const matchFilter = currentFilter === 'all' || game.type === currentFilter;
@@ -8450,6 +8787,52 @@
 
         grid.appendChild(card);
       });
+
+      setupPaginationVisibility();
+    }
+
+    function setupPaginationVisibility() {
+      const grid = document.getElementById('contentGrid');
+      const paginationControls = document.getElementById('paginationControls');
+      if (!grid || !paginationControls) return;
+
+      if (window._paginationObserver) {
+        window._paginationObserver.disconnect();
+        window._paginationObserver = null;
+      }
+
+      paginationControls.classList.remove('visible');
+
+      if (paginationControls.style.display === 'none') return;
+
+      const cards = Array.from(grid.children);
+      if (cards.length === 0) return;
+
+      // Agrupa os cards por linha (mesmo offsetTop) pra achar as 2 últimas linhas
+      const rows = [];
+      cards.forEach(card => {
+        const top = card.offsetTop;
+        if (!rows.length || rows[rows.length - 1].top !== top) {
+          rows.push({ top, cards: [card] });
+        } else {
+          rows[rows.length - 1].cards.push(card);
+        }
+      });
+
+      const lastRow = rows.slice(-1);
+      const triggerCard = lastRow[0] ? lastRow[0].cards[0] : cards[0];
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          paginationControls.classList.toggle('visible', entry.isIntersecting);
+        });
+      }, {
+        root: document.querySelector('.content-wrapper'),
+        threshold: 0.01
+      });
+
+      observer.observe(triggerCard);
+      window._paginationObserver = observer;
     }
 
     function updatePaginationUI(startIndex, endIndex, totalGames, totalPages) {
@@ -11544,10 +11927,14 @@
         if (navBadge) {
           navBadge.textContent = unreadCount > 99 ? '99+' : unreadCount;
           navBadge.style.display = 'flex';
+          navBadge.classList.add('pulsing');
         }
       } else {
         badge.style.display = 'none';
-        if (navBadge) navBadge.style.display = 'none';
+        if (navBadge) {
+          navBadge.style.display = 'none';
+          navBadge.classList.remove('pulsing');
+        }
       }
     }
 
@@ -13464,6 +13851,8 @@
     }
 
     let dailyRewardModalShown = false;
+    let dailyRecommendationChecked = false;
+    const DAILY_REC_STORAGE_KEY = 'gamePlusDailyRecommendation';
 
     function showDailyRewardModal() {
       if (dailyRewardModalShown) return;
@@ -13589,6 +13978,147 @@
         console.error('[SEGURANÇA] Erro ao resgatar recompensa:', e);
         showCustomAlert('Erro ao resgatar recompensa. Tente novamente.');
       }
+    }
+
+    function getTodayDateString() {
+      const now = new Date();
+      return now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+    }
+
+    function getDailyRecommendationState() {
+      try {
+        const raw = localStorage.getItem(DAILY_REC_STORAGE_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function saveDailyRecommendationState(state) {
+      try {
+        localStorage.setItem(DAILY_REC_STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        console.error('Erro ao salvar recomendação diária:', e);
+      }
+    }
+
+    function isAnyModalOpen() {
+      const overlayIds = [
+        'overlay', 'authOverlay', 'historyOverlay', 'reportProblemOverlay',
+        'notificationsOverlay', 'favoritesOverlay', 'commentsOverlay',
+        'downloadsOverlay', 'redeemOverlay', 'publishOverlay', 'manageOverlay',
+        'searchOverlay', 'communityOverlay', 'generateCodeOverlay',
+        'dailyRewardModal'
+      ];
+
+      const anyOverlayActive = overlayIds.some((id) => {
+        const el = document.getElementById(id);
+        return el && el.classList.contains('active');
+      });
+
+      const anyCustomModalActive = !!document.querySelector('.custom-modal.active');
+
+      const sidebarEl = document.getElementById('sidebar');
+      const sidebarOpen = !!(sidebarEl && sidebarEl.classList.contains('open'));
+
+      return anyOverlayActive || anyCustomModalActive || sidebarOpen;
+    }
+
+    function checkDailyRecommendation(attempt) {
+      try {
+        attempt = attempt || 0;
+        if (!gamesLoaded) return;
+
+        const gameIds = Object.keys(allGames);
+        if (gameIds.length === 0) return;
+
+        const today = getTodayDateString();
+        const state = getDailyRecommendationState();
+
+        if (state && state.date === today) {
+          return;
+        }
+
+        if (isAnyModalOpen()) {
+          if (attempt < 60) {
+            setTimeout(() => checkDailyRecommendation(attempt + 1), 1000);
+          }
+          return;
+        }
+
+        const randomId = gameIds[Math.floor(Math.random() * gameIds.length)];
+        const game = allGames[randomId];
+        if (!game) return;
+
+        saveDailyRecommendationState({ date: today, gameId: randomId });
+        showDailyRecommendationModal(randomId, game);
+      } catch (e) {}
+    }
+
+    function showDailyRecommendationModal(id, game) {
+      const existing = document.getElementById('dailyRecModal');
+      if (existing) existing.remove();
+
+      const typeLabels = {
+        aplicativos: 'APLICATIVO',
+        jogos: 'JOGO',
+        tutoriais: 'TUTORIAL',
+        pc: 'PC',
+        outros: 'OUTRO'
+      };
+      const typeLabel = typeLabels[game.type] || 'RECOMENDADO';
+      const description = game.descricao || 'Confira este conteúdo recomendado para você hoje.';
+
+      const modal = document.createElement('div');
+      modal.className = 'custom-modal active';
+      modal.id = 'dailyRecModal';
+      modal.innerHTML = `
+        <div class="custom-modal-content daily-rec-modal-content">
+          <button class="daily-rec-modal-close" id="dailyRecCloseBtn" aria-label="Fechar">&times;</button>
+          <div class="daily-rec-modal-image-wrap">
+            <div class="daily-rec-modal-badge">${typeLabel}</div>
+            <img src="${game.poster || 'logo.png'}" alt="${game.titulo || ''}" onerror="this.src='logo.png'">
+          </div>
+          <div class="daily-rec-modal-body">
+            <div class="daily-rec-modal-eyebrow">Recomendação de hoje</div>
+            <div class="daily-rec-modal-title">${game.titulo || ''}</div>
+            <div class="daily-rec-modal-desc">${description}</div>
+            <div class="daily-rec-modal-buttons">
+              <button class="daily-rec-modal-btn secondary" id="dailyRecDislikeBtn">Não gostei</button>
+              <button class="daily-rec-modal-btn primary" id="dailyRecMoreBtn">Ver mais</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(modal);
+
+      document.getElementById('dailyRecDislikeBtn').addEventListener('click', () => {
+        closeDailyRecommendationModal();
+      });
+
+      document.getElementById('dailyRecMoreBtn').addEventListener('click', () => {
+        closeDailyRecommendationModal();
+        openGameDetail(id);
+      });
+
+      document.getElementById('dailyRecCloseBtn').addEventListener('click', () => {
+        clearDailyRecommendationState();
+        closeDailyRecommendationModal();
+      });
+    }
+
+    function clearDailyRecommendationState() {
+      try {
+        localStorage.removeItem(DAILY_REC_STORAGE_KEY);
+      } catch (e) {
+        console.error('Erro ao limpar recomendação diária:', e);
+      }
+    }
+
+    function closeDailyRecommendationModal() {
+      const modal = document.getElementById('dailyRecModal');
+      if (modal) modal.remove();
     }
 
     function showCustomConfirm(message, onConfirm) {
