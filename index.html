@@ -13002,12 +13002,20 @@ const RATING_STAR_PATH = "M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9
 const RATING_LINK_REGEX = /(\bhttps?:\/\/[^\s]+)|(\bwww\.[^\s]+)|(\b[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.(?:com|net|org|io|co|info|biz|me|ao|pt|br|xyz|online|site|shop|app|dev|gg|tv|link|ly|club|top|vip|store)(?:\.[a-z]{2,3})?(?:\/[^\s]*)?\b)/gi;
 function stripLinks(text) {
   if (!text) return "";
-  return text.replace(RATING_LINK_REGEX, "").replace(/\s{2,}/g, " ").trim();
+  RATING_LINK_REGEX.lastIndex = 0;
+  if (!RATING_LINK_REGEX.test(text)) return text;
+  RATING_LINK_REGEX.lastIndex = 0;
+  return text.replace(RATING_LINK_REGEX, "").replace(/[ \t]{2,}/g, " ").trimStart();
+}
+function stripHtmlChars(text) {
+  if (!text) return "";
+  return text.replace(/[<>]/g, "");
 }
 function handleRatingCommentInput(el) {
   const cursorPos = el.selectionStart;
   const before = el.value;
-  const after = stripLinks(before);
+  const noHtml = stripHtmlChars(before);
+  const after = stripLinks(noHtml);
   if (after !== before) {
     el.value = after;
     const diff = before.length - after.length;
@@ -13122,10 +13130,10 @@ function renderRatingList(items) {
     return `
           <div class="rating-list-item">
             <div class="rating-list-item-header">
-              <div class="rating-list-item-author">${item.authorName || "Usu\xE1rio"}</div>
+              <div class="rating-list-item-author">${escapeHtml(item.authorName || "Usu\xE1rio")}</div>
               <div class="rating-list-item-stars">${starsHtml}</div>
             </div>
-            ${item.comment ? `<div class="rating-list-item-comment">${item.comment}</div>` : ""}
+            ${item.comment ? `<div class="rating-list-item-comment">${escapeHtml(item.comment)}</div>` : ""}
             <div class="rating-list-item-time">${formatTimeAgo(item.timestamp || Date.now())}</div>
           </div>
         `;
@@ -13147,7 +13155,7 @@ async function submitRating() {
   }
   const gameId = currentGameData.id;
   const commentInput = document.getElementById("ratingCommentInput");
-  const comment = commentInput ? stripLinks(commentInput.value.trim()).slice(0, 200) : "";
+  const comment = commentInput ? stripLinks(stripHtmlChars(commentInput.value.trim())).slice(0, 200) : "";
   const { doc, getDoc, setDoc } = window.firebaseModules;
   const firestore = window.firebaseFirestore;
   setRatingSubmitLoading(true);
