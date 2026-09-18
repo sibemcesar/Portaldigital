@@ -429,6 +429,37 @@
       top: 0;
       z-index: 100;
     }
+    .page-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      padding: 10px 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+      background: var(--bg-primary);
+      border-bottom: 1px solid var(--border-color);
+    }
+    .page-breadcrumb a {
+      color: var(--accent-primary);
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .page-breadcrumb a:hover {
+      text-decoration: underline;
+    }
+    .page-breadcrumb .breadcrumb-sep {
+      opacity: 0.6;
+    }
+    .page-breadcrumb .breadcrumb-current {
+      color: var(--text-primary);
+      font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 60vw;
+    }
     .content-header-btn {
       background: none;
       border: none;
@@ -558,11 +589,29 @@
       color: var(--text-secondary);
       margin-bottom: 16px;
     }
-    .game-info {
-      display: none;
+    .content-column {
+      max-width: 680px;
+      margin: 0 auto;
+      --cta-bg: var(--accent-hover);
+      --cta-fg: #ffffff;
     }
-    .game-info.active {
+    .dark .content-column {
+      --cta-bg: var(--accent);
+      --cta-fg: #0f0f0f;
+    }
+    .game-info {
       display: block;
+      margin-bottom: 32px;
+      scroll-margin-top: 72px;
+    }
+    .content-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+    .content-actions .like-btn span {
+      font-weight: 600;
     }
 
     .social-ad-links {
@@ -915,237 +964,332 @@
       text-decoration: underline;
     }
 
-    .comments-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: var(--bg-primary);
-      z-index: 2000;
-      flex-direction: column;
-      animation: fadeIn 0.25s ease;
-    }
-    .comments-overlay.active {
-      display: flex;
-    }
-
+    .comments-overlay,
     .downloads-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: var(--bg-primary);
-      z-index: 2000;
-      flex-direction: column;
-      animation: fadeIn 0.25s ease;
-    }
-    .downloads-overlay.active {
       display: flex;
+      flex-direction: column;
     }
     .downloads-overlay-content {
       width: 100%;
-      height: 100%;
-      max-width: 600px;
-      margin: 0 auto;
-      background: var(--bg-primary);
       display: flex;
       flex-direction: column;
-      overflow: hidden;
+    }
+    .panel-subheader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 0 14px;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 14px;
+    }
+    .panel-subheader-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-primary);
     }
     .downloads-list-container {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px;
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
+    .downloads-header-points .points-label {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
     .downloads-info-box {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 8px;
+      border-radius: 14px;
+      padding: 16px 18px;
     }
-    .downloads-info-box p {
-      font-size: 14px;
-      color: var(--text-secondary);
-      line-height: 1.5;
-      margin: 0;
+    .downloads-info-box .cost-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .downloads-info-box .cost-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
     }
     .downloads-info-box .cost-badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: var(--accent-primary);
-      color: var(--bg-primary);
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-weight: 600;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .downloads-info-box .cost-badge svg {
+      width: 22px;
+      height: 22px;
+      fill: var(--accent);
+    }
+    .downloads-info-box p {
       font-size: 13px;
-      margin-top: 12px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin: 0;
+    }
+    .downloads-list-container .insufficient-points {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: var(--text-primary);
+      padding: 12px 14px;
+      border-radius: 12px;
+      margin-bottom: 0;
+      font-size: 14px;
+      text-align: left;
+    }
+    #downloadSectionsContainer {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .downloads-overlay .download-section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 14px 16px;
+    }
+    .downloads-overlay .download-section-title {
+      min-width: 0;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      overflow-wrap: anywhere;
+    }
+    .downloads-overlay .download-section-buttons {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .downloads-overlay .download-section-buttons .btn-main {
+      flex: none;
+      min-width: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 10px;
+      background: var(--cta-bg);
+      color: var(--cta-fg);
+      font-size: 14px;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+    .downloads-overlay .download-section-buttons .btn-main[hidden] {
+      display: none;
+    }
+    .downloads-overlay .download-section-buttons .btn-main svg {
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+    .downloads-overlay .download-section-buttons .btn-main:hover {
+      opacity: 0.92;
+      transform: none;
+      box-shadow: none;
+    }
+    .downloads-overlay .download-section-buttons .btn-main:active {
+      transform: scale(0.97);
+    }
+    .downloads-overlay .download-section-buttons .btn-main:focus-visible {
+      outline: 2px solid var(--cta-bg);
+      outline-offset: 2px;
+    }
+    .section-count {
+      margin-left: 8px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      vertical-align: middle;
+    }
+    .section-count:empty {
+      display: none;
     }
     .comments-overlay-content {
       width: 100%;
-      height: 100%;
-      max-width: 600px;
-      margin: 0 auto;
-      background: var(--bg-primary);
       display: flex;
       flex-direction: column;
-      overflow: hidden;
     }
     .comments-list-container {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      margin-bottom: 20px;
     }
-    .comment-input-wrapper {
+    .comment-item {
       display: flex;
-      flex-direction: column;
-      gap: 10px;
-      padding: 16px;
-      background: var(--bg-card);
-      border-top: 1px solid var(--border-color);
-      flex-shrink: 0;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border-color);
     }
-    .comment-btn-row {
-      display: flex;
-      justify-content: flex-end;
+    .comment-item:first-child {
+      padding-top: 0;
     }
-    .comment-input {
-      width: 100%;
-      padding: 12px 18px;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      color: var(--text-primary);
-      font-size: 16px;
-      font-family: 'Inter', sans-serif;
-      resize: none;
-      min-height: 48px;
-      line-height: 22px;
-      box-sizing: border-box;
+    .comment-item:last-child {
+      border-bottom: none;
     }
-    .comment-input:focus {
-      outline: none;
-      border-color: var(--accent-primary);
-    }
-    .comment-input::placeholder {
-      color: var(--text-muted);
-    }
-    .comment-btn {
-      width: 44px;
-      height: 44px;
-      min-width: 44px;
-      padding: 0;
-      background: var(--accent-primary);
-      border: none;
+    .comment-avatar {
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
-      color: var(--bg-primary);
-      cursor: pointer;
-      transition: all 0.2s ease;
+      flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      flex-shrink: 0;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    }
-    .comment-btn:hover {
-      opacity: 0.9;
-      transform: scale(1.05);
-    }
-    .comment-btn:active {
-      transform: scale(0.95);
-    }
-    .comment-btn svg {
-      width: 20px;
-      height: 20px;
-      fill: currentColor;
-    }
-    .comment-item {
-      background: var(--bg-card);
-      padding: 12px 16px;
-      border-radius: 18px 18px 18px 4px;
-      max-width: 85%;
-      align-self: flex-start;
-      border: 1px solid var(--border-color);
-      animation: slideIn 0.2s ease;
-    }
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    .comment-item.own-comment {
-      align-self: flex-end;
-      border-radius: 18px 18px 4px 18px;
-      background: #2196F3;
-      border-color: #2196F3;
-    }
-    .comment-item.own-comment .comment-author {
-      color: rgba(255, 255, 255, 0.9);
-    }
-    .comment-item.own-comment .comment-text {
       color: #ffffff;
+      font-size: 15px;
+      font-weight: 700;
     }
-    .comment-item.own-comment .comment-time {
-      color: rgba(255, 255, 255, 0.7);
+    .comment-body {
+      flex: 1;
+      min-width: 0;
     }
     .comment-header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 4px 8px;
       margin-bottom: 4px;
     }
     .comment-author {
       font-weight: 600;
-      font-size: 13px;
-      color: var(--accent-primary);
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+    .comment-you {
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: var(--accent-light);
+      color: var(--accent-hover);
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .comment-body .comment-time {
+      margin-top: 0;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .comment-body .comment-text {
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--text-secondary);
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
     }
     .comment-delete-btn {
+      margin-left: auto;
+      display: flex;
       background: none;
       border: none;
       cursor: pointer;
-      font-size: 12px;
-      padding: 4px 8px;
-      border-radius: 4px;
+      padding: 4px;
+      border-radius: 6px;
       opacity: 0.6;
       transition: opacity 0.2s, background 0.2s;
+    }
+    .comment-delete-btn svg {
+      width: 18px;
+      height: 18px;
     }
     .comment-delete-btn:hover {
       opacity: 1;
       background: rgba(244, 67, 54, 0.15);
     }
-    .no-comments-msg {
-      text-align: center;
+    .comment-input-wrapper {
+      padding: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      transition: border-color 0.2s ease;
+    }
+    .comment-input-wrapper > * + * {
+      margin-top: 10px;
+    }
+    .comment-input-wrapper:focus-within {
+      border-color: var(--accent);
+    }
+    .comment-input {
+      display: block;
+      width: 100%;
+      min-height: 66px;
+      padding: 6px 4px;
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      font-size: 16px;
+      font-family: 'Inter', sans-serif;
+      line-height: 22px;
+      resize: none;
+      box-sizing: border-box;
+    }
+    .comment-input:focus {
+      outline: none;
+    }
+    .comment-input::placeholder {
       color: var(--text-muted);
-      padding: 60px 20px;
+    }
+    .comment-btn-row {
+      display: flex;
+      justify-content: flex-end;
+    }
+    .comment-btn {
+      padding: 9px 18px;
+      background: var(--cta-bg);
+      color: var(--cta-fg);
+      border: none;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
       font-size: 14px;
-      flex: 1;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s ease, transform 0.1s ease;
+    }
+    .comment-btn:hover {
+      opacity: 0.92;
+    }
+    .comment-btn:active {
+      transform: scale(0.97);
+    }
+    .comment-login-hint {
+      padding: 14px 16px;
+      border: 1px dashed var(--border-color);
+      border-radius: 14px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+    .no-comments-msg {
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      text-align: center;
+      padding: 28px 16px;
+      border: 1px dashed var(--border-color);
+      border-radius: 14px;
+      color: var(--text-muted);
+      font-size: 14px;
     }
     .no-comments-msg svg {
-      width: 56px;
-      height: 56px;
+      width: 36px;
+      height: 36px;
       fill: var(--text-muted);
-      opacity: 0.4;
-      margin-bottom: 16px;
+      opacity: 0.5;
+      margin-bottom: 10px;
+    }
+    .no-comments-msg p {
+      margin: 0;
     }
 
     .notification-btn {
@@ -1684,6 +1828,56 @@
     .auth-overlay-btn:active {
       transform: translateY(0) scale(0.98);
     }
+    .free-account-intro {
+      margin: 0 0 16px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+    }
+    .free-account-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+      padding: 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+    }
+    .free-account-item-icon {
+      flex-shrink: 0;
+      font-size: 22px;
+      line-height: 1.2;
+    }
+    .free-account-item h4,
+    .free-account-own h4 {
+      margin: 0 0 4px;
+      font-size: 15px;
+      color: var(--text-primary);
+    }
+    .free-account-item p,
+    .free-account-own p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--text-secondary);
+    }
+    .free-account-own {
+      margin-top: 16px;
+      padding: 14px;
+      background: var(--accent-light);
+      border-radius: 12px;
+    }
+    .free-account-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .free-account-actions .custom-modal-btn {
+      width: 100%;
+      padding: 12px 20px;
+    }
     .custom-modal h2 {
       margin-top: 0;
       margin-bottom: 16px;
@@ -2172,61 +2366,8 @@
       animation: likeAnimation 0.3s ease;
     }
 
-    .overlay-footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: var(--bg-primary);
-      border-top: 1px solid var(--border-color);
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      padding: 12px 16px;
-      padding-bottom: max(12px, env(safe-area-inset-bottom));
-      z-index: 1001;
-    }
-    .footer-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 8px 16px;
-      border-radius: 12px;
-      transition: all 0.2s ease;
-      color: var(--text-muted);
-      min-width: 70px;
-    }
-    .footer-btn svg {
-      width: 24px;
-      height: 24px;
-      fill: currentColor;
-      transition: all 0.2s ease;
-    }
-    .footer-btn span {
-      font-size: 11px;
-      font-weight: 500;
-      font-family: 'Inter', sans-serif;
-    }
-    .footer-btn:hover {
-      color: var(--text-primary);
-      background: var(--bg-secondary);
-    }
-    .footer-btn.active {
-      color: var(--accent-primary);
-    }
-    .footer-btn.like-active {
-      color: #e91e63;
-    }
-    .footer-btn.like-active svg {
-      animation: likeAnimation 0.3s ease;
-    }
-
     .modal-body {
-      padding-bottom: 100px;
+      padding-bottom: 48px;
     }
     @keyframes likeAnimation {
       0% { transform: scale(1); }
@@ -2287,28 +2428,6 @@
     .add-link-btn:hover {
       border-color: var(--accent-primary);
       background: rgba(124, 77, 255, 0.1);
-    }
-
-    .download-section {
-      background: var(--bg-tertiary);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 12px;
-    }
-    .download-section-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 12px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border-color);
-    }
-    .download-section-buttons {
-      display: flex;
-      gap: 12px;
-    }
-    .download-section-buttons .btn-main {
-      flex: 1;
     }
 
     .favorites-item {
@@ -3092,89 +3211,88 @@
           <svg viewBox="0 0 24 24" width="24" height="24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
         </button>
       </div>
+      <div class="page-breadcrumb" id="pageBreadcrumb">
+        <a href="#" onclick="goHome(event)">Início</a>
+        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-current" id="breadcrumbTitle"></span>
+      </div>
       <div class="modal-header">
         <h2 class="modal-title" id="modalTitle">Título</h2>
         <div class="modal-meta" id="modalMeta"></div>
       </div>
       <div class="modal-body">
-        <div id="videoContainer" class="video-container" style="display: none;"></div>
-        <div class="game-info active" id="gameInfo">
-          <div class="modal-description" id="modalDescription"></div>
-        </div>
-      </div>
+        <div class="content-column">
+          <div class="game-info" id="gameInfo">
+            <div class="panel-subheader">
+              <span class="panel-subheader-title">Informações</span>
+            </div>
+            <div id="videoContainer" class="video-container" style="display: none;"></div>
+            <div class="modal-description" id="modalDescription"></div>
+          </div>
 
-      <div class="overlay-footer">
-        <button class="footer-btn" id="footerDownloadsBtn" onclick="showDownloads(); updateFooterActive('downloads')">
-          <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-          <span>Downloads</span>
-        </button>
-        <button class="footer-btn active" id="footerInfoBtn" onclick="showGameInfo(); updateFooterActive('info')">
-          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-          <span>Informações</span>
-        </button>
-        <button class="footer-btn" id="footerLikeBtn" onclick="toggleLike()">
-          <svg id="footerLikeIcon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-          <span>Curtir</span>
-        </button>
-        <button class="footer-btn" id="footerCommentsBtn" onclick="showComments(); updateFooterActive('comments')">
-          <svg viewBox="0 0 24 24"><path d="M21 6h-2V3c0-.55-.45-1-1-1H2c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1v-2h2c.55 0 1-.45 1-1V7c0-.55-.45-1-1-1zm-4 6H6.83L5 13.83V4h12v8zm4-2h-2V7h-9v-.5c0-.28.22-.5.5-.5h9c.28 0 .5.22.5.5V10z"/></svg>
-          <span>Comentários</span>
-        </button>
-      </div>
-    </div>
-  </div>
+          <div id="downloadsOverlay" class="game-info downloads-overlay">
+            <div class="downloads-overlay-content">
+              <div class="panel-subheader">
+                <span class="panel-subheader-title">Downloads</span>
+                <div class="downloads-header-points">
+                  <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/></svg>
+                  <span class="points-label">Seus pontos</span>
+                  <span id="downloadsHeaderPoints">0</span>
+                </div>
+              </div>
+              <div class="downloads-list-container">
+                <div id="downloadsInsufficientWarning" style="display: none;" class="insufficient-points">
+                  ⚠️ Você não tem pontos suficientes para baixar este conteúdo!
+                </div>
+                <div class="downloads-info-box">
+                  <div class="cost-summary">
+                    <span class="cost-label">Custo por download</span>
+                    <div class="cost-badge" id="downloadsCostBadge">
+                    <svg viewBox="0 0 24 24" width="16" height="16" style="fill: currentColor;"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+                    <span id="downloadsCostValue">0 pontos</span>
+                  </div>
+                  </div>
+                  <p>Escolha uma das opções abaixo para baixar o conteúdo. Cada download irá descontar os pontos indicados.</p>
+                </div>
 
-  <div id="commentsOverlay" class="comments-overlay">
-    <div class="comments-overlay-content">
-      <div class="content-header">
-        <button class="content-header-btn back-btn" onclick="closeCommentsOverlay()">
-          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-        </button>
-        <h1 class="content-header-title">Comentários</h1>
-        <button class="content-header-btn help-btn" onclick="openCommentsHelpModal()" title="Dúvidas">
-          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
-        </button>
-      </div>
-      <div id="commentsList" class="comments-list-container"></div>
-      <div id="commentInputWrapper" class="comment-input-wrapper" style="display: none;">
-        <div id="commentBtnRow" class="comment-btn-row" style="display: none;">
-          <button id="commentSendBtn" class="comment-btn" onclick="postComment()" title="Enviar">
-            <svg viewBox="0 0 24 24"><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/></svg>
-          </button>
-        </div>
-        <textarea id="commentInput" class="comment-input" placeholder="Escreva um comentário..." rows="1"></textarea>
-      </div>
-    </div>
-  </div>
+                <div id="downloadSectionsContainer"></div>
+              </div>
+            </div>
+          </div>
 
-  <div id="downloadsOverlay" class="downloads-overlay">
-    <div class="downloads-overlay-content">
-      <div class="content-header">
-        <button class="content-header-btn back-btn" onclick="closeDownloadsOverlay()">
-          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-        </button>
-        <h1 class="content-header-title">Downloads</h1>
-        <div class="downloads-header-points">
-          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/></svg>
-          <span id="downloadsHeaderPoints">0</span>
-        </div>
-      </div>
-      <div class="downloads-list-container">
-        <div id="downloadsInsufficientWarning" style="display: none;" class="insufficient-points">
-          ⚠️ Você não tem pontos suficientes para baixar este conteúdo!
-        </div>
-        <div class="downloads-info-box">
-          <p>Escolha uma das opções abaixo para baixar o conteúdo. Cada download irá descontar os pontos indicados.</p>
-          <div class="cost-badge" id="downloadsCostBadge">
-            <svg viewBox="0 0 24 24" width="16" height="16" style="fill: currentColor;"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
-            <span id="downloadsCostValue">0 pontos</span>
+          <div class="content-actions">
+            <button class="like-btn" id="likeBtn" onclick="toggleLike()">
+              <svg class="like-icon" id="likeIcon" viewBox="0 0 24 24" width="20" height="20" style="fill: currentColor;"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+              <span>Curtir</span>
+              <span id="likeCountBtn">0</span>
+            </button>
+          </div>
+
+          <div id="commentsOverlay" class="game-info comments-overlay">
+            <div class="comments-overlay-content">
+              <div class="panel-subheader">
+                <span class="panel-subheader-title">Comentários<span class="section-count" id="commentsCount"></span></span>
+                <button class="content-header-btn help-btn" onclick="openCommentsHelpModal()" title="Dúvidas">
+                  <svg viewBox="0 0 24 24" width="22" height="22"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
+                </button>
+              </div>
+              <div id="commentsList" class="comments-list-container"></div>
+              <div id="commentInputWrapper" class="comment-input-wrapper" style="display: none;">
+                <textarea id="commentInput" class="comment-input" placeholder="Escreva um comentário..." rows="2"></textarea>
+                <div id="commentBtnRow" class="comment-btn-row" style="display: none;">
+                  <button id="commentSendBtn" class="comment-btn" onclick="postComment()" title="Enviar comentário">Comentar</button>
+                </div>
+              </div>
+              <div id="commentLoginHint" class="comment-login-hint" style="display: none;">
+                Entre na sua conta para comentar.
+              </div>
+            </div>
           </div>
         </div>
-
-        <div id="downloadSectionsContainer"></div>
       </div>
     </div>
   </div>
+
   <div id="avatarModal" class="custom-modal">
     <div class="custom-modal-content">
       <h2>Alterar Foto do Perfil</h2>
@@ -3221,7 +3339,41 @@
           <button type="button" class="custom-modal-btn secondary" onclick="closeLoginModal()">Cancelar</button>
           <button type="submit" class="custom-modal-btn primary">Entrar</button>
         </div>
+        <div class="auth-overlay-divider">ou</div>
+        <button type="button" class="auth-overlay-btn secondary" onclick="openFreeAccountModal()">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 7L9.6 8.4l2.6 2.6H2v2h10.2l-2.6 2.6L11 17l5-5-5-5zm9 12h-8v2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-8v2h8v14z"/></svg>
+          Continuar com a Conta Livre
+        </button>
       </form>
+    </div>
+  </div>
+  <div id="freeAccountModal" class="custom-modal">
+    <div class="custom-modal-content" style="max-width: 480px;">
+      <h2>Sobre a Conta Livre</h2>
+      <p class="free-account-intro">A Conta Livre é uma conta que todo mundo pode usar, sem precisar criar cadastro. Como ela é de todos, funciona um pouco diferente de uma conta só sua:</p>
+      <div class="free-account-item">
+        <span class="free-account-item-icon">💰</span>
+        <div>
+          <h4>Os pontos são de todos</h4>
+          <p>Os pontos ficam numa conta só. Se alguém usar, os pontos diminuem para todo mundo.</p>
+        </div>
+      </div>
+      <div class="free-account-item">
+        <span class="free-account-item-icon">💬</span>
+        <div>
+          <h4>Seu nome não aparece</h4>
+          <p>Todos os comentários saem com o mesmo nome, e quem estiver usando a Conta Livre pode apagar os comentários dos outros.</p>
+        </div>
+      </div>
+      <div class="free-account-own">
+        <h4>🔒 Quer liberdade e privacidade?</h4>
+        <p>Crie a sua própria conta. É rápido, e seus pontos, seu nome e seus comentários ficam só com você.</p>
+      </div>
+      <div class="free-account-actions">
+        <button type="button" class="custom-modal-btn primary" onclick="confirmFreeAccount()">Entendi, continuar</button>
+        <button type="button" class="custom-modal-btn secondary" onclick="createOwnAccountInstead()">Criar minha conta</button>
+        <button type="button" class="custom-modal-btn secondary" onclick="closeFreeAccountModal()" style="border-color: transparent;">Voltar</button>
+      </div>
     </div>
   </div>
   <div id="registerModal" class="custom-modal">
@@ -4278,14 +4430,17 @@
         commentBtnRow.style.display = 'none';
       }
     });
-    async function openGameDetail(id) {
+    async function openGameDetail(id, skipPush) {
       const game = allGames[id];
       if (!game) return;
       addToHistory(id);
       currentGameData = { ...game, id: id };
-      const newUrl = window.location.pathname + '?id=' + id;
-      window.history.pushState({ gameId: id }, game.titulo, newUrl);
+      if (!skipPush) {
+        const newUrl = window.location.pathname + '?id=' + id;
+        window.history.pushState({ gameId: id, view: 'info' }, game.titulo, newUrl);
+      }
       document.getElementById('contentHeaderTitle').textContent = game.titulo;
+      document.getElementById('breadcrumbTitle').textContent = game.titulo;
       document.getElementById('modalTitle').textContent = game.titulo;
       document.getElementById('modalMeta').innerHTML = `
         <div class="modal-meta-item">
@@ -4358,7 +4513,7 @@
           <div class="download-section">
             <div class="download-section-title">${link.desc || 'Download'}</div>
             <div class="download-section-buttons">
-              ${hasGA ? `<button class="btn-main download-btn" data-game-id="${id}" data-app-type="GA" data-link-index="${index}" data-cost="${cost}">Baixar</button>` : ''}
+              ${hasGA ? `<button class="btn-main download-btn" data-game-id="${id}" data-app-type="GA" data-link-index="${index}" data-cost="${cost}"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg><span>Baixar</span></button>` : ''}
               ${hasADM ? `<button class="btn-main download-btn" data-game-id="${id}" data-app-type="ADM" data-link-index="${index}" data-cost="${cost}" hidden="true">Baixar ADM</button>` : ''}
             </div>
           </div>
@@ -4378,16 +4533,21 @@
       });
       loadComments(id);
       const commentInputWrapper = document.getElementById('commentInputWrapper');
+      const commentLoginHint = document.getElementById('commentLoginHint');
       if (currentUser && !currentUser.isAnonymous) {
         commentInputWrapper.style.display = 'block';
+        commentLoginHint.style.display = 'none';
       } else {
         commentInputWrapper.style.display = 'none';
+        commentLoginHint.style.display = 'block';
       }
       await loadGameLikes(id);
       updateLikeButton();
       updateFavoriteButton();
-      showGameInfo();
+      updatePointsDisplay();
       document.getElementById('overlay').classList.add('active');
+      document.getElementById('overlay').scrollTop = 0;
+      window.scrollTo(0, 0);
     }
     function extractYoutubeId(url) {
       const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
@@ -4472,10 +4632,8 @@
         showCustomAlert('Erro ao processar download. Tente novamente.');
       }
     }
-    function closeOverlay() {
+    function closeOverlay(skipPush) {
       document.getElementById('overlay').classList.remove('active');
-      document.getElementById('commentsOverlay').classList.remove('active');
-      document.getElementById('downloadsOverlay').classList.remove('active');
       document.body.style.overflow = '';
       currentGameData = null;
       const videoContainer = document.getElementById('videoContainer');
@@ -4483,10 +4641,16 @@
         videoContainer.innerHTML = '';
         videoContainer.style.display = 'none';
       }
-      const newUrl = window.location.pathname;
-      window.history.pushState({}, document.title, newUrl);
+      if (!skipPush) {
+        const newUrl = window.location.pathname;
+        window.history.pushState({}, document.title, newUrl);
+      }
     }
     function closeModal() {
+      closeOverlay();
+    }
+    function goHome(event) {
+      if (event) event.preventDefault();
       closeOverlay();
     }
     function shareContent() {
@@ -4531,38 +4695,30 @@
       document.body.removeChild(textArea);
     }
     function checkUrlForGameId() {
+      renderFromLocation(true);
+    }
+    async function renderFromLocation(isInitial) {
       const urlParams = new URLSearchParams(window.location.search);
       const gameId = urlParams.get('id');
-      if (gameId && allGames[gameId]) {
-        openGameDetail(gameId);
+      const view = urlParams.get('view');
+      if (!gameId || !allGames[gameId]) {
+        if (!isInitial) closeOverlay(true);
+        return;
       }
+      if (!currentGameData || currentGameData.id !== gameId) {
+        await openGameDetail(gameId, true);
+      }
+      if (view === 'comentarios') scrollToSection('commentsOverlay', isInitial);
+      else if (view === 'downloads') scrollToSection('downloadsOverlay', isInitial);
+      else document.getElementById('overlay').scrollTop = 0;
     }
-    function showGameInfo() {
-      document.getElementById('gameInfo').classList.add('active');
-      updateFooterActive('info');
-    }
-    function showComments() {
-      document.getElementById('commentsOverlay').classList.add('active');
-      document.body.style.overflow = 'hidden';
-      updateFooterActive('comments');
-    }
-    function closeCommentsOverlay(event) {
-      if (event && event.target !== event.currentTarget) return;
-      document.getElementById('commentsOverlay').classList.remove('active');
-      document.body.style.overflow = '';
-      updateFooterActive('info');
-    }
-    function showDownloads() {
-      document.getElementById('downloadsOverlay').classList.add('active');
-      document.body.style.overflow = 'hidden';
-      updateFooterActive('downloads');
-      updatePointsDisplay();
-    }
-    function closeDownloadsOverlay(event) {
-      if (event && event.target !== event.currentTarget) return;
-      document.getElementById('downloadsOverlay').classList.remove('active');
-      document.body.style.overflow = '';
-      updateFooterActive('info');
+    window.addEventListener('popstate', function() {
+      renderFromLocation(false);
+    });
+    function scrollToSection(id, instant) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.scrollIntoView({ behavior: instant ? 'auto' : 'smooth', block: 'start' });
     }
     async function loadComments(gameId) {
       const { ref, onValue } = window.firebaseModules;
@@ -4573,12 +4729,27 @@
         renderComments(comments);
       });
     }
+    function escapeHtml(value) {
+      return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+    function commentAvatarColor(name) {
+      let hash = 0;
+      for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) % 360;
+      return `hsl(${hash} 45% 40%)`;
+    }
     function renderComments(comments) {
       const commentsList = document.getElementById('commentsList');
       const commentsArray = Object.entries(comments).map(([id, comment]) => ({
         id,
         ...comment
       })).sort((a, b) => a.timestamp - b.timestamp);
+      const commentsCountEl = document.getElementById('commentsCount');
+      if (commentsCountEl) commentsCountEl.textContent = commentsArray.length || '';
       if (commentsArray.length === 0) {
         commentsList.innerHTML = `
           <div class="no-comments-msg">
@@ -4591,20 +4762,26 @@
       }
       const currentUserId = currentUser ? currentUser.uid : null;
       commentsList.innerHTML = commentsArray.map(comment => {
-        const authorDisplayName = comment.authorName || comment.authorEmail.split('@')[0];
+        const authorDisplayName = comment.authorName || (comment.authorEmail || '').split('@')[0] || 'Usuário';
         const isAuthor = currentUserId && comment.authorId === currentUserId;
         const ownCommentClass = isAuthor ? ' own-comment' : '';
         const deleteBtn = isAuthor ? `<button class="comment-delete-btn" onclick="deleteComment('${currentGameData.id}', '${comment.id}')" title="Apagar"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
   <path fill="#808080" d="M9 3h6v2h5v2H4V5h5V3zm-3 6h12l-1.2 10.2c-.1.9-.8 1.8-1.8 1.8H8c-1 0-1.7-.9-1.8-1.8L6 9zm3 2v8h2v-8H9zm4 0v8h2v-8h-2z"/>
 </svg></button>` : '';
+        const initial = escapeHtml(Array.from(authorDisplayName.trim())[0] || '?').toUpperCase();
+        const youTag = isAuthor ? '<span class="comment-you">Você</span>' : '';
         return `
           <div class="comment-item${ownCommentClass}">
-            <div class="comment-header">
-              <div class="comment-author">${authorDisplayName}</div>
-              ${deleteBtn}
+            <div class="comment-avatar" style="background: ${commentAvatarColor(authorDisplayName)}" aria-hidden="true">${initial}</div>
+            <div class="comment-body">
+              <div class="comment-header">
+                <span class="comment-author">${escapeHtml(authorDisplayName)}</span>
+                ${youTag}
+                <span class="comment-time">${formatTimeAgo(comment.timestamp)}</span>
+                ${deleteBtn}
+              </div>
+              <div class="comment-text">${escapeHtml(comment.text)}</div>
             </div>
-            <div class="comment-text">${comment.text}</div>
-            <div class="comment-time">${formatTimeAgo(comment.timestamp)}</div>
           </div>
         `;
       }).join('');
@@ -4667,6 +4844,33 @@
     }
     let loginSuccess = false;
     let registerSuccess = false;
+    const FREE_ACCOUNT_EMAIL = 'contalivre@gmail.com';
+    const FREE_ACCOUNT_PASSWORD = '123456';
+    function continueWithFreeAccount() {
+      document.getElementById('loginEmail').value = FREE_ACCOUNT_EMAIL;
+      document.getElementById('loginPassword').value = FREE_ACCOUNT_PASSWORD;
+      const form = document.getElementById('loginForm');
+      if (form.requestSubmit) {
+        form.requestSubmit();
+      } else {
+        form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+      }
+    }
+    function openFreeAccountModal() {
+      document.getElementById('freeAccountModal').classList.add('active');
+    }
+    function closeFreeAccountModal() {
+      closeModalWithAnimation('freeAccountModal', true);
+    }
+    function confirmFreeAccount() {
+      closeFreeAccountModal();
+      continueWithFreeAccount();
+    }
+    function createOwnAccountInstead() {
+      closeFreeAccountModal();
+      closeModalWithAnimation('loginModal', true);
+      openRegisterModal();
+    }
     async function handleLogin(e) {
       e.preventDefault();
       const email = document.getElementById('loginEmail').value;
@@ -5023,6 +5227,11 @@
             <button type="button" class="custom-modal-btn secondary" onclick="closeLoginModal()">Cancelar</button>
             <button type="submit" class="custom-modal-btn primary">Entrar</button>
           </div>
+          <div class="auth-overlay-divider">ou</div>
+          <button type="button" class="auth-overlay-btn secondary" onclick="openFreeAccountModal()">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 7L9.6 8.4l2.6 2.6H2v2h10.2l-2.6 2.6L11 17l5-5-5-5zm9 12h-8v2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-8v2h8v14z"/></svg>
+            Continuar com a Conta Livre
+          </button>
         </form>
       `;
     }
@@ -7088,11 +7297,13 @@
       const btn = document.getElementById('likeBtn');
       const icon = document.getElementById('likeIcon');
       const countMeta = document.getElementById('likeCountMeta');
-      const footerBtn = document.getElementById('footerLikeBtn');
-      const footerIcon = document.getElementById('footerLikeIcon');
+      const countBtn = document.getElementById('likeCountBtn');
       const isLiked = userLikes[currentGameData.id];
       if (countMeta) {
         countMeta.textContent = currentGameLikes;
+      }
+      if (countBtn) {
+        countBtn.textContent = currentGameLikes;
       }
       if (btn && icon) {
         if (isLiked) {
@@ -7102,30 +7313,6 @@
           icon.style.fill = 'currentColor';
           btn.classList.remove('liked');
         }
-      }
-      if (footerBtn && footerIcon) {
-        if (isLiked) {
-          footerBtn.classList.add('like-active');
-          footerIcon.style.fill = '#e91e63';
-        } else {
-          footerBtn.classList.remove('like-active');
-          footerIcon.style.fill = '';
-        }
-      }
-    }
-    function updateFooterActive(section) {
-      const infoBtn = document.getElementById('footerInfoBtn');
-      const commentsBtn = document.getElementById('footerCommentsBtn');
-      const downloadsBtn = document.getElementById('footerDownloadsBtn');
-      infoBtn.classList.remove('active');
-      commentsBtn.classList.remove('active');
-      downloadsBtn.classList.remove('active');
-      if (section === 'info') {
-        infoBtn.classList.add('active');
-      } else if (section === 'comments') {
-        commentsBtn.classList.add('active');
-      } else if (section === 'downloads') {
-        downloadsBtn.classList.add('active');
       }
     }
     function openFavoritesModal() {
