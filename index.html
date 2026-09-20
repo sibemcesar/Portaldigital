@@ -7318,6 +7318,26 @@ window.firebaseModules = {
       font-weight: 600;
     }
     #pdAdOverlay .pdad-skip:disabled { opacity: 0.4; cursor: default; }
+    #pdAdOverlay .pdad-loading {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: #9ca3af;
+      font-size: 12px;
+      z-index: 2;
+    }
+    #pdAdOverlay .pdad-spinner {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      border: 3px solid rgba(255,255,255,0.15);
+      border-top-color: #ff6a00;
+      animation: pdadSpin 0.9s linear infinite;
+    }
+    @keyframes pdadSpin { to { transform: rotate(360deg); } }
     #pdAdToast {
       display: none;
       position: fixed;
@@ -8770,6 +8790,7 @@ window.firebaseModules = {
       <div class="pdad-fase">
         <div class="pdad-video">
           <span class="pdad-rotulo">ANÚNCIO</span>
+          <div class="pdad-loading" id="pdAdLoading"><div class="pdad-spinner"></div><span>A carregar anúncio...</span></div>
           <div id="pdAdYtPlayer"></div>
         </div>
         <div class="pdad-corpo">
@@ -14334,25 +14355,22 @@ document.addEventListener("keydown", (e) => {
 
   const SEGUNDOS_PARA_IGNORAR = 15;
   const SEGUNDOS_PARA_CLIQUE = 5;
-  const COOLDOWN_SEG = 15;
   const VIDEO_ID = 'JDjhs9hF9f0';
   const LINK_ANUNCIO = 'https://portaldigital.vercel.app';
   const TIMEOUT_API_MS = 20000;
   const TIMEOUT_ANUNCIO_MS = 30000;
 
   let ytPlayer = null;
+  let playerPronto = false;
   let apiPedida = false;
   let apiPronta = false;
   let falhou = false;
-  let videoPronto = false;
-  let fase = 'inicio';
-  let progressoCarga = 0;
+  let fase = 'inicio';          // inicio | precarga | pronto | anuncio | usado
   let timerCarga = null;
   let timerProgresso = null;
   let ultimaFracao = 0;
   let ultimoAvanco = 0;
   let precargaComecou = false;
-  let proximoAnuncioApos = 0;
   let liberadoPara = null;
   let anuncioDoConteudo = null;
   let aoConcluir = null;
@@ -14372,9 +14390,10 @@ document.addEventListener("keydown", (e) => {
   function falhar() {
     falhou = true;
     clearInterval(timerCarga);
+    if (fase === 'anuncio') fecharAnuncio();   // não deixa o utilizador preso
   }
 
-  // ---------- Carregamento do vídeo ----------
+  // ---------- Carregamento do vídeo (em segundo plano) ----------
   function carregarApiYouTube() {
     if (apiPedida) return;
     apiPedida = true;
@@ -14396,13 +14415,13 @@ document.addEventListener("keydown", (e) => {
       height: '100%',
       playerVars: { controls: 0, disablekb: 1, modestbranding: 1, rel: 0, playsinline: 1, autoplay: 0 },
       events: {
-        onReady: iniciarPrecarga,
+        onReady: function (e) {
+          playerPronto = true;
+          if (fase === 'anuncio') { comecarReproducao(false); return; }  // o utilizador já estava à espera
+          iniciarPrecarga(e);
+        },
         onStateChange: onEstadoVideoMudou,
-        onError: function () {
-          const emAnuncio = fase === 'anuncio';
-          falhar();
-          if (emAnuncio) fecharAnuncio();
-        }
+        onError: falhar
       }
     });
   }
@@ -14420,11 +14439,9 @@ document.addEventListener("keydown", (e) => {
 
   function recarregarAnuncio() {
     fase = 'precarga';
-    videoPronto = false;
     precargaComecou = false;
     ultimaFracao = 0;
     ultimoAvanco = Date.now();
-    progressoCarga = 0;
     ytPlayer.mute();
     ytPlayer.loadVideoById(VIDEO_ID);
     clearInterval(timerCarga);
@@ -14432,31 +14449,32 @@ document.addEventListener("keydown", (e) => {
   }
 
   function verificarCarga() {
-    if (videoPronto) return;
+    if (fase !== 'precarga') { clearInterval(timerCarga); return; }
     if (!precargaComecou) {
       if (Date.now() - ultimoAvanco > 15000) finalizarPrecarga();
       return;
     }
     const f = ytPlayer.getVideoLoadedFraction ? ytPlayer.getVideoLoadedFraction() : 0;
-    progressoCarga = Math.round(f * 100);
     if (f > ultimaFracao) { ultimaFracao = f; ultimoAvanco = Date.now(); }
     if (f >= 0.99 || Date.now() - ultimoAvanco > 15000) finalizarPrecarga();
   }
 
   function finalizarPrecarga() {
     clearInterval(timerCarga);
+    if (fase !== 'precarga') return;
     fase = 'pronto';
     ytPlayer.pauseVideo();
     ytPlayer.seekTo(0, true);
     setTimeout(() => { if (fase === 'pronto') ytPlayer.pauseVideo(); }, 150);
-    progressoCarga = 100;
-    videoPronto = true;
   }
 
   function onEstadoVideoMudou(evento) {
     if (fase === 'precarga' &&
         (evento.data === YT.PlayerState.PLAYING || evento.data === YT.PlayerState.BUFFERING)) {
       precargaComecou = true;
+    }
+    if (fase === 'anuncio' && evento.data === YT.PlayerState.PLAYING) {
+      $('pdAdLoading').style.display = 'none';
     }
     if (evento.data !== YT.PlayerState.ENDED) return;
     if (fase === 'precarga') { finalizarPrecarga(); return; }
@@ -14467,12 +14485,14 @@ document.addEventListener("keydown", (e) => {
   function garantirCarga() {
     if (falhou) return;
     if (!apiPedida) { carregarApiYouTube(); return; }
-    if (ytPlayer && fase === 'usado') recarregarAnuncio();
+    if (playerPronto && fase === 'usado') recarregarAnuncio();
   }
 
   // ---------- Exibição do anúncio ----------
+  // Abre logo, mesmo que o vídeo ainda não esteja 100% carregado (mostra "A carregar" e toca assim que der)
   function abrirAnuncio(idConteudo, callback) {
     fase = 'anuncio';
+    clearInterval(timerCarga);
     anuncioDoConteudo = idConteudo;
     aoConcluir = callback;
     inicioAnuncio = Date.now();
@@ -14481,13 +14501,29 @@ document.addEventListener("keydown", (e) => {
     $('pdAdSkip').disabled = true;
     $('pdAdFill').style.width = '0%';
     $('pdAdTempo').textContent = '--:--';
-
+    $('pdAdLoading').style.display = 'flex';
     pedirFullscreen();
-    ytPlayer.unMute();
-    ytPlayer.setVolume(100);
-    ytPlayer.seekTo(0, true);
-    ytPlayer.playVideo();
+
+    if (playerPronto) comecarReproducao(true);
+    else garantirCarga();   // o vídeo começa sozinho quando o player ficar pronto (onReady)
     iniciarProgresso();
+  }
+
+  function comecarReproducao(comGesto) {
+    try {
+      ytPlayer.unMute();
+      ytPlayer.setVolume(100);
+      ytPlayer.seekTo(0, true);
+      ytPlayer.playVideo();
+      // Se o navegador bloquear o som sem toque do utilizador, toca sem som em vez de ficar parado
+      setTimeout(() => {
+        if (fase !== 'anuncio') return;
+        if (ytPlayer.getPlayerState() !== YT.PlayerState.PLAYING) {
+          ytPlayer.mute();
+          ytPlayer.playVideo();
+        }
+      }, comGesto ? 2500 : 1500);
+    } catch (e) {}
   }
 
   function iniciarProgresso() {
@@ -14498,6 +14534,7 @@ document.addEventListener("keydown", (e) => {
     timerProgresso = setInterval(() => {
       // Salvaguarda: se o vídeo travar, o botão de ignorar não pode ficar bloqueado para sempre
       if (Date.now() - inicioAnuncio > TIMEOUT_ANUNCIO_MS) skipBtn.disabled = false;
+      if (!playerPronto) return;
 
       const duracao = ytPlayer.getDuration();
       const atual = ytPlayer.getCurrentTime();
@@ -14513,14 +14550,14 @@ document.addEventListener("keydown", (e) => {
   function fecharAnuncio() {
     if (fase !== 'anuncio') return;
     clearInterval(timerProgresso);
-    if (ytPlayer) ytPlayer.pauseVideo();
+    if (playerPronto) ytPlayer.pauseVideo();
     sairFullscreen();
     $('pdAdOverlay').classList.remove('aberto');
+    $('pdAdLoading').style.display = 'none';
 
-    // O vídeo já foi usado: só volta a carregar quando o utilizador abrir outro conteúdo de 0 pontos
+    // O vídeo já foi usado: recarrega em segundo plano para o próximo anúncio
     fase = 'usado';
-    videoPronto = false;
-    proximoAnuncioApos = Date.now() + COOLDOWN_SEG * 1000;
+    if (playerPronto) recarregarAnuncio();
 
     const id = anuncioDoConteudo;
     const cb = aoConcluir;
@@ -14530,7 +14567,7 @@ document.addEventListener("keydown", (e) => {
     // Só continua se o utilizador ainda estiver no mesmo conteúdo
     if (typeof currentGameData !== 'undefined' && currentGameData && currentGameData.id === id) {
       liberadoPara = id;
-      toast('Anúncio concluído! Toca no botão para abrir o link');
+      if (!falhou) toast('Anúncio concluído! Toca no botão para abrir o link');
       if (cb) cb();
     }
   }
@@ -14541,8 +14578,8 @@ document.addEventListener("keydown", (e) => {
   });
 
   $('pdAdOverlay').addEventListener('click', function () {
-    if (fase !== 'anuncio') return;
-    if (!ytPlayer || ytPlayer.getCurrentTime() < SEGUNDOS_PARA_CLIQUE) return;
+    if (fase !== 'anuncio' || !playerPronto) return;
+    if (ytPlayer.getCurrentTime() < SEGUNDOS_PARA_CLIQUE) return;
     window.open(LINK_ANUNCIO, '_blank', 'noopener');
     fecharAnuncio();
   });
@@ -14581,22 +14618,15 @@ document.addEventListener("keydown", (e) => {
   }
 
   window.PortalAd = {
-    // Chamado ao abrir um conteúdo: se for de 0 pontos, já vai carregando o anúncio
+    // Ao abrir um conteúdo de 0 pontos, garante que o vídeo já está a carregar
     preparar: function (game) {
       if (ehGratis(game)) garantirCarga();
     },
 
-    // Chamado ao clicar em "Downloads": mostra o anúncio (se for de 0 pontos) e só depois executa onLiberado
+    // Ao clicar em "Downloads": mostra o anúncio (se for de 0 pontos) e só depois executa onLiberado
     exigir: function (game, onLiberado) {
       if (!ehGratis(game) || liberadoPara === game.id || falhou) { onLiberado(); return; }
-
-      garantirCarga();
-      const espera = Math.ceil((proximoAnuncioApos - Date.now()) / 1000);
-      if (espera > 0) { toast('Novo anúncio disponível em ' + espera + 's'); return; }
-      if (!videoPronto) {
-        toast('A preparar o anúncio' + (progressoCarga > 0 ? ' (' + progressoCarga + '%)' : '...') + ' Tenta de novo em instantes');
-        return;
-      }
+      if (fase === 'anuncio') return;
       abrirAnuncio(game.id, onLiberado);
     },
 
@@ -14605,6 +14635,10 @@ document.addEventListener("keydown", (e) => {
       liberadoPara = null;
     }
   };
+
+  // Começa a carregar o anúncio cedo, para estar pronto quando o utilizador precisar
+  if (document.readyState === 'complete') setTimeout(garantirCarga, 1500);
+  else window.addEventListener('load', function () { setTimeout(garantirCarga, 1500); });
 })();
 </script>
 </body>
