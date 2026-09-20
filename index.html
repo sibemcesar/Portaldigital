@@ -14463,7 +14463,7 @@ document.addEventListener("keydown", (e) => {
         onReady: function (e) {
           playerPronto = true;
           if (fase === 'anuncio') { mostrarBotaoPlay(); return; }  // o utilizador já estava à espera
-          iniciarPrecarga(e);
+          iniciarPrecarga();
         },
         onStateChange: onEstadoVideoMudou,
         onError: function (e) {
@@ -14474,56 +14474,74 @@ document.addEventListener("keydown", (e) => {
     });
   }
 
-  function iniciarPrecarga(e) {
+  const STALL_MS = 15000;      // sem progresso durante este tempo = travou
+  const MAX_TENTATIVAS = 2;    // recargas automáticas antes de pedir um toque
+  let tentativasCarga = 0;
+
+  function comecarCarga(primeira) {
     fase = 'precarga';
     progressoCarga = 0;
     precargaComecou = false;
     ultimaFracao = 0;
     ultimoAvanco = Date.now();
-    e.target.mute();
-    e.target.playVideo();
+    if (primeira) tentativasCarga = 0;
+    try {
+      ytPlayer.mute();
+      if (primeira) ytPlayer.playVideo(); else ytPlayer.loadVideoById(VIDEO_ID);
+    } catch (e) {}
     clearInterval(timerCarga);
     timerCarga = setInterval(verificarCarga, 300);
+    atualizarPorta();
   }
 
-  function recarregarAnuncio() {
-    fase = 'precarga';
-    progressoCarga = 0;
-    precargaComecou = false;
-    ultimaFracao = 0;
-    ultimoAvanco = Date.now();
-    ytPlayer.mute();
-    ytPlayer.loadVideoById(VIDEO_ID);
-    clearInterval(timerCarga);
-    timerCarga = setInterval(verificarCarga, 300);
-  }
+  function iniciarPrecarga() { comecarCarga(true); }
+  function recarregarAnuncio() { comecarCarga(false); }
 
   function verificarCarga() {
     if (fase !== 'precarga') { clearInterval(timerCarga); return; }
+    const parado = Date.now() - ultimoAvanco > STALL_MS;
+
     if (!precargaComecou) {
-      if (Date.now() - ultimoAvanco > 15000) finalizarPrecarga();
+      // O vídeo nem arrancou (o telemóvel pode exigir um toque para carregar): pede um toque
+      if (parado) travar();
       return;
     }
     const f = ytPlayer.getVideoLoadedFraction ? ytPlayer.getVideoLoadedFraction() : 0;
-    progressoCarga = Math.round(f * 100);
+    progressoCarga = Math.min(99, Math.round(f * 100));
     if (f > ultimaFracao) { ultimaFracao = f; ultimoAvanco = Date.now(); }
-    if (f >= 0.99 || Date.now() - ultimoAvanco > 15000) finalizarPrecarga();
+
+    if (f >= 0.99) finalizarPrecarga();          // 100% carregado
+    else if (parado) {                            // travou a meio: tenta outra vez
+      tentativasCarga++;
+      if (tentativasCarga > MAX_TENTATIVAS) travar(); else recarregarAnuncio();
+    }
   }
 
+  function travar() {
+    clearInterval(timerCarga);
+    try { ytPlayer.pauseVideo(); } catch (e) {}
+    fase = 'travado';
+    atualizarPorta();
+  }
+
+  // Só chega aqui quando o vídeo está totalmente carregado
   function finalizarPrecarga() {
     clearInterval(timerCarga);
     if (fase !== 'precarga') return;
     progressoCarga = 100;
     fase = 'pronto';
+    try { ytPlayer.setPlaybackRate(1); } catch (e) {}
     ytPlayer.pauseVideo();
     ytPlayer.seekTo(0, true);
     setTimeout(() => { if (fase === 'pronto') ytPlayer.pauseVideo(); }, 150);
+    atualizarPorta();
   }
 
   function onEstadoVideoMudou(evento) {
     if (fase === 'precarga' &&
         (evento.data === YT.PlayerState.PLAYING || evento.data === YT.PlayerState.BUFFERING)) {
       precargaComecou = true;
+      try { ytPlayer.setPlaybackRate(2); } catch (e) {}   // só na pré-carga escondida
     }
     if (fase === 'anuncio' && evento.data === YT.PlayerState.PLAYING) {
       if (!usuarioTocou) { ytPlayer.pauseVideo(); return; }   // nada de tocar sozinho
@@ -14532,14 +14550,14 @@ document.addEventListener("keydown", (e) => {
     }
     if (evento.data !== YT.PlayerState.ENDED) return;
     if (fase === 'precarga') { finalizarPrecarga(); return; }
-    if (fase === 'anuncio' && usuarioTocou) fecharAnuncio();
+    if (fase === 'anuncio' && usuarioTocou && assistido >= 3) fecharAnuncio();
   }
 
   // Começa (ou recomeça) a carga do vídeo sem repetir trabalho já feito
   function garantirCarga() {
     if (falhou) return;
     if (!apiPedida) { carregarApiYouTube(); return; }
-    if (playerPronto && fase === 'usado') recarregarAnuncio();
+    if (playerPronto && fase === 'usado') { tentativasCarga = 0; recarregarAnuncio(); }
   }
 
   // ---------- Exibição do anúncio ----------
@@ -14575,6 +14593,7 @@ document.addEventListener("keydown", (e) => {
     $('pdAdPlay').style.display = 'none';
     $('pdAdLoading').style.display = 'flex';
     try {
+      ytPlayer.setPlaybackRate(1);
       ytPlayer.unMute();
       ytPlayer.setVolume(100);
       ytPlayer.seekTo(0, true);
@@ -14712,6 +14731,9 @@ document.addEventListener("keydown", (e) => {
     if (fase === 'pronto') {
       btn.disabled = false;
       btn.textContent = '▶ Assistir o anúncio para liberar o conteúdo';
+    } else if (fase === 'travado') {
+      btn.disabled = false;
+      btn.textContent = '⚠ Não carregou. Toque para tentar de novo';
     } else if (fase !== 'anuncio') {
       btn.disabled = true;
       btn.textContent = '⏳ A carregar anúncio' + (progressoCarga > 0 ? ' ' + progressoCarga + '%' : '...');
@@ -14719,9 +14741,18 @@ document.addEventListener("keydown", (e) => {
   }
 
   $('pdAdGateBtn').addEventListener('click', function () {
-    if (fase !== 'pronto' || falhou) return;
+    if (falhou) { atualizarPorta(); return; }
     if (typeof currentGameData === 'undefined' || !currentGameData) return;
-    abrirAnuncio(currentGameData.id);
+
+    if (fase === 'pronto') {
+      abrirAnuncio(currentGameData.id);              // vídeo 100% carregado
+    } else if (fase === 'travado') {
+      tentativasCarga = 0;
+      recarregarAnuncio();                           // o toque do utilizador permite o vídeo arrancar
+      try { ytPlayer.playVideo(); } catch (e) {}
+    } else {
+      toast('O anúncio ainda está a carregar, aguarde');
+    }
   });
 
   // ---------- API usada pelo resto do site ----------
