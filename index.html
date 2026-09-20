@@ -14377,7 +14377,6 @@ document.addEventListener("keydown", (e) => {
   const VIDEO_ID = 'JDjhs9hF9f0';
   const LINK_ANUNCIO = 'https://portaldigital.vercel.app';
   const TIMEOUT_API_MS = 20000;
-  const TIMEOUT_ANUNCIO_MS = 30000;
 
   let ytPlayer = null;
   let playerPronto = false;
@@ -14396,6 +14395,8 @@ document.addEventListener("keydown", (e) => {
   let inicioAnuncio = 0;
   let toastTimer = null;
   let timerRetry = null;
+  let usuarioTocou = false;   // só vale depois de o utilizador tocar em reproduzir
+  let assistido = 0;          // segundos realmente vistos (só conta com o vídeo a tocar)
 
   const $ = (id) => document.getElementById(id);
 
@@ -14437,7 +14438,7 @@ document.addEventListener("keydown", (e) => {
       events: {
         onReady: function (e) {
           playerPronto = true;
-          if (fase === 'anuncio') { comecarReproducao(false); return; }  // o utilizador já estava à espera
+          if (fase === 'anuncio') { mostrarBotaoPlay(); return; }  // o utilizador já estava à espera
           iniciarPrecarga(e);
         },
         onStateChange: onEstadoVideoMudou,
@@ -14497,12 +14498,13 @@ document.addEventListener("keydown", (e) => {
       precargaComecou = true;
     }
     if (fase === 'anuncio' && evento.data === YT.PlayerState.PLAYING) {
+      if (!usuarioTocou) { ytPlayer.pauseVideo(); return; }   // nada de tocar sozinho
       $('pdAdLoading').style.display = 'none';
       $('pdAdPlay').style.display = 'none';
     }
     if (evento.data !== YT.PlayerState.ENDED) return;
     if (fase === 'precarga') { finalizarPrecarga(); return; }
-    if (fase === 'anuncio') fecharAnuncio();
+    if (fase === 'anuncio' && usuarioTocou) fecharAnuncio();
   }
 
   // Começa (ou recomeça) a carga do vídeo sem repetir trabalho já feito
@@ -14513,28 +14515,43 @@ document.addEventListener("keydown", (e) => {
   }
 
   // ---------- Exibição do anúncio ----------
-  // Abre logo, mesmo que o vídeo ainda não esteja 100% carregado (mostra "A carregar" e toca assim que der)
+  // Abre logo; o vídeo só toca quando o utilizador tocar em "Reproduzir"
   function abrirAnuncio(idConteudo, callback) {
     fase = 'anuncio';
     clearInterval(timerCarga);
     anuncioDoConteudo = idConteudo;
     aoConcluir = callback;
-    inicioAnuncio = Date.now();
+    usuarioTocou = false;
+    assistido = 0;
 
     $('pdAdOverlay').classList.add('aberto');
     $('pdAdSkip').disabled = true;
     $('pdAdFill').style.width = '0%';
     $('pdAdTempo').textContent = '--:--';
-    $('pdAdLoading').style.display = 'flex';
-    $('pdAdPlay').style.display = 'none';
 
-    if (playerPronto) comecarReproducao(true);
-    else garantirCarga();
-    pedirFullscreen();   // depois de mandar tocar, para não gastar o toque do utilizador   // o vídeo começa sozinho quando o player ficar pronto (onReady)
+    if (playerPronto) {
+      try { ytPlayer.pauseVideo(); ytPlayer.seekTo(0, true); } catch (e) {}   // para o que ficou a carregar em segundo plano
+      mostrarBotaoPlay();
+    } else {
+      $('pdAdLoading').style.display = 'flex';
+      $('pdAdPlay').style.display = 'none';
+      garantirCarga();
+    }
+    pedirFullscreen();
     iniciarProgresso();
   }
 
-  function comecarReproducao(comGesto) {
+  function mostrarBotaoPlay() {
+    $('pdAdLoading').style.display = 'none';
+    $('pdAdPlay').style.display = 'flex';
+  }
+
+  // Chamado pelo toque do utilizador em "Reproduzir"
+  function tocarPeloUtilizador() {
+    if (!playerPronto || fase !== 'anuncio') return;
+    usuarioTocou = true;
+    $('pdAdPlay').style.display = 'none';
+    $('pdAdLoading').style.display = 'flex';
     try {
       ytPlayer.unMute();
       ytPlayer.setVolume(100);
@@ -14542,43 +14559,37 @@ document.addEventListener("keydown", (e) => {
       ytPlayer.playVideo();
     } catch (e) {}
 
-    // Confere a cada segundo se realmente começou; se não, tenta de novo e, por fim, pede um toque
-    let tentativas = 0;
-    clearInterval(timerRetry);
-    timerRetry = setInterval(() => {
-      if (fase !== 'anuncio') { clearInterval(timerRetry); return; }
+    // Se não começou em 4 s, volta a mostrar o botão para ele tentar de novo
+    clearTimeout(timerRetry);
+    timerRetry = setTimeout(() => {
+      if (fase !== 'anuncio') return;
       let st;
       try { st = ytPlayer.getPlayerState(); } catch (e) { return; }
-      if (st === YT.PlayerState.PLAYING) { clearInterval(timerRetry); return; }
-      if (st === YT.PlayerState.BUFFERING) return;
-      tentativas++;
-      try {
-        if (tentativas === 2) ytPlayer.mute();      // o navegador pode bloquear som sem toque
-        ytPlayer.playVideo();
-      } catch (e) {}
-      if (tentativas >= 2) {
-        $('pdAdLoading').style.display = 'none';
-        $('pdAdPlay').style.display = 'flex';       // pede um toque (gesto do utilizador)
+      if (st !== YT.PlayerState.PLAYING && st !== YT.PlayerState.BUFFERING) {
+        usuarioTocou = false;
+        mostrarBotaoPlay();
       }
-    }, 1000);
+    }, 4000);
   }
 
   $('pdAdPlay').addEventListener('click', function (e) {
     e.stopPropagation();
-    $('pdAdPlay').style.display = 'none';
-    if (playerPronto) comecarReproducao(true);
+    tocarPeloUtilizador();
   });
 
+  // O anúncio só conta enquanto o vídeo está mesmo a tocar
   function iniciarProgresso() {
     const skipBtn = $('pdAdSkip');
     const fill = $('pdAdFill');
     const tempoTxt = $('pdAdTempo');
     clearInterval(timerProgresso);
     timerProgresso = setInterval(() => {
-      // Salvaguarda: se o vídeo travar, o botão de ignorar não pode ficar bloqueado para sempre
-      if (Date.now() - inicioAnuncio > TIMEOUT_ANUNCIO_MS) skipBtn.disabled = false;
-      if (!playerPronto) return;
+      if (!playerPronto || !usuarioTocou) return;
+      let st;
+      try { st = ytPlayer.getPlayerState(); } catch (e) { return; }
+      if (st !== YT.PlayerState.PLAYING) return;
 
+      assistido += 0.25;
       const duracao = ytPlayer.getDuration();
       const atual = ytPlayer.getCurrentTime();
       if (!duracao) return;
@@ -14586,14 +14597,14 @@ document.addEventListener("keydown", (e) => {
       fill.style.width = Math.min(100, (atual / duracao) * 100) + '%';
       const restante = Math.max(0, Math.ceil(duracao - atual));
       tempoTxt.textContent = Math.floor(restante / 60) + ':' + String(restante % 60).padStart(2, '0');
-      if (atual >= SEGUNDOS_PARA_IGNORAR) skipBtn.disabled = false;
+      if (assistido >= SEGUNDOS_PARA_IGNORAR) skipBtn.disabled = false;
     }, 250);
   }
 
   function fecharAnuncio() {
     if (fase !== 'anuncio') return;
     clearInterval(timerProgresso);
-    clearInterval(timerRetry);
+    clearTimeout(timerRetry);
     $('pdAdPlay').style.display = 'none';
     if (playerPronto) ytPlayer.pauseVideo();
     sairFullscreen();
@@ -14623,11 +14634,7 @@ document.addEventListener("keydown", (e) => {
   });
 
   $('pdAdOverlay').addEventListener('click', function () {
-    if (fase !== 'anuncio' || !playerPronto) return;
-    let st;
-    try { st = ytPlayer.getPlayerState(); } catch (e) {}
-    if (st !== YT.PlayerState.PLAYING && st !== YT.PlayerState.BUFFERING) { comecarReproducao(true); return; }
-    if (ytPlayer.getCurrentTime() < SEGUNDOS_PARA_CLIQUE) return;
+    if (fase !== 'anuncio' || !usuarioTocou || assistido < SEGUNDOS_PARA_CLIQUE) return;
     window.open(LINK_ANUNCIO, '_blank', 'noopener');
     fecharAnuncio();
   });
