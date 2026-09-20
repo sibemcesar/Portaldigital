@@ -7318,6 +7318,24 @@ window.firebaseModules = {
       font-weight: 600;
     }
     #pdAdOverlay .pdad-skip:disabled { opacity: 0.4; cursor: default; }
+    #pdAdOverlay .pdad-play {
+      position: absolute;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-family: inherit;
+      border: none;
+      cursor: pointer;
+      background: #ff6a00;
+      color: #fff;
+      padding: 12px 22px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: 700;
+      z-index: 5;
+    }
     #pdAdOverlay .pdad-loading {
       position: absolute;
       inset: 0;
@@ -8790,6 +8808,7 @@ window.firebaseModules = {
       <div class="pdad-fase">
         <div class="pdad-video">
           <span class="pdad-rotulo">ANÚNCIO</span>
+          <button class="pdad-play" id="pdAdPlay" type="button">▶ Toque para reproduzir</button>
           <div class="pdad-loading" id="pdAdLoading"><div class="pdad-spinner"></div><span>A carregar anúncio...</span></div>
           <div id="pdAdYtPlayer"></div>
         </div>
@@ -14376,6 +14395,7 @@ document.addEventListener("keydown", (e) => {
   let aoConcluir = null;
   let inicioAnuncio = 0;
   let toastTimer = null;
+  let timerRetry = null;
 
   const $ = (id) => document.getElementById(id);
 
@@ -14421,7 +14441,10 @@ document.addEventListener("keydown", (e) => {
           iniciarPrecarga(e);
         },
         onStateChange: onEstadoVideoMudou,
-        onError: falhar
+        onError: function (e) {
+          falhar();
+          toast('Anúncio indisponível (erro ' + (e && e.data) + ')');
+        }
       }
     });
   }
@@ -14475,6 +14498,7 @@ document.addEventListener("keydown", (e) => {
     }
     if (fase === 'anuncio' && evento.data === YT.PlayerState.PLAYING) {
       $('pdAdLoading').style.display = 'none';
+      $('pdAdPlay').style.display = 'none';
     }
     if (evento.data !== YT.PlayerState.ENDED) return;
     if (fase === 'precarga') { finalizarPrecarga(); return; }
@@ -14502,10 +14526,11 @@ document.addEventListener("keydown", (e) => {
     $('pdAdFill').style.width = '0%';
     $('pdAdTempo').textContent = '--:--';
     $('pdAdLoading').style.display = 'flex';
-    pedirFullscreen();
+    $('pdAdPlay').style.display = 'none';
 
     if (playerPronto) comecarReproducao(true);
-    else garantirCarga();   // o vídeo começa sozinho quando o player ficar pronto (onReady)
+    else garantirCarga();
+    pedirFullscreen();   // depois de mandar tocar, para não gastar o toque do utilizador   // o vídeo começa sozinho quando o player ficar pronto (onReady)
     iniciarProgresso();
   }
 
@@ -14515,16 +14540,34 @@ document.addEventListener("keydown", (e) => {
       ytPlayer.setVolume(100);
       ytPlayer.seekTo(0, true);
       ytPlayer.playVideo();
-      // Se o navegador bloquear o som sem toque do utilizador, toca sem som em vez de ficar parado
-      setTimeout(() => {
-        if (fase !== 'anuncio') return;
-        if (ytPlayer.getPlayerState() !== YT.PlayerState.PLAYING) {
-          ytPlayer.mute();
-          ytPlayer.playVideo();
-        }
-      }, comGesto ? 2500 : 1500);
     } catch (e) {}
+
+    // Confere a cada segundo se realmente começou; se não, tenta de novo e, por fim, pede um toque
+    let tentativas = 0;
+    clearInterval(timerRetry);
+    timerRetry = setInterval(() => {
+      if (fase !== 'anuncio') { clearInterval(timerRetry); return; }
+      let st;
+      try { st = ytPlayer.getPlayerState(); } catch (e) { return; }
+      if (st === YT.PlayerState.PLAYING) { clearInterval(timerRetry); return; }
+      if (st === YT.PlayerState.BUFFERING) return;
+      tentativas++;
+      try {
+        if (tentativas === 2) ytPlayer.mute();      // o navegador pode bloquear som sem toque
+        ytPlayer.playVideo();
+      } catch (e) {}
+      if (tentativas >= 2) {
+        $('pdAdLoading').style.display = 'none';
+        $('pdAdPlay').style.display = 'flex';       // pede um toque (gesto do utilizador)
+      }
+    }, 1000);
   }
+
+  $('pdAdPlay').addEventListener('click', function (e) {
+    e.stopPropagation();
+    $('pdAdPlay').style.display = 'none';
+    if (playerPronto) comecarReproducao(true);
+  });
 
   function iniciarProgresso() {
     const skipBtn = $('pdAdSkip');
@@ -14550,6 +14593,8 @@ document.addEventListener("keydown", (e) => {
   function fecharAnuncio() {
     if (fase !== 'anuncio') return;
     clearInterval(timerProgresso);
+    clearInterval(timerRetry);
+    $('pdAdPlay').style.display = 'none';
     if (playerPronto) ytPlayer.pauseVideo();
     sairFullscreen();
     $('pdAdOverlay').classList.remove('aberto');
@@ -14579,6 +14624,9 @@ document.addEventListener("keydown", (e) => {
 
   $('pdAdOverlay').addEventListener('click', function () {
     if (fase !== 'anuncio' || !playerPronto) return;
+    let st;
+    try { st = ytPlayer.getPlayerState(); } catch (e) {}
+    if (st !== YT.PlayerState.PLAYING && st !== YT.PlayerState.BUFFERING) { comecarReproducao(true); return; }
     if (ytPlayer.getCurrentTime() < SEGUNDOS_PARA_CLIQUE) return;
     window.open(LINK_ANUNCIO, '_blank', 'noopener');
     fecharAnuncio();
