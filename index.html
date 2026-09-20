@@ -7356,6 +7356,30 @@ window.firebaseModules = {
       animation: pdadSpin 0.9s linear infinite;
     }
     @keyframes pdadSpin { to { transform: rotate(360deg); } }
+    .pdad-gate {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .pdad-gate-titulo { font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+    .pdad-gate-texto { font-size: 13px; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.4; }
+    .pdad-gate-btn {
+      width: 100%;
+      font-family: inherit;
+      border: none;
+      cursor: pointer;
+      background: #ff6a00;
+      color: #fff;
+      padding: 13px 16px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .pdad-gate-btn:active { background: #e05e00; }
+    .pdad-gate-btn:disabled { background: #d1d5db; color: #6b7280; cursor: default; }
     #pdAdToast {
       display: none;
       position: fixed;
@@ -7800,6 +7824,11 @@ window.firebaseModules = {
           </div>
         </div>
         
+        <div id="pdAdGate" class="pdad-gate" style="display:none;">
+          <div class="pdad-gate-titulo">Conteúdo gratuito</div>
+          <div class="pdad-gate-texto">Assista a um anúncio curto para liberar os links de download.</div>
+          <button type="button" class="pdad-gate-btn" id="pdAdGateBtn" disabled>⏳ A carregar anúncio...</button>
+        </div>
         <div id="downloadSectionsContainer"></div>
       </div>
     </div>
@@ -9877,16 +9906,10 @@ function closeCommentsOverlay(event) {
   updateFooterActive("info");
 }
 function showDownloads() {
-  const abrirDownloads = () => {
-    document.getElementById("downloadsOverlay").classList.add("active");
-    document.body.style.overflow = "hidden";
-    updateFooterActive("downloads");
-  };
-  if (window.PortalAd) {
-    window.PortalAd.exigir(currentGameData, abrirDownloads);
-  } else {
-    abrirDownloads();
-  }
+  document.getElementById("downloadsOverlay").classList.add("active");
+  document.body.style.overflow = "hidden";
+  updateFooterActive("downloads");
+  if (window.PortalAd) window.PortalAd.aplicarPorta(currentGameData);
 }
 function closeDownloadsOverlay(event) {
   if (event && event.target !== event.currentTarget) return;
@@ -14391,10 +14414,11 @@ document.addEventListener("keydown", (e) => {
   let precargaComecou = false;
   let liberadoPara = null;
   let anuncioDoConteudo = null;
-  let aoConcluir = null;
   let inicioAnuncio = 0;
   let toastTimer = null;
   let timerRetry = null;
+  let progressoCarga = 0;
+  let timerPorta = null;
   let usuarioTocou = false;   // só vale depois de o utilizador tocar em reproduzir
   let assistido = 0;          // segundos realmente vistos (só conta com o vídeo a tocar)
 
@@ -14452,6 +14476,7 @@ document.addEventListener("keydown", (e) => {
 
   function iniciarPrecarga(e) {
     fase = 'precarga';
+    progressoCarga = 0;
     precargaComecou = false;
     ultimaFracao = 0;
     ultimoAvanco = Date.now();
@@ -14463,6 +14488,7 @@ document.addEventListener("keydown", (e) => {
 
   function recarregarAnuncio() {
     fase = 'precarga';
+    progressoCarga = 0;
     precargaComecou = false;
     ultimaFracao = 0;
     ultimoAvanco = Date.now();
@@ -14479,6 +14505,7 @@ document.addEventListener("keydown", (e) => {
       return;
     }
     const f = ytPlayer.getVideoLoadedFraction ? ytPlayer.getVideoLoadedFraction() : 0;
+    progressoCarga = Math.round(f * 100);
     if (f > ultimaFracao) { ultimaFracao = f; ultimoAvanco = Date.now(); }
     if (f >= 0.99 || Date.now() - ultimoAvanco > 15000) finalizarPrecarga();
   }
@@ -14486,6 +14513,7 @@ document.addEventListener("keydown", (e) => {
   function finalizarPrecarga() {
     clearInterval(timerCarga);
     if (fase !== 'precarga') return;
+    progressoCarga = 100;
     fase = 'pronto';
     ytPlayer.pauseVideo();
     ytPlayer.seekTo(0, true);
@@ -14515,12 +14543,11 @@ document.addEventListener("keydown", (e) => {
   }
 
   // ---------- Exibição do anúncio ----------
-  // Abre logo; o vídeo só toca quando o utilizador tocar em "Reproduzir"
-  function abrirAnuncio(idConteudo, callback) {
+  // Só é chamado pelo toque no botão "Assistir anúncio": abre e começa a tocar
+  function abrirAnuncio(idConteudo) {
     fase = 'anuncio';
     clearInterval(timerCarga);
     anuncioDoConteudo = idConteudo;
-    aoConcluir = callback;
     usuarioTocou = false;
     assistido = 0;
 
@@ -14528,15 +14555,10 @@ document.addEventListener("keydown", (e) => {
     $('pdAdSkip').disabled = true;
     $('pdAdFill').style.width = '0%';
     $('pdAdTempo').textContent = '--:--';
+    $('pdAdPlay').style.display = 'none';
+    $('pdAdLoading').style.display = 'flex';
 
-    if (playerPronto) {
-      try { ytPlayer.pauseVideo(); ytPlayer.seekTo(0, true); } catch (e) {}   // para o que ficou a carregar em segundo plano
-      mostrarBotaoPlay();
-    } else {
-      $('pdAdLoading').style.display = 'flex';
-      $('pdAdPlay').style.display = 'none';
-      garantirCarga();
-    }
+    tocarPeloUtilizador();
     pedirFullscreen();
     iniciarProgresso();
   }
@@ -14616,15 +14638,13 @@ document.addEventListener("keydown", (e) => {
     if (playerPronto) recarregarAnuncio();
 
     const id = anuncioDoConteudo;
-    const cb = aoConcluir;
     anuncioDoConteudo = null;
-    aoConcluir = null;
 
     // Só continua se o utilizador ainda estiver no mesmo conteúdo
     if (typeof currentGameData !== 'undefined' && currentGameData && currentGameData.id === id) {
       liberadoPara = id;
       if (!falhou) toast('Anúncio concluído! Toca no botão para abrir o link');
-      if (cb) cb();
+      atualizarPorta();
     }
   }
 
@@ -14667,6 +14687,43 @@ document.addEventListener("keydown", (e) => {
     }
   }
 
+  // ---------- Tela de Downloads: botão "Assistir anúncio" ----------
+  function portaBloqueada(game) {
+    return ehGratis(game) && liberadoPara !== game.id && !falhou;
+  }
+
+  function atualizarPorta() {
+    const gate = $('pdAdGate');
+    const lista = $('downloadSectionsContainer');
+    const btn = $('pdAdGateBtn');
+    const jogo = (typeof currentGameData !== 'undefined') ? currentGameData : null;
+    const ativa = $('downloadsOverlay') && $('downloadsOverlay').classList.contains('active');
+
+    if (!jogo || !portaBloqueada(jogo)) {
+      gate.style.display = 'none';
+      lista.style.display = '';
+      clearInterval(timerPorta);
+      return;
+    }
+    if (!ativa) { clearInterval(timerPorta); return; }
+
+    gate.style.display = 'block';
+    lista.style.display = 'none';
+    if (fase === 'pronto') {
+      btn.disabled = false;
+      btn.textContent = '▶ Assistir o anúncio para liberar o conteúdo';
+    } else if (fase !== 'anuncio') {
+      btn.disabled = true;
+      btn.textContent = '⏳ A carregar anúncio' + (progressoCarga > 0 ? ' ' + progressoCarga + '%' : '...');
+    }
+  }
+
+  $('pdAdGateBtn').addEventListener('click', function () {
+    if (fase !== 'pronto' || falhou) return;
+    if (typeof currentGameData === 'undefined' || !currentGameData) return;
+    abrirAnuncio(currentGameData.id);
+  });
+
   // ---------- API usada pelo resto do site ----------
   function ehGratis(game) {
     return !!game && Number(game.cost || 0) === 0;
@@ -14678,11 +14735,14 @@ document.addEventListener("keydown", (e) => {
       if (ehGratis(game)) garantirCarga();
     },
 
-    // Ao clicar em "Downloads": mostra o anúncio (se for de 0 pontos) e só depois executa onLiberado
-    exigir: function (game, onLiberado) {
-      if (!ehGratis(game) || liberadoPara === game.id || falhou) { onLiberado(); return; }
-      if (fase === 'anuncio') return;
-      abrirAnuncio(game.id, onLiberado);
+    // Ao abrir a tela de Downloads: em conteúdo de 0 pontos, mostra o botão "Assistir anúncio" no lugar dos links
+    aplicarPorta: function (game) {
+      atualizarPorta();
+      clearInterval(timerPorta);
+      if (portaBloqueada(game)) {
+        garantirCarga();
+        timerPorta = setInterval(atualizarPorta, 400);
+      }
     },
 
     // Ao fechar o conteúdo, a liberação deixa de valer
