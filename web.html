@@ -3792,6 +3792,200 @@
         transition: none !important;
       }
     }
+    #pdAdOverlay {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      display: flex;
+      opacity: 0;
+      z-index: -1;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+    }
+    #pdAdOverlay.aberto {
+      opacity: 1;
+      z-index: 10050;
+      pointer-events: auto;
+    }
+    @media (orientation: landscape) {
+      #pdAdOverlay.aberto {
+        inset: auto;
+        top: 0;
+        left: 0;
+        width: 100vh;
+        height: 100vw;
+        transform-origin: top left;
+        transform: rotate(90deg) translateY(-100%);
+      }
+    }
+    #pdAdOverlay .pdad-caixa {
+      position: relative;
+      background: #000;
+      color: #fff;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    #pdAdOverlay .pdad-fase {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    #pdAdOverlay .pdad-video {
+      flex: 1;
+      min-height: 0;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    #pdAdOverlay .pdad-video iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      pointer-events: none;
+    }
+    #pdAdOverlay .pdad-rotulo {
+      position: absolute;
+      top: 10px;
+      left: 12px;
+      font-size: 10px;
+      background: rgba(255,255,255,0.15);
+      padding: 3px 8px;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+      z-index: 3;
+      color: #fff;
+    }
+    #pdAdOverlay .pdad-corpo {
+      padding: 14px 16px calc(14px + env(safe-area-inset-bottom, 0px));
+      background: linear-gradient(to top, rgba(0,0,0,0.92), rgba(0,0,0,0.7) 70%, transparent);
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      z-index: 4;
+    }
+    #pdAdOverlay .pdad-titulo { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+    #pdAdOverlay .pdad-sub { font-size: 12px; color: #9ca3af; margin-bottom: 14px; }
+    #pdAdOverlay .pdad-barra {
+      height: 5px;
+      background: #374151;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    #pdAdOverlay .pdad-fill {
+      height: 100%;
+      width: 0%;
+      background: #3B82F6;
+      transition: width 0.2s linear;
+    }
+    #pdAdOverlay .pdad-rodape {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #9ca3af;
+    }
+    #pdAdOverlay .pdad-skip {
+      font-family: inherit;
+      border: none;
+      cursor: pointer;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    #pdAdOverlay .pdad-skip:disabled { opacity: 0.4; cursor: default; }
+    #pdAdOverlay .pdad-play {
+      position: absolute;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-family: inherit;
+      border: none;
+      cursor: pointer;
+      background: #1D4ED8;
+      color: #fff;
+      padding: 12px 22px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: 700;
+      z-index: 5;
+      pointer-events: none;
+    }
+    #pdAdOverlay.pdad-toque .pdad-video iframe { pointer-events: auto; }
+    #pdAdOverlay .pdad-loading {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: #9ca3af;
+      font-size: 12px;
+      z-index: 2;
+    }
+    #pdAdOverlay .pdad-spinner {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      border: 3px solid rgba(255,255,255,0.15);
+      border-top-color: #60A5FA;
+      animation: pdadSpin 0.9s linear infinite;
+    }
+    @keyframes pdadSpin { to { transform: rotate(360deg); } }
+    .pdad-gate {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .pdad-gate-titulo { font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+    .pdad-gate-texto { font-size: 13px; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.4; }
+    .pdad-gate-btn {
+      width: 100%;
+      font-family: inherit;
+      border: none;
+      cursor: pointer;
+      background: var(--accent);
+      color: #fff;
+      padding: 13px 16px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .pdad-gate-btn:active { background: var(--accent-hover); }
+    .pdad-gate-btn:disabled { background: var(--btn-secondary-bg); color: var(--text-muted); cursor: default; }
+    #pdAdToast {
+      display: none;
+      position: fixed;
+      bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+      left: 50%;
+      transform: translateX(-50%);
+      background: #111827;
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 30px;
+      font-size: 13px;
+      z-index: 10060;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+      max-width: 90vw;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -4162,6 +4356,11 @@
               Você não tem pontos suficientes para baixar este conteúdo. Resgate um código no menu para ganhar mais pontos.
             </div>
             <p class="pd-note" id="pdCostNote"></p>
+            <div id="pdAdGate" class="pdad-gate" style="display:none;">
+              <div class="pdad-gate-titulo">Conteúdo gratuito</div>
+              <div class="pdad-gate-texto">Assista a um anúncio curto para liberar os links de download.</div>
+              <button type="button" class="pdad-gate-btn" id="pdAdGateBtn" disabled>⏳ A carregar anúncio...</button>
+            </div>
             <div class="pd-files" id="downloadSectionsContainer"></div>
           </section>
 
@@ -4866,6 +5065,28 @@
       </form>
     </div>
   </div>
+  <div id="pdAdOverlay">
+    <div class="pdad-caixa">
+      <div class="pdad-fase">
+        <div class="pdad-video">
+          <span class="pdad-rotulo">ANÚNCIO</span>
+          <button class="pdad-play" id="pdAdPlay" type="button">▶ Toque no vídeo para reproduzir</button>
+          <div class="pdad-loading" id="pdAdLoading"><div class="pdad-spinner"></div><span id="pdAdLoadingTxt">A carregar anúncio...</span></div>
+          <div id="pdAdYtPlayer"></div>
+        </div>
+        <div class="pdad-corpo">
+          <div class="pdad-titulo">A exibir anúncio</div>
+          <div class="pdad-sub" id="pdAdSub">Não saias desta página até terminar</div>
+          <div class="pdad-barra"><div class="pdad-fill" id="pdAdFill"></div></div>
+          <div class="pdad-rodape">
+            <span id="pdAdTempo">--:--</span>
+            <button class="pdad-skip" id="pdAdSkip" disabled>Ignorar anúncio</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="pdAdToast"></div>
   <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     function applyTheme() {
       const hour = new Date().getHours();
@@ -5417,6 +5638,7 @@
       if (!game) return;
       addToHistory(id);
       currentGameData = { ...game, id: id };
+      if (window.PortalAd) window.PortalAd.preparar(currentGameData);
       if (!skipPush) {
         const newUrl = window.location.pathname + '?id=' + id;
         window.history.pushState({ gameId: id, view: 'info' }, game.titulo, newUrl);
@@ -5494,6 +5716,7 @@
         `;
       }).join('');
       window.currentDownloadLinks = links;
+      if (window.PortalAd) window.PortalAd.aplicarPorta(currentGameData);
       downloadContainer.querySelectorAll('.download-btn').forEach(btn => {
         btn.addEventListener('click', function() {
           const gameId = this.dataset.gameId;
@@ -5604,6 +5827,7 @@
       document.body.style.overflow = '';
       if (commentsUnsub) { commentsUnsub(); commentsUnsub = null; }
       currentGameData = null;
+      if (window.PortalAd) window.PortalAd.limparLiberacao();
       const videoContainer = document.getElementById('videoContainer');
       if (videoContainer) {
         videoContainer.innerHTML = '';
@@ -5791,6 +6015,7 @@
       updateProductTabs('downloads');
       updatePointsDisplay();
       updateGameUrl('downloads', skipPush);
+      if (window.PortalAd) window.PortalAd.aplicarPorta(currentGameData);
     }
     function closeDownloadsOverlay() {
       showGameInfo();
@@ -9363,6 +9588,502 @@
       });
     }
   </script>
+<script>
+
+(function () {
+  'use strict';
+
+  const SEGUNDOS_PARA_IGNORAR = 15;
+  const SEGUNDOS_PARA_CLIQUE = 5;
+  let VIDEO_ID = null;
+  let LINK_ANUNCIO = null;
+  let ANUNCIO_ATIVO_ID = null;
+  let ANUNCIOS_ATIVOS = [];
+  let ultimoAnuncioId = null;
+  let anuncioExibido = null;
+  let anuncioDisponivel = false;
+  const TIMEOUT_API_MS = 20000;
+  const LIMITE_INICIO_MS = 10000;
+
+  let ytPlayer = null;
+  let playerPronto = false;
+  let apiPedida = false;
+  let apiPronta = false;
+  let falhou = false;
+  let fase = 'inicio';
+  let timerCarga = null;
+  let timerProgresso = null;
+  let ultimaFracao = 0;
+  let ultimoAvanco = 0;
+  let precargaComecou = false;
+  let liberadoPara = null;
+  let anuncioDoConteudo = null;
+  let inicioAnuncio = 0;
+  let toastTimer = null;
+  let timerRetry = null;
+  let progressoCarga = 0;
+  let timerPorta = null;
+  let iniciouReproducao = false;
+  let abriuLink = false;
+  let timerLimite = null;
+  let falhasSeguidas = 0;
+  let usuarioTocou = false;
+  let assistido = 0;
+
+  const $ = (id) => document.getElementById(id);
+
+  function sortearAnuncio() {
+    const lista = ANUNCIOS_ATIVOS;
+    if (!lista.length) {
+      anuncioDisponivel = false;
+      VIDEO_ID = null;
+      LINK_ANUNCIO = null;
+      ANUNCIO_ATIVO_ID = null;
+      return;
+    }
+    let candidatos = lista;
+    if (lista.length > 1 && ultimoAnuncioId) {
+      const outros = lista.filter((a) => a.id !== ultimoAnuncioId);
+      if (outros.length) candidatos = outros;
+    }
+    const escolhido = candidatos[Math.floor(Math.random() * candidatos.length)];
+    VIDEO_ID = escolhido.videoId;
+    LINK_ANUNCIO = escolhido.link;
+    ANUNCIO_ATIVO_ID = escolhido.id;
+    ultimoAnuncioId = escolhido.id;
+    anuncioDisponivel = true;
+  }
+
+  async function carregarAnuncioAtivo() {
+    ANUNCIOS_ATIVOS = [];
+    try {
+      const firestore = window.firebaseFirestore;
+      const { collection, where, query, limit, getDocs } = window.firebaseModules;
+      const anunciosRef = collection(firestore, 'anuncios');
+      const q = query(anunciosRef, where('ativo', '==', true), limit(30));
+      const snap = await getDocs(q);
+      snap.forEach((d) => {
+        const dados = d.data();
+        if (dados.videoId && dados.link) ANUNCIOS_ATIVOS.push({ id: d.id, videoId: dados.videoId, link: dados.link });
+      });
+    } catch (e) {  }
+    sortearAnuncio();
+    atualizarPorta();
+  }
+
+  function registrarEventoAnuncio(tipo) {
+    const anuncio = anuncioExibido;
+    if (!anuncio || !anuncio.id) return;
+    try {
+      const firestore = window.firebaseFirestore;
+      const { doc, setDoc, updateDoc, increment } = window.firebaseModules;
+      const agora = new Date();
+      const usuario = (typeof currentUser !== 'undefined') ? currentUser : null;
+      const logado = usuario && !usuario.isAnonymous;
+      const uid = (usuario && usuario.uid) ? usuario.uid : 'visitante';
+      const campo = tipo === 'clique' ? 'cliques' : 'exibicoes';
+      setDoc(doc(firestore, 'anuncio_usuarios', anuncio.id + '_' + uid), {
+        anuncioId: anuncio.id,
+        userId: uid,
+        userEmail: logado ? (usuario.email || '') : 'Visitante',
+        userName: logado ? (usuario.displayName || '') : '',
+        ultimaData: agora.toLocaleDateString('pt-BR'),
+        ultimaHora: agora.toLocaleTimeString('pt-BR'),
+        ultimoTimestamp: agora.getTime(),
+        [campo]: increment(1)
+      }, { merge: true }).catch(() => {});
+      updateDoc(doc(firestore, 'anuncios', anuncio.id), { [campo]: increment(1) }).catch(() => {});
+    } catch (e) {  }
+  }
+
+  function toast(msg, ms) {
+    const t = $('pdAdToast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { t.style.display = 'none'; }, ms || 2800);
+  }
+
+  function falhar() {
+    falhou = true;
+    clearInterval(timerCarga);
+    if (fase === 'anuncio') fecharAnuncio();
+  }
+
+  function carregarApiYouTube() {
+    if (apiPedida) return;
+    apiPedida = true;
+    window.onYouTubeIframeAPIReady = function () {
+      apiPronta = true;
+      criarPlayer();
+    };
+    const tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    tag.onerror = falhar;
+    document.head.appendChild(tag);
+    setTimeout(() => { if (!apiPronta) falhar(); }, TIMEOUT_API_MS);
+  }
+
+  function criarPlayer() {
+    ytPlayer = new YT.Player('pdAdYtPlayer', {
+      videoId: VIDEO_ID,
+      width: '100%',
+      height: '100%',
+      playerVars: { controls: 0, disablekb: 1, modestbranding: 1, rel: 0, playsinline: 1, autoplay: 0 },
+      events: {
+        onReady: function (e) {
+          playerPronto = true;
+          if (fase === 'anuncio') { mostrarBotaoPlay(); return; }
+          iniciarPrecarga();
+        },
+        onStateChange: onEstadoVideoMudou,
+        onError: function (e) {
+          falhar();
+          toast('Anúncio indisponível');
+        }
+      }
+    });
+  }
+
+  const STALL_MS = 15000;
+  const MAX_TENTATIVAS = 2;
+  let tentativasCarga = 0;
+
+  function comecarCarga(primeira) {
+    fase = 'precarga';
+    progressoCarga = 0;
+    precargaComecou = false;
+    ultimaFracao = 0;
+    ultimoAvanco = Date.now();
+    if (primeira) tentativasCarga = 0;
+    try {
+      ytPlayer.mute();
+      if (primeira) ytPlayer.playVideo(); else ytPlayer.loadVideoById(VIDEO_ID);
+    } catch (e) {}
+    clearInterval(timerCarga);
+    timerCarga = setInterval(verificarCarga, 300);
+    atualizarPorta();
+  }
+
+  function iniciarPrecarga() { comecarCarga(true); }
+  function recarregarAnuncio() { comecarCarga(false); }
+
+  function verificarCarga() {
+    if (fase !== 'precarga') { clearInterval(timerCarga); return; }
+    const parado = Date.now() - ultimoAvanco > STALL_MS;
+
+    if (!precargaComecou) {
+      if (parado) travar();
+      return;
+    }
+    const f = ytPlayer.getVideoLoadedFraction ? ytPlayer.getVideoLoadedFraction() : 0;
+    progressoCarga = Math.min(99, Math.round(f * 100));
+    if (f > ultimaFracao) { ultimaFracao = f; ultimoAvanco = Date.now(); }
+
+    if (f >= 0.99) finalizarPrecarga();
+    else if (parado) {
+      tentativasCarga++;
+      if (tentativasCarga > MAX_TENTATIVAS) travar(); else recarregarAnuncio();
+    }
+  }
+
+  function travar() {
+    clearInterval(timerCarga);
+    try { ytPlayer.pauseVideo(); } catch (e) {}
+    fase = 'travado';
+    atualizarPorta();
+  }
+
+  function finalizarPrecarga() {
+    clearInterval(timerCarga);
+    if (fase !== 'precarga') return;
+    progressoCarga = 100;
+    fase = 'pronto';
+    try { ytPlayer.setPlaybackRate(1); } catch (e) {}
+    ytPlayer.pauseVideo();
+    ytPlayer.seekTo(0, true);
+    setTimeout(() => { if (fase === 'pronto') ytPlayer.pauseVideo(); }, 150);
+    atualizarPorta();
+  }
+
+  function onEstadoVideoMudou(evento) {
+    if (fase === 'pronto' && evento.data === YT.PlayerState.PLAYING) { try { ytPlayer.pauseVideo(); } catch (e) {} }
+    if (fase === 'precarga' &&
+        (evento.data === YT.PlayerState.PLAYING || evento.data === YT.PlayerState.BUFFERING)) {
+      precargaComecou = true;
+      try { ytPlayer.setPlaybackRate(2); } catch (e) {}
+    }
+    if (fase === 'anuncio' && evento.data === YT.PlayerState.PLAYING) {
+      if (!usuarioTocou) { ytPlayer.pauseVideo(); return; }
+      $('pdAdLoading').style.display = 'none';
+      esconderAvisoToque();
+      iniciouReproducao = true;
+      falhasSeguidas = 0;
+      clearTimeout(timerLimite);
+      try { ytPlayer.unMute(); ytPlayer.setVolume(100); } catch (e) {}
+    }
+    if (evento.data !== YT.PlayerState.ENDED) return;
+    if (fase === 'precarga') { finalizarPrecarga(); return; }
+    if (fase === 'anuncio' && usuarioTocou && assistido >= 3) fecharAnuncio();
+  }
+
+  function garantirCarga() {
+    if (!anuncioDisponivel) return;
+    if (falhou) return;
+    if (!apiPedida) { carregarApiYouTube(); return; }
+    if (playerPronto && fase === 'usado') { tentativasCarga = 0; recarregarAnuncio(); }
+  }
+
+  function abrirAnuncio(idConteudo) {
+    fase = 'anuncio';
+    anuncioExibido = { id: ANUNCIO_ATIVO_ID, link: LINK_ANUNCIO };
+    registrarEventoAnuncio('exibicao');
+    clearInterval(timerCarga);
+    anuncioDoConteudo = idConteudo;
+    usuarioTocou = false;
+    iniciouReproducao = false;
+    assistido = 0;
+    clearTimeout(timerLimite);
+    timerLimite = setTimeout(cancelarAnuncio, LIMITE_INICIO_MS);
+    $('pdAdLoadingTxt').textContent = 'A carregar anúncio...';
+    $('pdAdSub').textContent = 'Não saias desta página até terminar';
+
+    $('pdAdOverlay').classList.add('aberto');
+    $('pdAdSkip').disabled = true;
+    $('pdAdFill').style.width = '0%';
+    $('pdAdTempo').textContent = '--:--';
+    esconderAvisoToque();
+    $('pdAdLoading').style.display = 'flex';
+
+    tocarPeloUtilizador();
+    iniciarProgresso();
+  }
+
+  function mostrarBotaoPlay() {
+    $('pdAdOverlay').classList.add('pdad-toque');
+    $('pdAdLoading').style.display = 'none';
+    $('pdAdPlay').style.display = 'flex';
+  }
+
+  function esconderAvisoToque() {
+    $('pdAdOverlay').classList.remove('pdad-toque');
+    $('pdAdPlay').style.display = 'none';
+  }
+
+  function tocarPeloUtilizador() {
+    if (!playerPronto || fase !== 'anuncio') return;
+    usuarioTocou = true;
+    esconderAvisoToque();
+    $('pdAdLoading').style.display = 'flex';
+    try {
+      ytPlayer.setPlaybackRate(1);
+      ytPlayer.unMute();
+      ytPlayer.setVolume(100);
+      if (ytPlayer.getCurrentTime() > 0.5) ytPlayer.seekTo(0, true);
+      ytPlayer.playVideo();
+    } catch (e) {  }
+
+    let ticks = 0;
+    clearInterval(timerRetry);
+    timerRetry = setInterval(() => {
+      if (fase !== 'anuncio') { clearInterval(timerRetry); return; }
+      let st;
+      try { st = ytPlayer.getPlayerState(); } catch (e) { return; }
+      if (st === YT.PlayerState.PLAYING) { clearInterval(timerRetry); return; }
+      ticks++;
+      $('pdAdLoadingTxt').textContent = 'A iniciar anúncio...';
+      if (st === YT.PlayerState.BUFFERING) {
+        if (ticks > 15) { clearInterval(timerRetry); mostrarBotaoPlay(); }
+        return;
+      }
+      if (ticks >= 2) { clearInterval(timerRetry); mostrarBotaoPlay(); }
+    }, 1000);
+  }
+
+  $('pdAdPlay').addEventListener('click', function (e) {
+    e.stopPropagation();
+    tocarPeloUtilizador();
+  });
+
+  function iniciarProgresso() {
+    const skipBtn = $('pdAdSkip');
+    const fill = $('pdAdFill');
+    const tempoTxt = $('pdAdTempo');
+    clearInterval(timerProgresso);
+    timerProgresso = setInterval(() => {
+      if (!playerPronto || !usuarioTocou) return;
+      let st;
+      try { st = ytPlayer.getPlayerState(); } catch (e) { return; }
+      if (st !== YT.PlayerState.PLAYING) return;
+
+      assistido += 0.25;
+      const duracao = ytPlayer.getDuration();
+      const atual = ytPlayer.getCurrentTime();
+      if (!duracao) return;
+
+      fill.style.width = Math.min(100, (atual / duracao) * 100) + '%';
+      const restante = Math.max(0, Math.ceil(duracao - atual));
+      tempoTxt.textContent = Math.floor(restante / 60) + ':' + String(restante % 60).padStart(2, '0');
+      if (assistido >= SEGUNDOS_PARA_CLIQUE) $('pdAdSub').textContent = 'Toque no vídeo para saber mais';
+      if (assistido >= SEGUNDOS_PARA_IGNORAR) skipBtn.disabled = false;
+    }, 250);
+  }
+
+  function cancelarAnuncio() {
+    if (fase !== 'anuncio' || iniciouReproducao) return;
+    clearInterval(timerProgresso);
+    clearInterval(timerRetry);
+    clearTimeout(timerLimite);
+    esconderAvisoToque();
+    if (playerPronto) {
+      try { ytPlayer.mute(); ytPlayer.pauseVideo(); ytPlayer.seekTo(0, true); } catch (e) {}
+    }
+    sairFullscreen();
+    $('pdAdOverlay').classList.remove('aberto');
+    $('pdAdLoading').style.display = 'none';
+    usuarioTocou = false;
+    anuncioDoConteudo = null;
+    fase = 'pronto';
+
+    toast('O anúncio não iniciou em 10 s. Toque em "Assistir" para tentar de novo.', 6000);
+
+    falhasSeguidas++;
+    if (falhasSeguidas >= 2) { falhasSeguidas = 0; recarregarAnuncio(); }
+    atualizarPorta();
+  }
+
+  function fecharAnuncio() {
+    if (fase !== 'anuncio') return;
+    clearInterval(timerProgresso);
+    clearInterval(timerRetry);
+    clearTimeout(timerLimite);
+    esconderAvisoToque();
+    if (playerPronto) ytPlayer.pauseVideo();
+    sairFullscreen();
+    $('pdAdOverlay').classList.remove('aberto');
+    $('pdAdLoading').style.display = 'none';
+
+    fase = 'usado';
+    sortearAnuncio();
+    if (playerPronto && anuncioDisponivel) recarregarAnuncio();
+
+    const id = anuncioDoConteudo;
+    anuncioDoConteudo = null;
+
+    if (typeof currentGameData !== 'undefined' && currentGameData && currentGameData.id === id) {
+      liberadoPara = id;
+      if (!falhou && !abriuLink) toast('Anúncio concluído! Toca no botão para abrir o link');
+      abriuLink = false;
+      atualizarPorta();
+    }
+  }
+
+  $('pdAdSkip').addEventListener('click', function (e) {
+    e.stopPropagation();
+    fecharAnuncio();
+  });
+
+  $('pdAdOverlay').addEventListener('click', function () {
+    if (fase !== 'anuncio' || !usuarioTocou || assistido < SEGUNDOS_PARA_CLIQUE) return;
+    sairFullscreen();
+    abriuLink = true;
+    registrarEventoAnuncio('clique');
+    try {
+      openLinkInGA((anuncioExibido && anuncioExibido.link) || LINK_ANUNCIO);
+    } catch (e) {
+      toast('Não foi possível abrir o link', 5000);
+    }
+    fecharAnuncio();
+  });
+
+  function sairFullscreen() {
+    if (screen.orientation && screen.orientation.unlock) {
+      try { screen.orientation.unlock(); } catch (e) {}
+    }
+    const sair = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+    if (sair && (document.fullscreenElement || document.webkitFullscreenElement)) {
+      const p = sair.call(document);
+      if (p && p.catch) p.catch(() => {});
+    }
+  }
+
+  function portaBloqueada(game) {
+    return ehGratis(game) && anuncioDisponivel && liberadoPara !== game.id && !falhou;
+  }
+
+  function atualizarPorta() {
+    const gate = $('pdAdGate');
+    const lista = $('downloadSectionsContainer');
+    const btn = $('pdAdGateBtn');
+    const jogo = (typeof currentGameData !== 'undefined') ? currentGameData : null;
+
+    if (!jogo || !portaBloqueada(jogo)) {
+      gate.style.display = 'none';
+      lista.style.display = '';
+      clearInterval(timerPorta);
+      return;
+    }
+
+    gate.style.display = 'block';
+    lista.style.display = 'none';
+    if (fase === 'pronto') {
+      btn.disabled = false;
+      btn.textContent = '▶ Assistir o anúncio para liberar o conteúdo';
+    } else if (fase === 'travado') {
+      btn.disabled = false;
+      btn.textContent = '⚠ Não carregou. Toque para tentar de novo';
+    } else if (fase !== 'anuncio') {
+      btn.disabled = true;
+      btn.textContent = '⏳ A carregar anúncio' + (progressoCarga > 0 ? ' ' + progressoCarga + '%' : '...');
+    }
+  }
+
+  $('pdAdGateBtn').addEventListener('click', function () {
+    if (falhou) { atualizarPorta(); return; }
+    if (typeof currentGameData === 'undefined' || !currentGameData) return;
+
+    if (fase === 'pronto') {
+      abrirAnuncio(currentGameData.id);
+    } else if (fase === 'travado') {
+      tentativasCarga = 0;
+      recarregarAnuncio();
+      try { ytPlayer.playVideo(); } catch (e) {}
+    } else {
+      toast('O anúncio ainda está a carregar, aguarde');
+    }
+  });
+
+  function ehGratis(game) {
+    return !!game && Number(game.cost || 0) === 0;
+  }
+
+  window.PortalAd = {
+    preparar: function (game) {
+      if (ehGratis(game)) garantirCarga();
+    },
+
+    aplicarPorta: function (game) {
+      atualizarPorta();
+      clearInterval(timerPorta);
+      if (portaBloqueada(game)) {
+        garantirCarga();
+        timerPorta = setInterval(atualizarPorta, 400);
+      }
+    },
+
+    limparLiberacao: function () {
+      liberadoPara = null;
+    }
+  };
+
+  async function inicializarAnuncio() {
+    await carregarAnuncioAtivo();
+    setTimeout(garantirCarga, 1500);
+  }
+  if (document.readyState === 'complete') inicializarAnuncio();
+  else window.addEventListener('load', inicializarAnuncio);
+})();
+</script>
 </body>
 </html>
 

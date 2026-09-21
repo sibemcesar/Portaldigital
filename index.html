@@ -1041,7 +1041,6 @@ window.firebaseModules = {
       border: none;
     }
 
-    /* ===== Animação de espera ao abrir um conteúdo ===== */
     .content-load-bar {
       position: fixed;
       top: 0;
@@ -1071,7 +1070,6 @@ window.firebaseModules = {
       100% { transform: translateX(260%); }
     }
 
-    /* Skeleton (brilho a passar) nos dados que ainda estão a chegar */
     @keyframes pdShimmer {
       0% { background-position: 200% 0; }
       100% { background-position: -200% 0; }
@@ -1094,7 +1092,6 @@ window.firebaseModules = {
     .overlay.is-loading #ratingList { min-height: 84px; }
     .overlay.is-loading #likeCountMeta { display: inline-block; min-width: 22px; }
 
-    /* Vídeo: capa desfocada enquanto o player do YouTube carrega */
     .video-container::before {
       content: "";
       position: absolute;
@@ -7278,7 +7275,6 @@ window.firebaseModules = {
       to { transform: rotate(360deg); }
     }
   
-    /* ===== Anúncio recompensado (conteúdos de 0 pontos) ===== */
     #pdAdOverlay {
       position: fixed;
       inset: 0;
@@ -7410,7 +7406,7 @@ window.firebaseModules = {
       font-size: 14px;
       font-weight: 700;
       z-index: 5;
-      pointer-events: none;   /* o toque passa direto para o vídeo */
+      pointer-events: none;   
     }
     #pdAdOverlay.pdad-toque .pdad-video iframe { pointer-events: auto; }
     #pdAdOverlay .pdad-loading {
@@ -8985,7 +8981,6 @@ window.firebaseModules = {
     </div>
   </div>
 
-  <!-- Anúncio recompensado (só para conteúdos de 0 pontos) -->
   <div id="pdAdOverlay">
     <div class="pdad-caixa">
       <div class="pdad-fase">
@@ -9799,7 +9794,7 @@ async function openGameDetail(id, skipPushState) {
       videoContainer.classList.add("is-loading");
       videoContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen onload="this.parentNode.classList.remove('is-loading')"></iframe>`;
       clearTimeout(window._videoLoadTimer);
-      window._videoLoadTimer = setTimeout(() => videoContainer.classList.remove("is-loading"), 6000);   // segurança: nunca deixa o vídeo escondido
+      window._videoLoadTimer = setTimeout(() => videoContainer.classList.remove("is-loading"), 6000);
       videoContainer.style.display = "block";
     } else {
       videoContainer.style.display = "none";
@@ -9861,7 +9856,6 @@ async function openGameDetail(id, skipPushState) {
       downloadGame(gameId, appType, url, cost2);
     });
   });
-  // Abre a página já, com a animação de espera, enquanto curtidas e avaliações chegam do servidor
   const overlayEl = document.getElementById("overlay");
   overlayEl.classList.add("is-loading");
   showGameInfo();
@@ -9874,7 +9868,6 @@ async function openGameDetail(id, skipPushState) {
     commentInputWrapper.style.display = "none";
   }
   updateFavoriteButton();
-  // A avaliação do próprio usuário já está em memória: mostra já, sem esperar a rede
   const minhaAvaliacao = userRatings[id];
   selectedRatingStars = minhaAvaliacao ? minhaAvaliacao.stars : 0;
   renderRatingStarsInput();
@@ -9884,7 +9877,7 @@ async function openGameDetail(id, skipPushState) {
   const aindaAberto = () => currentGameData && currentGameData.id === id;
   const pCurtidas = loadGameLikes(id).then(() => { if (aindaAberto()) updateLikeButton(); });
   const pAvaliacoes = loadGameRatings(id);
-  try { await Promise.all([pCurtidas, pAvaliacoes]); } catch (e) { /* segue com o que carregou */ }
+  try { await Promise.all([pCurtidas, pAvaliacoes]); } catch (e) {  }
   if (aindaAberto()) overlayEl.classList.remove("is-loading");
 }
 function extractYoutubeId(url) {
@@ -13479,7 +13472,7 @@ async function loadGameRatings(gameId) {
   } catch (e) {
     console.error("Erro ao carregar m\xE9dia de avalia\xE7\xF5es:", e);
   }
-  if (!currentGameData || currentGameData.id !== gameId) return;   // o usuário já abriu outro conteúdo
+  if (!currentGameData || currentGameData.id !== gameId) return;
   const average = count > 0 ? sum / count : 0;
   const roundedAvg = Math.round(average);
   const avgEl = document.getElementById("ratingAverageValue");
@@ -13509,7 +13502,7 @@ async function loadGameRatings(gameId) {
     const ratingsRef = collection(firestore, "ratings");
     const q = query(ratingsRef, where("gameId", "==", gameId), limit(50));
     const snapshot = await getDocs(q);
-    if (!currentGameData || currentGameData.id !== gameId) return;   // o usuário já abriu outro conteúdo
+    if (!currentGameData || currentGameData.id !== gameId) return;
     const items = [];
     snapshot.forEach((docSnap) => items.push(docSnap.data()));
     items.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
@@ -13739,7 +13732,7 @@ async function loadGameLikes(gameId) {
   const firestore = window.firebaseFirestore;
   try {
     const gameLikesDoc = await getDoc(doc(firestore, "gameLikes", gameId));
-    if (!currentGameData || currentGameData.id !== gameId) return;   // o usuário já abriu outro conteúdo
+    if (!currentGameData || currentGameData.id !== gameId) return;
     if (gameLikesDoc.exists()) {
       currentGameLikes = gameLikesDoc.data().count || 0;
     } else {
@@ -14569,28 +14562,27 @@ document.addEventListener("keydown", (e) => {
 });
 </script>
 <script>
-/* ===== Anúncio recompensado: só aparece em conteúdos de 0 pontos ===== */
 (function () {
   'use strict';
 
   const SEGUNDOS_PARA_IGNORAR = 15;
   const SEGUNDOS_PARA_CLIQUE = 5;
-  let VIDEO_ID = null;                    // só é definido se existir um anúncio ativo no Firestore
+  let VIDEO_ID = null;
   let LINK_ANUNCIO = null;
-  let ANUNCIO_ATIVO_ID = null;            // id do anúncio sorteado (o que está pré-carregado no player)
-  let ANUNCIOS_ATIVOS = [];               // todos os anúncios ativos e válidos
-  let ultimoAnuncioId = null;             // último anúncio sorteado, para não repetir em seguida
-  let anuncioExibido = null;              // { id, link } do anúncio que está realmente na tela
-  let anuncioDisponivel = false;          // false = não há anúncio configurado: downloads abrem sem bloqueio
+  let ANUNCIO_ATIVO_ID = null;
+  let ANUNCIOS_ATIVOS = [];
+  let ultimoAnuncioId = null;
+  let anuncioExibido = null;
+  let anuncioDisponivel = false;
   const TIMEOUT_API_MS = 20000;
-  const LIMITE_INICIO_MS = 10000;   // se o vídeo não começar em 10 s, cancela o anúncio
+  const LIMITE_INICIO_MS = 10000;
 
   let ytPlayer = null;
   let playerPronto = false;
   let apiPedida = false;
   let apiPronta = false;
   let falhou = false;
-  let fase = 'inicio';          // inicio | precarga | pronto | anuncio | usado
+  let fase = 'inicio';
   let timerCarga = null;
   let timerProgresso = null;
   let ultimaFracao = 0;
@@ -14607,12 +14599,11 @@ document.addEventListener("keydown", (e) => {
   let abriuLink = false;
   let timerLimite = null;
   let falhasSeguidas = 0;
-  let usuarioTocou = false;   // só vale depois de o utilizador tocar em reproduzir
-  let assistido = 0;          // segundos realmente vistos (só conta com o vídeo a tocar)
+  let usuarioTocou = false;
+  let assistido = 0;
 
   const $ = (id) => document.getElementById(id);
 
-  // Sorteia um anúncio entre os ativos. Havendo mais de um, evita repetir o último sorteado.
   function sortearAnuncio() {
     const lista = ANUNCIOS_ATIVOS;
     if (!lista.length) {
@@ -14635,9 +14626,6 @@ document.addEventListener("keydown", (e) => {
     anuncioDisponivel = true;
   }
 
-  // Busca no Firestore os anúncios marcados como ativos (coleção "anuncios") e sorteia um.
-  // Se não houver nenhum anúncio ativo, o bloqueio de downloads fica desligado
-  // e o conteúdo gratuito abre diretamente, sem exibir nenhum vídeo padrão.
   async function carregarAnuncioAtivo() {
     ANUNCIOS_ATIVOS = [];
     try {
@@ -14650,13 +14638,11 @@ document.addEventListener("keydown", (e) => {
         const dados = d.data();
         if (dados.videoId && dados.link) ANUNCIOS_ATIVOS.push({ id: d.id, videoId: dados.videoId, link: dados.link });
       });
-    } catch (e) { /* sem anúncio configurado/erro de rede: fica indisponível, downloads abrem normalmente */ }
+    } catch (e) {  }
     sortearAnuncio();
     atualizarPorta();
   }
 
-  // Regista o usuário UMA vez por anúncio (coleção "anuncio_usuarios", doc "<anuncioId>_<uid>")
-  // e apenas incrementa os contadores de exibições/cliques dele. Também incrementa o total no anúncio.
   function registrarEventoAnuncio(tipo) {
     const anuncio = anuncioExibido;
     if (!anuncio || !anuncio.id) return;
@@ -14679,7 +14665,7 @@ document.addEventListener("keydown", (e) => {
         [campo]: increment(1)
       }, { merge: true }).catch(() => {});
       updateDoc(doc(firestore, 'anuncios', anuncio.id), { [campo]: increment(1) }).catch(() => {});
-    } catch (e) { /* falha ao registar não deve travar o anúncio */ }
+    } catch (e) {  }
   }
 
   function toast(msg, ms) {
@@ -14693,10 +14679,9 @@ document.addEventListener("keydown", (e) => {
   function falhar() {
     falhou = true;
     clearInterval(timerCarga);
-    if (fase === 'anuncio') fecharAnuncio();   // não deixa o utilizador preso
+    if (fase === 'anuncio') fecharAnuncio();
   }
 
-  // ---------- Carregamento do vídeo (em segundo plano) ----------
   function carregarApiYouTube() {
     if (apiPedida) return;
     apiPedida = true;
@@ -14720,7 +14705,7 @@ document.addEventListener("keydown", (e) => {
       events: {
         onReady: function (e) {
           playerPronto = true;
-          if (fase === 'anuncio') { mostrarBotaoPlay(); return; }  // o utilizador já estava à espera
+          if (fase === 'anuncio') { mostrarBotaoPlay(); return; }
           iniciarPrecarga();
         },
         onStateChange: onEstadoVideoMudou,
@@ -14732,8 +14717,8 @@ document.addEventListener("keydown", (e) => {
     });
   }
 
-  const STALL_MS = 15000;      // sem progresso durante este tempo = travou
-  const MAX_TENTATIVAS = 2;    // recargas automáticas antes de pedir um toque
+  const STALL_MS = 15000;
+  const MAX_TENTATIVAS = 2;
   let tentativasCarga = 0;
 
   function comecarCarga(primeira) {
@@ -14760,7 +14745,6 @@ document.addEventListener("keydown", (e) => {
     const parado = Date.now() - ultimoAvanco > STALL_MS;
 
     if (!precargaComecou) {
-      // O vídeo nem arrancou (o telemóvel pode exigir um toque para carregar): pede um toque
       if (parado) travar();
       return;
     }
@@ -14768,8 +14752,8 @@ document.addEventListener("keydown", (e) => {
     progressoCarga = Math.min(99, Math.round(f * 100));
     if (f > ultimaFracao) { ultimaFracao = f; ultimoAvanco = Date.now(); }
 
-    if (f >= 0.99) finalizarPrecarga();          // 100% carregado
-    else if (parado) {                            // travou a meio: tenta outra vez
+    if (f >= 0.99) finalizarPrecarga();
+    else if (parado) {
       tentativasCarga++;
       if (tentativasCarga > MAX_TENTATIVAS) travar(); else recarregarAnuncio();
     }
@@ -14782,7 +14766,6 @@ document.addEventListener("keydown", (e) => {
     atualizarPorta();
   }
 
-  // Só chega aqui quando o vídeo está totalmente carregado
   function finalizarPrecarga() {
     clearInterval(timerCarga);
     if (fase !== 'precarga') return;
@@ -14800,10 +14783,10 @@ document.addEventListener("keydown", (e) => {
     if (fase === 'precarga' &&
         (evento.data === YT.PlayerState.PLAYING || evento.data === YT.PlayerState.BUFFERING)) {
       precargaComecou = true;
-      try { ytPlayer.setPlaybackRate(2); } catch (e) {}   // só na pré-carga escondida
+      try { ytPlayer.setPlaybackRate(2); } catch (e) {}
     }
     if (fase === 'anuncio' && evento.data === YT.PlayerState.PLAYING) {
-      if (!usuarioTocou) { ytPlayer.pauseVideo(); return; }   // nada de tocar sozinho
+      if (!usuarioTocou) { ytPlayer.pauseVideo(); return; }
       $('pdAdLoading').style.display = 'none';
       esconderAvisoToque();
       iniciouReproducao = true;
@@ -14816,19 +14799,16 @@ document.addEventListener("keydown", (e) => {
     if (fase === 'anuncio' && usuarioTocou && assistido >= 3) fecharAnuncio();
   }
 
-  // Começa (ou recomeça) a carga do vídeo sem repetir trabalho já feito
   function garantirCarga() {
-    if (!anuncioDisponivel) return;   // sem anúncio ativo configurado: não há nada para pré-carregar
+    if (!anuncioDisponivel) return;
     if (falhou) return;
     if (!apiPedida) { carregarApiYouTube(); return; }
     if (playerPronto && fase === 'usado') { tentativasCarga = 0; recarregarAnuncio(); }
   }
 
-  // ---------- Exibição do anúncio ----------
-  // Só é chamado pelo toque no botão "Assistir anúncio": abre e começa a tocar
   function abrirAnuncio(idConteudo) {
     fase = 'anuncio';
-    anuncioExibido = { id: ANUNCIO_ATIVO_ID, link: LINK_ANUNCIO };   // fixa o anúncio que está no player
+    anuncioExibido = { id: ANUNCIO_ATIVO_ID, link: LINK_ANUNCIO };
     registrarEventoAnuncio('exibicao');
     clearInterval(timerCarga);
     anuncioDoConteudo = idConteudo;
@@ -14851,7 +14831,6 @@ document.addEventListener("keydown", (e) => {
     iniciarProgresso();
   }
 
-  // O toque direto no vídeo do YouTube é o gesto que o telemóvel aceita para tocar COM SOM
   function mostrarBotaoPlay() {
     $('pdAdOverlay').classList.add('pdad-toque');
     $('pdAdLoading').style.display = 'none';
@@ -14863,11 +14842,9 @@ document.addEventListener("keydown", (e) => {
     $('pdAdPlay').style.display = 'none';
   }
 
-  // Tenta tocar já (o clique em "Assistir" conta como gesto). Se o telemóvel não deixar,
-  // pede o toque direto no vídeo, sem repetir ciclos.
   function tocarPeloUtilizador() {
     if (!playerPronto || fase !== 'anuncio') return;
-    usuarioTocou = true;               // fica verdadeiro até fechar: um "PLAYING" atrasado não é pausado
+    usuarioTocou = true;
     esconderAvisoToque();
     $('pdAdLoading').style.display = 'flex';
     try {
@@ -14876,7 +14853,7 @@ document.addEventListener("keydown", (e) => {
       ytPlayer.setVolume(100);
       if (ytPlayer.getCurrentTime() > 0.5) ytPlayer.seekTo(0, true);
       ytPlayer.playVideo();
-    } catch (e) { /* o temporizador abaixo pede o toque no vídeo */ }
+    } catch (e) {  }
 
     let ticks = 0;
     clearInterval(timerRetry);
@@ -14891,7 +14868,7 @@ document.addEventListener("keydown", (e) => {
         if (ticks > 15) { clearInterval(timerRetry); mostrarBotaoPlay(); }
         return;
       }
-      if (ticks >= 2) { clearInterval(timerRetry); mostrarBotaoPlay(); }   // pede o toque no vídeo
+      if (ticks >= 2) { clearInterval(timerRetry); mostrarBotaoPlay(); }
     }, 1000);
   }
 
@@ -14900,7 +14877,6 @@ document.addEventListener("keydown", (e) => {
     tocarPeloUtilizador();
   });
 
-  // O anúncio só conta enquanto o vídeo está mesmo a tocar
   function iniciarProgresso() {
     const skipBtn = $('pdAdSkip');
     const fill = $('pdAdFill');
@@ -14925,7 +14901,6 @@ document.addEventListener("keydown", (e) => {
     }, 250);
   }
 
-  // Passou o limite e o vídeo não começou: cancela e deixa o utilizador tentar de novo
   function cancelarAnuncio() {
     if (fase !== 'anuncio' || iniciouReproducao) return;
     clearInterval(timerProgresso);
@@ -14940,12 +14915,12 @@ document.addEventListener("keydown", (e) => {
     $('pdAdLoading').style.display = 'none';
     usuarioTocou = false;
     anuncioDoConteudo = null;
-    fase = 'pronto';                       // o vídeo continua carregado: basta tocar em "Assistir" de novo
+    fase = 'pronto';
 
     toast('O anúncio não iniciou em 10 s. Toque em "Assistir" para tentar de novo.', 6000);
 
     falhasSeguidas++;
-    if (falhasSeguidas >= 2) { falhasSeguidas = 0; recarregarAnuncio(); }   // 2 falhas seguidas: recarrega o vídeo
+    if (falhasSeguidas >= 2) { falhasSeguidas = 0; recarregarAnuncio(); }
     atualizarPorta();
   }
 
@@ -14960,7 +14935,6 @@ document.addEventListener("keydown", (e) => {
     $('pdAdOverlay').classList.remove('aberto');
     $('pdAdLoading').style.display = 'none';
 
-    // O vídeo já foi usado: sorteia o próximo e recarrega em segundo plano
     fase = 'usado';
     sortearAnuncio();
     if (playerPronto && anuncioDisponivel) recarregarAnuncio();
@@ -14968,7 +14942,6 @@ document.addEventListener("keydown", (e) => {
     const id = anuncioDoConteudo;
     anuncioDoConteudo = null;
 
-    // Só continua se o utilizador ainda estiver no mesmo conteúdo
     if (typeof currentGameData !== 'undefined' && currentGameData && currentGameData.id === id) {
       liberadoPara = id;
       if (!falhou && !abriuLink) toast('Anúncio concluído! Toca no botão para abrir o link');
@@ -14988,7 +14961,7 @@ document.addEventListener("keydown", (e) => {
     abriuLink = true;
     registrarEventoAnuncio('clique');
     try {
-      openLinkInGA((anuncioExibido && anuncioExibido.link) || LINK_ANUNCIO);   // mesma função dos botões de redes sociais (Sobre nós)
+      openLinkInGA((anuncioExibido && anuncioExibido.link) || LINK_ANUNCIO);
     } catch (e) {
       toast('Não foi possível abrir o link', 5000);
     }
@@ -15006,9 +14979,6 @@ document.addEventListener("keydown", (e) => {
     }
   }
 
-  // ---------- Tela de Downloads: botão "Assistir anúncio" ----------
-  // Só bloqueia o download se existir um anúncio ativo configurado no Firestore;
-  // sem anúncio disponível, o conteúdo gratuito abre normalmente.
   function portaBloqueada(game) {
     return ehGratis(game) && anuncioDisponivel && liberadoPara !== game.id && !falhou;
   }
@@ -15047,28 +15017,25 @@ document.addEventListener("keydown", (e) => {
     if (typeof currentGameData === 'undefined' || !currentGameData) return;
 
     if (fase === 'pronto') {
-      abrirAnuncio(currentGameData.id);              // vídeo 100% carregado
+      abrirAnuncio(currentGameData.id);
     } else if (fase === 'travado') {
       tentativasCarga = 0;
-      recarregarAnuncio();                           // o toque do utilizador permite o vídeo arrancar
+      recarregarAnuncio();
       try { ytPlayer.playVideo(); } catch (e) {}
     } else {
       toast('O anúncio ainda está a carregar, aguarde');
     }
   });
 
-  // ---------- API usada pelo resto do site ----------
   function ehGratis(game) {
     return !!game && Number(game.cost || 0) === 0;
   }
 
   window.PortalAd = {
-    // Ao abrir um conteúdo de 0 pontos, garante que o vídeo já está a carregar
     preparar: function (game) {
       if (ehGratis(game)) garantirCarga();
     },
 
-    // Ao abrir a tela de Downloads: em conteúdo de 0 pontos, mostra o botão "Assistir anúncio" no lugar dos links
     aplicarPorta: function (game) {
       atualizarPorta();
       clearInterval(timerPorta);
@@ -15078,19 +15045,16 @@ document.addEventListener("keydown", (e) => {
       }
     },
 
-    // Ao fechar o conteúdo, a liberação deixa de valer
     limparLiberacao: function () {
       liberadoPara = null;
     }
   };
 
-  // Permite que o painel "Gestão de Anúncios" force a releitura do anúncio ativo
-  // (ex.: depois de criar, editar, ativar/desativar ou excluir um anúncio).
   window.PortalAdRuntime = {
     recarregarAtivo: async function () {
       await carregarAnuncioAtivo();
-      if (!anuncioDisponivel) return;   // sem anúncio ativo: nada a (re)carregar
-      if (fase === 'anuncio') return;   // não troca o vídeo enquanto o anúncio está na tela
+      if (!anuncioDisponivel) return;
+      if (fase === 'anuncio') return;
       if (playerPronto) {
         tentativasCarga = 0;
         recarregarAnuncio();
@@ -15100,7 +15064,6 @@ document.addEventListener("keydown", (e) => {
     }
   };
 
-  // Começa a carregar o anúncio cedo, para estar pronto quando o utilizador precisar
   async function inicializarAnuncio() {
     await carregarAnuncioAtivo();
     setTimeout(garantirCarga, 1500);
@@ -15110,7 +15073,6 @@ document.addEventListener("keydown", (e) => {
 })();
 </script>
 <script>
-/* ===== Gestão de Anúncios (admin): CRUD + estatísticas via Firestore ===== */
 let allAds = {};
 let currentAdStatsId = null;
 let allAdStatsUsers = [];
@@ -15311,8 +15273,7 @@ async function openAdStatsModal(id) {
         ultimaHora: u.ultimaHora || ""
       };
     });
-  } catch (e) { /* segue com o que houver */ }
-  // Histórico antigo (um documento por evento): soma por usu\xE1rio, para n\xE3o perder os dados j\xE1 registados
+  } catch (e) {  }
   try {
     const snapAntigo = await getDocs(query(collection(firestore, "anuncio_eventos"), where("anuncioId", "==", id)));
     snapAntigo.forEach((d) => {
@@ -15327,7 +15288,7 @@ async function openAdStatsModal(id) {
         u.ultimaHora = ev.hora || "";
       }
     });
-  } catch (e) { /* sem hist\xF3rico antigo */ }
+  } catch (e) {  }
   allAdStatsUsers = Object.values(porUsuario);
   renderAdStats();
 }
