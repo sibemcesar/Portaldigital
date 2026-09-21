@@ -7335,7 +7335,9 @@ window.firebaseModules = {
       font-size: 14px;
       font-weight: 700;
       z-index: 5;
+      pointer-events: none;   /* o toque passa direto para o vídeo */
     }
+    #pdAdOverlay.pdad-toque .pdad-video iframe { pointer-events: auto; }
     #pdAdOverlay .pdad-loading {
       position: absolute;
       inset: 0;
@@ -8837,7 +8839,7 @@ window.firebaseModules = {
       <div class="pdad-fase">
         <div class="pdad-video">
           <span class="pdad-rotulo">ANÚNCIO</span>
-          <button class="pdad-play" id="pdAdPlay" type="button">▶ Toque para reproduzir</button>
+          <button class="pdad-play" id="pdAdPlay" type="button">▶ Toque no vídeo para reproduzir</button>
           <div class="pdad-loading" id="pdAdLoading"><div class="pdad-spinner"></div><span id="pdAdLoadingTxt">A carregar anúncio...</span></div>
           <div id="pdAdYtPlayer"></div>
         </div>
@@ -14547,7 +14549,8 @@ document.addEventListener("keydown", (e) => {
     if (fase === 'anuncio' && evento.data === YT.PlayerState.PLAYING) {
       if (!usuarioTocou) { ytPlayer.pauseVideo(); return; }   // nada de tocar sozinho
       $('pdAdLoading').style.display = 'none';
-      $('pdAdPlay').style.display = 'none';
+      esconderAvisoToque();
+      try { ytPlayer.unMute(); ytPlayer.setVolume(100); } catch (e) {}
       if (!fullscreenPedido) { fullscreenPedido = true; pedirFullscreen(); }
     }
     if (evento.data !== YT.PlayerState.ENDED) return;
@@ -14577,48 +14580,55 @@ document.addEventListener("keydown", (e) => {
     $('pdAdSkip').disabled = true;
     $('pdAdFill').style.width = '0%';
     $('pdAdTempo').textContent = '--:--';
-    $('pdAdPlay').style.display = 'none';
+    esconderAvisoToque();
     $('pdAdLoading').style.display = 'flex';
 
     tocarPeloUtilizador();
     iniciarProgresso();
   }
 
+  // O toque direto no vídeo do YouTube é o gesto que o telemóvel aceita para tocar COM SOM
   function mostrarBotaoPlay() {
+    $('pdAdOverlay').classList.add('pdad-toque');
     $('pdAdLoading').style.display = 'none';
     $('pdAdPlay').style.display = 'flex';
   }
 
-  // Manda tocar (com o toque do utilizador) e confere até realmente arrancar
+  function esconderAvisoToque() {
+    $('pdAdOverlay').classList.remove('pdad-toque');
+    $('pdAdPlay').style.display = 'none';
+  }
+
+  // Tenta tocar já (o clique em "Assistir" conta como gesto). Se o telemóvel não deixar,
+  // pede o toque direto no vídeo, sem repetir ciclos.
   function tocarPeloUtilizador() {
     if (!playerPronto || fase !== 'anuncio') return;
-    usuarioTocou = true;               // continua verdadeiro até fechar: um "PLAYING" atrasado não é pausado
-    $('pdAdPlay').style.display = 'none';
+    usuarioTocou = true;               // fica verdadeiro até fechar: um "PLAYING" atrasado não é pausado
+    esconderAvisoToque();
     $('pdAdLoading').style.display = 'flex';
     try {
       ytPlayer.setPlaybackRate(1);
       ytPlayer.unMute();
       ytPlayer.setVolume(100);
-      if (ytPlayer.getCurrentTime() > 0.5) ytPlayer.seekTo(0, true);   // evita "seek + play" ao mesmo tempo
+      if (ytPlayer.getCurrentTime() > 0.5) ytPlayer.seekTo(0, true);
       ytPlayer.playVideo();
     } catch (e) {}
 
-    let tentativas = 0;
+    let ticks = 0;
     clearInterval(timerRetry);
     timerRetry = setInterval(() => {
       if (fase !== 'anuncio') { clearInterval(timerRetry); return; }
       let st;
       try { st = ytPlayer.getPlayerState(); } catch (e) { return; }
       if (st === YT.PlayerState.PLAYING) { clearInterval(timerRetry); return; }
-      tentativas++;
+      ticks++;
       $('pdAdLoadingTxt').textContent = 'A iniciar anúncio... (estado ' + st + ')';
       if (st === YT.PlayerState.BUFFERING) {
-        if (tentativas > 12) { clearInterval(timerRetry); mostrarBotaoPlay(); }
+        if (ticks > 15) { clearInterval(timerRetry); mostrarBotaoPlay(); }
         return;
       }
-      if (tentativas <= 4) { try { ytPlayer.playVideo(); } catch (e) {} }   // insiste antes de pedir outro toque
-      else { clearInterval(timerRetry); mostrarBotaoPlay(); }
-    }, 1500);
+      if (ticks >= 2) { clearInterval(timerRetry); mostrarBotaoPlay(); }   // pede o toque no vídeo
+    }, 1000);
   }
 
   $('pdAdPlay').addEventListener('click', function (e) {
@@ -14654,7 +14664,7 @@ document.addEventListener("keydown", (e) => {
     if (fase !== 'anuncio') return;
     clearInterval(timerProgresso);
     clearInterval(timerRetry);
-    $('pdAdPlay').style.display = 'none';
+    esconderAvisoToque();
     if (playerPronto) ytPlayer.pauseVideo();
     sairFullscreen();
     $('pdAdOverlay').classList.remove('aberto');
