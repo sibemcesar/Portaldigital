@@ -1041,6 +1041,81 @@ window.firebaseModules = {
       border: none;
     }
 
+    /* ===== Animação de espera ao abrir um conteúdo ===== */
+    .content-load-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      overflow: hidden;
+      z-index: 150;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .overlay.is-loading .content-load-bar { opacity: 1; }
+    .content-load-bar::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 40%;
+      border-radius: 3px;
+      background: var(--accent-primary);
+      animation: pdLoadBar 1.1s ease-in-out infinite;
+    }
+    @keyframes pdLoadBar {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(260%); }
+    }
+
+    /* Skeleton (brilho a passar) nos dados que ainda estão a chegar */
+    @keyframes pdShimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .overlay.is-loading #likeCountMeta,
+    .overlay.is-loading #ratingAverageValue,
+    .overlay.is-loading #ratingCountValue,
+    .overlay.is-loading #ratingStarsDisplay,
+    .overlay.is-loading #ratingList {
+      color: transparent !important;
+      background: linear-gradient(90deg, var(--border-color) 25%, var(--bg-card) 50%, var(--border-color) 75%);
+      background-size: 200% 100%;
+      animation: pdShimmer 1.3s linear infinite;
+      border-radius: 6px;
+      pointer-events: none;
+    }
+    .overlay.is-loading #ratingStarsDisplay > *,
+    .overlay.is-loading #ratingList > * { visibility: hidden; }
+    .overlay.is-loading #ratingStarsDisplay { min-width: 100px; min-height: 22px; }
+    .overlay.is-loading #ratingList { min-height: 84px; }
+    .overlay.is-loading #likeCountMeta { display: inline-block; min-width: 22px; }
+
+    /* Vídeo: capa desfocada enquanto o player do YouTube carrega */
+    .video-container::before {
+      content: "";
+      position: absolute;
+      inset: -14px;
+      background: var(--poster, none) center / cover no-repeat;
+      filter: blur(14px) brightness(0.8);
+      transition: opacity 0.4s ease;
+    }
+    .video-container:not(.is-loading)::before { opacity: 0; pointer-events: none; }
+    .video-container iframe { position: relative; transition: opacity 0.4s ease; }
+    .video-container.is-loading iframe { opacity: 0; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .content-load-bar::before,
+      .overlay.is-loading #likeCountMeta,
+      .overlay.is-loading #ratingAverageValue,
+      .overlay.is-loading #ratingCountValue,
+      .overlay.is-loading #ratingStarsDisplay,
+      .overlay.is-loading #ratingList { animation: none; }
+    }
+
     .info-comments-toggle {
       display: flex;
       gap: 8px;
@@ -7715,6 +7790,7 @@ window.firebaseModules = {
   </nav>
 
   <div id="overlay" class="overlay">
+    <div class="content-load-bar" aria-hidden="true"></div>
     <div class="modal">
       
       <div class="content-header">
@@ -9718,7 +9794,12 @@ async function openGameDetail(id, skipPushState) {
   if (game.videoUrl) {
     const videoId = extractYoutubeId(game.videoUrl);
     if (videoId) {
-      videoContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe>`;
+      const posterUrl = game.poster ? "url(" + JSON.stringify(game.poster) + ")" : "none";
+      videoContainer.style.setProperty("--poster", posterUrl);
+      videoContainer.classList.add("is-loading");
+      videoContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen onload="this.parentNode.classList.remove('is-loading')"></iframe>`;
+      clearTimeout(window._videoLoadTimer);
+      window._videoLoadTimer = setTimeout(() => videoContainer.classList.remove("is-loading"), 6000);   // segurança: nunca deixa o vídeo escondido
       videoContainer.style.display = "block";
     } else {
       videoContainer.style.display = "none";
@@ -9780,6 +9861,11 @@ async function openGameDetail(id, skipPushState) {
       downloadGame(gameId, appType, url, cost2);
     });
   });
+  // Abre a página já, com a animação de espera, enquanto curtidas e avaliações chegam do servidor
+  const overlayEl = document.getElementById("overlay");
+  overlayEl.classList.add("is-loading");
+  showGameInfo();
+  overlayEl.classList.add("active");
   loadComments(id);
   const commentInputWrapper = document.getElementById("commentInputWrapper");
   if (currentUser && !currentUser.isAnonymous) {
@@ -9787,12 +9873,19 @@ async function openGameDetail(id, skipPushState) {
   } else {
     commentInputWrapper.style.display = "none";
   }
-  await loadGameLikes(id);
-  updateLikeButton();
   updateFavoriteButton();
-  await loadGameRatings(id);
-  showGameInfo();
-  document.getElementById("overlay").classList.add("active");
+  // A avaliação do próprio usuário já está em memória: mostra já, sem esperar a rede
+  const minhaAvaliacao = userRatings[id];
+  selectedRatingStars = minhaAvaliacao ? minhaAvaliacao.stars : 0;
+  renderRatingStarsInput();
+  const campoComentario = document.getElementById("ratingCommentInput");
+  if (campoComentario) campoComentario.value = minhaAvaliacao ? minhaAvaliacao.comment || "" : "";
+  if (minhaAvaliacao) hideRatingCommentField(); else showRatingCommentField();
+  const aindaAberto = () => currentGameData && currentGameData.id === id;
+  const pCurtidas = loadGameLikes(id).then(() => { if (aindaAberto()) updateLikeButton(); });
+  const pAvaliacoes = loadGameRatings(id);
+  try { await Promise.all([pCurtidas, pAvaliacoes]); } catch (e) { /* segue com o que carregou */ }
+  if (aindaAberto()) overlayEl.classList.remove("is-loading");
 }
 function extractYoutubeId(url) {
   const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
@@ -9905,7 +9998,7 @@ async function downloadGame(gameId, appType, url, cost) {
   }
 }
 function closeOverlay(skipPushState) {
-  document.getElementById("overlay").classList.remove("active");
+  document.getElementById("overlay").classList.remove("active", "is-loading");
   document.getElementById("commentsOverlay").classList.remove("active");
   document.getElementById("downloadsOverlay").classList.remove("active");
   document.body.style.overflow = "";
@@ -13386,6 +13479,7 @@ async function loadGameRatings(gameId) {
   } catch (e) {
     console.error("Erro ao carregar m\xE9dia de avalia\xE7\xF5es:", e);
   }
+  if (!currentGameData || currentGameData.id !== gameId) return;   // o usuário já abriu outro conteúdo
   const average = count > 0 ? sum / count : 0;
   const roundedAvg = Math.round(average);
   const avgEl = document.getElementById("ratingAverageValue");
@@ -13415,6 +13509,7 @@ async function loadGameRatings(gameId) {
     const ratingsRef = collection(firestore, "ratings");
     const q = query(ratingsRef, where("gameId", "==", gameId), limit(50));
     const snapshot = await getDocs(q);
+    if (!currentGameData || currentGameData.id !== gameId) return;   // o usuário já abriu outro conteúdo
     const items = [];
     snapshot.forEach((docSnap) => items.push(docSnap.data()));
     items.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
@@ -13644,6 +13739,7 @@ async function loadGameLikes(gameId) {
   const firestore = window.firebaseFirestore;
   try {
     const gameLikesDoc = await getDoc(doc(firestore, "gameLikes", gameId));
+    if (!currentGameData || currentGameData.id !== gameId) return;   // o usuário já abriu outro conteúdo
     if (gameLikesDoc.exists()) {
       currentGameLikes = gameLikesDoc.data().count || 0;
     } else {
