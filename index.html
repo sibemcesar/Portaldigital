@@ -14758,35 +14758,9 @@ document.addEventListener("keydown", (e) => {
 
   $('pdAdOverlay').addEventListener('click', function () {
     if (fase !== 'anuncio' || !usuarioTocou || assistido < SEGUNDOS_PARA_CLIQUE) return;
-    abrirLinkNoGA(LINK_ANUNCIO);
+    openLinkInGA(LINK_ANUNCIO);   // mesma função dos botões de redes sociais (Sobre nós)
     fecharAnuncio();
   });
-
-  // Abre o link no navegador GA, do mesmo jeito que o botão "Link 1" dos downloads
-  function abrirLinkNoGA(url) {
-    if (typeof Android !== 'undefined' && Android.openApp) {
-      // dentro do app: abre o link e depois chama o navegador GA
-      const a = document.createElement('a');
-      a.href = url;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      a.style.display = 'none';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      setTimeout(function () { Android.openApp('GA'); }, 200);
-    } else {
-      // fora do app: abre direto no pacote do navegador GA
-      const intent = 'intent://' + url.replace(/^https?:\/\//, '') +
-                     '#Intent;scheme=https;package=porg.sixtysecond.crazy.browser;end';
-      const a = document.createElement('a');
-      a.href = intent;
-      a.style.display = 'none';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }
-  }
 
   function pedirFullscreen() {
     const el = $('pdAdOverlay');
