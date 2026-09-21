@@ -7296,7 +7296,7 @@ window.firebaseModules = {
     #pdAdOverlay .pdad-fill {
       height: 100%;
       width: 0%;
-      background: #ff6a00;
+      background: #3B82F6;
       transition: width 0.2s linear;
     }
     #pdAdOverlay .pdad-rodape {
@@ -7328,7 +7328,7 @@ window.firebaseModules = {
       font-family: inherit;
       border: none;
       cursor: pointer;
-      background: #ff6a00;
+      background: #1D4ED8;
       color: #fff;
       padding: 12px 22px;
       border-radius: 30px;
@@ -7352,7 +7352,7 @@ window.firebaseModules = {
       width: 30px; height: 30px;
       border-radius: 50%;
       border: 3px solid rgba(255,255,255,0.15);
-      border-top-color: #ff6a00;
+      border-top-color: #60A5FA;
       animation: pdadSpin 0.9s linear infinite;
     }
     @keyframes pdadSpin { to { transform: rotate(360deg); } }
@@ -7371,14 +7371,14 @@ window.firebaseModules = {
       font-family: inherit;
       border: none;
       cursor: pointer;
-      background: #ff6a00;
+      background: #1D4ED8;
       color: #fff;
       padding: 13px 16px;
       border-radius: 10px;
       font-size: 14px;
       font-weight: 700;
     }
-    .pdad-gate-btn:active { background: #e05e00; }
+    .pdad-gate-btn:active { background: #1E40AF; }
     .pdad-gate-btn:disabled { background: #d1d5db; color: #6b7280; cursor: default; }
     #pdAdToast {
       display: none;
@@ -8838,7 +8838,7 @@ window.firebaseModules = {
         <div class="pdad-video">
           <span class="pdad-rotulo">ANÚNCIO</span>
           <button class="pdad-play" id="pdAdPlay" type="button">▶ Toque para reproduzir</button>
-          <div class="pdad-loading" id="pdAdLoading"><div class="pdad-spinner"></div><span>A carregar anúncio...</span></div>
+          <div class="pdad-loading" id="pdAdLoading"><div class="pdad-spinner"></div><span id="pdAdLoadingTxt">A carregar anúncio...</span></div>
           <div id="pdAdYtPlayer"></div>
         </div>
         <div class="pdad-corpo">
@@ -14419,6 +14419,7 @@ document.addEventListener("keydown", (e) => {
   let timerRetry = null;
   let progressoCarga = 0;
   let timerPorta = null;
+  let fullscreenPedido = false;
   let usuarioTocou = false;   // só vale depois de o utilizador tocar em reproduzir
   let assistido = 0;          // segundos realmente vistos (só conta com o vídeo a tocar)
 
@@ -14547,6 +14548,7 @@ document.addEventListener("keydown", (e) => {
       if (!usuarioTocou) { ytPlayer.pauseVideo(); return; }   // nada de tocar sozinho
       $('pdAdLoading').style.display = 'none';
       $('pdAdPlay').style.display = 'none';
+      if (!fullscreenPedido) { fullscreenPedido = true; pedirFullscreen(); }
     }
     if (evento.data !== YT.PlayerState.ENDED) return;
     if (fase === 'precarga') { finalizarPrecarga(); return; }
@@ -14567,7 +14569,9 @@ document.addEventListener("keydown", (e) => {
     clearInterval(timerCarga);
     anuncioDoConteudo = idConteudo;
     usuarioTocou = false;
+    fullscreenPedido = false;
     assistido = 0;
+    $('pdAdLoadingTxt').textContent = 'A carregar anúncio...';
 
     $('pdAdOverlay').classList.add('aberto');
     $('pdAdSkip').disabled = true;
@@ -14577,7 +14581,6 @@ document.addEventListener("keydown", (e) => {
     $('pdAdLoading').style.display = 'flex';
 
     tocarPeloUtilizador();
-    pedirFullscreen();
     iniciarProgresso();
   }
 
@@ -14586,31 +14589,36 @@ document.addEventListener("keydown", (e) => {
     $('pdAdPlay').style.display = 'flex';
   }
 
-  // Chamado pelo toque do utilizador em "Reproduzir"
+  // Manda tocar (com o toque do utilizador) e confere até realmente arrancar
   function tocarPeloUtilizador() {
     if (!playerPronto || fase !== 'anuncio') return;
-    usuarioTocou = true;
+    usuarioTocou = true;               // continua verdadeiro até fechar: um "PLAYING" atrasado não é pausado
     $('pdAdPlay').style.display = 'none';
     $('pdAdLoading').style.display = 'flex';
     try {
       ytPlayer.setPlaybackRate(1);
       ytPlayer.unMute();
       ytPlayer.setVolume(100);
-      ytPlayer.seekTo(0, true);
+      if (ytPlayer.getCurrentTime() > 0.5) ytPlayer.seekTo(0, true);   // evita "seek + play" ao mesmo tempo
       ytPlayer.playVideo();
     } catch (e) {}
 
-    // Se não começou em 4 s, volta a mostrar o botão para ele tentar de novo
-    clearTimeout(timerRetry);
-    timerRetry = setTimeout(() => {
-      if (fase !== 'anuncio') return;
+    let tentativas = 0;
+    clearInterval(timerRetry);
+    timerRetry = setInterval(() => {
+      if (fase !== 'anuncio') { clearInterval(timerRetry); return; }
       let st;
       try { st = ytPlayer.getPlayerState(); } catch (e) { return; }
-      if (st !== YT.PlayerState.PLAYING && st !== YT.PlayerState.BUFFERING) {
-        usuarioTocou = false;
-        mostrarBotaoPlay();
+      if (st === YT.PlayerState.PLAYING) { clearInterval(timerRetry); return; }
+      tentativas++;
+      $('pdAdLoadingTxt').textContent = 'A iniciar anúncio... (estado ' + st + ')';
+      if (st === YT.PlayerState.BUFFERING) {
+        if (tentativas > 12) { clearInterval(timerRetry); mostrarBotaoPlay(); }
+        return;
       }
-    }, 4000);
+      if (tentativas <= 4) { try { ytPlayer.playVideo(); } catch (e) {} }   // insiste antes de pedir outro toque
+      else { clearInterval(timerRetry); mostrarBotaoPlay(); }
+    }, 1500);
   }
 
   $('pdAdPlay').addEventListener('click', function (e) {
@@ -14645,7 +14653,7 @@ document.addEventListener("keydown", (e) => {
   function fecharAnuncio() {
     if (fase !== 'anuncio') return;
     clearInterval(timerProgresso);
-    clearTimeout(timerRetry);
+    clearInterval(timerRetry);
     $('pdAdPlay').style.display = 'none';
     if (playerPronto) ytPlayer.pauseVideo();
     sairFullscreen();
