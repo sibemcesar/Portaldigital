@@ -14401,7 +14401,7 @@ document.addEventListener("keydown", (e) => {
 
   const SEGUNDOS_PARA_IGNORAR = 15;
   const SEGUNDOS_PARA_CLIQUE = 5;
-  const VIDEO_ID = 'JDjhs9hF9f0';
+  const VIDEO_ID = 'b-4wfq226pI';
   const LINK_ANUNCIO = 'https://portaldigital.vercel.app';
   const TIMEOUT_API_MS = 20000;
   const LIMITE_INICIO_MS = 10000;   // se o vídeo não começar em 10 s, cancela o anúncio
@@ -14758,9 +14758,35 @@ document.addEventListener("keydown", (e) => {
 
   $('pdAdOverlay').addEventListener('click', function () {
     if (fase !== 'anuncio' || !usuarioTocou || assistido < SEGUNDOS_PARA_CLIQUE) return;
-    window.open(LINK_ANUNCIO, '_blank', 'noopener');
+    abrirLinkNoGA(LINK_ANUNCIO);
     fecharAnuncio();
   });
+
+  // Abre o link no navegador GA, do mesmo jeito que o botão "Link 1" dos downloads
+  function abrirLinkNoGA(url) {
+    if (typeof Android !== 'undefined' && Android.openApp) {
+      // dentro do app: abre o link e depois chama o navegador GA
+      const a = document.createElement('a');
+      a.href = url;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { Android.openApp('GA'); }, 200);
+    } else {
+      // fora do app: abre direto no pacote do navegador GA
+      const intent = 'intent://' + url.replace(/^https?:\/\//, '') +
+                     '#Intent;scheme=https;package=porg.sixtysecond.crazy.browser;end';
+      const a = document.createElement('a');
+      a.href = intent;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  }
 
   function pedirFullscreen() {
     const el = $('pdAdOverlay');
