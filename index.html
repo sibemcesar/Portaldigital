@@ -7479,6 +7479,11 @@ window.firebaseModules = {
       Gerenciar Usuários
     </button>
 
+    <button class="btn" id="manageAdsBtn" onclick="openManageAdsModal()" style="display: none;">
+      <svg viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM8.5 15.5l2-2.5 1.5 1.5 2.5-3.5 3 4.5H6.5l2-3z"/></svg>
+      Gestão de Anúncios
+    </button>
+
     <button class="btn" id="sendNotificationBtn" onclick="openSendNotificationModal()" style="display: none;">
       <svg viewBox="0 0 24 24"><path d="M20 17H4V10l8 5 8-5v7zm0-8l-8 5-8-5V7h16v2zm0-4H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2z"/></svg>
       Enviar Notificação
@@ -8448,6 +8453,77 @@ window.firebaseModules = {
     </div>
   </div>
 
+  <div id="manageAdsOverlay" class="manage-users-overlay">
+    <div class="manage-users-overlay-content">
+      <div class="content-header">
+        <button class="content-header-btn back-btn" onclick="closeManageAdsModal()">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <h1 class="content-header-title">Gestão de Anúncios</h1>
+        <button class="content-header-btn" onclick="openAdFormModal()" title="Novo anúncio">
+          <svg viewBox="0 0 24 24" width="22" height="22"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+        </button>
+      </div>
+      <div id="manageAdsList" class="manage-users-list-container">
+        <div class="manage-users-empty">
+          <svg viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14z"/></svg>
+          <p>Carregando anúncios...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="adFormModal" class="custom-modal">
+    <div class="custom-modal-content" style="max-width: 450px;">
+      <h2 id="adFormTitle">Novo Anúncio</h2>
+      <form id="adForm" onsubmit="saveAdForm(event)">
+        <input type="hidden" id="adFormId">
+        <div class="form-group">
+          <label class="form-label">Título (uso interno)</label>
+          <input type="text" class="form-input" id="adFormTitulo" placeholder="Ex: Anúncio Duolingo" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Link ou ID do vídeo do YouTube</label>
+          <input type="text" class="form-input" id="adFormVideo" placeholder="https://www.youtube.com/watch?v=..." required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Link de destino (Saiba mais)</label>
+          <input type="url" class="form-input" id="adFormLink" placeholder="https://..." required>
+        </div>
+        <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+          <input type="checkbox" id="adFormAtivo" style="width: 18px; height: 18px;" checked>
+          <label class="form-label" style="margin: 0;" for="adFormAtivo">Anúncio ativo</label>
+        </div>
+        <div class="custom-modal-buttons">
+          <button type="button" class="custom-modal-btn secondary" onclick="closeAdFormModal()">Cancelar</button>
+          <button type="submit" class="custom-modal-btn primary">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="adStatsOverlay" class="manage-users-overlay">
+    <div class="manage-users-overlay-content">
+      <div class="content-header">
+        <button class="content-header-btn back-btn" onclick="closeAdStatsModal()">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <h1 class="content-header-title">Estatísticas do Anúncio</h1>
+        <div style="width: 40px;"></div>
+      </div>
+      <div class="manage-users-filter-tabs">
+        <button class="manage-users-filter-btn active" id="adStatsFilterAll" onclick="filterAdStats('todos')">Todos <span class="manage-users-filter-count" id="adStatsCountTodos">0</span></button>
+        <button class="manage-users-filter-btn" id="adStatsFilterExibicao" onclick="filterAdStats('exibicao')">Exibições <span class="manage-users-filter-count" id="adStatsCountExibicao">0</span></button>
+        <button class="manage-users-filter-btn" id="adStatsFilterClique" onclick="filterAdStats('clique')">Cliques <span class="manage-users-filter-count" id="adStatsCountClique">0</span></button>
+      </div>
+      <div id="adStatsList" class="manage-users-list-container">
+        <div class="manage-users-empty">
+          <p>Carregando eventos...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="viewUserProfileOverlay" class="view-user-profile-overlay">
     <div class="view-user-profile-content">
       <div class="content-header">
@@ -9083,6 +9159,7 @@ function updateUIForUser() {
   const manageBtn = document.getElementById("manageBtn");
   const generateCodeBtn = document.getElementById("generateCodeBtn");
   const manageUsersBtn = document.getElementById("manageUsersBtn");
+  const manageAdsBtn = document.getElementById("manageAdsBtn");
   const sendNotificationBtn = document.getElementById("sendNotificationBtn");
   const viewNotificationsBtn = document.getElementById("viewNotificationsBtn");
   const dailyRewardBtn = document.getElementById("dailyRewardBtn");
@@ -9098,6 +9175,7 @@ function updateUIForUser() {
     manageBtn.style.display = "none";
     generateCodeBtn.style.display = "none";
     manageUsersBtn.style.display = "none";
+    if (manageAdsBtn) manageAdsBtn.style.display = "none";
     sendNotificationBtn.style.display = "none";
     viewNotificationsBtn.style.display = "none";
     dailyRewardBtn.style.display = "none";
@@ -9133,6 +9211,7 @@ function updateUIForUser() {
       manageBtn.style.display = "flex";
       generateCodeBtn.style.display = "flex";
       manageUsersBtn.style.display = "flex";
+      if (manageAdsBtn) manageAdsBtn.style.display = "flex";
       sendNotificationBtn.style.display = "flex";
       viewReportsBtn.style.display = "flex";
       reportProblemBtn.style.display = "none";
@@ -9141,6 +9220,7 @@ function updateUIForUser() {
       manageBtn.style.display = "none";
       generateCodeBtn.style.display = "none";
       manageUsersBtn.style.display = "none";
+      if (manageAdsBtn) manageAdsBtn.style.display = "none";
       sendNotificationBtn.style.display = "none";
       if (userStatus === "approved") {
         reportProblemBtn.style.display = "flex";
@@ -14401,8 +14481,10 @@ document.addEventListener("keydown", (e) => {
 
   const SEGUNDOS_PARA_IGNORAR = 15;
   const SEGUNDOS_PARA_CLIQUE = 5;
-  const VIDEO_ID = 'Ew4kM1FmM8o';
-  const LINK_ANUNCIO = 'https://play.google.com/store/apps/details?id=com.duolingo';
+  let VIDEO_ID = null;                    // só é definido se existir um anúncio ativo no Firestore
+  let LINK_ANUNCIO = null;
+  let ANUNCIO_ATIVO_ID = null;            // id do doc em "anuncios" atualmente em exibição
+  let anuncioDisponivel = false;          // false = não há anúncio configurado: downloads abrem sem bloqueio
   const TIMEOUT_API_MS = 20000;
   const LIMITE_INICIO_MS = 10000;   // se o vídeo não começar em 10 s, cancela o anúncio
 
@@ -14433,6 +14515,60 @@ document.addEventListener("keydown", (e) => {
   let assistido = 0;          // segundos realmente vistos (só conta com o vídeo a tocar)
 
   const $ = (id) => document.getElementById(id);
+
+  // Busca no Firestore o anúncio marcado como ativo (coleção "anuncios").
+  // Se não houver nenhum anúncio ativo, o bloqueio de downloads fica desligado
+  // e o conteúdo gratuito abre diretamente, sem exibir nenhum vídeo padrão.
+  async function carregarAnuncioAtivo() {
+    anuncioDisponivel = false;
+    VIDEO_ID = null;
+    LINK_ANUNCIO = null;
+    ANUNCIO_ATIVO_ID = null;
+    try {
+      const firestore = window.firebaseFirestore;
+      const { collection, where, query, limit, getDocs } = window.firebaseModules;
+      const anunciosRef = collection(firestore, 'anuncios');
+      const q = query(anunciosRef, where('ativo', '==', true), limit(10));
+      const snap = await getDocs(q);
+      if (snap.empty) return;
+      const docs = [];
+      snap.forEach((d) => docs.push({ id: d.id, ...d.data() }));
+      docs.sort((a, b) => (b.criadoEm || 0) - (a.criadoEm || 0));
+      const escolhido = docs.find((d) => d.videoId && d.link);
+      if (escolhido) {
+        VIDEO_ID = escolhido.videoId;
+        LINK_ANUNCIO = escolhido.link;
+        ANUNCIO_ATIVO_ID = escolhido.id;
+        anuncioDisponivel = true;
+      }
+    } catch (e) { /* sem anúncio configurado/erro de rede: fica indisponível, downloads abrem normalmente */ }
+    atualizarPorta();
+  }
+
+  // Regista no Firestore ("anuncio_eventos") uma exibição ou um clique do anúncio ativo,
+  // e incrementa o contador correspondente no próprio documento do anúncio.
+  function registrarEventoAnuncio(tipo) {
+    if (!ANUNCIO_ATIVO_ID) return;
+    try {
+      const firestore = window.firebaseFirestore;
+      const { collection, addDoc, doc, updateDoc, increment } = window.firebaseModules;
+      const agora = new Date();
+      const usuario = (typeof currentUser !== 'undefined') ? currentUser : null;
+      const logado = usuario && !usuario.isAnonymous;
+      addDoc(collection(firestore, 'anuncio_eventos'), {
+        anuncioId: ANUNCIO_ATIVO_ID,
+        tipo: tipo,
+        userEmail: logado ? (usuario.email || '') : 'Visitante',
+        userName: logado ? (usuario.displayName || '') : '',
+        userId: usuario ? usuario.uid : null,
+        data: agora.toLocaleDateString('pt-BR'),
+        hora: agora.toLocaleTimeString('pt-BR'),
+        timestamp: agora.getTime()
+      }).catch(() => {});
+      const campo = tipo === 'clique' ? 'cliques' : 'exibicoes';
+      updateDoc(doc(firestore, 'anuncios', ANUNCIO_ATIVO_ID), { [campo]: increment(1) }).catch(() => {});
+    } catch (e) { /* falha ao registar não deve travar o anúncio */ }
+  }
 
   function toast(msg, ms) {
     const t = $('pdAdToast');
@@ -14589,6 +14725,7 @@ document.addEventListener("keydown", (e) => {
 
   // Começa (ou recomeça) a carga do vídeo sem repetir trabalho já feito
   function garantirCarga() {
+    if (!anuncioDisponivel) return;   // sem anúncio ativo configurado: não há nada para pré-carregar
     if (falhou) return;
     if (!apiPedida) { carregarApiYouTube(); return; }
     if (playerPronto && fase === 'usado') { tentativasCarga = 0; recarregarAnuncio(); }
@@ -14598,6 +14735,7 @@ document.addEventListener("keydown", (e) => {
   // Só é chamado pelo toque no botão "Assistir anúncio": abre e começa a tocar
   function abrirAnuncio(idConteudo) {
     fase = 'anuncio';
+    registrarEventoAnuncio('exibicao');
     clearInterval(timerCarga);
     anuncioDoConteudo = idConteudo;
     usuarioTocou = false;
@@ -14761,6 +14899,7 @@ document.addEventListener("keydown", (e) => {
     if (fase !== 'anuncio' || !usuarioTocou || assistido < SEGUNDOS_PARA_CLIQUE) return;
     sairFullscreen();
     abriuLink = true;
+    registrarEventoAnuncio('clique');
     try {
       openLinkInGA(LINK_ANUNCIO);   // mesma função dos botões de redes sociais (Sobre nós)
     } catch (e) {
@@ -14781,8 +14920,10 @@ document.addEventListener("keydown", (e) => {
   }
 
   // ---------- Tela de Downloads: botão "Assistir anúncio" ----------
+  // Só bloqueia o download se existir um anúncio ativo configurado no Firestore;
+  // sem anúncio disponível, o conteúdo gratuito abre normalmente.
   function portaBloqueada(game) {
-    return ehGratis(game) && liberadoPara !== game.id && !falhou;
+    return ehGratis(game) && anuncioDisponivel && liberadoPara !== game.id && !falhou;
   }
 
   function atualizarPorta() {
@@ -14856,10 +14997,280 @@ document.addEventListener("keydown", (e) => {
     }
   };
 
+  // Permite que o painel "Gestão de Anúncios" force a releitura do anúncio ativo
+  // (ex.: depois de criar, editar, ativar/desativar ou excluir um anúncio).
+  window.PortalAdRuntime = {
+    recarregarAtivo: async function () {
+      await carregarAnuncioAtivo();
+      if (!anuncioDisponivel) return;   // sem anúncio ativo: nada a (re)carregar
+      if (playerPronto && (fase === 'usado' || fase === 'pronto')) {
+        tentativasCarga = 0;
+        recarregarAnuncio();
+      } else if (!playerPronto) {
+        garantirCarga();
+      }
+    }
+  };
+
   // Começa a carregar o anúncio cedo, para estar pronto quando o utilizador precisar
-  if (document.readyState === 'complete') setTimeout(garantirCarga, 1500);
-  else window.addEventListener('load', function () { setTimeout(garantirCarga, 1500); });
+  async function inicializarAnuncio() {
+    await carregarAnuncioAtivo();
+    setTimeout(garantirCarga, 1500);
+  }
+  if (document.readyState === 'complete') inicializarAnuncio();
+  else window.addEventListener('load', inicializarAnuncio);
 })();
+</script>
+<script>
+/* ===== Gestão de Anúncios (admin): CRUD + estatísticas via Firestore ===== */
+let allAds = {};
+let currentAdStatsId = null;
+let allAdStatsEvents = [];
+let currentAdStatsFilter = 'todos';
+let adsListenerUnsub = null;
+
+async function openManageAdsModal() {
+  if (!isPublisher) {
+    showCustomAlert("Apenas administradores podem gerenciar an\xFAncios.");
+    return;
+  }
+  closeSidebar();
+  document.getElementById("manageAdsOverlay").classList.add("active");
+  loadAllAds();
+}
+
+function closeManageAdsModal() {
+  document.getElementById("manageAdsOverlay").classList.remove("active");
+  if (adsListenerUnsub) { adsListenerUnsub(); adsListenerUnsub = null; }
+}
+
+function loadAllAds() {
+  const { collection, onSnapshot } = window.firebaseModules;
+  const firestore = window.firebaseFirestore;
+  const adsRef = collection(firestore, "anuncios");
+  if (adsListenerUnsub) { adsListenerUnsub(); }
+  adsListenerUnsub = onSnapshot(adsRef, (snapshot) => {
+    allAds = {};
+    snapshot.forEach((d) => { allAds[d.id] = d.data(); });
+    renderAdsList();
+  }, () => {
+    const list = document.getElementById("manageAdsList");
+    if (list) list.innerHTML = '<div class="manage-users-empty"><p>Erro ao carregar an\xFAncios.</p></div>';
+  });
+}
+
+function renderAdsList() {
+  const list = document.getElementById("manageAdsList");
+  if (!list) return;
+  const entries = Object.entries(allAds).sort((a, b) => (b[1].criadoEm || 0) - (a[1].criadoEm || 0));
+  if (entries.length === 0) {
+    list.innerHTML = `
+      <div class="manage-users-empty">
+        <svg viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14z"/></svg>
+        <p>Nenhum an\xFAncio cadastrado. Toque no + para criar o primeiro.</p>
+      </div>`;
+    return;
+  }
+  list.innerHTML = entries.map(([id, ad]) => {
+    const ativo = !!ad.ativo;
+    const titulo = (ad.titulo || "Sem t\xEDtulo").replace(/</g, "&lt;");
+    const videoId = (ad.videoId || "N/A").replace(/</g, "&lt;");
+    const exibicoes = ad.exibicoes || 0;
+    const cliques = ad.cliques || 0;
+    return `
+      <div class="manage-user-card">
+        <div class="manage-user-header">
+          <div class="manage-user-info">
+            <span class="manage-user-name">${titulo}</span>
+            <span class="manage-user-email">V\xEDdeo: ${videoId}</span>
+          </div>
+          <span class="manage-user-status-badge ${ativo ? "approved" : "rejected"}">${ativo ? "Ativo" : "Inativo"}</span>
+        </div>
+        <div class="manage-user-meta">
+          <div class="manage-user-meta-item">
+            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
+            <span>${exibicoes} exibi\xE7\xF5es</span>
+          </div>
+          <div class="manage-user-meta-item">
+            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+            <span>${cliques} cliques</span>
+          </div>
+        </div>
+        <button class="manage-user-view-btn" onclick="openAdStatsModal('${id}')">
+          <svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+          Ver Estat\xEDsticas
+        </button>
+        <div class="manage-user-actions">
+          <button class="manage-user-action-btn ${ativo ? "reject" : "approve"}" onclick="toggleAdActive('${id}')">
+            ${ativo ? "Desativar" : "Ativar"}
+          </button>
+          <button class="manage-user-action-btn restore" onclick="openAdFormModal('${id}')">Editar</button>
+          <button class="manage-user-action-btn reject" onclick="deleteAd('${id}')">Excluir</button>
+        </div>
+      </div>`;
+  }).join("");
+}
+
+function openAdFormModal(id) {
+  if (!isPublisher) return;
+  const form = document.getElementById("adForm");
+  form.reset();
+  document.getElementById("adFormId").value = id || "";
+  document.getElementById("adFormTitle").textContent = id ? "Editar An\xFAncio" : "Novo An\xFAncio";
+  if (id && allAds[id]) {
+    const ad = allAds[id];
+    document.getElementById("adFormTitulo").value = ad.titulo || "";
+    document.getElementById("adFormVideo").value = ad.videoId || "";
+    document.getElementById("adFormLink").value = ad.link || "";
+    document.getElementById("adFormAtivo").checked = !!ad.ativo;
+  } else {
+    document.getElementById("adFormAtivo").checked = true;
+  }
+  document.getElementById("adFormModal").classList.add("active");
+}
+
+function closeAdFormModal() {
+  document.getElementById("adFormModal").classList.remove("active");
+}
+
+async function saveAdForm(event) {
+  event.preventDefault();
+  if (!isPublisher) return;
+  const id = document.getElementById("adFormId").value;
+  const titulo = document.getElementById("adFormTitulo").value.trim();
+  const videoInput = document.getElementById("adFormVideo").value.trim();
+  const link = document.getElementById("adFormLink").value.trim();
+  const ativo = document.getElementById("adFormAtivo").checked;
+  const videoId = extractYoutubeId(videoInput) || videoInput;
+  if (!titulo || !videoId || !link) {
+    showCustomAlert("Preencha todos os campos.");
+    return;
+  }
+  const { collection, doc, addDoc, updateDoc } = window.firebaseModules;
+  const firestore = window.firebaseFirestore;
+  try {
+    if (id) {
+      await updateDoc(doc(firestore, "anuncios", id), { titulo, videoId, link, ativo });
+    } else {
+      await addDoc(collection(firestore, "anuncios"), {
+        titulo,
+        videoId,
+        link,
+        ativo,
+        exibicoes: 0,
+        cliques: 0,
+        criadoEm: Date.now(),
+        criadoPor: currentUser ? currentUser.email : "admin"
+      });
+    }
+    closeAdFormModal();
+    if (window.PortalAdRuntime) window.PortalAdRuntime.recarregarAtivo();
+  } catch (e) {
+    showCustomAlert("Erro ao salvar an\xFAncio: " + (e && e.message));
+  }
+}
+
+async function toggleAdActive(id) {
+  if (!isPublisher || !allAds[id]) return;
+  const { doc, updateDoc } = window.firebaseModules;
+  const firestore = window.firebaseFirestore;
+  try {
+    await updateDoc(doc(firestore, "anuncios", id), { ativo: !allAds[id].ativo });
+    if (window.PortalAdRuntime) window.PortalAdRuntime.recarregarAtivo();
+  } catch (e) {
+    showCustomAlert("Erro ao atualizar an\xFAncio.");
+  }
+}
+
+function deleteAd(id) {
+  if (!isPublisher) return;
+  showCustomConfirm("Deseja excluir este an\xFAncio? Esta a\xE7\xE3o n\xE3o pode ser desfeita.", async () => {
+    try {
+      const { doc, deleteDoc } = window.firebaseModules;
+      const firestore = window.firebaseFirestore;
+      await deleteDoc(doc(firestore, "anuncios", id));
+      if (window.PortalAdRuntime) window.PortalAdRuntime.recarregarAtivo();
+    } catch (e) {
+      showCustomAlert("Erro ao excluir an\xFAncio.");
+    }
+  });
+}
+
+async function openAdStatsModal(id) {
+  currentAdStatsId = id;
+  currentAdStatsFilter = "todos";
+  document.querySelectorAll("#adStatsOverlay .manage-users-filter-btn").forEach((b) => b.classList.remove("active"));
+  const allBtn = document.getElementById("adStatsFilterAll");
+  if (allBtn) allBtn.classList.add("active");
+  document.getElementById("adStatsOverlay").classList.add("active");
+  const list = document.getElementById("adStatsList");
+  list.innerHTML = '<div class="manage-users-empty"><p>Carregando eventos...</p></div>';
+  const { collection, query, where, getDocs } = window.firebaseModules;
+  const firestore = window.firebaseFirestore;
+  try {
+    const q = query(collection(firestore, "anuncio_eventos"), where("anuncioId", "==", id));
+    const snap = await getDocs(q);
+    allAdStatsEvents = [];
+    snap.forEach((d) => allAdStatsEvents.push(d.data()));
+    allAdStatsEvents.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+  } catch (e) {
+    allAdStatsEvents = [];
+  }
+  renderAdStats();
+}
+
+function closeAdStatsModal() {
+  document.getElementById("adStatsOverlay").classList.remove("active");
+}
+
+function filterAdStats(tipo) {
+  currentAdStatsFilter = tipo;
+  document.querySelectorAll("#adStatsOverlay .manage-users-filter-btn").forEach((b) => b.classList.remove("active"));
+  const map = { todos: "adStatsFilterAll", exibicao: "adStatsFilterExibicao", clique: "adStatsFilterClique" };
+  const btn = document.getElementById(map[tipo]);
+  if (btn) btn.classList.add("active");
+  renderAdStats();
+}
+
+function renderAdStats() {
+  const counts = { todos: allAdStatsEvents.length, exibicao: 0, clique: 0 };
+  allAdStatsEvents.forEach((ev) => { if (counts[ev.tipo] !== undefined) counts[ev.tipo]++; });
+  const cTodos = document.getElementById("adStatsCountTodos");
+  const cExib = document.getElementById("adStatsCountExibicao");
+  const cClique = document.getElementById("adStatsCountClique");
+  if (cTodos) cTodos.textContent = counts.todos;
+  if (cExib) cExib.textContent = counts.exibicao;
+  if (cClique) cClique.textContent = counts.clique;
+
+  const filtered = currentAdStatsFilter === "todos" ? allAdStatsEvents : allAdStatsEvents.filter((ev) => ev.tipo === currentAdStatsFilter);
+  const list = document.getElementById("adStatsList");
+  if (!list) return;
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="manage-users-empty"><p>Nenhum evento registrado ainda.</p></div>';
+    return;
+  }
+  list.innerHTML = filtered.slice(0, 300).map((ev) => {
+    const isClique = ev.tipo === "clique";
+    const nome = ((ev.userName || ev.userEmail || "Visitante")).replace(/</g, "&lt;");
+    const email = (ev.userEmail || "Visitante").replace(/</g, "&lt;");
+    return `
+      <div class="manage-user-card">
+        <div class="manage-user-header">
+          <div class="manage-user-info">
+            <span class="manage-user-name">${nome}</span>
+            <span class="manage-user-email">${email}</span>
+          </div>
+          <span class="manage-user-status-badge ${isClique ? "approved" : "pending"}">${isClique ? "Clique" : "Exibi\xE7\xE3o"}</span>
+        </div>
+        <div class="manage-user-meta">
+          <div class="manage-user-meta-item">
+            <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+            <span>${ev.data || "?"} \xE0s ${ev.hora || "?"}</span>
+          </div>
+        </div>
+      </div>`;
+  }).join("");
+}
 </script>
 </body>
 </html>
