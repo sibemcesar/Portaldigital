@@ -7380,6 +7380,7 @@ window.firebaseModules = {
       font-size: 14px;
       font-weight: 700;
     }
+    .pdad-gate-diag { margin-top: 10px; font-size: 11px; color: var(--text-muted); text-align: left; word-break: break-word; line-height: 1.4; }
     .pdad-gate-btn:active { background: #1E40AF; }
     .pdad-gate-btn:disabled { background: #d1d5db; color: #6b7280; cursor: default; }
     #pdAdToast {
@@ -7830,6 +7831,7 @@ window.firebaseModules = {
           <div class="pdad-gate-titulo">Conteúdo gratuito</div>
           <div class="pdad-gate-texto">Assista a um anúncio curto para liberar os links de download.</div>
           <button type="button" class="pdad-gate-btn" id="pdAdGateBtn" disabled>⏳ A carregar anúncio...</button>
+          <div id="pdAdGateDiag" class="pdad-gate-diag" style="display:none;"></div>
         </div>
         <div id="downloadSectionsContainer"></div>
       </div>
@@ -14402,6 +14404,7 @@ document.addEventListener("keydown", (e) => {
   const VIDEO_ID = 'JDjhs9hF9f0';
   const LINK_ANUNCIO = 'https://portaldigital.vercel.app';
   const TIMEOUT_API_MS = 20000;
+  const LIMITE_INICIO_MS = 10000;   // se o vídeo não começar em 10 s, cancela o anúncio
 
   let ytPlayer = null;
   let playerPronto = false;
@@ -14422,17 +14425,38 @@ document.addEventListener("keydown", (e) => {
   let progressoCarga = 0;
   let timerPorta = null;
   let fullscreenPedido = false;
+  let iniciouReproducao = false;
+  let timerLimite = null;
+  let falhasSeguidas = 0;
+  const logEventos = [];
   let usuarioTocou = false;   // só vale depois de o utilizador tocar em reproduzir
   let assistido = 0;          // segundos realmente vistos (só conta com o vídeo a tocar)
 
   const $ = (id) => document.getElementById(id);
 
-  function toast(msg) {
+  function toast(msg, ms) {
     const t = $('pdAdToast');
     t.textContent = msg;
     t.style.display = 'block';
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => { t.style.display = 'none'; }, 2800);
+    toastTimer = setTimeout(() => { t.style.display = 'none'; }, ms || 2800);
+  }
+
+  function logEv(x) {
+    logEventos.push(x);
+    if (logEventos.length > 10) logEventos.shift();
+  }
+
+  function diagnostico() {
+    let st = '?', car = '?', t = '?', mudo = '?';
+    try {
+      st = ytPlayer.getPlayerState();
+      car = Math.round(ytPlayer.getVideoLoadedFraction() * 100);
+      t = ytPlayer.getCurrentTime().toFixed(1);
+      mudo = ytPlayer.isMuted() ? 'sim' : 'não';
+    } catch (e) {}
+    return 'player ' + (playerPronto ? 'ok' : 'NÃO iniciou') + ' | estado ' + st + ' | carga ' + car +
+           '% | tempo ' + t + 's | mudo ' + mudo + ' | eventos: ' + (logEventos.join(',') || 'nenhum');
   }
 
   function falhar() {
@@ -14470,6 +14494,7 @@ document.addEventListener("keydown", (e) => {
         },
         onStateChange: onEstadoVideoMudou,
         onError: function (e) {
+          logEv('erro' + (e && e.data));
           falhar();
           toast('Anúncio indisponível (erro ' + (e && e.data) + ')');
         }
@@ -14541,6 +14566,8 @@ document.addEventListener("keydown", (e) => {
   }
 
   function onEstadoVideoMudou(evento) {
+    logEv(evento.data);
+    if (fase === 'pronto' && evento.data === YT.PlayerState.PLAYING) { try { ytPlayer.pauseVideo(); } catch (e) {} }
     if (fase === 'precarga' &&
         (evento.data === YT.PlayerState.PLAYING || evento.data === YT.PlayerState.BUFFERING)) {
       precargaComecou = true;
@@ -14550,6 +14577,9 @@ document.addEventListener("keydown", (e) => {
       if (!usuarioTocou) { ytPlayer.pauseVideo(); return; }   // nada de tocar sozinho
       $('pdAdLoading').style.display = 'none';
       esconderAvisoToque();
+      iniciouReproducao = true;
+      falhasSeguidas = 0;
+      clearTimeout(timerLimite);
       try { ytPlayer.unMute(); ytPlayer.setVolume(100); } catch (e) {}
       if (!fullscreenPedido) { fullscreenPedido = true; pedirFullscreen(); }
     }
@@ -14573,7 +14603,12 @@ document.addEventListener("keydown", (e) => {
     anuncioDoConteudo = idConteudo;
     usuarioTocou = false;
     fullscreenPedido = false;
+    iniciouReproducao = false;
     assistido = 0;
+    logEventos.length = 0;
+    $('pdAdGateDiag').style.display = 'none';
+    clearTimeout(timerLimite);
+    timerLimite = setTimeout(cancelarAnuncio, LIMITE_INICIO_MS);
     $('pdAdLoadingTxt').textContent = 'A carregar anúncio...';
 
     $('pdAdOverlay').classList.add('aberto');
@@ -14611,8 +14646,9 @@ document.addEventListener("keydown", (e) => {
       ytPlayer.unMute();
       ytPlayer.setVolume(100);
       if (ytPlayer.getCurrentTime() > 0.5) ytPlayer.seekTo(0, true);
+      logEv('cmd:play');
       ytPlayer.playVideo();
-    } catch (e) {}
+    } catch (e) { logEv('cmd-erro'); }
 
     let ticks = 0;
     clearInterval(timerRetry);
@@ -14660,10 +14696,40 @@ document.addEventListener("keydown", (e) => {
     }, 250);
   }
 
+  // Passou o limite e o vídeo não começou: cancela e deixa o utilizador tentar de novo
+  function cancelarAnuncio() {
+    if (fase !== 'anuncio' || iniciouReproducao) return;
+    const diag = diagnostico();
+    clearInterval(timerProgresso);
+    clearInterval(timerRetry);
+    clearTimeout(timerLimite);
+    esconderAvisoToque();
+    if (playerPronto) {
+      try { ytPlayer.mute(); ytPlayer.pauseVideo(); ytPlayer.seekTo(0, true); } catch (e) {}
+    }
+    sairFullscreen();
+    $('pdAdOverlay').classList.remove('aberto');
+    $('pdAdLoading').style.display = 'none';
+    usuarioTocou = false;
+    anuncioDoConteudo = null;
+    fase = 'pronto';                       // o vídeo continua carregado: basta tocar em "Assistir" de novo
+
+    const dg = $('pdAdGateDiag');
+    dg.textContent = 'Diagnóstico: ' + diag;
+    dg.style.display = 'block';
+    toast('O anúncio não iniciou em 10 s. Toque em "Assistir" para tentar de novo.', 6000);
+
+    falhasSeguidas++;
+    if (falhasSeguidas >= 2) { falhasSeguidas = 0; recarregarAnuncio(); }   // 2 falhas seguidas: recarrega o vídeo
+    atualizarPorta();
+  }
+
   function fecharAnuncio() {
     if (fase !== 'anuncio') return;
     clearInterval(timerProgresso);
     clearInterval(timerRetry);
+    clearTimeout(timerLimite);
+    $('pdAdGateDiag').style.display = 'none';
     esconderAvisoToque();
     if (playerPronto) ytPlayer.pauseVideo();
     sairFullscreen();
