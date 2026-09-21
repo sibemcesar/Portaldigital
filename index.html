@@ -7277,23 +7277,6 @@ window.firebaseModules = {
       z-index: 3;
       color: #fff;
     }
-    #pdAdOverlay .pdad-saiba {
-      position: absolute;
-      top: calc(10px + env(safe-area-inset-top, 0px));
-      right: 12px;
-      z-index: 6;
-      font-family: inherit;
-      border: none;
-      cursor: pointer;
-      background: #1D4ED8;
-      color: #fff;
-      padding: 8px 14px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 700;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.4);
-    }
-    #pdAdOverlay .pdad-saiba:active { background: #1E40AF; }
     #pdAdOverlay .pdad-corpo {
       padding: 14px 16px calc(14px + env(safe-area-inset-bottom, 0px));
       background: linear-gradient(to top, rgba(0,0,0,0.92), rgba(0,0,0,0.7) 70%, transparent);
@@ -8858,7 +8841,6 @@ window.firebaseModules = {
       <div class="pdad-fase">
         <div class="pdad-video">
           <span class="pdad-rotulo">ANÚNCIO</span>
-          <button type="button" class="pdad-saiba" id="pdAdSaibaMais" style="display:none;">Clica aqui pra saber mais</button>
           <button class="pdad-play" id="pdAdPlay" type="button">▶ Toque no vídeo para reproduzir</button>
           <div class="pdad-loading" id="pdAdLoading"><div class="pdad-spinner"></div><span id="pdAdLoadingTxt">A carregar anúncio...</span></div>
           <div id="pdAdYtPlayer"></div>
@@ -14419,8 +14401,8 @@ document.addEventListener("keydown", (e) => {
 
   const SEGUNDOS_PARA_IGNORAR = 15;
   const SEGUNDOS_PARA_CLIQUE = 5;
-  const VIDEO_ID = 'b-4wfq226pI';
-  const LINK_ANUNCIO = 'https://portaldigital.vercel.app';
+  const VIDEO_ID = 'Ew4kM1FmM8o';
+  const LINK_ANUNCIO = 'https://play.google.com/store/apps/details?id=com.duolingo';
   const TIMEOUT_API_MS = 20000;
   const LIMITE_INICIO_MS = 10000;   // se o vídeo não começar em 10 s, cancela o anúncio
 
@@ -14443,6 +14425,7 @@ document.addEventListener("keydown", (e) => {
   let progressoCarga = 0;
   let timerPorta = null;
   let iniciouReproducao = false;
+  let abriuLink = false;
   let timerLimite = null;
   let falhasSeguidas = 0;
   const logEventos = [];
@@ -14625,7 +14608,7 @@ document.addEventListener("keydown", (e) => {
     clearTimeout(timerLimite);
     timerLimite = setTimeout(cancelarAnuncio, LIMITE_INICIO_MS);
     $('pdAdLoadingTxt').textContent = 'A carregar anúncio...';
-    $('pdAdSaibaMais').style.display = 'none';
+    $('pdAdSub').textContent = 'Não saias desta página até terminar';
 
     $('pdAdOverlay').classList.add('aberto');
     $('pdAdSkip').disabled = true;
@@ -14708,7 +14691,7 @@ document.addEventListener("keydown", (e) => {
       fill.style.width = Math.min(100, (atual / duracao) * 100) + '%';
       const restante = Math.max(0, Math.ceil(duracao - atual));
       tempoTxt.textContent = Math.floor(restante / 60) + ':' + String(restante % 60).padStart(2, '0');
-      if (assistido >= SEGUNDOS_PARA_CLIQUE) $('pdAdSaibaMais').style.display = 'block';
+      if (assistido >= SEGUNDOS_PARA_CLIQUE) $('pdAdSub').textContent = 'Toque no vídeo para saber mais';
       if (assistido >= SEGUNDOS_PARA_IGNORAR) skipBtn.disabled = false;
     }, 250);
   }
@@ -14720,7 +14703,6 @@ document.addEventListener("keydown", (e) => {
     clearInterval(timerProgresso);
     clearInterval(timerRetry);
     clearTimeout(timerLimite);
-    $('pdAdSaibaMais').style.display = 'none';
     esconderAvisoToque();
     if (playerPronto) {
       try { ytPlayer.mute(); ytPlayer.pauseVideo(); ytPlayer.seekTo(0, true); } catch (e) {}
@@ -14748,7 +14730,6 @@ document.addEventListener("keydown", (e) => {
     clearInterval(timerRetry);
     clearTimeout(timerLimite);
     $('pdAdGateDiag').style.display = 'none';
-    $('pdAdSaibaMais').style.display = 'none';
     esconderAvisoToque();
     if (playerPronto) ytPlayer.pauseVideo();
     sairFullscreen();
@@ -14765,7 +14746,8 @@ document.addEventListener("keydown", (e) => {
     // Só continua se o utilizador ainda estiver no mesmo conteúdo
     if (typeof currentGameData !== 'undefined' && currentGameData && currentGameData.id === id) {
       liberadoPara = id;
-      if (!falhou) toast('Anúncio concluído! Toca no botão para abrir o link');
+      if (!falhou && !abriuLink) toast('Anúncio concluído! Toca no botão para abrir o link');
+      abriuLink = false;
       atualizarPorta();
     }
   }
@@ -14775,15 +14757,14 @@ document.addEventListener("keydown", (e) => {
     fecharAnuncio();
   });
 
-  // Botão no topo à direita (aparece depois de 5 s de vídeo visto): abre o link no navegador GA
-  $('pdAdSaibaMais').addEventListener('click', function (e) {
-    e.stopPropagation();
+  $('pdAdOverlay').addEventListener('click', function () {
     if (fase !== 'anuncio' || !usuarioTocou || assistido < SEGUNDOS_PARA_CLIQUE) return;
     sairFullscreen();
+    abriuLink = true;
     try {
       openLinkInGA(LINK_ANUNCIO);   // mesma função dos botões de redes sociais (Sobre nós)
-    } catch (err) {
-      toast('Não foi possível abrir o link', 4000);
+    } catch (e) {
+      toast('Não foi possível abrir o link (' + (e && e.message) + ')', 5000);
     }
     fecharAnuncio();
   });
