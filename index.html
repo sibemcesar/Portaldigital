@@ -8847,7 +8847,7 @@ window.firebaseModules = {
         </div>
         <div class="pdad-corpo">
           <div class="pdad-titulo">A exibir anúncio</div>
-          <div class="pdad-sub">Não saias desta página até terminar</div>
+          <div class="pdad-sub" id="pdAdSub">Não saias desta página até terminar</div>
           <div class="pdad-barra"><div class="pdad-fill" id="pdAdFill"></div></div>
           <div class="pdad-rodape">
             <span id="pdAdTempo">--:--</span>
@@ -14424,8 +14424,8 @@ document.addEventListener("keydown", (e) => {
   let timerRetry = null;
   let progressoCarga = 0;
   let timerPorta = null;
-  let fullscreenPedido = false;
   let iniciouReproducao = false;
+  let abriuLink = false;
   let timerLimite = null;
   let falhasSeguidas = 0;
   const logEventos = [];
@@ -14581,7 +14581,6 @@ document.addEventListener("keydown", (e) => {
       falhasSeguidas = 0;
       clearTimeout(timerLimite);
       try { ytPlayer.unMute(); ytPlayer.setVolume(100); } catch (e) {}
-      if (!fullscreenPedido) { fullscreenPedido = true; pedirFullscreen(); }
     }
     if (evento.data !== YT.PlayerState.ENDED) return;
     if (fase === 'precarga') { finalizarPrecarga(); return; }
@@ -14602,7 +14601,6 @@ document.addEventListener("keydown", (e) => {
     clearInterval(timerCarga);
     anuncioDoConteudo = idConteudo;
     usuarioTocou = false;
-    fullscreenPedido = false;
     iniciouReproducao = false;
     assistido = 0;
     logEventos.length = 0;
@@ -14610,6 +14608,7 @@ document.addEventListener("keydown", (e) => {
     clearTimeout(timerLimite);
     timerLimite = setTimeout(cancelarAnuncio, LIMITE_INICIO_MS);
     $('pdAdLoadingTxt').textContent = 'A carregar anúncio...';
+    $('pdAdSub').textContent = 'Não saias desta página até terminar';
 
     $('pdAdOverlay').classList.add('aberto');
     $('pdAdSkip').disabled = true;
@@ -14692,6 +14691,7 @@ document.addEventListener("keydown", (e) => {
       fill.style.width = Math.min(100, (atual / duracao) * 100) + '%';
       const restante = Math.max(0, Math.ceil(duracao - atual));
       tempoTxt.textContent = Math.floor(restante / 60) + ':' + String(restante % 60).padStart(2, '0');
+      if (assistido >= SEGUNDOS_PARA_CLIQUE) $('pdAdSub').textContent = 'Toque no vídeo para saber mais';
       if (assistido >= SEGUNDOS_PARA_IGNORAR) skipBtn.disabled = false;
     }, 250);
   }
@@ -14746,7 +14746,8 @@ document.addEventListener("keydown", (e) => {
     // Só continua se o utilizador ainda estiver no mesmo conteúdo
     if (typeof currentGameData !== 'undefined' && currentGameData && currentGameData.id === id) {
       liberadoPara = id;
-      if (!falhou) toast('Anúncio concluído! Toca no botão para abrir o link');
+      if (!falhou && !abriuLink) toast('Anúncio concluído! Toca no botão para abrir o link');
+      abriuLink = false;
       atualizarPorta();
     }
   }
@@ -14758,26 +14759,16 @@ document.addEventListener("keydown", (e) => {
 
   $('pdAdOverlay').addEventListener('click', function () {
     if (fase !== 'anuncio' || !usuarioTocou || assistido < SEGUNDOS_PARA_CLIQUE) return;
-    openLinkInGA(LINK_ANUNCIO);   // mesma função dos botões de redes sociais (Sobre nós)
+    sairFullscreen();
+    abriuLink = true;
+    toast('A abrir no navegador GA...');
+    try {
+      openLinkInGA(LINK_ANUNCIO);   // mesma função dos botões de redes sociais (Sobre nós)
+    } catch (e) {
+      toast('Não foi possível abrir o link (' + (e && e.message) + ')', 5000);
+    }
     fecharAnuncio();
   });
-
-  function pedirFullscreen() {
-    const el = $('pdAdOverlay');
-    const pedir = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
-    const bloquear = () => {
-      if (screen.orientation && screen.orientation.lock) {
-        screen.orientation.lock('portrait').catch(() => {});
-      }
-    };
-    if (pedir) {
-      const p = pedir.call(el);
-      if (p && p.then) p.then(bloquear).catch(bloquear);
-      else bloquear();
-    } else {
-      bloquear();
-    }
-  }
 
   function sairFullscreen() {
     if (screen.orientation && screen.orientation.unlock) {
