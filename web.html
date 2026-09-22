@@ -4687,8 +4687,13 @@
   </div>
   <div id="manageUsersModal" class="custom-modal">
     <div class="custom-modal-content">
-      <h2>Gerenciar Usuários</h2>
-      <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+        <h2 style="margin: 0;">Gerenciar Usuários</h2>
+        <button class="custom-modal-btn secondary" onclick="emailFilteredUsers()" title="Enviar e-mail para os usuários do filtro atual" style="font-size: 12px; padding: 6px 12px; display: flex; align-items: center; gap: 4px; white-space: nowrap;">
+          ✉️ E-mail
+        </button>
+      </div>
+      <div style="display: flex; gap: 8px; margin: 16px 0;">
         <button class="filter-btn active" id="filterPending" onclick="filterUsers('pending')">Pendentes</button>
         <button class="filter-btn" id="filterApproved" onclick="filterUsers('approved')">Aprovados</button>
         <button class="filter-btn" id="filterRejected" onclick="filterUsers('rejected')">Rejeitados</button>
@@ -7528,6 +7533,7 @@
       document.getElementById('manageAdModal').classList.remove('active');
     }
     let currentUserFilter = 'pending';
+    const userFilterLabels = { pending: 'pendentes', approved: 'aprovados', rejected: 'bloqueados' };
     let allUsers = {};
     let userNotifications = [];
     let dismissedNotifications = {};
@@ -7623,6 +7629,21 @@
           </div>
         `;
       }).join('');
+    }
+    function emailFilteredUsers() {
+      const filteredUsers = Object.entries(allUsers).filter(([id, user]) => {
+        const status = user.status || 'pending';
+        return status === currentUserFilter;
+      });
+      const emails = filteredUsers
+        .map(([id, user]) => user.email)
+        .filter(email => !!email);
+      if (emails.length === 0) {
+        showCustomAlert(`Nenhum e-mail encontrado para os usuários ${userFilterLabels[currentUserFilter]}.`);
+        return;
+      }
+      const mailtoLink = `mailto:?bcc=${encodeURIComponent(emails.join(','))}`;
+      window.location.href = mailtoLink;
     }
     async function approveUser(userId) {
       showCustomConfirm('Deseja aprovar este usuário? Ele receberá 100 pontos de bônus.', async () => {
