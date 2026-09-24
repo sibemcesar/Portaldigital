@@ -7661,7 +7661,6 @@ window.firebaseModules = {
       text-align: center;
     }
 
-    /* ===== Anúncios recompensados (DEMO) ===== */
     .rw-saldo {
       display: flex;
       align-items: center;
@@ -15735,7 +15734,6 @@ document.addEventListener("keydown", (e) => {
     if (playerPronto && fase === 'usado') { tentativasCarga = 0; recarregarAnuncio(); }
   }
 
-  // Preenche logo, título, subtítulo e texto do botão com os dados do anúncio (Gestão de Anúncios)
   function aplicarTopoAnuncio(ad) {
     const LOGO_PADRAO = 'https://portaldigital.vercel.app/logo.png';
     const logo = $('pdAdTopoLogo');
@@ -15891,7 +15889,6 @@ document.addEventListener("keydown", (e) => {
     }
   }
 
-  // Igual ao demo: "Abrir" abre o link e interrompe o anúncio sem liberar o conteúdo
   function interromperAnuncio() {
     if (fase !== 'anuncio') return;
     clearInterval(timerProgresso);
@@ -16355,14 +16352,6 @@ function renderAdStats() {
 }
 </script>
 <script>
-/* Anúncios recompensados
-   Cada anúncio (2 vídeos vistos até ao fim) vale 25 pontos, no máximo 6 anúncios
-   e 150 pontos por janela de 24 h. Usa a mesma lógica do bónus diário: hora do
-   servidor, escrita atómica (update multi-caminho) em adRewards/{uid} + users/{uid}/points
-   e validação nas regras da base de dados. Cada vídeo exibido e cada clique no
-   anúncio (botão "Abrir" ou toque no vídeo) são contabilizados na Gestão de
-   Anúncios (coleções Firestore "anuncios" e "anuncio_usuarios"), tal como no
-   anúncio de desbloqueio de conteúdos. */
 (function () {
   'use strict';
 
@@ -16371,11 +16360,11 @@ function renderAdStats() {
 
   const SEGUNDOS_PARA_IGNORAR = 15;
   const SEGUNDOS_PARA_CLIQUE = 5;
-  const ANUNCIOS_NECESSARIOS = 2;          // vídeos por anúncio (1 anúncio = 2 vídeos)
+  const ANUNCIOS_NECESSARIOS = 2;
   const PONTOS_POR_ANUNCIO = 25;
-  const MAX_PONTOS_POR_ANUNCIO = 25;       // teto absoluto: nunca se ganha mais de 25 num anúncio
+  const MAX_PONTOS_POR_ANUNCIO = 25;
   const MAX_ANUNCIOS_DIA = 6;
-  const LIMITE_DIARIO = 150;               // pontos recebidos por janela de 24 h
+  const LIMITE_DIARIO = 150;
   const JANELA_MS = 24 * 60 * 60 * 1000;
   const COOLDOWN_SEG = 15;
   const SEGUNDOS_TRANSICAO = 2;
@@ -16383,7 +16372,7 @@ function renderAdStats() {
   const STALL_MS = 15000;
   const TIMEOUT_API_MS = 20000;
 
-  const CH_PROGRESSO = 'pd_demo_rw_progresso';   // só o vídeo em curso (1 de 2); não guarda pontos
+  const CH_PROGRESSO = 'pd_demo_rw_progresso';
 
   const $ = (id) => document.getElementById(id);
 
@@ -16411,13 +16400,11 @@ function renderAdStats() {
   const falhados = new Set();
   let motivoIndisponivel = '';
 
-  /* ---------- armazenamento local (só o progresso dos 2 vídeos) ---------- */
   function ler(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function gravar(k, v) { try { localStorage.setItem(k, String(v)); } catch (e) {} }
   function apagar(k) { try { localStorage.removeItem(k); } catch (e) {} }
   function lerInt(k) { const n = parseInt(ler(k) || '0', 10); return isNaN(n) ? 0 : n; }
 
-  /* ---------- estado dos pontos (vem da base de dados, como o bónus diário) ---------- */
   let estado = { windowStart: 0, adsCount: 0, pointsToday: 0, totalEarned: 0 };
   let estadoCarregado = false;
   let carregandoEstado = false;
@@ -16487,8 +16474,6 @@ function renderAdStats() {
       (limiteDiarioAtingido() && estado.windowStart ? ' · novo ciclo em ' + tempoAteNovaJanela() : '');
   }
 
-  // Credita 1 anúncio (25 pontos): mesma lógica do bónus diário, com hora do servidor
-  // e update atómico. As regras da base de dados voltam a validar tudo no servidor.
   async function creditarAnuncio() {
     if (!contaValida()) return { status: 'login' };
     const { ref, get, update } = window.firebaseModules;
@@ -16536,7 +16521,6 @@ function renderAdStats() {
     }
   }
 
-  /* ---------- botão principal ---------- */
   function atualizarBotao() {
     const btn = $('rwBtnAnuncio');
     if (!contaValida()) {
@@ -16574,7 +16558,6 @@ function renderAdStats() {
     toastTimer = setTimeout(() => { t.style.display = 'none'; }, ms || 2600);
   }
 
-  /* ---------- API do YouTube (carregada só quando o ecrã abre) ---------- */
   function apiPronta() { return !!(window.YT && typeof window.YT.Player === 'function'); }
 
   function falhaApi() {
@@ -16602,7 +16585,6 @@ function renderAdStats() {
     }, 300);
   }
 
-  // Os anúncios vêm só da "Gestão de Anúncios" (lista ativa do sistema de anúncios da app).
   function candidatos() {
     let lista = [];
     try {
@@ -16632,7 +16614,6 @@ function renderAdStats() {
     atualizarBotao();
   }
 
-  // A lista carrega do Firestore em segundo plano; espera um pouco por ela antes de desistir.
   function aguardarAnuncios(cb) {
     const t0 = Date.now();
     clearInterval(timerAnuncios);
@@ -16701,7 +16682,6 @@ function renderAdStats() {
       abortarAnuncio('Não foi possível reproduzir o anúncio');
       return;
     }
-    // tenta outro vídeo antes de desistir
     if (escolherAnuncio()) { comecarCarga(false); return; }
     videoPronto = false;
     indisponivel = true;
@@ -16710,7 +16690,6 @@ function renderAdStats() {
     toast('Não foi possível carregar o anúncio (' + motivoIndisponivel + ')');
   }
 
-  /* ---------- pré-carga do vídeo ---------- */
   function comecarCarga(primeira) {
     fase = 'precarga';
     videoPronto = false;
@@ -16773,7 +16752,6 @@ function renderAdStats() {
     if (fase === 'anuncio') anuncioConcluido();
   }
 
-  /* ---------- feedback ---------- */
   function vibrarRecompensa() {
     if (navigator.vibrate) { try { navigator.vibrate([120, 60, 120]); } catch (e) {} }
   }
@@ -16801,7 +16779,6 @@ function renderAdStats() {
     } catch (e) {}
   }
 
-  /* ---------- ecrã inteiro e botão voltar ---------- */
   function pedirFullscreen() {
     const el = $('rwAdOverlay');
     const pedir = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
@@ -16841,14 +16818,12 @@ function renderAdStats() {
     if (!bloquearVoltar) return;
     bloquearVoltar = false;
     if (history.state && history.state.rwAd) {
-      // remove a entrada de histórico criada para bloquear o botão voltar
       consumindoVoltar = true;
       setTimeout(() => { consumindoVoltar = false; }, 600);
       try { history.back(); } catch (e) { consumindoVoltar = false; }
     }
   }
 
-  // Em captura, para o handler de popstate do resto da app não reagir a estes eventos.
   window.addEventListener('popstate', function (e) {
     if (consumindoVoltar) {
       consumindoVoltar = false;
@@ -16862,9 +16837,6 @@ function renderAdStats() {
     }
   }, true);
 
-  /* ---------- contabilização na Gestão de Anúncios ---------- */
-  // Mesma lógica/coleções do anúncio de desbloqueio de conteúdos, para que exibições
-  // e cliques dos anúncios recompensados também apareçam nas Estatísticas do Anúncio.
   function registrarEventoAnuncioRW(tipo) {
     const anuncio = anuncioAtual;
     if (!anuncio || !anuncio.id) return;
@@ -16890,7 +16862,6 @@ function renderAdStats() {
     } catch (e) {}
   }
 
-  /* ---------- reprodução do anúncio ---------- */
   function abrirLink() {
     const link = anuncioAtual && anuncioAtual.link;
     if (!link) return;
@@ -16906,7 +16877,6 @@ function renderAdStats() {
     }, LIMITE_INICIO_MS);
   }
 
-  // Alguns WebViews bloqueiam o arranque automático: mostra o botão e deixa o toque cair no próprio vídeo.
   function mostrarBotaoPlay() {
     $('rwAdOverlay').classList.add('rw-toque');
     $('rwAdLoading').style.display = 'none';
@@ -16942,7 +16912,6 @@ function renderAdStats() {
     }, 1000);
   }
 
-  // Preenche logo, título, subtítulo e texto do botão com os dados do anúncio (Gestão de Anúncios)
   function aplicarTopoAnuncio(ad) {
     const LOGO_PADRAO = 'https://portaldigital.vercel.app/logo.png';
     const logo = $('rwAdTopoLogo');
@@ -16970,7 +16939,6 @@ function renderAdStats() {
       ytPlayer.seekTo(0, true);
       ytPlayer.playVideo();
     } catch (e) {}
-    // se o vídeo não arrancar, não deixa o utilizador preso no ecrã do anúncio
     armarTimerInicio();
     vigiarInicio();
     iniciarProgresso();
@@ -17048,11 +17016,9 @@ function renderAdStats() {
     const v = lerInt(CH_PROGRESSO) + 1;
 
     if (v < ANUNCIOS_NECESSARIOS) {
-      // ainda falta(m) vídeo(s) para completar este anúncio
       gravar(CH_PROGRESSO, v);
       atualizarPainel();
       fase = 'transicao';
-      // sorteia outro anúncio para o próximo (não repete o que acabou de passar)
       const anteriorId = anuncioAtual && anuncioAtual.videoId;
       escolherAnuncio();
       if (anuncioAtual && anuncioAtual.videoId !== anteriorId) preCarregarProximo();
@@ -17067,7 +17033,6 @@ function renderAdStats() {
       return;
     }
 
-    // último vídeo: credita 1 anúncio (25 pontos) no servidor
     fase = 'creditando';
     $('rwSucessoIcone').style.display = 'none';
     $('rwSucessoSpinner').style.display = 'block';
@@ -17090,7 +17055,6 @@ function renderAdStats() {
       } else if (r.status === 'login') {
         mostrarResultado('🔒', 'Sessão necessária', 'Inicia sessão com uma conta verificada para receber os pontos.', false);
       } else {
-        // falha ao guardar: o próximo vídeo completa o anúncio outra vez
         gravar(CH_PROGRESSO, ANUNCIOS_NECESSARIOS - 1);
         mostrarResultado('⚠', 'Não foi possível guardar os pontos',
           'Verifica a ligação e tenta outra vez. Não perdeste o progresso.', false);
@@ -17100,7 +17064,6 @@ function renderAdStats() {
     });
   }
 
-  // Fecha o ecrã do anúncio (com ou sem aviso) e inicia o tempo de espera até ao próximo.
   function encerrarOverlay(msg) {
     clearInterval(timerProgresso);
     clearTimeout(timerTransicao);
@@ -17138,7 +17101,6 @@ function renderAdStats() {
     }, 1000);
   }
 
-  /* ---------- eventos ---------- */
   $('rwBtnAnuncio').addEventListener('click', function () {
     if (!contaValida()) return;
     if (!estadoCarregado) { carregarEstado(); return; }
@@ -17177,7 +17139,6 @@ function renderAdStats() {
     }
   });
 
-  /* ---------- ecrã "Ganhar Pontos" ---------- */
   function abrirPagina() {
     if (typeof closeSidebar === 'function') closeSidebar();
     $('rwOverlay').classList.add('active');
