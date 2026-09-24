@@ -9520,6 +9520,7 @@ window.firebaseModules = {
             <div class="rw-bolinha" id="rwBolinha3">3</div>
             <div class="rw-bolinha" id="rwBolinha4">4</div>
             <div class="rw-bolinha" id="rwBolinha5">5</div>
+            <div class="rw-bolinha" id="rwBolinha6">6</div>
           </div>
           <div class="rw-progresso-txt" id="rwProgressoTxt"></div>
           <div class="rw-hoje" id="rwHojeTxt"></div>
@@ -16036,10 +16037,13 @@ function renderAdStats() {
 </script>
 <script>
 /* Anúncios recompensados
-   Cada anúncio (2 vídeos vistos até ao fim) vale 25 pontos, no máximo 5 anúncios
+   Cada anúncio (2 vídeos vistos até ao fim) vale 25 pontos, no máximo 6 anúncios
    e 150 pontos por janela de 24 h. Usa a mesma lógica do bónus diário: hora do
    servidor, escrita atómica (update multi-caminho) em adRewards/{uid} + users/{uid}/points
-   e validação nas regras da base de dados. */
+   e validação nas regras da base de dados. Cada vídeo exibido e cada clique no
+   anúncio (botão "Abrir" ou toque no vídeo) são contabilizados na Gestão de
+   Anúncios (coleções Firestore "anuncios" e "anuncio_usuarios"), tal como no
+   anúncio de desbloqueio de conteúdos. */
 (function () {
   'use strict';
 
@@ -16051,7 +16055,7 @@ function renderAdStats() {
   const ANUNCIOS_NECESSARIOS = 2;          // vídeos por anúncio (1 anúncio = 2 vídeos)
   const PONTOS_POR_ANUNCIO = 25;
   const MAX_PONTOS_POR_ANUNCIO = 25;       // teto absoluto: nunca se ganha mais de 25 num anúncio
-  const MAX_ANUNCIOS_DIA = 5;
+  const MAX_ANUNCIOS_DIA = 6;
   const LIMITE_DIARIO = 150;               // pontos recebidos por janela de 24 h
   const JANELA_MS = 24 * 60 * 60 * 1000;
   const COOLDOWN_SEG = 15;
@@ -16286,7 +16290,7 @@ function renderAdStats() {
     } catch (e) {}
     return lista
       .filter((a) => a && a.videoId && a.link)
-      .map((a) => ({ videoId: a.videoId, link: a.link, logoUrl: a.logoUrl || '', tituloExibido: a.tituloExibido || '', subtitulo: a.subtitulo || '', textoBotao: a.textoBotao || '' }))
+      .map((a) => ({ id: a.id, videoId: a.videoId, link: a.link, logoUrl: a.logoUrl || '', tituloExibido: a.tituloExibido || '', subtitulo: a.subtitulo || '', textoBotao: a.textoBotao || '' }))
       .filter((a, i, arr) => arr.findIndex((b) => b.videoId === a.videoId) === i);
   }
 
@@ -16538,10 +16542,39 @@ function renderAdStats() {
     }
   }, true);
 
+  /* ---------- contabilização na Gestão de Anúncios ---------- */
+  // Mesma lógica/coleções do anúncio de desbloqueio de conteúdos, para que exibições
+  // e cliques dos anúncios recompensados também apareçam nas Estatísticas do Anúncio.
+  function registrarEventoAnuncioRW(tipo) {
+    const anuncio = anuncioAtual;
+    if (!anuncio || !anuncio.id) return;
+    try {
+      const firestore = window.firebaseFirestore;
+      const { doc, setDoc, updateDoc, increment } = window.firebaseModules;
+      const agora = new Date();
+      const usuario = (typeof currentUser !== 'undefined') ? currentUser : null;
+      const logado = usuario && !usuario.isAnonymous;
+      const uid = (usuario && usuario.uid) ? usuario.uid : 'visitante';
+      const campo = tipo === 'clique' ? 'cliques' : 'exibicoes';
+      setDoc(doc(firestore, 'anuncio_usuarios', anuncio.id + '_' + uid), {
+        anuncioId: anuncio.id,
+        userId: uid,
+        userEmail: logado ? (usuario.email || '') : 'Visitante',
+        userName: logado ? (usuario.displayName || '') : '',
+        ultimaData: agora.toLocaleDateString('pt-BR'),
+        ultimaHora: agora.toLocaleTimeString('pt-BR'),
+        ultimoTimestamp: agora.getTime(),
+        [campo]: increment(1)
+      }, { merge: true }).catch(() => {});
+      updateDoc(doc(firestore, 'anuncios', anuncio.id), { [campo]: increment(1) }).catch(() => {});
+    } catch (e) {}
+  }
+
   /* ---------- reprodução do anúncio ---------- */
   function abrirLink() {
     const link = anuncioAtual && anuncioAtual.link;
     if (!link) return;
+    registrarEventoAnuncioRW('clique');
     if (typeof openLinkInGA === 'function') openLinkInGA(link);
     else window.open(link, '_blank', 'noopener');
   }
@@ -16603,6 +16636,7 @@ function renderAdStats() {
 
   function iniciarReproducao() {
     aplicarTopoAnuncio(anuncioAtual);
+    registrarEventoAnuncioRW('exibicao');
     $('rwAdSkip').disabled = true;
     $('rwAdFill').style.width = '0%';
     $('rwAdTempo').textContent = '--:--';
