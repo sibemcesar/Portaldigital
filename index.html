@@ -7479,6 +7479,324 @@ window.firebaseModules = {
       max-width: 90vw;
       text-align: center;
     }
+
+    /* ===== Anúncios recompensados (DEMO) ===== */
+    .rw-saldo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+    .rw-saldo-ic {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(37, 99, 235, 0.12);
+      color: #2563eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .rw-saldo-info { flex: 1; min-width: 0; }
+    .rw-saldo-num { font-size: 26px; font-weight: 700; line-height: 1.1; color: var(--text-primary); }
+    .rw-saldo-txt { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .rw-pill-demo {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(245, 158, 11, 0.15);
+      color: #d97706;
+      flex-shrink: 0;
+    }
+    .rw-aviso {
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--text-secondary);
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+    .rw-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 18px 16px;
+      box-shadow: var(--shadow-sm);
+    }
+    .rw-card h3 { font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0 0 4px; }
+    .rw-card p { font-size: 13px; line-height: 1.5; color: var(--text-secondary); margin: 0 0 14px; }
+    .rw-bolinhas { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; }
+    .rw-bolinha {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 2px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      color: var(--text-muted);
+      background: var(--bg-secondary);
+      transition: all 0.2s ease;
+    }
+    .rw-bolinha.feito { border-color: #16a34a; background: rgba(22, 163, 74, 0.12); color: #16a34a; }
+    .rw-seta { color: var(--text-muted); font-size: 14px; }
+    .rw-progresso-txt { text-align: center; font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+    .rw-progresso-txt b { color: var(--text-primary); }
+    .rw-hoje { text-align: center; font-size: 12px; color: var(--text-muted); margin-bottom: 14px; }
+    .rw-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .rw-btn:active { background: #1d4ed8; }
+    .rw-btn:disabled { background: var(--bg-secondary); color: var(--text-muted); cursor: default; }
+    .rw-reset { text-align: center; }
+    .rw-reset button {
+      background: none;
+      border: none;
+      font-family: inherit;
+      color: var(--text-muted);
+      font-size: 12px;
+      text-decoration: underline;
+      padding: 6px;
+      cursor: pointer;
+    }
+
+    #rwAdOverlay {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      display: flex;
+      opacity: 0;
+      z-index: -1;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+    }
+    #rwAdOverlay.aberto {
+      opacity: 1;
+      z-index: 10070;
+      pointer-events: auto;
+    }
+    @media (orientation: landscape) {
+      #rwAdOverlay.aberto {
+        inset: auto;
+        top: 0;
+        left: 0;
+        width: 100vh;
+        height: 100vw;
+        transform-origin: top left;
+        transform: rotate(90deg) translateY(-100%);
+      }
+    }
+    #rwAdOverlay .rw-ad-caixa {
+      position: relative;
+      background: #000;
+      color: #fff;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    #rwAdOverlay .rw-ad-fase {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    #rwAdOverlay .rw-ad-video {
+      flex: 1;
+      min-height: 0;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    #rwAdOverlay .rw-ad-video iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      pointer-events: none;
+    }
+    #rwAdOverlay .rw-ad-topo {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 14px;
+      padding-top: calc(16px + env(safe-area-inset-top, 0px));
+      background: #000;
+    }
+    #rwAdOverlay .rw-ad-topo img {
+      width: 46px;
+      height: 46px;
+      border-radius: 10px;
+      object-fit: cover;
+      background: #fff;
+      flex-shrink: 0;
+    }
+    #rwAdOverlay .rw-ad-topo .txt {
+      flex: 1;
+      min-width: 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.3;
+    }
+    #rwAdOverlay .rw-ad-topo .selo {
+      display: block;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #9ca3af;
+    }
+    #rwAdOverlay .rw-ad-topo small {
+      display: block;
+      font-weight: 400;
+      color: #d1d5db;
+      font-size: 12px;
+      margin-top: 2px;
+    }
+    #rwAdOverlay .rw-ad-topo button {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 10px 20px;
+      border-radius: 22px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    #rwAdOverlay .rw-ad-corpo {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      z-index: 4;
+      padding: 14px 16px calc(14px + env(safe-area-inset-bottom, 0px));
+      background: linear-gradient(to top, rgba(0,0,0,0.92), rgba(0,0,0,0.7) 70%, transparent);
+    }
+    #rwAdOverlay .rw-ad-titulo { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+    #rwAdOverlay .rw-ad-sub { font-size: 12px; color: #9ca3af; margin-bottom: 14px; }
+    #rwAdOverlay .rw-ad-barra {
+      height: 5px;
+      background: #374151;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    #rwAdOverlay .rw-ad-fill { height: 100%; width: 0%; background: #2563eb; transition: width 0.2s linear; }
+    #rwAdOverlay .rw-ad-rodape {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #9ca3af;
+    }
+    #rwAdOverlay .rw-ad-skip {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border: none;
+      font-family: inherit;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    #rwAdOverlay .rw-ad-skip:disabled { opacity: 0.4; cursor: default; }
+    #rwAdOverlay .rw-ad-sucesso {
+      display: none;
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      background: #000;
+      padding: 26px 20px;
+      text-align: center;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+    #rwAdOverlay .rw-ad-check {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: rgba(22, 163, 74, 0.15);
+      color: #16a34a;
+      font-size: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+    }
+    #rwAdOverlay .rw-ad-spinner-t {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 3px solid rgba(255,255,255,0.15);
+      border-top-color: #2563eb;
+      animation: rwSpin 0.9s linear infinite;
+      margin: 0 auto 16px;
+    }
+    #rwAdOverlay .rw-ad-sucesso h3 { margin: 0 0 6px; font-size: 16px; color: #fff; }
+    #rwAdOverlay .rw-ad-sucesso p { margin: 0 0 18px; font-size: 12px; color: #9ca3af; }
+    #rwAdOverlay .rw-ad-sucesso button {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      font-family: inherit;
+      padding: 10px 20px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    @keyframes rwSpin { to { transform: rotate(360deg); } }
+    #rwToast {
+      display: none;
+      position: fixed;
+      bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+      left: 50%;
+      transform: translateX(-50%);
+      background: #111827;
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 30px;
+      font-size: 13px;
+      z-index: 10080;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+      max-width: 90vw;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -7588,6 +7906,11 @@ window.firebaseModules = {
     <button class="btn" id="redeemCodeBtn" onclick="openRedeemCodeModal()">
       <svg viewBox="0 0 24 24"><path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 00-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"/></svg>
       Resgatar Código
+    </button>
+
+    <button class="btn" id="rewardedAdsBtn" onclick="RewardedAds.abrirPagina()">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+      Ganhar Pontos (Demo)
     </button>
 
     <button class="btn" onclick="openHistoryModal()">
@@ -9064,6 +9387,86 @@ window.firebaseModules = {
     </div>
   </div>
   <div id="pdAdToast"></div>
+
+  <div id="rwOverlay" class="redeem-overlay">
+    <div class="redeem-overlay-content">
+      <div class="content-header">
+        <button class="content-header-btn back-btn" id="rwVoltar" type="button">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <h1 class="content-header-title">Ganhar Pontos</h1>
+        <div style="width: 40px;"></div>
+      </div>
+
+      <div class="redeem-container">
+        <div class="rw-saldo">
+          <div class="rw-saldo-ic">★</div>
+          <div class="rw-saldo-info">
+            <div class="rw-saldo-num" id="rwPontosTotal">0</div>
+            <div class="rw-saldo-txt">pontos demo acumulados</div>
+          </div>
+          <span class="rw-pill-demo">DEMO</span>
+        </div>
+
+        <div class="rw-aviso">
+          Modo demonstração: estes pontos ficam guardados só neste dispositivo e
+          <strong>não são somados</strong> ao teu saldo real do Portal Digital.
+        </div>
+
+        <div class="rw-card">
+          <h3>Ver anúncio</h3>
+          <p>Assiste o anúncio até ao fim para que conte. Se ignorares antes do fim, ele não conta para os pontos.</p>
+
+          <div class="rw-bolinhas">
+            <div class="rw-bolinha" id="rwBolinha1">1</div>
+            <span class="rw-seta">➜</span>
+            <div class="rw-bolinha" id="rwBolinha2">2</div>
+          </div>
+          <div class="rw-progresso-txt" id="rwProgressoTxt"></div>
+          <div class="rw-hoje" id="rwHojeTxt"></div>
+
+          <button class="rw-btn" id="rwBtnAnuncio" type="button" disabled>⏳ A preparar anúncio...</button>
+        </div>
+
+        <div class="rw-reset">
+          <button type="button" id="rwRepor">Repor pontos demo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="rwAdOverlay">
+    <div class="rw-ad-caixa">
+      <div class="rw-ad-fase">
+        <div class="rw-ad-video">
+          <div class="rw-ad-topo">
+            <img src="https://portaldigital.vercel.app/logo.png" alt="Portal Digital">
+            <div class="txt"><span class="selo">ANÚNCIO</span>Portal Digital<small>Visita o nosso portal</small></div>
+            <button type="button" id="rwAdAbrir">Abrir</button>
+          </div>
+          <div id="rwYtPlayer"></div>
+        </div>
+        <div class="rw-ad-corpo">
+          <div class="rw-ad-titulo" id="rwAdTitulo">A exibir anúncio</div>
+          <div class="rw-ad-sub">Não saias desta página até terminar</div>
+          <div class="rw-ad-barra"><div class="rw-ad-fill" id="rwAdFill"></div></div>
+          <div class="rw-ad-rodape">
+            <span id="rwAdTempo">--:--</span>
+            <button class="rw-ad-skip" id="rwAdSkip" type="button" disabled>Ignorar anúncio</button>
+          </div>
+        </div>
+
+        <div class="rw-ad-sucesso" id="rwAdSucesso">
+          <div class="rw-ad-check" id="rwSucessoIcone">✓</div>
+          <div class="rw-ad-spinner-t" id="rwSucessoSpinner" style="display:none"></div>
+          <h3 id="rwSucessoTitulo"></h3>
+          <p id="rwSucessoTexto"></p>
+          <button type="button" id="rwSucessoBotao">Continuar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="rwToast"></div>
 
   <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>const THEME_STORAGE_KEY = "gamePlusThemePreference";
 let manualThemeOverride = false;
@@ -14445,6 +14848,7 @@ function isAnyModalOpen() {
     "commentsOverlay",
     "downloadsOverlay",
     "redeemOverlay",
+    "rwOverlay",
     "publishOverlay",
     "manageOverlay",
     "searchOverlay",
@@ -15152,6 +15556,10 @@ document.addEventListener("keydown", (e) => {
 
     limparLiberacao: function () {
       liberadoPara = null;
+    },
+
+    listarAnuncios: function () {
+      return ANUNCIOS_ATIVOS.slice();
     }
   };
 
@@ -15465,6 +15873,602 @@ function renderAdStats() {
       </div>`;
   }).join("");
 }
+</script>
+<script>
+/* Anúncios recompensados (DEMO)
+   Os pontos deste módulo são guardados só no localStorage deste dispositivo,
+   com chaves próprias (pd_demo_rw_*). Nunca tocam em userPoints, no Firestore
+   nem no contador do cabeçalho. */
+(function () {
+  'use strict';
+
+  const VIDEO_ID = 'JDjhs9hF9f0';
+  const LINK_ANUNCIO = 'https://portaldigital.vercel.app';
+
+  const SEGUNDOS_PARA_IGNORAR = 15;
+  const SEGUNDOS_PARA_CLIQUE = 5;
+  const ANUNCIOS_NECESSARIOS = 2;
+  const PONTOS_POR_CICLO = 20;
+  const LIMITE_DIARIO = 100;
+  const COOLDOWN_SEG = 15;
+  const SEGUNDOS_TRANSICAO = 2;
+  const LIMITE_INICIO_MS = 10000;
+  const STALL_MS = 15000;
+  const TIMEOUT_API_MS = 20000;
+
+  const CH_PONTOS = 'pd_demo_rw_pontos';
+  const CH_PROGRESSO = 'pd_demo_rw_progresso';
+  const CH_PONTOS_HOJE = 'pd_demo_rw_pontos_hoje';
+  const CH_DATA_HOJE = 'pd_demo_rw_data_hoje';
+
+  const $ = (id) => document.getElementById(id);
+
+  let ytPlayer = null;
+  let apiEmCarga = false;
+  let indisponivel = false;
+  let videoPronto = false;
+  let fase = 'inicio';
+  let progressoCarga = 0;
+  let precargaComecou = false;
+  let ultimaFracao = 0;
+  let ultimoAvanco = 0;
+  let iniciouReproducao = false;
+  let cooldownRestante = 0;
+  let timerApi = null;
+  let timerCarga = null;
+  let timerProgresso = null;
+  let timerTransicao = null;
+  let timerInicio = null;
+  let timerCooldown = null;
+  let toastTimer = null;
+  let anuncioAtual = { videoId: VIDEO_ID, link: LINK_ANUNCIO };
+  const falhados = new Set();
+  let motivoIndisponivel = '';
+
+  /* ---------- armazenamento local (só demo) ---------- */
+  function ler(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function gravar(k, v) { try { localStorage.setItem(k, String(v)); } catch (e) {} }
+  function apagar(k) { try { localStorage.removeItem(k); } catch (e) {} }
+  function lerInt(k) { const n = parseInt(ler(k) || '0', 10); return isNaN(n) ? 0 : n; }
+
+  function dataHoje() {
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function pontosHoje() { return ler(CH_DATA_HOJE) === dataHoje() ? lerInt(CH_PONTOS_HOJE) : 0; }
+  function limiteDiarioAtingido() { return pontosHoje() >= LIMITE_DIARIO; }
+
+  function atualizarPainel() {
+    $('rwPontosTotal').textContent = lerInt(CH_PONTOS);
+    const p = lerInt(CH_PROGRESSO);
+    for (let i = 1; i <= ANUNCIOS_NECESSARIOS; i++) {
+      const bola = $('rwBolinha' + i);
+      bola.classList.toggle('feito', i <= p);
+      bola.textContent = i <= p ? '✓' : i;
+    }
+    $('rwProgressoTxt').innerHTML = '<b>' + p + '</b> de ' + ANUNCIOS_NECESSARIOS + ' anúncios assistidos até ao fim';
+    $('rwHojeTxt').textContent = 'Hoje: ' + pontosHoje() + ' / ' + LIMITE_DIARIO + ' pontos demo';
+  }
+
+  function registarAnuncioConcluido() {
+    let p = lerInt(CH_PROGRESSO) + 1;
+    let ganhouAgora = false;
+    let limiteAtingido = false;
+    if (p >= ANUNCIOS_NECESSARIOS) {
+      if (limiteDiarioAtingido()) {
+        limiteAtingido = true;
+      } else {
+        gravar(CH_PONTOS, lerInt(CH_PONTOS) + PONTOS_POR_CICLO);
+        gravar(CH_DATA_HOJE, dataHoje());
+        gravar(CH_PONTOS_HOJE, pontosHoje() + PONTOS_POR_CICLO);
+        ganhouAgora = true;
+      }
+      p = 0;
+    }
+    gravar(CH_PROGRESSO, p);
+    atualizarPainel();
+    atualizarBotao();
+    return { ganhouAgora: ganhouAgora, limiteAtingido: limiteAtingido };
+  }
+
+  /* ---------- botão principal ---------- */
+  function atualizarBotao() {
+    const btn = $('rwBtnAnuncio');
+    if (limiteDiarioAtingido()) {
+      btn.disabled = true;
+      btn.textContent = '⏸ Limite diário atingido';
+    } else if (indisponivel) {
+      btn.disabled = false;
+      btn.textContent = '⚠ Anúncio indisponível' + (motivoIndisponivel ? ' (' + motivoIndisponivel + ')' : '') + '. Toca para tentar de novo';
+    } else if (videoPronto && cooldownRestante <= 0) {
+      btn.disabled = false;
+      btn.textContent = '▶ Ver anúncio';
+    } else {
+      btn.disabled = true;
+      if (cooldownRestante > 0) {
+        btn.textContent = '⏳ Novo anúncio em ' + cooldownRestante + 's';
+      } else {
+        btn.textContent = '⏳ A carregar anúncio' + (progressoCarga > 0 ? ' ' + progressoCarga + '%' : '...');
+      }
+    }
+  }
+
+  function toast(msg, ms) {
+    const t = $('rwToast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { t.style.display = 'none'; }, ms || 2600);
+  }
+
+  /* ---------- API do YouTube (carregada só quando o ecrã abre) ---------- */
+  function apiPronta() { return !!(window.YT && typeof window.YT.Player === 'function'); }
+
+  function falhaApi() {
+    clearInterval(timerApi);
+    apiEmCarga = false;
+    indisponivel = true;
+    motivoIndisponivel = 'sem acesso ao YouTube';
+    atualizarBotao();
+    toast('Não foi possível carregar o anúncio');
+  }
+
+  function garantirApi(cb) {
+    if (apiPronta()) { cb(); return; }
+    if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      tag.onerror = falhaApi;
+      document.head.appendChild(tag);
+    }
+    const t0 = Date.now();
+    clearInterval(timerApi);
+    timerApi = setInterval(() => {
+      if (apiPronta()) { clearInterval(timerApi); cb(); }
+      else if (Date.now() - t0 > TIMEOUT_API_MS) falhaApi();
+    }, 300);
+  }
+
+  // Anúncios reais da app primeiro (já provados neste ambiente); o vídeo fixo da demo fica como último recurso.
+  function candidatos() {
+    let lista = [];
+    try {
+      if (window.PortalAd && typeof window.PortalAd.listarAnuncios === 'function') lista = window.PortalAd.listarAnuncios() || [];
+    } catch (e) {}
+    lista = lista.filter((a) => a && a.videoId).map((a) => ({ videoId: a.videoId, link: a.link || LINK_ANUNCIO }));
+    lista.push({ videoId: VIDEO_ID, link: LINK_ANUNCIO });
+    return lista.filter((a, i, arr) => arr.findIndex((b) => b.videoId === a.videoId) === i);
+  }
+
+  function escolherAnuncio() {
+    const livres = candidatos().filter((a) => !falhados.has(a.videoId));
+    if (!livres.length) return false;
+    const outros = livres.filter((a) => a.videoId !== anuncioAtual.videoId);
+    const pool = outros.length ? outros : livres;
+    const reais = pool.filter((a) => a.videoId !== VIDEO_ID);
+    const fonte = reais.length ? reais : pool;
+    anuncioAtual = fonte[Math.floor(Math.random() * fonte.length)];
+    return true;
+  }
+
+  function preparar() {
+    if (ytPlayer || apiEmCarga) return;
+    apiEmCarga = true;
+    indisponivel = false;
+    motivoIndisponivel = '';
+    escolherAnuncio();
+    atualizarBotao();
+    garantirApi(criarPlayer);
+  }
+
+  function criarPlayer() {
+    try {
+      ytPlayer = new YT.Player('rwYtPlayer', {
+        videoId: anuncioAtual.videoId,
+        width: '100%',
+        height: '100%',
+        playerVars: { controls: 0, disablekb: 1, modestbranding: 1, rel: 0, playsinline: 1, autoplay: 0 },
+        events: {
+          onReady: function () { apiEmCarga = false; comecarCarga(true); },
+          onStateChange: onEstadoVideoMudou,
+          onError: onErroPlayer
+        }
+      });
+    } catch (e) {
+      ytPlayer = null;
+      falhaApi();
+    }
+  }
+
+  function onErroPlayer(e) {
+    clearInterval(timerCarga);
+    falhados.add(anuncioAtual.videoId);
+    if (fase === 'anuncio' || fase === 'transicao') {
+      abortarAnuncio('Não foi possível reproduzir o anúncio');
+      return;
+    }
+    // tenta outro vídeo antes de desistir
+    if (escolherAnuncio()) { comecarCarga(false); return; }
+    videoPronto = false;
+    indisponivel = true;
+    motivoIndisponivel = e && e.data ? 'erro ' + e.data : 'erro no vídeo';
+    atualizarBotao();
+    toast('Não foi possível carregar o anúncio (' + motivoIndisponivel + ')');
+  }
+
+  /* ---------- pré-carga do vídeo ---------- */
+  function comecarCarga(primeira) {
+    fase = 'precarga';
+    videoPronto = false;
+    precargaComecou = false;
+    ultimaFracao = 0;
+    ultimoAvanco = Date.now();
+    progressoCarga = 0;
+    atualizarBotao();
+    try {
+      ytPlayer.mute();
+      if (primeira) ytPlayer.playVideo(); else ytPlayer.loadVideoById(anuncioAtual.videoId);
+    } catch (e) {}
+    clearInterval(timerCarga);
+    timerCarga = setInterval(verificarCarga, 300);
+  }
+
+  function verificarCarga() {
+    if (fase !== 'precarga') { clearInterval(timerCarga); return; }
+    const parado = Date.now() - ultimoAvanco > STALL_MS;
+    if (!precargaComecou) {
+      if (parado) finalizarPrecarga();
+      return;
+    }
+    const f = ytPlayer.getVideoLoadedFraction ? ytPlayer.getVideoLoadedFraction() : 0;
+    progressoCarga = Math.min(99, Math.round(f * 100));
+    if (f > ultimaFracao) { ultimaFracao = f; ultimoAvanco = Date.now(); }
+    atualizarBotao();
+    if (f >= 0.99 || parado) finalizarPrecarga();
+  }
+
+  function finalizarPrecarga() {
+    clearInterval(timerCarga);
+    if (fase !== 'precarga') return;
+    fase = 'pronto';
+    try {
+      ytPlayer.pauseVideo();
+      ytPlayer.seekTo(0, true);
+    } catch (e) {}
+    setTimeout(() => { if (fase === 'pronto') { try { ytPlayer.pauseVideo(); } catch (e) {} } }, 150);
+    progressoCarga = 100;
+    videoPronto = true;
+    atualizarBotao();
+  }
+
+  function onEstadoVideoMudou(evento) {
+    const E = YT.PlayerState;
+    if (fase === 'pronto' && evento.data === E.PLAYING) { try { ytPlayer.pauseVideo(); } catch (e) {} return; }
+    if (fase === 'precarga' && (evento.data === E.PLAYING || evento.data === E.BUFFERING)) precargaComecou = true;
+    if (fase === 'anuncio' && evento.data === E.PLAYING) {
+      iniciouReproducao = true;
+      clearTimeout(timerInicio);
+    }
+    if (evento.data !== E.ENDED) return;
+    if (fase === 'precarga') { finalizarPrecarga(); return; }
+    if (fase === 'anuncio') anuncioConcluido();
+  }
+
+  /* ---------- feedback ---------- */
+  function vibrarRecompensa() {
+    if (navigator.vibrate) { try { navigator.vibrate([120, 60, 120]); } catch (e) {} }
+  }
+
+  function tocarSomRecompensa() {
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      const ctx = new Ctx();
+      const tom = (freq, inicio, duracao) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.0001, ctx.currentTime + inicio);
+        gain.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + inicio + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + inicio + duracao);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime + inicio);
+        osc.stop(ctx.currentTime + inicio + duracao + 0.05);
+      };
+      tom(880, 0, 0.12);
+      tom(1320, 0.12, 0.18);
+    } catch (e) {}
+  }
+
+  /* ---------- ecrã inteiro e botão voltar ---------- */
+  function pedirFullscreen() {
+    const el = $('rwAdOverlay');
+    const pedir = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+    const bloquear = () => {
+      if (screen.orientation && screen.orientation.lock) screen.orientation.lock('portrait').catch(() => {});
+    };
+    if (pedir) {
+      try {
+        const p = pedir.call(el);
+        if (p && p.then) p.then(bloquear).catch(bloquear); else bloquear();
+      } catch (e) { bloquear(); }
+    } else {
+      bloquear();
+    }
+  }
+
+  function sairFullscreen() {
+    if (screen.orientation && screen.orientation.unlock) {
+      try { screen.orientation.unlock(); } catch (e) {}
+    }
+    const sair = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+    if (sair && (document.fullscreenElement || document.webkitFullscreenElement)) {
+      try { const p = sair.call(document); if (p && p.catch) p.catch(() => {}); } catch (e) {}
+    }
+  }
+
+  let bloquearVoltar = false;
+  let consumindoVoltar = false;
+
+  function prenderVoltar() {
+    if (bloquearVoltar) return;
+    bloquearVoltar = true;
+    try { history.pushState({ rwAd: true }, ''); } catch (e) {}
+  }
+
+  function libertarVoltar() {
+    if (!bloquearVoltar) return;
+    bloquearVoltar = false;
+    if (history.state && history.state.rwAd) {
+      // remove a entrada de histórico criada para bloquear o botão voltar
+      consumindoVoltar = true;
+      setTimeout(() => { consumindoVoltar = false; }, 600);
+      try { history.back(); } catch (e) { consumindoVoltar = false; }
+    }
+  }
+
+  // Em captura, para o handler de popstate do resto da app não reagir a estes eventos.
+  window.addEventListener('popstate', function (e) {
+    if (consumindoVoltar) {
+      consumindoVoltar = false;
+      e.stopImmediatePropagation();
+      return;
+    }
+    if (bloquearVoltar) {
+      e.stopImmediatePropagation();
+      try { history.pushState({ rwAd: true }, ''); } catch (err) {}
+      toast('Termina o anúncio para continuares');
+    }
+  }, true);
+
+  /* ---------- reprodução do anúncio ---------- */
+  function abrirLink() {
+    const link = anuncioAtual.link || LINK_ANUNCIO;
+    if (typeof openLinkInGA === 'function') openLinkInGA(link);
+    else window.open(link, '_blank', 'noopener');
+  }
+
+  function iniciarReproducao() {
+    $('rwAdSkip').disabled = true;
+    $('rwAdFill').style.width = '0%';
+    $('rwAdTempo').textContent = '--:--';
+    $('rwAdTitulo').textContent = 'Anúncio ' + (lerInt(CH_PROGRESSO) + 1) + ' de ' + ANUNCIOS_NECESSARIOS;
+    iniciouReproducao = false;
+    try {
+      ytPlayer.unMute();
+      ytPlayer.setVolume(100);
+      ytPlayer.seekTo(0, true);
+      ytPlayer.playVideo();
+    } catch (e) {}
+    // se o vídeo não arrancar, não deixa o utilizador preso no ecrã do anúncio
+    clearTimeout(timerInicio);
+    timerInicio = setTimeout(() => {
+      if (fase === 'anuncio' && !iniciouReproducao) abortarAnuncio('O anúncio não iniciou. Tenta novamente.');
+    }, LIMITE_INICIO_MS);
+    iniciarProgresso();
+  }
+
+  function abrirAnuncio() {
+    if (!videoPronto || cooldownRestante > 0) {
+      toast('O anúncio ainda não está disponível, aguarda um instante');
+      return;
+    }
+    if (limiteDiarioAtingido()) {
+      toast('Já atingiste o limite diário de ' + LIMITE_DIARIO + ' pontos demo. Volta amanhã.');
+      return;
+    }
+    fase = 'anuncio';
+    $('rwAdSucesso').style.display = 'none';
+    $('rwAdOverlay').classList.add('aberto');
+    prenderVoltar();
+    pedirFullscreen();
+    iniciarReproducao();
+  }
+
+  function iniciarProximoAnuncioAutomatico() {
+    if (fase !== 'transicao') return;
+    $('rwAdSucesso').style.display = 'none';
+    fase = 'anuncio';
+    iniciarReproducao();
+  }
+
+  function iniciarProgresso() {
+    const skipBtn = $('rwAdSkip');
+    const fill = $('rwAdFill');
+    const tempoTxt = $('rwAdTempo');
+    clearInterval(timerProgresso);
+    timerProgresso = setInterval(() => {
+      let duracao, atual;
+      try { duracao = ytPlayer.getDuration(); atual = ytPlayer.getCurrentTime(); } catch (e) { return; }
+      if (!duracao) return;
+      fill.style.width = Math.min(100, (atual / duracao) * 100) + '%';
+      const restante = Math.max(0, Math.ceil(duracao - atual));
+      tempoTxt.textContent = Math.floor(restante / 60) + ':' + String(restante % 60).padStart(2, '0');
+      if (atual >= SEGUNDOS_PARA_IGNORAR) skipBtn.disabled = false;
+    }, 250);
+  }
+
+  function anuncioConcluido() {
+    if (fase !== 'anuncio') return;
+    clearInterval(timerProgresso);
+    clearTimeout(timerInicio);
+    try { ytPlayer.pauseVideo(); } catch (e) {}
+
+    const resultado = registarAnuncioConcluido();
+    const icone = $('rwSucessoIcone');
+    const spinner = $('rwSucessoSpinner');
+    const titulo = $('rwSucessoTitulo');
+    const texto = $('rwSucessoTexto');
+    const botao = $('rwSucessoBotao');
+
+    if (resultado.limiteAtingido || resultado.ganhouAgora) {
+      fase = 'sucesso';
+      spinner.style.display = 'none';
+      icone.style.display = 'flex';
+      botao.style.display = 'inline-block';
+      if (resultado.limiteAtingido) {
+        icone.textContent = '⏸';
+        titulo.textContent = 'Limite diário atingido';
+        texto.textContent = 'Já atingiste o limite de ' + LIMITE_DIARIO + ' pontos demo por hoje. Volta amanhã para ganhar mais.';
+      } else {
+        icone.textContent = '✓';
+        titulo.textContent = '🎉 Ganhaste ' + PONTOS_POR_CICLO + ' pontos demo!';
+        texto.textContent = 'Foram adicionados ao saldo de demonstração. O teu saldo real não foi alterado.';
+        vibrarRecompensa();
+        tocarSomRecompensa();
+      }
+    } else {
+      fase = 'transicao';
+      icone.style.display = 'none';
+      spinner.style.display = 'block';
+      botao.style.display = 'none';
+      titulo.textContent = 'A carregar o próximo anúncio...';
+      texto.textContent = '';
+      clearTimeout(timerTransicao);
+      timerTransicao = setTimeout(iniciarProximoAnuncioAutomatico, SEGUNDOS_TRANSICAO * 1000);
+    }
+    $('rwAdSucesso').style.display = 'flex';
+  }
+
+  // Fecha o ecrã do anúncio (com ou sem aviso) e inicia o tempo de espera até ao próximo.
+  function encerrarOverlay(msg) {
+    clearInterval(timerProgresso);
+    clearTimeout(timerTransicao);
+    clearTimeout(timerInicio);
+    try { if (ytPlayer) ytPlayer.pauseVideo(); } catch (e) {}
+    fase = 'pronto';
+    sairFullscreen();
+    $('rwAdSucesso').style.display = 'none';
+    $('rwAdOverlay').classList.remove('aberto');
+    libertarVoltar();
+    if (msg) toast(msg);
+    iniciarCooldown();
+  }
+
+  function abortarAnuncio(msg) {
+    if (fase !== 'anuncio' && fase !== 'transicao') return;
+    encerrarOverlay(msg);
+  }
+
+  function iniciarCooldown() {
+    videoPronto = false;
+    progressoCarga = 0;
+    cooldownRestante = COOLDOWN_SEG;
+    escolherAnuncio();
+    comecarCarga(false);
+    clearInterval(timerCooldown);
+    timerCooldown = setInterval(() => {
+      cooldownRestante--;
+      if (cooldownRestante <= 0) {
+        clearInterval(timerCooldown);
+        cooldownRestante = 0;
+      }
+      atualizarBotao();
+    }, 1000);
+  }
+
+  /* ---------- eventos ---------- */
+  $('rwBtnAnuncio').addEventListener('click', function () {
+    if (indisponivel) {
+      indisponivel = false;
+      motivoIndisponivel = '';
+      falhados.clear();
+      escolherAnuncio();
+      if (ytPlayer) comecarCarga(false); else preparar();
+      atualizarBotao();
+      return;
+    }
+    abrirAnuncio();
+  });
+
+  $('rwAdSkip').addEventListener('click', function (e) {
+    e.stopPropagation();
+    abortarAnuncio('Anúncio ignorado — não conta para os pontos');
+  });
+
+  $('rwAdAbrir').addEventListener('click', function (e) {
+    e.stopPropagation();
+    abrirLink();
+    abortarAnuncio('Anúncio interrompido — não conta para os pontos');
+  });
+
+  $('rwAdOverlay').addEventListener('click', function () {
+    if (fase !== 'anuncio' || !ytPlayer) return;
+    let atual = 0;
+    try { atual = ytPlayer.getCurrentTime(); } catch (e) {}
+    if (atual < SEGUNDOS_PARA_CLIQUE) return;
+    abrirLink();
+    abortarAnuncio('Anúncio interrompido — não conta para os pontos');
+  });
+
+  $('rwSucessoBotao').addEventListener('click', function () {
+    if (fase !== 'sucesso') return;
+    encerrarOverlay();
+  });
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden && (fase === 'anuncio' || fase === 'transicao')) {
+      abortarAnuncio('Anúncio cancelado — saíste da app antes de terminar');
+    }
+  });
+
+  /* ---------- ecrã "Ganhar Pontos" ---------- */
+  function abrirPagina() {
+    if (typeof closeSidebar === 'function') closeSidebar();
+    $('rwOverlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+    atualizarPainel();
+    atualizarBotao();
+    preparar();
+  }
+
+  function fecharPagina() {
+    $('rwOverlay').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  function emAnuncio() { return fase === 'anuncio' || fase === 'transicao' || fase === 'sucesso'; }
+
+  function reporDemo() {
+    if (emAnuncio()) return;
+    [CH_PONTOS, CH_PROGRESSO, CH_PONTOS_HOJE, CH_DATA_HOJE].forEach(apagar);
+    atualizarPainel();
+    atualizarBotao();
+    toast('Pontos demo repostos');
+  }
+
+  $('rwVoltar').addEventListener('click', fecharPagina);
+  $('rwRepor').addEventListener('click', reporDemo);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && $('rwOverlay').classList.contains('active') && !emAnuncio()) fecharPagina();
+  });
+
+  atualizarPainel();
+
+  window.RewardedAds = { abrirPagina: abrirPagina };
+})();
 </script>
 </body>
 </html>
