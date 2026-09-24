@@ -7547,6 +7547,7 @@ window.firebaseModules = {
       flex-shrink: 0;
     }
     .rw-saldo-info { flex: 1; min-width: 0; }
+    #rwSaldoTotalUsuario { flex-shrink: 0; }
     .rw-saldo-num { font-size: 26px; font-weight: 700; line-height: 1.1; color: var(--text-primary); }
     .rw-saldo-txt { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
     .rw-pill-demo {
@@ -9503,10 +9504,14 @@ window.firebaseModules = {
 
       <div class="redeem-container">
         <div class="rw-saldo">
-          <div class="rw-saldo-ic">★</div>
+          <div class="rw-saldo-ic"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM8.5 15.5l2-2.5 1.5 1.5 2.5-3.5 3 4.5H6.5l2-3z"/></svg></div>
           <div class="rw-saldo-info">
             <div class="rw-saldo-num" id="rwPontosTotal">0</div>
             <div class="rw-saldo-txt">total de pontos ganhos com anúncios</div>
+          </div>
+          <div class="profile-header-points" id="rwSaldoTotalUsuario" title="Seu saldo total de pontos">
+            <svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/></svg>
+            <span id="rwSaldoTotalValue">0</span>
           </div>
         </div>
 
@@ -9782,6 +9787,8 @@ function _syncPointsDisplay(newPoints) {
 function updatePointsDisplay() {
   const headerPointsValue = document.getElementById("headerPointsValue");
   if (headerPointsValue) headerPointsValue.textContent = userPoints || 0;
+  const rwSaldoTotalValue = document.getElementById("rwSaldoTotalValue");
+  if (rwSaldoTotalValue) rwSaldoTotalValue.textContent = userPoints || 0;
 }
 function updateUIForUser() {
   const loginBtn = document.getElementById("loginBtn");
@@ -10457,7 +10464,7 @@ async function downloadGame(gameId, appType, url, cost) {
     return;
   }
   if (userPoints < cost) {
-    showCustomAlert("Voc\xEA n\xE3o tem pontos suficientes! Resgate um c\xF3digo para obter mais pontos.");
+    showInsufficientPointsAlert();
     return;
   }
   if (!url || url.trim() === "") {
@@ -10472,7 +10479,7 @@ async function downloadGame(gameId, appType, url, cost) {
     const userData = userSnapshot.val() || {};
     const currentPoints = userData.points || 0;
     if (currentPoints < cost) {
-      showCustomAlert("Voc\xEA n\xE3o tem pontos suficientes! Resgate um c\xF3digo para obter mais pontos.");
+      showInsufficientPointsAlert();
       return;
     }
     const newPointsTotal = currentPoints - cost;
@@ -12808,6 +12815,20 @@ function showCustomAlert(message) {
         <div class="custom-modal-content">
           <p style="margin: 0 0 16px 0;">${message}</p>
           <div class="custom-modal-buttons">
+            <button class="custom-modal-btn primary" onclick="this.closest('.custom-modal').remove()">OK</button>
+          </div>
+        </div>
+      `;
+  document.body.appendChild(modal);
+}
+function showInsufficientPointsAlert() {
+  const modal = document.createElement("div");
+  modal.className = "custom-modal active";
+  modal.innerHTML = `
+        <div class="custom-modal-content">
+          <p style="margin: 0 0 16px 0;">Voc\xEA n\xE3o tem pontos suficientes! Resgate um c\xF3digo ou ganhe mais pontos para obter este conte\xFAdo.</p>
+          <div class="custom-modal-buttons">
+            <button class="custom-modal-btn secondary" onclick="this.closest('.custom-modal').remove(); RewardedAds.abrirPagina();">Ganhar + Pontos</button>
             <button class="custom-modal-btn primary" onclick="this.closest('.custom-modal').remove()">OK</button>
           </div>
         </div>
@@ -16154,6 +16175,7 @@ function renderAdStats() {
 
   function atualizarPainel() {
     $('rwPontosTotal').textContent = estado.totalEarned;
+    if (typeof updatePointsDisplay === 'function') updatePointsDisplay();
     const feitos = anunciosHoje();
     for (let i = 1; i <= MAX_ANUNCIOS_DIA; i++) {
       const bola = $('rwBolinha' + i);
@@ -16227,7 +16249,7 @@ function renderAdStats() {
       btn.textContent = carregandoEstado ? '⏳ A carregar os teus pontos...' : '⚠ Não foi possível carregar. Toca para tentar de novo';
     } else if (limiteDiarioAtingido()) {
       btn.disabled = true;
-      btn.textContent = '⏸ Limite diário atingido';
+      btn.textContent = 'Limite diário atingido';
     } else if (indisponivel) {
       btn.disabled = false;
       btn.textContent = motivoIndisponivel === MOTIVO_SEM_ANUNCIOS
@@ -16711,7 +16733,7 @@ function renderAdStats() {
     fase = 'sucesso';
     $('rwSucessoSpinner').style.display = 'none';
     $('rwSucessoIcone').style.display = 'flex';
-    $('rwSucessoIcone').textContent = icone;
+    $('rwSucessoIcone').innerHTML = icone;
     $('rwSucessoTitulo').textContent = titulo;
     $('rwSucessoTexto').textContent = texto;
     $('rwSucessoBotao').style.display = 'inline-block';
@@ -16765,7 +16787,7 @@ function renderAdStats() {
           (resto <= 0 ? '. Este foi o último de hoje.' : '.'), true);
       } else if (r.status === 'limite') {
         gravar(CH_PROGRESSO, 0);
-        mostrarResultado('⏸', 'Limite diário atingido',
+        mostrarResultado('<svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM8.5 15.5l2-2.5 1.5 1.5 2.5-3.5 3 4.5H6.5l2-3z"/></svg>', 'Limite diário atingido',
           'Já atingiste o limite de hoje. Volta dentro de ' + tempoAteNovaJanela() + ' para ganhar mais.', false);
       } else if (r.status === 'login') {
         mostrarResultado('🔒', 'Sessão necessária', 'Inicia sessão com uma conta verificada para receber os pontos.', false);
