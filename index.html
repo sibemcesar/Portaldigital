@@ -7544,6 +7544,103 @@ window.firebaseModules = {
     .pdprep-overlay.active .pdprep-bar > span { animation: pdprepBar 2.5s linear forwards; }
     @keyframes pdprepSpin { to { transform: rotate(360deg); } }
     @keyframes pdprepBar { to { width: 100%; } }
+    .pdlink-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 10100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: calc(20px + env(safe-area-inset-top, 0px)) 20px calc(20px + env(safe-area-inset-bottom, 0px));
+      background: rgba(0, 0, 0, 0.65);
+      -webkit-backdrop-filter: blur(4px);
+      backdrop-filter: blur(4px);
+      animation: pdlinkFade 0.2s ease;
+    }
+    .pdlink-card {
+      width: 100%;
+      max-width: 340px;
+      padding: 28px 22px 18px;
+      text-align: center;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 22px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+      animation: pdlinkIn 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+    }
+    .pdlink-check {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      color: #16a34a;
+      background: rgba(34, 197, 94, 0.15);
+    }
+    .pdlink-title { font-size: 19px; font-weight: 700; margin: 0 0 4px; color: var(--text-primary); }
+    .pdlink-sub { font-size: 14px; margin: 0 0 12px; color: var(--text-secondary); }
+    .pdlink-pontos {
+      display: inline-block;
+      margin-bottom: 20px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      border-radius: 999px;
+      color: var(--text-secondary);
+      background: var(--bg-secondary);
+    }
+    .pdlink-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+      padding: 10px 14px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      border-radius: 14px;
+      border: 1px solid transparent;
+      transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+    .pdlink-btn:active { transform: scale(0.98); }
+    .pdlink-btn-icon {
+      flex: 0 0 auto;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    .pdlink-btn-text { flex: 1 1 auto; }
+    .pdlink-btn-main { background: var(--accent-primary); color: var(--bg-primary); box-shadow: 0 6px 16px rgba(29, 78, 216, 0.3); }
+    .pdlink-btn-main .pdlink-btn-icon { background: #ffffff; }
+    .pdlink-btn-alt { background: var(--bg-secondary); color: var(--text-primary); border-color: var(--border-color); }
+    .pdlink-btn-alt .pdlink-btn-icon { color: var(--accent-primary); background: var(--bg-card); }
+    .pdlink-btn-alt.ok { color: #16a34a; border-color: #16a34a; }
+    .pdlink-btn-alt.ok .pdlink-btn-icon { color: #16a34a; }
+    .pdlink-close {
+      margin-top: 2px;
+      padding: 8px 16px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--text-muted);
+      background: none;
+      border: none;
+    }
+    @keyframes pdlinkFade { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes pdlinkIn {
+      from { opacity: 0; transform: translateY(14px) scale(0.95); }
+      to { opacity: 1; transform: none; }
+    }
     #pdAdToast {
       display: none;
       position: fixed;
@@ -10558,35 +10655,39 @@ function copiarTextoSimples(texto) {
     }
   });
 }
-function abrirNoChrome(url) {
-  const m = url.match(/^(https?):\/\//i);
-  const esquema = m ? m[1].toLowerCase() : "https";
-  const semEsquema = url.replace(/^https?:\/\//i, "");
-  const intentUrl = `intent://${semEsquema}#Intent;scheme=${esquema};package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(url)};end`;
-  const a = document.createElement("a");
-  a.href = intentUrl;
-  a.style.display = "none";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-}
 function mostrarLinkPronto(url, cost, pontosRestantes) {
   const antigo = document.getElementById("pdLinkPronto");
   if (antigo) antigo.remove();
   const modal = document.createElement("div");
   modal.id = "pdLinkPronto";
-  modal.className = "custom-modal active";
-  modal.style.zIndex = "10100";
+  modal.className = "pdlink-overlay";
   modal.innerHTML = `
-        <div class="custom-modal-content" style="max-width: 360px; text-align: center;">
-          <h2 style="font-size: 18px;">O seu link est\xE1 pronto</h2>
-          <p style="margin-bottom: 4px;">Escolha como quer continuar:</p>
-          <p style="font-size: 12px; color: var(--text-muted);">${cost} pontos deduzidos. Pontos restantes: ${pontosRestantes}</p>
-          <div class="custom-modal-buttons" style="flex-direction: column;">
-            <button type="button" class="custom-modal-btn primary" data-acao="chrome">Abrir no Chrome</button>
-            <button type="button" class="custom-modal-btn secondary" data-acao="copiar">Copiar o link</button>
-            <button type="button" class="custom-modal-btn secondary" data-acao="fechar" style="border-color: transparent;">Fechar</button>
+        <div class="pdlink-card" role="dialog" aria-modal="true" aria-labelledby="pdLinkTitulo">
+          <div class="pdlink-check">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
           </div>
+          <h2 class="pdlink-title" id="pdLinkTitulo">O seu link est\xE1 pronto</h2>
+          <p class="pdlink-sub">Escolha como quer continuar</p>
+          <div class="pdlink-pontos">${cost} pontos deduzidos &middot; Restam ${pontosRestantes}</div>
+          <button type="button" class="pdlink-btn pdlink-btn-main" data-acao="chrome">
+            <span class="pdlink-btn-icon">
+              <svg viewBox="0 0 48 48" width="28" height="28" aria-hidden="true">
+                <path fill="#DB4437" d="M24 24L4.95 13A22 22 0 0 1 43.05 13Z"/>
+                <path fill="#F4B400" d="M24 24L43.05 13A22 22 0 0 1 24 46Z"/>
+                <path fill="#0F9D58" d="M24 24L24 46A22 22 0 0 1 4.95 13Z"/>
+                <circle cx="24" cy="24" r="10.5" fill="#ffffff"/>
+                <circle cx="24" cy="24" r="8" fill="#4285F4"/>
+              </svg>
+            </span>
+            <span class="pdlink-btn-text">Abrir no Chrome</span>
+          </button>
+          <button type="button" class="pdlink-btn pdlink-btn-alt" data-acao="copiar">
+            <span class="pdlink-btn-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </span>
+            <span class="pdlink-btn-text">Copiar o link</span>
+          </button>
+          <button type="button" class="pdlink-close" data-acao="fechar">Fechar</button>
         </div>
       `;
   modal.addEventListener("click", (e) => {
@@ -10594,14 +10695,19 @@ function mostrarLinkPronto(url, cost, pontosRestantes) {
     if (!btn) return;
     const acao = btn.dataset.acao;
     if (acao === "chrome") {
-      abrirNoChrome(url);
+      abrirLinkDownload("GA", url);
     } else if (acao === "copiar") {
+      const txt = btn.querySelector(".pdlink-btn-text");
       copiarTextoSimples(url).then(() => {
-        btn.textContent = "Link copiado!";
+        btn.classList.add("ok");
+        txt.textContent = "Link copiado!";
       }).catch(() => {
-        btn.textContent = "Erro ao copiar";
+        txt.textContent = "Erro ao copiar";
       }).then(() => {
-        setTimeout(() => { btn.textContent = "Copiar o link"; }, 2000);
+        setTimeout(() => {
+          btn.classList.remove("ok");
+          txt.textContent = "Copiar o link";
+        }, 2000);
       });
     } else {
       modal.remove();
