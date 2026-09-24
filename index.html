@@ -7780,6 +7780,46 @@ window.firebaseModules = {
       font-weight: 600;
       cursor: pointer;
     }
+    #rwAdOverlay .rw-ad-play {
+      position: absolute;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-family: inherit;
+      border: none;
+      background: #1D4ED8;
+      color: #fff;
+      padding: 12px 22px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: 700;
+      white-space: nowrap;
+      z-index: 5;
+      pointer-events: none;
+    }
+    #rwAdOverlay.rw-toque .rw-ad-video iframe { pointer-events: auto; }
+    #rwAdOverlay .rw-ad-loading {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: #9ca3af;
+      font-size: 12px;
+      z-index: 2;
+    }
+    #rwAdOverlay .rw-ad-spinner {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 3px solid rgba(255,255,255,0.15);
+      border-top-color: #60A5FA;
+      animation: rwSpin 0.9s linear infinite;
+    }
     @keyframes rwSpin { to { transform: rotate(360deg); } }
     #rwToast {
       display: none;
@@ -9445,6 +9485,8 @@ window.firebaseModules = {
             <button type="button" id="rwAdAbrir">Abrir</button>
           </div>
           <div id="rwYtPlayer"></div>
+          <div class="rw-ad-loading" id="rwAdLoading"><div class="rw-ad-spinner"></div><span>A carregar anúncio...</span></div>
+          <button class="rw-ad-play" id="rwAdPlay" type="button">▶ Toque no vídeo para reproduzir</button>
         </div>
         <div class="rw-ad-corpo">
           <div class="rw-ad-titulo" id="rwAdTitulo">A exibir anúncio</div>
@@ -15882,8 +15924,8 @@ function renderAdStats() {
 (function () {
   'use strict';
 
-  const VIDEO_ID = 'JDjhs9hF9f0';
-  const LINK_ANUNCIO = 'https://portaldigital.vercel.app';
+  const ESPERA_ANUNCIOS_MS = 6000;
+  const MOTIVO_SEM_ANUNCIOS = 'sem anúncios ativos';
 
   const SEGUNDOS_PARA_IGNORAR = 15;
   const SEGUNDOS_PARA_CLIQUE = 5;
@@ -15919,9 +15961,11 @@ function renderAdStats() {
   let timerProgresso = null;
   let timerTransicao = null;
   let timerInicio = null;
+  let timerRetry = null;
   let timerCooldown = null;
   let toastTimer = null;
-  let anuncioAtual = { videoId: VIDEO_ID, link: LINK_ANUNCIO };
+  let anuncioAtual = null;
+  let timerAnuncios = null;
   const falhados = new Set();
   let motivoIndisponivel = '';
 
@@ -15979,7 +16023,9 @@ function renderAdStats() {
       btn.textContent = '⏸ Limite diário atingido';
     } else if (indisponivel) {
       btn.disabled = false;
-      btn.textContent = '⚠ Anúncio indisponível' + (motivoIndisponivel ? ' (' + motivoIndisponivel + ')' : '') + '. Toca para tentar de novo';
+      btn.textContent = motivoIndisponivel === MOTIVO_SEM_ANUNCIOS
+        ? '⚠ Sem anúncios disponíveis. Toca para procurar'
+        : '⚠ Anúncio indisponível' + (motivoIndisponivel ? ' (' + motivoIndisponivel + ')' : '') + '. Toca para tentar de novo';
     } else if (videoPronto && cooldownRestante <= 0) {
       btn.disabled = false;
       btn.textContent = '▶ Ver anúncio';
@@ -16029,26 +16075,46 @@ function renderAdStats() {
     }, 300);
   }
 
-  // Anúncios reais da app primeiro (já provados neste ambiente); o vídeo fixo da demo fica como último recurso.
+  // Os anúncios vêm só da "Gestão de Anúncios" (lista ativa do sistema de anúncios da app).
   function candidatos() {
     let lista = [];
     try {
       if (window.PortalAd && typeof window.PortalAd.listarAnuncios === 'function') lista = window.PortalAd.listarAnuncios() || [];
     } catch (e) {}
-    lista = lista.filter((a) => a && a.videoId).map((a) => ({ videoId: a.videoId, link: a.link || LINK_ANUNCIO }));
-    lista.push({ videoId: VIDEO_ID, link: LINK_ANUNCIO });
-    return lista.filter((a, i, arr) => arr.findIndex((b) => b.videoId === a.videoId) === i);
+    return lista
+      .filter((a) => a && a.videoId && a.link)
+      .map((a) => ({ videoId: a.videoId, link: a.link }))
+      .filter((a, i, arr) => arr.findIndex((b) => b.videoId === a.videoId) === i);
   }
 
   function escolherAnuncio() {
     const livres = candidatos().filter((a) => !falhados.has(a.videoId));
     if (!livres.length) return false;
-    const outros = livres.filter((a) => a.videoId !== anuncioAtual.videoId);
+    const outros = livres.filter((a) => !anuncioAtual || a.videoId !== anuncioAtual.videoId);
     const pool = outros.length ? outros : livres;
-    const reais = pool.filter((a) => a.videoId !== VIDEO_ID);
-    const fonte = reais.length ? reais : pool;
-    anuncioAtual = fonte[Math.floor(Math.random() * fonte.length)];
+    anuncioAtual = pool[Math.floor(Math.random() * pool.length)];
     return true;
+  }
+
+  function semAnuncios() {
+    clearInterval(timerAnuncios);
+    apiEmCarga = false;
+    videoPronto = false;
+    indisponivel = true;
+    motivoIndisponivel = MOTIVO_SEM_ANUNCIOS;
+    atualizarBotao();
+  }
+
+  // A lista carrega do Firestore em segundo plano; espera um pouco por ela antes de desistir.
+  function aguardarAnuncios(cb) {
+    const t0 = Date.now();
+    clearInterval(timerAnuncios);
+    const tentar = () => {
+      if (escolherAnuncio()) { clearInterval(timerAnuncios); cb(); return true; }
+      if (Date.now() - t0 > ESPERA_ANUNCIOS_MS) semAnuncios();
+      return false;
+    };
+    if (!tentar()) timerAnuncios = setInterval(tentar, 500);
   }
 
   function preparar() {
@@ -16056,9 +16122,25 @@ function renderAdStats() {
     apiEmCarga = true;
     indisponivel = false;
     motivoIndisponivel = '';
-    escolherAnuncio();
     atualizarBotao();
-    garantirApi(criarPlayer);
+    aguardarAnuncios(() => garantirApi(criarPlayer));
+  }
+
+  async function tentarDeNovo() {
+    indisponivel = false;
+    motivoIndisponivel = '';
+    falhados.clear();
+    atualizarBotao();
+    if (!candidatos().length) {
+      try {
+        if (window.PortalAdRuntime && window.PortalAdRuntime.recarregarAtivo) await window.PortalAdRuntime.recarregarAtivo();
+      } catch (e) {}
+    }
+    if (ytPlayer) {
+      if (escolherAnuncio()) comecarCarga(false); else semAnuncios();
+    } else {
+      preparar();
+    }
   }
 
   function criarPlayer() {
@@ -16082,7 +16164,7 @@ function renderAdStats() {
 
   function onErroPlayer(e) {
     clearInterval(timerCarga);
-    falhados.add(anuncioAtual.videoId);
+    if (anuncioAtual) falhados.add(anuncioAtual.videoId);
     if (fase === 'anuncio' || fase === 'transicao') {
       abortarAnuncio('Não foi possível reproduzir o anúncio');
       return;
@@ -16148,6 +16230,10 @@ function renderAdStats() {
     if (fase === 'anuncio' && evento.data === E.PLAYING) {
       iniciouReproducao = true;
       clearTimeout(timerInicio);
+      clearInterval(timerRetry);
+      esconderAvisoToque();
+      $('rwAdLoading').style.display = 'none';
+      try { ytPlayer.unMute(); ytPlayer.setVolume(100); } catch (e) {}
     }
     if (evento.data !== E.ENDED) return;
     if (fase === 'precarga') { finalizarPrecarga(); return; }
@@ -16245,9 +16331,53 @@ function renderAdStats() {
 
   /* ---------- reprodução do anúncio ---------- */
   function abrirLink() {
-    const link = anuncioAtual.link || LINK_ANUNCIO;
+    const link = anuncioAtual && anuncioAtual.link;
+    if (!link) return;
     if (typeof openLinkInGA === 'function') openLinkInGA(link);
     else window.open(link, '_blank', 'noopener');
+  }
+
+  function armarTimerInicio() {
+    clearTimeout(timerInicio);
+    timerInicio = setTimeout(() => {
+      if (fase === 'anuncio' && !iniciouReproducao) abortarAnuncio('O anúncio não iniciou. Tenta novamente.');
+    }, LIMITE_INICIO_MS);
+  }
+
+  // Alguns WebViews bloqueiam o arranque automático: mostra o botão e deixa o toque cair no próprio vídeo.
+  function mostrarBotaoPlay() {
+    $('rwAdOverlay').classList.add('rw-toque');
+    $('rwAdLoading').style.display = 'none';
+    $('rwAdPlay').style.display = 'flex';
+    armarTimerInicio();
+  }
+
+  function esconderAvisoToque() {
+    $('rwAdOverlay').classList.remove('rw-toque');
+    $('rwAdPlay').style.display = 'none';
+  }
+
+  function limparAvisosInicio() {
+    clearInterval(timerRetry);
+    esconderAvisoToque();
+    $('rwAdLoading').style.display = 'none';
+  }
+
+  function vigiarInicio() {
+    let ticks = 0;
+    clearInterval(timerRetry);
+    timerRetry = setInterval(() => {
+      if (fase !== 'anuncio') { clearInterval(timerRetry); return; }
+      let st;
+      try { st = ytPlayer.getPlayerState(); } catch (e) { return; }
+      if (st === YT.PlayerState.PLAYING) { clearInterval(timerRetry); return; }
+      ticks++;
+      if (st === YT.PlayerState.BUFFERING) {
+        if (ticks > 15) { clearInterval(timerRetry); mostrarBotaoPlay(); }
+        return;
+      }
+      if (ticks >= 2) { clearInterval(timerRetry); mostrarBotaoPlay(); }
+    }, 1000);
   }
 
   function iniciarReproducao() {
@@ -16256,6 +16386,8 @@ function renderAdStats() {
     $('rwAdTempo').textContent = '--:--';
     $('rwAdTitulo').textContent = 'Anúncio ' + (lerInt(CH_PROGRESSO) + 1) + ' de ' + ANUNCIOS_NECESSARIOS;
     iniciouReproducao = false;
+    esconderAvisoToque();
+    $('rwAdLoading').style.display = 'flex';
     try {
       ytPlayer.unMute();
       ytPlayer.setVolume(100);
@@ -16263,10 +16395,8 @@ function renderAdStats() {
       ytPlayer.playVideo();
     } catch (e) {}
     // se o vídeo não arrancar, não deixa o utilizador preso no ecrã do anúncio
-    clearTimeout(timerInicio);
-    timerInicio = setTimeout(() => {
-      if (fase === 'anuncio' && !iniciouReproducao) abortarAnuncio('O anúncio não iniciou. Tenta novamente.');
-    }, LIMITE_INICIO_MS);
+    armarTimerInicio();
+    vigiarInicio();
     iniciarProgresso();
   }
 
@@ -16314,6 +16444,7 @@ function renderAdStats() {
     if (fase !== 'anuncio') return;
     clearInterval(timerProgresso);
     clearTimeout(timerInicio);
+    limparAvisosInicio();
     try { ytPlayer.pauseVideo(); } catch (e) {}
 
     const resultado = registarAnuncioConcluido();
@@ -16357,6 +16488,7 @@ function renderAdStats() {
     clearInterval(timerProgresso);
     clearTimeout(timerTransicao);
     clearTimeout(timerInicio);
+    limparAvisosInicio();
     try { if (ytPlayer) ytPlayer.pauseVideo(); } catch (e) {}
     fase = 'pronto';
     sairFullscreen();
@@ -16391,15 +16523,7 @@ function renderAdStats() {
 
   /* ---------- eventos ---------- */
   $('rwBtnAnuncio').addEventListener('click', function () {
-    if (indisponivel) {
-      indisponivel = false;
-      motivoIndisponivel = '';
-      falhados.clear();
-      escolherAnuncio();
-      if (ytPlayer) comecarCarga(false); else preparar();
-      atualizarBotao();
-      return;
-    }
+    if (indisponivel) { tentarDeNovo(); return; }
     abrirAnuncio();
   });
 
