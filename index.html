@@ -7993,7 +7993,7 @@ window.firebaseModules = {
 
     <button class="btn" id="rewardedAdsBtn" onclick="RewardedAds.abrirPagina()">
       <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
-      Ganhar Pontos (Demo)
+      Ganhar Pontos
     </button>
 
     <button class="btn" onclick="openHistoryModal()">
@@ -9506,33 +9506,25 @@ window.firebaseModules = {
           <div class="rw-saldo-ic">★</div>
           <div class="rw-saldo-info">
             <div class="rw-saldo-num" id="rwPontosTotal">0</div>
-            <div class="rw-saldo-txt">pontos demo acumulados</div>
+            <div class="rw-saldo-txt">total de pontos ganhos com anúncios</div>
           </div>
-          <span class="rw-pill-demo">DEMO</span>
-        </div>
-
-        <div class="rw-aviso">
-          Modo demonstração: estes pontos ficam guardados só neste dispositivo e
-          <strong>não são somados</strong> ao teu saldo real do Portal Digital.
         </div>
 
         <div class="rw-card">
           <h3>Ver anúncio</h3>
-          <p>Assiste o anúncio até ao fim para que conte. Se ignorares antes do fim, ele não conta para os pontos.</p>
+          <p>Cada anúncio vale 25 pontos e são 2 vídeos vistos até ao fim. Se ignorares antes do fim, ele não conta.</p>
 
           <div class="rw-bolinhas">
             <div class="rw-bolinha" id="rwBolinha1">1</div>
-            <span class="rw-seta">➜</span>
             <div class="rw-bolinha" id="rwBolinha2">2</div>
+            <div class="rw-bolinha" id="rwBolinha3">3</div>
+            <div class="rw-bolinha" id="rwBolinha4">4</div>
+            <div class="rw-bolinha" id="rwBolinha5">5</div>
           </div>
           <div class="rw-progresso-txt" id="rwProgressoTxt"></div>
           <div class="rw-hoje" id="rwHojeTxt"></div>
 
           <button class="rw-btn" id="rwBtnAnuncio" type="button" disabled>⏳ A preparar anúncio...</button>
-        </div>
-
-        <div class="rw-reset">
-          <button type="button" id="rwRepor">Repor pontos demo</button>
         </div>
       </div>
     </div>
@@ -16043,10 +16035,11 @@ function renderAdStats() {
 }
 </script>
 <script>
-/* Anúncios recompensados (DEMO)
-   Os pontos deste módulo são guardados só no localStorage deste dispositivo,
-   com chaves próprias (pd_demo_rw_*). Nunca tocam em userPoints, no Firestore
-   nem no contador do cabeçalho. */
+/* Anúncios recompensados
+   Cada anúncio (2 vídeos vistos até ao fim) vale 25 pontos, no máximo 5 anúncios
+   e 150 pontos por janela de 24 h. Usa a mesma lógica do bónus diário: hora do
+   servidor, escrita atómica (update multi-caminho) em adRewards/{uid} + users/{uid}/points
+   e validação nas regras da base de dados. */
 (function () {
   'use strict';
 
@@ -16055,19 +16048,19 @@ function renderAdStats() {
 
   const SEGUNDOS_PARA_IGNORAR = 15;
   const SEGUNDOS_PARA_CLIQUE = 5;
-  const ANUNCIOS_NECESSARIOS = 2;
-  const PONTOS_POR_CICLO = 20;
-  const LIMITE_DIARIO = 100;
+  const ANUNCIOS_NECESSARIOS = 2;          // vídeos por anúncio (1 anúncio = 2 vídeos)
+  const PONTOS_POR_ANUNCIO = 25;
+  const MAX_PONTOS_POR_ANUNCIO = 25;       // teto absoluto: nunca se ganha mais de 25 num anúncio
+  const MAX_ANUNCIOS_DIA = 5;
+  const LIMITE_DIARIO = 150;               // pontos recebidos por janela de 24 h
+  const JANELA_MS = 24 * 60 * 60 * 1000;
   const COOLDOWN_SEG = 15;
   const SEGUNDOS_TRANSICAO = 2;
   const LIMITE_INICIO_MS = 10000;
   const STALL_MS = 15000;
   const TIMEOUT_API_MS = 20000;
 
-  const CH_PONTOS = 'pd_demo_rw_pontos';
-  const CH_PROGRESSO = 'pd_demo_rw_progresso';
-  const CH_PONTOS_HOJE = 'pd_demo_rw_pontos_hoje';
-  const CH_DATA_HOJE = 'pd_demo_rw_data_hoje';
+  const CH_PROGRESSO = 'pd_demo_rw_progresso';   // só o vídeo em curso (1 de 2); não guarda pontos
 
   const $ = (id) => document.getElementById(id);
 
@@ -16095,56 +16088,140 @@ function renderAdStats() {
   const falhados = new Set();
   let motivoIndisponivel = '';
 
-  /* ---------- armazenamento local (só demo) ---------- */
+  /* ---------- armazenamento local (só o progresso dos 2 vídeos) ---------- */
   function ler(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function gravar(k, v) { try { localStorage.setItem(k, String(v)); } catch (e) {} }
   function apagar(k) { try { localStorage.removeItem(k); } catch (e) {} }
   function lerInt(k) { const n = parseInt(ler(k) || '0', 10); return isNaN(n) ? 0 : n; }
 
-  function dataHoje() {
-    const d = new Date();
-    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-  }
-  function pontosHoje() { return ler(CH_DATA_HOJE) === dataHoje() ? lerInt(CH_PONTOS_HOJE) : 0; }
-  function limiteDiarioAtingido() { return pontosHoje() >= LIMITE_DIARIO; }
+  /* ---------- estado dos pontos (vem da base de dados, como o bónus diário) ---------- */
+  let estado = { windowStart: 0, adsCount: 0, pointsToday: 0, totalEarned: 0 };
+  let estadoCarregado = false;
+  let carregandoEstado = false;
+  let offsetServidor = 0;
 
-  function atualizarPainel() {
-    $('rwPontosTotal').textContent = lerInt(CH_PONTOS);
-    const p = lerInt(CH_PROGRESSO);
-    for (let i = 1; i <= ANUNCIOS_NECESSARIOS; i++) {
-      const bola = $('rwBolinha' + i);
-      bola.classList.toggle('feito', i <= p);
-      bola.textContent = i <= p ? '✓' : i;
-    }
-    $('rwProgressoTxt').innerHTML = '<b>' + p + '</b> de ' + ANUNCIOS_NECESSARIOS + ' anúncios assistidos até ao fim';
-    $('rwHojeTxt').textContent = 'Hoje: ' + pontosHoje() + ' / ' + LIMITE_DIARIO + ' pontos demo';
+  function agora() { return Date.now() + offsetServidor; }
+  function contaValida() {
+    return typeof currentUser !== 'undefined' && !!currentUser && !currentUser.isAnonymous && userStatus !== 'pending';
+  }
+  function janelaAtiva() { return estado.windowStart > 0 && agora() - estado.windowStart < JANELA_MS; }
+  function anunciosHoje() { return janelaAtiva() ? estado.adsCount : 0; }
+  function pontosHoje() { return janelaAtiva() ? estado.pointsToday : 0; }
+  function limiteDiarioAtingido() {
+    return anunciosHoje() >= MAX_ANUNCIOS_DIA || pontosHoje() + PONTOS_POR_ANUNCIO > LIMITE_DIARIO;
+  }
+  function tempoAteNovaJanela() {
+    const ms = Math.max(0, estado.windowStart + JANELA_MS - agora());
+    const h = Math.floor(ms / 36e5);
+    const m = Math.ceil((ms % 36e5) / 6e4);
+    return h > 0 ? h + 'h ' + m + 'min' : m + 'min';
   }
 
-  function registarAnuncioConcluido() {
-    let p = lerInt(CH_PROGRESSO) + 1;
-    let ganhouAgora = false;
-    let limiteAtingido = false;
-    if (p >= ANUNCIOS_NECESSARIOS) {
-      if (limiteDiarioAtingido()) {
-        limiteAtingido = true;
-      } else {
-        gravar(CH_PONTOS, lerInt(CH_PONTOS) + PONTOS_POR_CICLO);
-        gravar(CH_DATA_HOJE, dataHoje());
-        gravar(CH_PONTOS_HOJE, pontosHoje() + PONTOS_POR_CICLO);
-        ganhouAgora = true;
-      }
-      p = 0;
+  function aplicarEstado(d) {
+    d = d || {};
+    estado = {
+      windowStart: Number(d.windowStart) || 0,
+      adsCount: Number(d.adsCount) || 0,
+      pointsToday: Number(d.pointsToday) || 0,
+      totalEarned: Number(d.totalEarned) || 0
+    };
+  }
+
+  async function carregarEstado() {
+    if (!contaValida() || carregandoEstado) { atualizarPainel(); atualizarBotao(); return; }
+    carregandoEstado = true;
+    atualizarBotao();
+    try {
+      const { ref, get } = window.firebaseModules;
+      const database = window.firebaseDatabase;
+      const t = await getServerTimestamp();
+      offsetServidor = t - Date.now();
+      const snap = await get(ref(database, 'adRewards/' + currentUser.uid));
+      aplicarEstado(snap.exists() ? snap.val() : {});
+      estadoCarregado = true;
+    } catch (e) {
+      console.error('[ANÚNCIOS] Erro ao carregar pontos:', e);
+      estadoCarregado = false;
     }
-    gravar(CH_PROGRESSO, p);
+    carregandoEstado = false;
     atualizarPainel();
     atualizarBotao();
-    return { ganhouAgora: ganhouAgora, limiteAtingido: limiteAtingido };
+  }
+
+  function atualizarPainel() {
+    $('rwPontosTotal').textContent = estado.totalEarned;
+    const feitos = anunciosHoje();
+    for (let i = 1; i <= MAX_ANUNCIOS_DIA; i++) {
+      const bola = $('rwBolinha' + i);
+      bola.classList.toggle('feito', i <= feitos);
+      bola.textContent = i <= feitos ? '✓' : i;
+    }
+    const v = lerInt(CH_PROGRESSO);
+    $('rwProgressoTxt').innerHTML = '<b>' + feitos + '</b> de ' + MAX_ANUNCIOS_DIA + ' anúncios hoje' +
+      (v > 0 && !limiteDiarioAtingido() ? ' · vídeo ' + v + ' de ' + ANUNCIOS_NECESSARIOS + ' visto' : '');
+    $('rwHojeTxt').textContent = 'Recebidos hoje: ' + pontosHoje() + ' / ' + LIMITE_DIARIO + ' pontos' +
+      (limiteDiarioAtingido() && estado.windowStart ? ' · novo ciclo em ' + tempoAteNovaJanela() : '');
+  }
+
+  // Credita 1 anúncio (25 pontos): mesma lógica do bónus diário, com hora do servidor
+  // e update atómico. As regras da base de dados voltam a validar tudo no servidor.
+  async function creditarAnuncio() {
+    if (!contaValida()) return { status: 'login' };
+    const { ref, get, update } = window.firebaseModules;
+    const database = window.firebaseDatabase;
+    try {
+      const serverTime = await getServerTimestamp();
+      offsetServidor = serverTime - Date.now();
+      const uid = currentUser.uid;
+      const snap = await get(ref(database, 'adRewards/' + uid));
+      const d = snap.exists() ? snap.val() : {};
+      const novaJanela = !d.windowStart || serverTime - d.windowStart >= JANELA_MS;
+      const count = novaJanela ? 0 : (Number(d.adsCount) || 0);
+      const hoje = novaJanela ? 0 : (Number(d.pointsToday) || 0);
+      const total = Number(d.totalEarned) || 0;
+
+      if (count >= MAX_ANUNCIOS_DIA || hoje + PONTOS_POR_ANUNCIO > LIMITE_DIARIO) {
+        aplicarEstado(d);
+        return { status: 'limite' };
+      }
+
+      const premio = Math.min(PONTOS_POR_ANUNCIO, MAX_PONTOS_POR_ANUNCIO);
+      const saldoSnap = await get(ref(database, 'users/' + uid + '/points'));
+      const novoSaldo = (Number(saldoSnap.val()) || 0) + premio;
+      const novo = {
+        windowStart: novaJanela ? serverTime : d.windowStart,
+        adsCount: count + 1,
+        pointsToday: hoje + premio,
+        totalEarned: total + premio,
+        lastClaimedAt: serverTime,
+        pointsAwarded: premio,
+        newPointsTotal: novoSaldo
+      };
+      const updates = {};
+      updates['adRewards/' + uid] = novo;
+      updates['users/' + uid + '/points'] = novoSaldo;
+      await update(ref(database), updates);
+
+      aplicarEstado(novo);
+      estadoCarregado = true;
+      _syncPointsDisplay(novoSaldo);
+      return { status: 'ganhou', premio: premio };
+    } catch (e) {
+      console.error('[SEGURANÇA] Pontos do anúncio bloqueados ou falharam:', e);
+      return { status: 'erro' };
+    }
   }
 
   /* ---------- botão principal ---------- */
   function atualizarBotao() {
     const btn = $('rwBtnAnuncio');
-    if (limiteDiarioAtingido()) {
+    if (!contaValida()) {
+      btn.disabled = true;
+      btn.textContent = '🔒 Inicia sessão com uma conta verificada';
+    } else if (!estadoCarregado) {
+      btn.disabled = carregandoEstado;
+      btn.textContent = carregandoEstado ? '⏳ A carregar os teus pontos...' : '⚠ Não foi possível carregar. Toca para tentar de novo';
+    } else if (limiteDiarioAtingido()) {
       btn.disabled = true;
       btn.textContent = '⏸ Limite diário atingido';
     } else if (indisponivel) {
@@ -16529,7 +16606,7 @@ function renderAdStats() {
     $('rwAdSkip').disabled = true;
     $('rwAdFill').style.width = '0%';
     $('rwAdTempo').textContent = '--:--';
-    $('rwAdTitulo').textContent = 'Anúncio ' + (lerInt(CH_PROGRESSO) + 1) + ' de ' + ANUNCIOS_NECESSARIOS;
+    $('rwAdTitulo').textContent = 'Vídeo ' + (lerInt(CH_PROGRESSO) + 1) + ' de ' + ANUNCIOS_NECESSARIOS;
     iniciouReproducao = false;
     esconderAvisoToque();
     $('rwAdLoading').style.display = 'flex';
@@ -16550,8 +16627,12 @@ function renderAdStats() {
       toast('O anúncio ainda não está disponível, aguarda um instante');
       return;
     }
+    if (!contaValida() || !estadoCarregado) {
+      toast('Inicia sessão e aguarda o carregamento dos teus pontos');
+      return;
+    }
     if (limiteDiarioAtingido()) {
-      toast('Já atingiste o limite diário de ' + LIMITE_DIARIO + ' pontos demo. Volta amanhã.');
+      toast('Já atingiste o limite diário. Volta dentro de ' + tempoAteNovaJanela() + '.');
       return;
     }
     fase = 'anuncio';
@@ -16592,6 +16673,17 @@ function renderAdStats() {
     }, 250);
   }
 
+  function mostrarResultado(icone, titulo, texto, som) {
+    fase = 'sucesso';
+    $('rwSucessoSpinner').style.display = 'none';
+    $('rwSucessoIcone').style.display = 'flex';
+    $('rwSucessoIcone').textContent = icone;
+    $('rwSucessoTitulo').textContent = titulo;
+    $('rwSucessoTexto').textContent = texto;
+    $('rwSucessoBotao').style.display = 'inline-block';
+    if (som) { vibrarRecompensa(); tocarSomRecompensa(); }
+  }
+
   function anuncioConcluido() {
     if (fase !== 'anuncio') return;
     clearInterval(timerProgresso);
@@ -16599,44 +16691,59 @@ function renderAdStats() {
     limparAvisosInicio();
     try { ytPlayer.pauseVideo(); } catch (e) {}
 
-    const resultado = registarAnuncioConcluido();
-    const icone = $('rwSucessoIcone');
-    const spinner = $('rwSucessoSpinner');
-    const titulo = $('rwSucessoTitulo');
-    const texto = $('rwSucessoTexto');
-    const botao = $('rwSucessoBotao');
+    const v = lerInt(CH_PROGRESSO) + 1;
 
-    if (resultado.limiteAtingido || resultado.ganhouAgora) {
-      fase = 'sucesso';
-      spinner.style.display = 'none';
-      icone.style.display = 'flex';
-      botao.style.display = 'inline-block';
-      if (resultado.limiteAtingido) {
-        icone.textContent = '⏸';
-        titulo.textContent = 'Limite diário atingido';
-        texto.textContent = 'Já atingiste o limite de ' + LIMITE_DIARIO + ' pontos demo por hoje. Volta amanhã para ganhar mais.';
-      } else {
-        icone.textContent = '✓';
-        titulo.textContent = '🎉 Ganhaste ' + PONTOS_POR_CICLO + ' pontos demo!';
-        texto.textContent = 'Foram adicionados ao saldo de demonstração. O teu saldo real não foi alterado.';
-        vibrarRecompensa();
-        tocarSomRecompensa();
-      }
-    } else {
+    if (v < ANUNCIOS_NECESSARIOS) {
+      // ainda falta(m) vídeo(s) para completar este anúncio
+      gravar(CH_PROGRESSO, v);
+      atualizarPainel();
       fase = 'transicao';
       // sorteia outro anúncio para o próximo (não repete o que acabou de passar)
       const anteriorId = anuncioAtual && anuncioAtual.videoId;
       escolherAnuncio();
       if (anuncioAtual && anuncioAtual.videoId !== anteriorId) preCarregarProximo();
-      icone.style.display = 'none';
-      spinner.style.display = 'block';
-      botao.style.display = 'none';
-      titulo.textContent = 'A carregar o próximo anúncio...';
-      texto.textContent = '';
+      $('rwSucessoIcone').style.display = 'none';
+      $('rwSucessoSpinner').style.display = 'block';
+      $('rwSucessoBotao').style.display = 'none';
+      $('rwSucessoTitulo').textContent = 'A carregar o próximo vídeo...';
+      $('rwSucessoTexto').textContent = '';
       clearTimeout(timerTransicao);
       timerTransicao = setTimeout(iniciarProximoAnuncioAutomatico, SEGUNDOS_TRANSICAO * 1000);
+      $('rwAdSucesso').style.display = 'flex';
+      return;
     }
+
+    // último vídeo: credita 1 anúncio (25 pontos) no servidor
+    fase = 'creditando';
+    $('rwSucessoIcone').style.display = 'none';
+    $('rwSucessoSpinner').style.display = 'block';
+    $('rwSucessoBotao').style.display = 'none';
+    $('rwSucessoTitulo').textContent = 'A guardar os teus pontos...';
+    $('rwSucessoTexto').textContent = '';
     $('rwAdSucesso').style.display = 'flex';
+
+    creditarAnuncio().then(function (r) {
+      if (r.status === 'ganhou') {
+        gravar(CH_PROGRESSO, 0);
+        const resto = MAX_ANUNCIOS_DIA - anunciosHoje();
+        mostrarResultado('✓', '🎉 Ganhaste ' + r.premio + ' pontos!',
+          'Já foram adicionados ao teu saldo. Hoje: ' + anunciosHoje() + ' de ' + MAX_ANUNCIOS_DIA + ' anúncios (' + pontosHoje() + ' / ' + LIMITE_DIARIO + ' pontos)' +
+          (resto <= 0 ? '. Este foi o último de hoje.' : '.'), true);
+      } else if (r.status === 'limite') {
+        gravar(CH_PROGRESSO, 0);
+        mostrarResultado('⏸', 'Limite diário atingido',
+          'Já atingiste o limite de hoje. Volta dentro de ' + tempoAteNovaJanela() + ' para ganhar mais.', false);
+      } else if (r.status === 'login') {
+        mostrarResultado('🔒', 'Sessão necessária', 'Inicia sessão com uma conta verificada para receber os pontos.', false);
+      } else {
+        // falha ao guardar: o próximo vídeo completa o anúncio outra vez
+        gravar(CH_PROGRESSO, ANUNCIOS_NECESSARIOS - 1);
+        mostrarResultado('⚠', 'Não foi possível guardar os pontos',
+          'Verifica a ligação e tenta outra vez. Não perdeste o progresso.', false);
+      }
+      atualizarPainel();
+      atualizarBotao();
+    });
   }
 
   // Fecha o ecrã do anúncio (com ou sem aviso) e inicia o tempo de espera até ao próximo.
@@ -16679,6 +16786,8 @@ function renderAdStats() {
 
   /* ---------- eventos ---------- */
   $('rwBtnAnuncio').addEventListener('click', function () {
+    if (!contaValida()) return;
+    if (!estadoCarregado) { carregarEstado(); return; }
     if (indisponivel) { tentarDeNovo(); return; }
     abrirAnuncio();
   });
@@ -16721,6 +16830,7 @@ function renderAdStats() {
     document.body.style.overflow = 'hidden';
     atualizarPainel();
     atualizarBotao();
+    carregarEstado();
     preparar();
   }
 
@@ -16729,18 +16839,9 @@ function renderAdStats() {
     document.body.style.overflow = '';
   }
 
-  function emAnuncio() { return fase === 'anuncio' || fase === 'transicao' || fase === 'sucesso'; }
-
-  function reporDemo() {
-    if (emAnuncio()) return;
-    [CH_PONTOS, CH_PROGRESSO, CH_PONTOS_HOJE, CH_DATA_HOJE].forEach(apagar);
-    atualizarPainel();
-    atualizarBotao();
-    toast('Pontos demo repostos');
-  }
+  function emAnuncio() { return fase === 'anuncio' || fase === 'transicao' || fase === 'creditando' || fase === 'sucesso'; }
 
   $('rwVoltar').addEventListener('click', fecharPagina);
-  $('rwRepor').addEventListener('click', reporDemo);
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && $('rwOverlay').classList.contains('active') && !emAnuncio()) fecharPagina();
   });
