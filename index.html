@@ -7542,6 +7542,9 @@ window.firebaseModules = {
     .pdprep-bar { height: 4px; border-radius: 2px; background: var(--border-color); overflow: hidden; }
     .pdprep-bar > span { display: block; width: 0; height: 100%; background: var(--accent-primary); }
     .pdprep-overlay.active .pdprep-bar > span { animation: pdprepBar 2.5s linear forwards; }
+    .pdprep-overlay.fase-aguarde .pdprep-text,
+    .pdprep-overlay.fase-aguarde .pdprep-bar { display: none; }
+    .pdprep-overlay.fase-aguarde .pdprep-title { margin-bottom: 0; }
     @keyframes pdprepSpin { to { transform: rotate(360deg); } }
     @keyframes pdprepBar { to { width: 100%; } }
     .pdlink-overlay {
@@ -10590,7 +10593,7 @@ function extractYoutubeId(url) {
   return match ? match[1] : null;
 }
 const LINK_PREP_MS = 2500;
-function mostrarPreparandoLink() {
+function obterOverlayPreparando() {
   let el = document.getElementById("pdPrepOverlay");
   if (!el) {
     el = document.createElement("div");
@@ -10601,13 +10604,27 @@ function mostrarPreparandoLink() {
     el.innerHTML = `
         <div class="pdprep-box">
           <div class="pdprep-spinner"></div>
-          <div class="pdprep-title">Estamos a preparar o seu link</div>
-          <div class="pdprep-text">Aguarde um segundo...</div>
+          <div class="pdprep-title"></div>
+          <div class="pdprep-text"></div>
           <div class="pdprep-bar"><span></span></div>
         </div>
       `;
     document.body.appendChild(el);
   }
+  return el;
+}
+function mostrarAguarde() {
+  const el = obterOverlayPreparando();
+  el.classList.add("fase-aguarde");
+  el.querySelector(".pdprep-title").textContent = "Aguarde...";
+  el.querySelector(".pdprep-text").textContent = "";
+  el.classList.add("active");
+}
+function mostrarPreparandoLink() {
+  const el = obterOverlayPreparando();
+  el.classList.remove("fase-aguarde");
+  el.querySelector(".pdprep-title").textContent = "Estamos a preparar o seu link";
+  el.querySelector(".pdprep-text").textContent = "Aguarde um segundo...";
   el.querySelector(".pdprep-bar > span").style.animationDuration = LINK_PREP_MS + "ms";
   el.classList.add("active");
 }
@@ -10760,6 +10777,7 @@ function abrirLinkDownload(appType, url) {
   }
 }
 async function downloadGame(gameId, appType, url, cost) {
+  if (window._downloadEmCurso) return;
   if (!currentUser || currentUser.isAnonymous) {
     showCustomAlert("Voc\xEA precisa fazer login com uma conta para baixar jogos.");
     return;
@@ -10776,6 +10794,12 @@ async function downloadGame(gameId, appType, url, cost) {
     showCustomAlert("Erro: Link de download n\xE3o dispon\xEDvel. Por favor, tente o outro bot\uFFFD\uFFFDo ou entre em contato com o administrador.");
     return;
   }
+  if (!navigator.onLine) {
+    showCustomAlert("Sem liga\xE7\xE3o \xE0 internet. Verifique a sua liga\xE7\xE3o e tente novamente.");
+    return;
+  }
+  window._downloadEmCurso = true;
+  mostrarAguarde();
   try {
     const { ref, get, update } = window.firebaseModules;
     const database = window.firebaseDatabase;
@@ -10784,6 +10808,7 @@ async function downloadGame(gameId, appType, url, cost) {
     const userData = userSnapshot.val() || {};
     const currentPoints = userData.points || 0;
     if (currentPoints < cost) {
+      esconderPreparandoLink();
       showInsufficientPointsAlert();
       return;
     }
@@ -10828,6 +10853,8 @@ async function downloadGame(gameId, appType, url, cost) {
     esconderPreparandoLink();
     console.error("[SEGURAN\xC7A] Erro na transa\xE7\xE3o de download:", error);
     showCustomAlert("Erro ao processar download. Tente novamente.");
+  } finally {
+    window._downloadEmCurso = false;
   }
 }
 function closeOverlay(skipPushState) {
