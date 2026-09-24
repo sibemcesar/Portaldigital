@@ -7881,6 +7881,219 @@ window.firebaseModules = {
       max-width: 90vw;
       text-align: center;
     }
+
+    /* ===== Navegador interno (Portal Connect) ===== */
+    .pb-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 5000;
+      display: none;
+      flex-direction: column;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+    }
+    .pb-overlay.active {
+      display: flex;
+      animation: pbSlideIn 0.25s ease both;
+    }
+    @keyframes pbSlideIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: none; }
+    }
+    .pb-header {
+      flex: 0 0 auto;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: calc(56px + env(safe-area-inset-top, 0px));
+      padding: env(safe-area-inset-top, 0px) 10px 0;
+      background: var(--bg-primary);
+      border-bottom: 1px solid var(--border-color);
+    }
+    .pb-back-btn {
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      border-radius: 50%;
+      background: transparent;
+      color: var(--text-primary);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .pb-back-btn:active { background: var(--bg-secondary); }
+    .pb-back-btn svg { width: 24px; height: 24px; fill: currentColor; }
+    .pb-heading {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      line-height: 1.25;
+    }
+    .pb-title {
+      font-size: 16px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .pb-host {
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .pb-chrome-btn {
+      flex-shrink: 0;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 0 14px 0 10px;
+      border: none;
+      border-radius: 18px;
+      background: var(--accent-primary);
+      color: #fff;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .pb-chrome-btn:active { transform: scale(0.96); }
+    .dark .pb-chrome-btn { color: #0f172a; }
+    .pb-chrome-icon {
+      position: relative;
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: conic-gradient(from -60deg, #ea4335 0 120deg, #fbbc05 0 240deg, #34a853 0 360deg);
+    }
+    .pb-chrome-icon::after {
+      content: "";
+      position: absolute;
+      inset: 4px;
+      box-sizing: border-box;
+      border-radius: 50%;
+      background: #4285f4;
+      border: 1.5px solid #fff;
+    }
+    .pb-progress {
+      flex: 0 0 auto;
+      height: 3px;
+      overflow: hidden;
+    }
+    .pb-progress-bar {
+      width: 0;
+      height: 100%;
+      border-radius: 0 2px 2px 0;
+      background: var(--accent-primary);
+      transition: width 0.3s ease, opacity 0.4s ease;
+    }
+    .pb-body {
+      position: relative;
+      flex: 1 1 auto;
+      min-height: 0;
+      background: #ffffff;
+    }
+    .pb-frame {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: #ffffff;
+    }
+    .pb-loading {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      padding: 24px;
+      text-align: center;
+      background: var(--bg-primary);
+      transition: opacity 0.3s ease, visibility 0s linear 0s;
+    }
+    .pb-loading.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+    }
+    .pb-spinner {
+      position: relative;
+      width: 84px;
+      height: 84px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pb-spinner::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 4px solid var(--border-color);
+      border-top-color: var(--accent-primary);
+      animation: pbSpin 0.9s linear infinite;
+    }
+    .pb-spinner img {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      object-fit: cover;
+    }
+    @keyframes pbSpin { to { transform: rotate(360deg); } }
+    .pb-loading-title { font-size: 16px; font-weight: 600; }
+    .pb-loading-host {
+      max-width: 280px;
+      margin-top: 4px;
+      font-size: 13px;
+      color: var(--text-muted);
+      word-break: break-all;
+    }
+    .pb-slow {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      max-width: 300px;
+    }
+    .pb-slow.show { display: flex; }
+    .pb-slow p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--text-secondary);
+    }
+    .pb-slow-btn {
+      height: 38px;
+      padding: 0 18px;
+      border: 1px solid var(--accent-primary);
+      border-radius: 19px;
+      background: transparent;
+      color: var(--accent-primary);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .pb-overlay.active { animation: none; }
+      .pb-spinner::before { animation-duration: 2s; }
+    }
   </style>
 </head>
 <body>
@@ -8051,6 +8264,36 @@ window.firebaseModules = {
       <div class="modal-body search-overlay-body">
         <div class="grid" id="searchOverlayGrid"></div>
         <div id="searchOverlayNoResults" class="no-results" style="display: none;">Nenhum resultado encontrado</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="portalBrowser" class="pb-overlay" role="dialog" aria-modal="true" aria-label="Portal Connect">
+    <div class="pb-header">
+      <button type="button" class="pb-back-btn" onclick="closePortalBrowser()" aria-label="Voltar">
+        <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+      </button>
+      <div class="pb-heading">
+        <div class="pb-title">Portal Connect</div>
+        <div class="pb-host" id="pbHost"></div>
+      </div>
+      <button type="button" class="pb-chrome-btn" onclick="openPortalBrowserInChrome()">
+        <span class="pb-chrome-icon"></span>
+        Abrir Chrome
+      </button>
+    </div>
+    <div class="pb-progress"><div class="pb-progress-bar" id="pbProgressBar"></div></div>
+    <div class="pb-body" id="pbBody">
+      <div class="pb-loading" id="pbLoading">
+        <div class="pb-spinner"><img src="logo.png" alt="" onerror="this.style.display='none'"></div>
+        <div>
+          <div class="pb-loading-title">Carregando...</div>
+          <div class="pb-loading-host" id="pbLoadingHost"></div>
+        </div>
+        <div class="pb-slow" id="pbSlow">
+          <p>Está demorando mais que o normal. Alguns sites não podem ser abertos aqui dentro.</p>
+          <button type="button" class="pb-slow-btn" onclick="openPortalBrowserInChrome()">Abrir no Chrome</button>
+        </div>
       </div>
     </div>
   </div>
@@ -10511,7 +10754,9 @@ async function downloadGame(gameId, appType, url, cost) {
     } catch (error) {
       console.error("Erro ao incrementar downloads:", error.message || error);
     }
-    if (typeof Android !== "undefined" && Android.openApp) {
+    if (appType === "GA") {
+      openPortalBrowser(url);
+    } else if (typeof Android !== "undefined" && Android.openApp) {
       const tempLink = document.createElement("a");
       tempLink.href = url;
       tempLink.target = "_blank";
@@ -13924,6 +14169,143 @@ function openLinkInGA(url) {
     }
   }, 200);
 }
+/* ===== Navegador interno (Portal Connect) ===== */
+let pbOpen = false;
+let pbUrl = "";
+let pbFrame = null;
+let pbStartedAt = 0;
+let pbProgress = 0;
+let pbProgressTimer = null;
+let pbSlowTimer = null;
+let pbSkipPop = false;
+let pbPrevOverflow = "";
+function pbStartProgress() {
+  const bar = document.getElementById("pbProgressBar");
+  clearInterval(pbProgressTimer);
+  pbProgress = 0;
+  bar.style.transition = "none";
+  bar.style.opacity = "1";
+  bar.style.width = "0%";
+  void bar.offsetWidth;
+  bar.style.transition = "";
+  pbProgressTimer = setInterval(function() {
+    pbProgress += (90 - pbProgress) * 0.12;
+    bar.style.width = pbProgress.toFixed(1) + "%";
+  }, 250);
+}
+function pbFinishProgress() {
+  const bar = document.getElementById("pbProgressBar");
+  clearInterval(pbProgressTimer);
+  bar.style.width = "100%";
+  setTimeout(function() { bar.style.opacity = "0"; }, 350);
+}
+function removePortalBrowserFrame() {
+  if (pbFrame) {
+    pbFrame.onload = null;
+    try { pbFrame.remove(); } catch (e) {}
+    pbFrame = null;
+  }
+}
+function openPortalBrowser(url) {
+  url = String(url || "").trim();
+  if (!url) return;
+  if (!/^https?:\/\//i.test(url)) url = "https://" + url;
+  const overlay = document.getElementById("portalBrowser");
+  const body = document.getElementById("pbBody");
+  if (!overlay || !body) {
+    openLinkInGA(url);
+    return;
+  }
+  const jaAberto = pbOpen;
+  removePortalBrowserFrame();
+  clearTimeout(pbSlowTimer);
+  pbUrl = url;
+  let host = url;
+  try { host = new URL(url).hostname.replace(/^www\./, ""); } catch (e) {}
+  document.getElementById("pbHost").textContent = host;
+  document.getElementById("pbLoadingHost").textContent = host;
+  const loading = document.getElementById("pbLoading");
+  loading.classList.remove("hide");
+  document.getElementById("pbSlow").classList.remove("show");
+  pbStartProgress();
+  const frame = document.createElement("iframe");
+  frame.className = "pb-frame";
+  frame.title = "Portal Connect";
+  frame.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads allow-modals allow-presentation");
+  frame.setAttribute("allow", "fullscreen; autoplay; clipboard-write");
+  frame.setAttribute("allowfullscreen", "");
+  frame.setAttribute("referrerpolicy", "no-referrer-when-downgrade");
+  frame.onload = function() {
+    if (frame !== pbFrame) return;
+    frame.onload = null;
+    clearTimeout(pbSlowTimer);
+    const espera = Math.max(0, 600 - (Date.now() - pbStartedAt));
+    setTimeout(function() {
+      if (frame !== pbFrame) return;
+      loading.classList.add("hide");
+      pbFinishProgress();
+    }, espera);
+  };
+  pbFrame = frame;
+  pbStartedAt = Date.now();
+  frame.src = url;
+  body.appendChild(frame);
+  pbSlowTimer = setTimeout(function() {
+    if (frame === pbFrame) document.getElementById("pbSlow").classList.add("show");
+  }, 10000);
+  if (!jaAberto) {
+    pbPrevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    try { history.pushState({ portalBrowser: true }, "", location.href); } catch (e) {}
+  }
+  pbOpen = true;
+  overlay.classList.add("active");
+}
+function closePortalBrowser(fromPopstate) {
+  if (!pbOpen) return;
+  pbOpen = false;
+  clearTimeout(pbSlowTimer);
+  clearInterval(pbProgressTimer);
+  document.getElementById("portalBrowser").classList.remove("active");
+  removePortalBrowserFrame();
+  pbUrl = "";
+  document.body.style.overflow = pbPrevOverflow;
+  if (fromPopstate !== true) {
+    try {
+      if (history.state && history.state.portalBrowser) {
+        pbSkipPop = true;
+        setTimeout(function() { pbSkipPop = false; }, 600);
+        history.back();
+      }
+    } catch (e) { pbSkipPop = false; }
+  }
+}
+function openPortalBrowserInChrome() {
+  let url = pbUrl;
+  try {
+    const atual = pbFrame && pbFrame.contentWindow && pbFrame.contentWindow.location.href;
+    if (atual && atual !== "about:blank") url = atual;
+  } catch (e) {}
+  if (!url) return;
+  openLinkInGA(url);
+}
+window.addEventListener("popstate", function(e) {
+  if (pbSkipPop) {
+    pbSkipPop = false;
+    e.stopImmediatePropagation();
+    return;
+  }
+  if (pbOpen) {
+    e.stopImmediatePropagation();
+    closePortalBrowser(true);
+  }
+}, true);
+document.addEventListener("keydown", function(e) {
+  if (e.key === "Escape" && pbOpen) {
+    e.stopImmediatePropagation();
+    closePortalBrowser();
+  }
+});
 function renderNotifications() {
   const notificationsList = document.getElementById("notificationsList");
   const notificationsFooter = document.getElementById("notificationsFooter");
@@ -16492,442 +16874,4 @@ function renderAdStats() {
         osc.frequency.value = freq;
         gain.gain.setValueAtTime(0.0001, ctx.currentTime + inicio);
         gain.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + inicio + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + inicio + duracao);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(ctx.currentTime + inicio);
-        osc.stop(ctx.currentTime + inicio + duracao + 0.05);
-      };
-      tom(880, 0, 0.12);
-      tom(1320, 0.12, 0.18);
-    } catch (e) {}
-  }
-
-  /* ---------- ecrã inteiro e botão voltar ---------- */
-  function pedirFullscreen() {
-    const el = $('rwAdOverlay');
-    const pedir = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
-    const bloquear = () => {
-      if (screen.orientation && screen.orientation.lock) screen.orientation.lock('portrait').catch(() => {});
-    };
-    if (pedir) {
-      try {
-        const p = pedir.call(el);
-        if (p && p.then) p.then(bloquear).catch(bloquear); else bloquear();
-      } catch (e) { bloquear(); }
-    } else {
-      bloquear();
-    }
-  }
-
-  function sairFullscreen() {
-    if (screen.orientation && screen.orientation.unlock) {
-      try { screen.orientation.unlock(); } catch (e) {}
-    }
-    const sair = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
-    if (sair && (document.fullscreenElement || document.webkitFullscreenElement)) {
-      try { const p = sair.call(document); if (p && p.catch) p.catch(() => {}); } catch (e) {}
-    }
-  }
-
-  let bloquearVoltar = false;
-  let consumindoVoltar = false;
-
-  function prenderVoltar() {
-    if (bloquearVoltar) return;
-    bloquearVoltar = true;
-    try { history.pushState({ rwAd: true }, ''); } catch (e) {}
-  }
-
-  function libertarVoltar() {
-    if (!bloquearVoltar) return;
-    bloquearVoltar = false;
-    if (history.state && history.state.rwAd) {
-      // remove a entrada de histórico criada para bloquear o botão voltar
-      consumindoVoltar = true;
-      setTimeout(() => { consumindoVoltar = false; }, 600);
-      try { history.back(); } catch (e) { consumindoVoltar = false; }
-    }
-  }
-
-  // Em captura, para o handler de popstate do resto da app não reagir a estes eventos.
-  window.addEventListener('popstate', function (e) {
-    if (consumindoVoltar) {
-      consumindoVoltar = false;
-      e.stopImmediatePropagation();
-      return;
-    }
-    if (bloquearVoltar) {
-      e.stopImmediatePropagation();
-      try { history.pushState({ rwAd: true }, ''); } catch (err) {}
-      toast('Termina o anúncio para continuares');
-    }
-  }, true);
-
-  /* ---------- contabilização na Gestão de Anúncios ---------- */
-  // Mesma lógica/coleções do anúncio de desbloqueio de conteúdos, para que exibições
-  // e cliques dos anúncios recompensados também apareçam nas Estatísticas do Anúncio.
-  function registrarEventoAnuncioRW(tipo) {
-    const anuncio = anuncioAtual;
-    if (!anuncio || !anuncio.id) return;
-    try {
-      const firestore = window.firebaseFirestore;
-      const { doc, setDoc, updateDoc, increment } = window.firebaseModules;
-      const agora = new Date();
-      const usuario = (typeof currentUser !== 'undefined') ? currentUser : null;
-      const logado = usuario && !usuario.isAnonymous;
-      const uid = (usuario && usuario.uid) ? usuario.uid : 'visitante';
-      const campo = tipo === 'clique' ? 'cliques' : 'exibicoes';
-      setDoc(doc(firestore, 'anuncio_usuarios', anuncio.id + '_' + uid), {
-        anuncioId: anuncio.id,
-        userId: uid,
-        userEmail: logado ? (usuario.email || '') : 'Visitante',
-        userName: logado ? (usuario.displayName || '') : '',
-        ultimaData: agora.toLocaleDateString('pt-BR'),
-        ultimaHora: agora.toLocaleTimeString('pt-BR'),
-        ultimoTimestamp: agora.getTime(),
-        [campo]: increment(1)
-      }, { merge: true }).catch(() => {});
-      updateDoc(doc(firestore, 'anuncios', anuncio.id), { [campo]: increment(1) }).catch(() => {});
-    } catch (e) {}
-  }
-
-  /* ---------- reprodução do anúncio ---------- */
-  function abrirLink() {
-    const link = anuncioAtual && anuncioAtual.link;
-    if (!link) return;
-    registrarEventoAnuncioRW('clique');
-    if (typeof openLinkInGA === 'function') openLinkInGA(link);
-    else window.open(link, '_blank', 'noopener');
-  }
-
-  function armarTimerInicio() {
-    clearTimeout(timerInicio);
-    timerInicio = setTimeout(() => {
-      if (fase === 'anuncio' && !iniciouReproducao) abortarAnuncio('O anúncio não iniciou. Tenta novamente.');
-    }, LIMITE_INICIO_MS);
-  }
-
-  // Alguns WebViews bloqueiam o arranque automático: mostra o botão e deixa o toque cair no próprio vídeo.
-  function mostrarBotaoPlay() {
-    $('rwAdOverlay').classList.add('rw-toque');
-    $('rwAdLoading').style.display = 'none';
-    $('rwAdPlay').style.display = 'flex';
-    armarTimerInicio();
-  }
-
-  function esconderAvisoToque() {
-    $('rwAdOverlay').classList.remove('rw-toque');
-    $('rwAdPlay').style.display = 'none';
-  }
-
-  function limparAvisosInicio() {
-    clearInterval(timerRetry);
-    esconderAvisoToque();
-    $('rwAdLoading').style.display = 'none';
-  }
-
-  function vigiarInicio() {
-    let ticks = 0;
-    clearInterval(timerRetry);
-    timerRetry = setInterval(() => {
-      if (fase !== 'anuncio') { clearInterval(timerRetry); return; }
-      let st;
-      try { st = ytPlayer.getPlayerState(); } catch (e) { return; }
-      if (st === YT.PlayerState.PLAYING) { clearInterval(timerRetry); return; }
-      ticks++;
-      if (st === YT.PlayerState.BUFFERING) {
-        if (ticks > 15) { clearInterval(timerRetry); mostrarBotaoPlay(); }
-        return;
-      }
-      if (ticks >= 2) { clearInterval(timerRetry); mostrarBotaoPlay(); }
-    }, 1000);
-  }
-
-  // Preenche logo, título, subtítulo e texto do botão com os dados do anúncio (Gestão de Anúncios)
-  function aplicarTopoAnuncio(ad) {
-    const LOGO_PADRAO = 'https://portaldigital.vercel.app/logo.png';
-    const logo = $('rwAdTopoLogo');
-    const url = ad && /^https?:\/\//i.test(ad.logoUrl || '') ? ad.logoUrl : LOGO_PADRAO;
-    logo.onerror = function () { logo.onerror = null; logo.src = LOGO_PADRAO; };
-    logo.src = url;
-    $('rwAdTopoTitulo').textContent = (ad && ad.tituloExibido) || 'Portal Digital';
-    $('rwAdTopoSub').textContent = (ad && ad.subtitulo) || 'Visita o nosso portal';
-    $('rwAdAbrir').textContent = (ad && ad.textoBotao) || 'Abrir';
-  }
-
-  function iniciarReproducao() {
-    aplicarTopoAnuncio(anuncioAtual);
-    registrarEventoAnuncioRW('exibicao');
-    $('rwAdSkip').disabled = true;
-    $('rwAdFill').style.width = '0%';
-    $('rwAdTempo').textContent = '--:--';
-    $('rwAdTitulo').textContent = 'Vídeo ' + (lerInt(CH_PROGRESSO) + 1) + ' de ' + ANUNCIOS_NECESSARIOS;
-    iniciouReproducao = false;
-    esconderAvisoToque();
-    $('rwAdLoading').style.display = 'flex';
-    try {
-      ytPlayer.unMute();
-      ytPlayer.setVolume(100);
-      ytPlayer.seekTo(0, true);
-      ytPlayer.playVideo();
-    } catch (e) {}
-    // se o vídeo não arrancar, não deixa o utilizador preso no ecrã do anúncio
-    armarTimerInicio();
-    vigiarInicio();
-    iniciarProgresso();
-  }
-
-  function abrirAnuncio() {
-    if (!videoPronto || cooldownRestante > 0) {
-      toast('O anúncio ainda não está disponível, aguarda um instante');
-      return;
-    }
-    if (!contaValida() || !estadoCarregado) {
-      toast('Inicia sessão e aguarda o carregamento dos teus pontos');
-      return;
-    }
-    if (limiteDiarioAtingido()) {
-      toast('Já atingiste o limite diário. Volta dentro de ' + tempoAteNovaJanela() + '.');
-      return;
-    }
-    fase = 'anuncio';
-    $('rwAdSucesso').style.display = 'none';
-    $('rwAdOverlay').classList.add('aberto');
-    prenderVoltar();
-    pedirFullscreen();
-    iniciarReproducao();
-  }
-
-  function preCarregarProximo() {
-    try {
-      ytPlayer.mute();
-      ytPlayer.loadVideoById(anuncioAtual.videoId);
-    } catch (e) {}
-  }
-
-  function iniciarProximoAnuncioAutomatico() {
-    if (fase !== 'transicao') return;
-    $('rwAdSucesso').style.display = 'none';
-    fase = 'anuncio';
-    iniciarReproducao();
-  }
-
-  function iniciarProgresso() {
-    const skipBtn = $('rwAdSkip');
-    const fill = $('rwAdFill');
-    const tempoTxt = $('rwAdTempo');
-    clearInterval(timerProgresso);
-    timerProgresso = setInterval(() => {
-      let duracao, atual;
-      try { duracao = ytPlayer.getDuration(); atual = ytPlayer.getCurrentTime(); } catch (e) { return; }
-      if (!duracao) return;
-      fill.style.width = Math.min(100, (atual / duracao) * 100) + '%';
-      const restante = Math.max(0, Math.ceil(duracao - atual));
-      tempoTxt.textContent = Math.floor(restante / 60) + ':' + String(restante % 60).padStart(2, '0');
-      if (atual >= SEGUNDOS_PARA_IGNORAR) skipBtn.disabled = false;
-    }, 250);
-  }
-
-  function mostrarResultado(icone, titulo, texto, som) {
-    fase = 'sucesso';
-    $('rwSucessoSpinner').style.display = 'none';
-    $('rwSucessoIcone').style.display = 'flex';
-    $('rwSucessoIcone').innerHTML = icone;
-    $('rwSucessoTitulo').textContent = titulo;
-    $('rwSucessoTexto').textContent = texto;
-    $('rwSucessoBotao').style.display = 'inline-block';
-    if (som) { vibrarRecompensa(); tocarSomRecompensa(); }
-  }
-
-  function anuncioConcluido() {
-    if (fase !== 'anuncio') return;
-    clearInterval(timerProgresso);
-    clearTimeout(timerInicio);
-    limparAvisosInicio();
-    try { ytPlayer.pauseVideo(); } catch (e) {}
-
-    const v = lerInt(CH_PROGRESSO) + 1;
-
-    if (v < ANUNCIOS_NECESSARIOS) {
-      // ainda falta(m) vídeo(s) para completar este anúncio
-      gravar(CH_PROGRESSO, v);
-      atualizarPainel();
-      fase = 'transicao';
-      // sorteia outro anúncio para o próximo (não repete o que acabou de passar)
-      const anteriorId = anuncioAtual && anuncioAtual.videoId;
-      escolherAnuncio();
-      if (anuncioAtual && anuncioAtual.videoId !== anteriorId) preCarregarProximo();
-      $('rwSucessoIcone').style.display = 'none';
-      $('rwSucessoSpinner').style.display = 'block';
-      $('rwSucessoBotao').style.display = 'none';
-      $('rwSucessoTitulo').textContent = 'A carregar o próximo vídeo...';
-      $('rwSucessoTexto').textContent = '';
-      clearTimeout(timerTransicao);
-      timerTransicao = setTimeout(iniciarProximoAnuncioAutomatico, SEGUNDOS_TRANSICAO * 1000);
-      $('rwAdSucesso').style.display = 'flex';
-      return;
-    }
-
-    // último vídeo: credita 1 anúncio (25 pontos) no servidor
-    fase = 'creditando';
-    $('rwSucessoIcone').style.display = 'none';
-    $('rwSucessoSpinner').style.display = 'block';
-    $('rwSucessoBotao').style.display = 'none';
-    $('rwSucessoTitulo').textContent = 'A guardar os teus pontos...';
-    $('rwSucessoTexto').textContent = '';
-    $('rwAdSucesso').style.display = 'flex';
-
-    creditarAnuncio().then(function (r) {
-      if (r.status === 'ganhou') {
-        gravar(CH_PROGRESSO, 0);
-        const resto = MAX_ANUNCIOS_DIA - anunciosHoje();
-        mostrarResultado('✓', '🎉 Ganhaste ' + r.premio + ' pontos!',
-          'Já foram adicionados ao teu saldo. Hoje: ' + anunciosHoje() + ' de ' + MAX_ANUNCIOS_DIA + ' anúncios (' + pontosHoje() + ' / ' + LIMITE_DIARIO + ' pontos)' +
-          (resto <= 0 ? '. Este foi o último de hoje.' : '.'), true);
-      } else if (r.status === 'limite') {
-        gravar(CH_PROGRESSO, 0);
-        mostrarResultado('<svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM8.5 15.5l2-2.5 1.5 1.5 2.5-3.5 3 4.5H6.5l2-3z"/></svg>', 'Limite diário atingido',
-          'Já atingiste o limite de hoje. Volta dentro de ' + tempoAteNovaJanela() + ' para ganhar mais.', false);
-      } else if (r.status === 'login') {
-        mostrarResultado('🔒', 'Sessão necessária', 'Inicia sessão com uma conta verificada para receber os pontos.', false);
-      } else {
-        // falha ao guardar: o próximo vídeo completa o anúncio outra vez
-        gravar(CH_PROGRESSO, ANUNCIOS_NECESSARIOS - 1);
-        mostrarResultado('⚠', 'Não foi possível guardar os pontos',
-          'Verifica a ligação e tenta outra vez. Não perdeste o progresso.', false);
-      }
-      atualizarPainel();
-      atualizarBotao();
-    });
-  }
-
-  // Fecha o ecrã do anúncio (com ou sem aviso) e inicia o tempo de espera até ao próximo.
-  function encerrarOverlay(msg) {
-    clearInterval(timerProgresso);
-    clearTimeout(timerTransicao);
-    clearTimeout(timerInicio);
-    limparAvisosInicio();
-    try { if (ytPlayer) ytPlayer.pauseVideo(); } catch (e) {}
-    fase = 'pronto';
-    sairFullscreen();
-    $('rwAdSucesso').style.display = 'none';
-    $('rwAdOverlay').classList.remove('aberto');
-    libertarVoltar();
-    if (msg) toast(msg);
-    iniciarCooldown();
-  }
-
-  function abortarAnuncio(msg) {
-    if (fase !== 'anuncio' && fase !== 'transicao') return;
-    encerrarOverlay(msg);
-  }
-
-  function iniciarCooldown() {
-    videoPronto = false;
-    progressoCarga = 0;
-    cooldownRestante = COOLDOWN_SEG;
-    escolherAnuncio();
-    comecarCarga(false);
-    clearInterval(timerCooldown);
-    timerCooldown = setInterval(() => {
-      cooldownRestante--;
-      if (cooldownRestante <= 0) {
-        clearInterval(timerCooldown);
-        cooldownRestante = 0;
-      }
-      atualizarBotao();
-    }, 1000);
-  }
-
-  /* ---------- eventos ---------- */
-  $('rwBtnAnuncio').addEventListener('click', function () {
-    if (!contaValida()) return;
-    if (!estadoCarregado) { carregarEstado(); return; }
-    if (indisponivel) { tentarDeNovo(); return; }
-    abrirAnuncio();
-  });
-
-  $('rwAdSkip').addEventListener('click', function (e) {
-    e.stopPropagation();
-    abortarAnuncio('Anúncio ignorado — não conta para os pontos');
-  });
-
-  $('rwAdAbrir').addEventListener('click', function (e) {
-    e.stopPropagation();
-    abrirLink();
-    abortarAnuncio('Anúncio interrompido — não conta para os pontos');
-  });
-
-  $('rwAdOverlay').addEventListener('click', function () {
-    if (fase !== 'anuncio' || !ytPlayer) return;
-    let atual = 0;
-    try { atual = ytPlayer.getCurrentTime(); } catch (e) {}
-    if (atual < SEGUNDOS_PARA_CLIQUE) return;
-    abrirLink();
-    abortarAnuncio('Anúncio interrompido — não conta para os pontos');
-  });
-
-  $('rwSucessoBotao').addEventListener('click', function () {
-    if (fase !== 'sucesso') return;
-    encerrarOverlay();
-  });
-
-  document.addEventListener('visibilitychange', function () {
-    if (document.hidden && (fase === 'anuncio' || fase === 'transicao')) {
-      abortarAnuncio('Anúncio cancelado — saíste da app antes de terminar');
-    }
-  });
-
-  /* ---------- ecrã "Ganhar Pontos" ---------- */
-  function abrirPagina() {
-    if (typeof closeSidebar === 'function') closeSidebar();
-    $('rwOverlay').classList.add('active');
-    document.body.style.overflow = 'hidden';
-    atualizarPainel();
-    atualizarBotao();
-    carregarEstado();
-    preparar();
-  }
-
-  function fecharPagina() {
-    $('rwOverlay').classList.remove('active');
-    document.body.style.overflow = '';
-  }
-
-  function emAnuncio() { return fase === 'anuncio' || fase === 'transicao' || fase === 'creditando' || fase === 'sucesso'; }
-
-  $('rwVoltar').addEventListener('click', fecharPagina);
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && $('rwOverlay').classList.contains('active') && !emAnuncio()) fecharPagina();
-  });
-
-  atualizarPainel();
-
-  window.RewardedAds = { abrirPagina: abrirPagina };
-})();
-</script>
-</body>
-</html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        gain.gain.exponentialRampToValueAt                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
