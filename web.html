@@ -3986,6 +3986,418 @@
       max-width: 90vw;
       text-align: center;
     }
+
+    .redeem-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg-primary);
+      z-index: 2000;
+      flex-direction: column;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .redeem-overlay.active {
+      display: flex;
+    }
+
+    .redeem-overlay-content {
+      width: 100%;
+      height: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      background: var(--bg-primary);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .redeem-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .profile-header-points {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .profile-header-points svg {
+      fill: #FFD700;
+    }
+
+    .rw-saldo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+    .rw-saldo-ic {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(37, 99, 235, 0.12);
+      color: #2563eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .rw-saldo-info { flex: 1; min-width: 0; }
+    #rwSaldoTotalUsuario { flex-shrink: 0; }
+    .rw-saldo-num { font-size: 26px; font-weight: 700; line-height: 1.1; color: var(--text-primary); }
+    .rw-saldo-txt { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .rw-pill-demo {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(245, 158, 11, 0.15);
+      color: #d97706;
+      flex-shrink: 0;
+    }
+    .rw-aviso {
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--text-secondary);
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+    .rw-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 18px 16px;
+      box-shadow: var(--shadow-sm);
+    }
+    .rw-card h3 { font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0 0 4px; }
+    .rw-card p { font-size: 13px; line-height: 1.5; color: var(--text-secondary); margin: 0 0 14px; }
+    .rw-bolinhas { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; }
+    .rw-bolinha {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 2px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      color: var(--text-muted);
+      background: var(--bg-secondary);
+      transition: all 0.2s ease;
+    }
+    .rw-bolinha.feito { border-color: #16a34a; background: rgba(22, 163, 74, 0.12); color: #16a34a; }
+    .rw-seta { color: var(--text-muted); font-size: 14px; }
+    .rw-progresso-txt { text-align: center; font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+    .rw-progresso-txt b { color: var(--text-primary); }
+    .rw-hoje { text-align: center; font-size: 12px; color: var(--text-muted); margin-bottom: 14px; }
+    .rw-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .rw-btn:active { background: #1d4ed8; }
+    .rw-btn:disabled { background: var(--bg-secondary); color: var(--text-muted); cursor: default; }
+    .rw-reset { text-align: center; }
+    .rw-reset button {
+      background: none;
+      border: none;
+      font-family: inherit;
+      color: var(--text-muted);
+      font-size: 12px;
+      text-decoration: underline;
+      padding: 6px;
+      cursor: pointer;
+    }
+
+    #rwAdOverlay {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      display: flex;
+      opacity: 0;
+      z-index: -1;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+    }
+    #rwAdOverlay.aberto {
+      opacity: 1;
+      z-index: 10070;
+      pointer-events: auto;
+    }
+    @media (orientation: landscape) {
+      #rwAdOverlay.aberto {
+        inset: auto;
+        top: 0;
+        left: 0;
+        width: 100vh;
+        height: 100vw;
+        transform-origin: top left;
+        transform: rotate(90deg) translateY(-100%);
+      }
+    }
+    #rwAdOverlay .rw-ad-caixa {
+      position: relative;
+      background: #000;
+      color: #fff;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    #rwAdOverlay .rw-ad-fase {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    #rwAdOverlay .rw-ad-video {
+      flex: 1;
+      min-height: 0;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    #rwAdOverlay .rw-ad-video iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      pointer-events: none;
+    }
+    #rwAdOverlay .rw-ad-topo {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 14px;
+      padding-top: calc(16px + env(safe-area-inset-top, 0px));
+      background: #000;
+    }
+    #rwAdOverlay .rw-ad-topo img {
+      width: 46px;
+      height: 46px;
+      border-radius: 10px;
+      object-fit: cover;
+      background: #fff;
+      flex-shrink: 0;
+    }
+    #rwAdOverlay .rw-ad-topo .txt {
+      flex: 1;
+      min-width: 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.3;
+    }
+    #rwAdOverlay .rw-ad-topo .selo {
+      display: block;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #9ca3af;
+    }
+    #rwAdOverlay .rw-ad-topo small {
+      display: block;
+      font-weight: 400;
+      color: #d1d5db;
+      font-size: 12px;
+      margin-top: 2px;
+    }
+    #rwAdOverlay .rw-ad-topo button {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 10px 20px;
+      border-radius: 22px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    #rwAdOverlay .rw-ad-corpo {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      z-index: 4;
+      padding: 14px 16px calc(14px + env(safe-area-inset-bottom, 0px));
+      background: linear-gradient(to top, rgba(0,0,0,0.92), rgba(0,0,0,0.7) 70%, transparent);
+    }
+    #rwAdOverlay .rw-ad-titulo { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+    #rwAdOverlay .rw-ad-sub { font-size: 12px; color: #9ca3af; margin-bottom: 14px; }
+    #rwAdOverlay .rw-ad-barra {
+      height: 5px;
+      background: #374151;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    #rwAdOverlay .rw-ad-fill { height: 100%; width: 0%; background: #2563eb; transition: width 0.2s linear; }
+    #rwAdOverlay .rw-ad-rodape {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #9ca3af;
+    }
+    #rwAdOverlay .rw-ad-skip {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border: none;
+      font-family: inherit;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    #rwAdOverlay .rw-ad-skip:disabled { opacity: 0.4; cursor: default; }
+    #rwAdOverlay .rw-ad-sucesso {
+      display: none;
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      background: #000;
+      padding: 26px 20px;
+      text-align: center;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+    #rwAdOverlay .rw-ad-check {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: rgba(22, 163, 74, 0.15);
+      color: #16a34a;
+      font-size: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+    }
+    #rwAdOverlay .rw-ad-spinner-t {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 3px solid rgba(255,255,255,0.15);
+      border-top-color: #2563eb;
+      animation: rwSpin 0.9s linear infinite;
+      margin: 0 auto 16px;
+    }
+    #rwAdOverlay .rw-ad-sucesso h3 { margin: 0 0 6px; font-size: 16px; color: #fff; }
+    #rwAdOverlay .rw-ad-sucesso p { margin: 0 0 18px; font-size: 12px; color: #9ca3af; }
+    #rwAdOverlay .rw-ad-sucesso button {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      font-family: inherit;
+      padding: 10px 20px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    #rwAdOverlay .rw-ad-play {
+      position: absolute;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-family: inherit;
+      border: none;
+      background: #1D4ED8;
+      color: #fff;
+      padding: 12px 22px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: 700;
+      white-space: nowrap;
+      z-index: 5;
+      pointer-events: none;
+    }
+    #rwAdOverlay.rw-toque .rw-ad-video iframe { pointer-events: auto; }
+    #rwAdOverlay .rw-ad-loading {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: #9ca3af;
+      font-size: 12px;
+      z-index: 2;
+    }
+    #rwAdOverlay .rw-ad-spinner {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 3px solid rgba(255,255,255,0.15);
+      border-top-color: #60A5FA;
+      animation: rwSpin 0.9s linear infinite;
+    }
+    @keyframes rwSpin { to { transform: rotate(360deg); } }
+    #rwToast {
+      display: none;
+      position: fixed;
+      bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+      left: 50%;
+      transform: translateX(-50%);
+      background: #111827;
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 30px;
+      font-size: 13px;
+      z-index: 10080;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+      max-width: 90vw;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -4176,6 +4588,11 @@
     <button class="btn" id="redeemCodeBtn" onclick="openRedeemCodeModal()">
       <svg viewBox="0 0 24 24"><path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 00-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"/></svg>
       Resgatar Código
+    </button>
+
+    <button class="btn" id="rewardedAdsBtn" onclick="RewardedAds.abrirPagina()">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+      Ganhar Pontos
     </button>
     <button class="btn" onclick="openHistoryModal()">
       <svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
@@ -5092,6 +5509,85 @@
     </div>
   </div>
   <div id="pdAdToast"></div>
+
+  <div id="rwOverlay" class="redeem-overlay">
+    <div class="redeem-overlay-content">
+      <div class="content-header">
+        <button class="content-header-btn back-btn" id="rwVoltar" type="button">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <h1 class="content-header-title">Ganhar Pontos</h1>
+        <div style="width: 40px;"></div>
+      </div>
+
+      <div class="redeem-container">
+        <div class="rw-saldo">
+          <div class="rw-saldo-ic"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM8.5 15.5l2-2.5 1.5 1.5 2.5-3.5 3 4.5H6.5l2-3z"/></svg></div>
+          <div class="rw-saldo-info">
+            <div class="rw-saldo-num" id="rwPontosTotal">0</div>
+            <div class="rw-saldo-txt">total de pontos ganhos com anúncios</div>
+          </div>
+          <div class="profile-header-points" id="rwSaldoTotalUsuario" title="Seu saldo total de pontos">
+            <svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/></svg>
+            <span id="rwSaldoTotalValue">0</span>
+          </div>
+        </div>
+
+        <div class="rw-card">
+          <h3>Ver anúncio</h3>
+          <p>Cada anúncio vale 25 pontos e são 2 vídeos vistos até ao fim. Se ignorares antes do fim, ele não conta.</p>
+
+          <div class="rw-bolinhas">
+            <div class="rw-bolinha" id="rwBolinha1">1</div>
+            <div class="rw-bolinha" id="rwBolinha2">2</div>
+            <div class="rw-bolinha" id="rwBolinha3">3</div>
+            <div class="rw-bolinha" id="rwBolinha4">4</div>
+            <div class="rw-bolinha" id="rwBolinha5">5</div>
+            <div class="rw-bolinha" id="rwBolinha6">6</div>
+          </div>
+          <div class="rw-progresso-txt" id="rwProgressoTxt"></div>
+          <div class="rw-hoje" id="rwHojeTxt"></div>
+
+          <button class="rw-btn" id="rwBtnAnuncio" type="button" disabled>⏳ A preparar anúncio...</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="rwAdOverlay">
+    <div class="rw-ad-caixa">
+      <div class="rw-ad-fase">
+        <div class="rw-ad-video">
+          <div class="rw-ad-topo">
+            <img src="https://portaldigital.vercel.app/logo.png" alt="" id="rwAdTopoLogo">
+            <div class="txt"><span class="selo">ANÚNCIO</span><span id="rwAdTopoTitulo">Portal Digital</span><small id="rwAdTopoSub">Visita o nosso portal</small></div>
+            <button type="button" id="rwAdAbrir">Abrir</button>
+          </div>
+          <div id="rwYtPlayer"></div>
+          <div class="rw-ad-loading" id="rwAdLoading"><div class="rw-ad-spinner"></div><span>A carregar anúncio...</span></div>
+          <button class="rw-ad-play" id="rwAdPlay" type="button">▶ Toque no vídeo para reproduzir</button>
+        </div>
+        <div class="rw-ad-corpo">
+          <div class="rw-ad-titulo" id="rwAdTitulo">A exibir anúncio</div>
+          <div class="rw-ad-sub">Não saias desta página até terminar</div>
+          <div class="rw-ad-barra"><div class="rw-ad-fill" id="rwAdFill"></div></div>
+          <div class="rw-ad-rodape">
+            <span id="rwAdTempo">--:--</span>
+            <button class="rw-ad-skip" id="rwAdSkip" type="button" disabled>Ignorar anúncio</button>
+          </div>
+        </div>
+
+        <div class="rw-ad-sucesso" id="rwAdSucesso">
+          <div class="rw-ad-check" id="rwSucessoIcone">✓</div>
+          <div class="rw-ad-spinner-t" id="rwSucessoSpinner" style="display:none"></div>
+          <h3 id="rwSucessoTitulo"></h3>
+          <p id="rwSucessoTexto"></p>
+          <button type="button" id="rwSucessoBotao">Continuar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="rwToast"></div>
   <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     function applyTheme() {
       const hour = new Date().getHours();
@@ -5293,6 +5789,8 @@
       if (downloadsHeaderPointsEl) {
         downloadsHeaderPointsEl.textContent = userPoints;
       }
+      const rwSaldoTotalValue = document.getElementById('rwSaldoTotalValue');
+      if (rwSaldoTotalValue) rwSaldoTotalValue.textContent = userPoints || 0;
     }
     function updateUIForUser() {
       const userInfoSection = document.getElementById('userInfoSection');
@@ -9062,7 +9560,7 @@
       }
     }
     function isAnyModalOpen() {
-      const overlayIds = ['overlay', 'auth-overlay', 'aboutOverlay', 'external-overlay1'];
+      const overlayIds = ['overlay', 'auth-overlay', 'aboutOverlay', 'external-overlay1', 'rwOverlay'];
       const anyOverlayActive = overlayIds.some((id) => {
         const el = document.getElementById(id);
         return el && el.classList.contains('active');
@@ -9685,7 +10183,7 @@
       const snap = await getDocs(q);
       snap.forEach((d) => {
         const dados = d.data();
-        if (dados.videoId && dados.link) ANUNCIOS_ATIVOS.push({ id: d.id, videoId: dados.videoId, link: dados.link });
+        if (dados.videoId && dados.link) ANUNCIOS_ATIVOS.push({ id: d.id, videoId: dados.videoId, link: dados.link, logoUrl: dados.logoUrl || '', tituloExibido: dados.tituloExibido || '', subtitulo: dados.subtitulo || '', textoBotao: dados.textoBotao || '' });
       });
     } catch (e) {  }
     sortearAnuncio();
@@ -10094,6 +10592,24 @@
 
     limparLiberacao: function () {
       liberadoPara = null;
+    },
+
+    listarAnuncios: function () {
+      return ANUNCIOS_ATIVOS.slice();
+    }
+  };
+
+  window.PortalAdRuntime = {
+    recarregarAtivo: async function () {
+      await carregarAnuncioAtivo();
+      if (!anuncioDisponivel) return;
+      if (fase === 'anuncio') return;
+      if (playerPronto) {
+        tentativasCarga = 0;
+        recarregarAnuncio();
+      } else {
+        garantirCarga();
+      }
     }
   };
 
@@ -10103,6 +10619,822 @@
   }
   if (document.readyState === 'complete') inicializarAnuncio();
   else window.addEventListener('load', inicializarAnuncio);
+})();
+</script>
+
+<script>
+(function () {
+  'use strict';
+
+  const ESPERA_ANUNCIOS_MS = 6000;
+  const MOTIVO_SEM_ANUNCIOS = 'sem anúncios ativos';
+
+  const SEGUNDOS_PARA_IGNORAR = 15;
+  const SEGUNDOS_PARA_CLIQUE = 5;
+  const ANUNCIOS_NECESSARIOS = 2;
+  const PONTOS_POR_ANUNCIO = 25;
+  const MAX_PONTOS_POR_ANUNCIO = 25;
+  const MAX_ANUNCIOS_DIA = 6;
+  const LIMITE_DIARIO = 150;
+  const JANELA_MS = 24 * 60 * 60 * 1000;
+  const COOLDOWN_SEG = 15;
+  const SEGUNDOS_TRANSICAO = 2;
+  const LIMITE_INICIO_MS = 10000;
+  const STALL_MS = 15000;
+  const TIMEOUT_API_MS = 20000;
+
+  const CH_PROGRESSO = 'pd_demo_rw_progresso';
+
+  const $ = (id) => document.getElementById(id);
+
+  let ytPlayer = null;
+  let apiEmCarga = false;
+  let indisponivel = false;
+  let videoPronto = false;
+  let fase = 'inicio';
+  let progressoCarga = 0;
+  let precargaComecou = false;
+  let ultimaFracao = 0;
+  let ultimoAvanco = 0;
+  let iniciouReproducao = false;
+  let cooldownRestante = 0;
+  let timerApi = null;
+  let timerCarga = null;
+  let timerProgresso = null;
+  let timerTransicao = null;
+  let timerInicio = null;
+  let timerRetry = null;
+  let timerCooldown = null;
+  let toastTimer = null;
+  let anuncioAtual = null;
+  let timerAnuncios = null;
+  const falhados = new Set();
+  let motivoIndisponivel = '';
+
+  function ler(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function gravar(k, v) { try { localStorage.setItem(k, String(v)); } catch (e) {} }
+  function apagar(k) { try { localStorage.removeItem(k); } catch (e) {} }
+  function lerInt(k) { const n = parseInt(ler(k) || '0', 10); return isNaN(n) ? 0 : n; }
+
+  let estado = { windowStart: 0, adsCount: 0, pointsToday: 0, totalEarned: 0 };
+  let estadoCarregado = false;
+  let carregandoEstado = false;
+  let offsetServidor = 0;
+
+  function agora() { return Date.now() + offsetServidor; }
+  function contaValida() {
+    return typeof currentUser !== 'undefined' && !!currentUser && !currentUser.isAnonymous && userStatus !== 'pending';
+  }
+  function janelaAtiva() { return estado.windowStart > 0 && agora() - estado.windowStart < JANELA_MS; }
+  function anunciosHoje() { return janelaAtiva() ? estado.adsCount : 0; }
+  function pontosHoje() { return janelaAtiva() ? estado.pointsToday : 0; }
+  function limiteDiarioAtingido() {
+    return anunciosHoje() >= MAX_ANUNCIOS_DIA || pontosHoje() + PONTOS_POR_ANUNCIO > LIMITE_DIARIO;
+  }
+  function tempoAteNovaJanela() {
+    const ms = Math.max(0, estado.windowStart + JANELA_MS - agora());
+    const h = Math.floor(ms / 36e5);
+    const m = Math.ceil((ms % 36e5) / 6e4);
+    return h > 0 ? h + 'h ' + m + 'min' : m + 'min';
+  }
+
+  function aplicarEstado(d) {
+    d = d || {};
+    estado = {
+      windowStart: Number(d.windowStart) || 0,
+      adsCount: Number(d.adsCount) || 0,
+      pointsToday: Number(d.pointsToday) || 0,
+      totalEarned: Number(d.totalEarned) || 0
+    };
+  }
+
+  async function carregarEstado() {
+    if (!contaValida() || carregandoEstado) { atualizarPainel(); atualizarBotao(); return; }
+    carregandoEstado = true;
+    atualizarBotao();
+    try {
+      const { ref, get } = window.firebaseModules;
+      const database = window.firebaseDatabase;
+      const t = await getServerTimestamp();
+      offsetServidor = t - Date.now();
+      const snap = await get(ref(database, 'adRewards/' + currentUser.uid));
+      aplicarEstado(snap.exists() ? snap.val() : {});
+      estadoCarregado = true;
+    } catch (e) {
+      console.error('[ANÚNCIOS] Erro ao carregar pontos:', e);
+      estadoCarregado = false;
+    }
+    carregandoEstado = false;
+    atualizarPainel();
+    atualizarBotao();
+  }
+
+  function atualizarPainel() {
+    $('rwPontosTotal').textContent = estado.totalEarned;
+    if (typeof updatePointsDisplay === 'function') updatePointsDisplay();
+    const feitos = anunciosHoje();
+    for (let i = 1; i <= MAX_ANUNCIOS_DIA; i++) {
+      const bola = $('rwBolinha' + i);
+      bola.classList.toggle('feito', i <= feitos);
+      bola.textContent = i <= feitos ? '✓' : i;
+    }
+    const v = lerInt(CH_PROGRESSO);
+    $('rwProgressoTxt').innerHTML = '<b>' + feitos + '</b> de ' + MAX_ANUNCIOS_DIA + ' anúncios hoje' +
+      (v > 0 && !limiteDiarioAtingido() ? ' · vídeo ' + v + ' de ' + ANUNCIOS_NECESSARIOS + ' visto' : '');
+    $('rwHojeTxt').textContent = 'Recebidos hoje: ' + pontosHoje() + ' / ' + LIMITE_DIARIO + ' pontos' +
+      (limiteDiarioAtingido() && estado.windowStart ? ' · novo ciclo em ' + tempoAteNovaJanela() : '');
+  }
+
+  async function creditarAnuncio() {
+    if (!contaValida()) return { status: 'login' };
+    const { ref, get, update } = window.firebaseModules;
+    const database = window.firebaseDatabase;
+    try {
+      const serverTime = await getServerTimestamp();
+      offsetServidor = serverTime - Date.now();
+      const uid = currentUser.uid;
+      const snap = await get(ref(database, 'adRewards/' + uid));
+      const d = snap.exists() ? snap.val() : {};
+      const novaJanela = !d.windowStart || serverTime - d.windowStart >= JANELA_MS;
+      const count = novaJanela ? 0 : (Number(d.adsCount) || 0);
+      const hoje = novaJanela ? 0 : (Number(d.pointsToday) || 0);
+      const total = Number(d.totalEarned) || 0;
+
+      if (count >= MAX_ANUNCIOS_DIA || hoje + PONTOS_POR_ANUNCIO > LIMITE_DIARIO) {
+        aplicarEstado(d);
+        return { status: 'limite' };
+      }
+
+      const premio = Math.min(PONTOS_POR_ANUNCIO, MAX_PONTOS_POR_ANUNCIO);
+      const saldoSnap = await get(ref(database, 'users/' + uid + '/points'));
+      const novoSaldo = (Number(saldoSnap.val()) || 0) + premio;
+      const novo = {
+        windowStart: novaJanela ? serverTime : d.windowStart,
+        adsCount: count + 1,
+        pointsToday: hoje + premio,
+        totalEarned: total + premio,
+        lastClaimedAt: serverTime,
+        pointsAwarded: premio,
+        newPointsTotal: novoSaldo
+      };
+      const updates = {};
+      updates['adRewards/' + uid] = novo;
+      updates['users/' + uid + '/points'] = novoSaldo;
+      await update(ref(database), updates);
+
+      aplicarEstado(novo);
+      estadoCarregado = true;
+      _syncPointsDisplay(novoSaldo);
+      return { status: 'ganhou', premio: premio };
+    } catch (e) {
+      console.error('[SEGURANÇA] Pontos do anúncio bloqueados ou falharam:', e);
+      return { status: 'erro' };
+    }
+  }
+
+  function atualizarBotao() {
+    const btn = $('rwBtnAnuncio');
+    if (!contaValida()) {
+      btn.disabled = true;
+      btn.textContent = '🔒 Inicia sessão com uma conta verificada';
+    } else if (!estadoCarregado) {
+      btn.disabled = carregandoEstado;
+      btn.textContent = carregandoEstado ? '⏳ A carregar os teus pontos...' : '⚠ Não foi possível carregar. Toca para tentar de novo';
+    } else if (limiteDiarioAtingido()) {
+      btn.disabled = true;
+      btn.textContent = 'Limite diário atingido';
+    } else if (indisponivel) {
+      btn.disabled = false;
+      btn.textContent = motivoIndisponivel === MOTIVO_SEM_ANUNCIOS
+        ? '⚠ Sem anúncios disponíveis. Toca para procurar'
+        : '⚠ Anúncio indisponível' + (motivoIndisponivel ? ' (' + motivoIndisponivel + ')' : '') + '. Toca para tentar de novo';
+    } else if (videoPronto && cooldownRestante <= 0) {
+      btn.disabled = false;
+      btn.textContent = '▶ Ver anúncio';
+    } else {
+      btn.disabled = true;
+      if (cooldownRestante > 0) {
+        btn.textContent = '⏳ Novo anúncio em ' + cooldownRestante + 's';
+      } else {
+        btn.textContent = '⏳ A carregar anúncio' + (progressoCarga > 0 ? ' ' + progressoCarga + '%' : '...');
+      }
+    }
+  }
+
+  function toast(msg, ms) {
+    const t = $('rwToast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { t.style.display = 'none'; }, ms || 2600);
+  }
+
+  function apiPronta() { return !!(window.YT && typeof window.YT.Player === 'function'); }
+
+  function falhaApi() {
+    clearInterval(timerApi);
+    apiEmCarga = false;
+    indisponivel = true;
+    motivoIndisponivel = 'sem acesso ao YouTube';
+    atualizarBotao();
+    toast('Não foi possível carregar o anúncio');
+  }
+
+  function garantirApi(cb) {
+    if (apiPronta()) { cb(); return; }
+    if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      tag.onerror = falhaApi;
+      document.head.appendChild(tag);
+    }
+    const t0 = Date.now();
+    clearInterval(timerApi);
+    timerApi = setInterval(() => {
+      if (apiPronta()) { clearInterval(timerApi); cb(); }
+      else if (Date.now() - t0 > TIMEOUT_API_MS) falhaApi();
+    }, 300);
+  }
+
+  function candidatos() {
+    let lista = [];
+    try {
+      if (window.PortalAd && typeof window.PortalAd.listarAnuncios === 'function') lista = window.PortalAd.listarAnuncios() || [];
+    } catch (e) {}
+    return lista
+      .filter((a) => a && a.videoId && a.link)
+      .map((a) => ({ id: a.id, videoId: a.videoId, link: a.link, logoUrl: a.logoUrl || '', tituloExibido: a.tituloExibido || '', subtitulo: a.subtitulo || '', textoBotao: a.textoBotao || '' }))
+      .filter((a, i, arr) => arr.findIndex((b) => b.videoId === a.videoId) === i);
+  }
+
+  function escolherAnuncio() {
+    const livres = candidatos().filter((a) => !falhados.has(a.videoId));
+    if (!livres.length) return false;
+    const outros = livres.filter((a) => !anuncioAtual || a.videoId !== anuncioAtual.videoId);
+    const pool = outros.length ? outros : livres;
+    anuncioAtual = pool[Math.floor(Math.random() * pool.length)];
+    return true;
+  }
+
+  function semAnuncios() {
+    clearInterval(timerAnuncios);
+    apiEmCarga = false;
+    videoPronto = false;
+    indisponivel = true;
+    motivoIndisponivel = MOTIVO_SEM_ANUNCIOS;
+    atualizarBotao();
+  }
+
+  function aguardarAnuncios(cb) {
+    const t0 = Date.now();
+    clearInterval(timerAnuncios);
+    const tentar = () => {
+      if (escolherAnuncio()) { clearInterval(timerAnuncios); cb(); return true; }
+      if (Date.now() - t0 > ESPERA_ANUNCIOS_MS) semAnuncios();
+      return false;
+    };
+    if (!tentar()) timerAnuncios = setInterval(tentar, 500);
+  }
+
+  function preparar() {
+    if (ytPlayer || apiEmCarga) return;
+    apiEmCarga = true;
+    indisponivel = false;
+    motivoIndisponivel = '';
+    atualizarBotao();
+    aguardarAnuncios(() => garantirApi(criarPlayer));
+  }
+
+  async function tentarDeNovo() {
+    indisponivel = false;
+    motivoIndisponivel = '';
+    falhados.clear();
+    atualizarBotao();
+    if (!candidatos().length) {
+      try {
+        if (window.PortalAdRuntime && window.PortalAdRuntime.recarregarAtivo) await window.PortalAdRuntime.recarregarAtivo();
+      } catch (e) {}
+    }
+    if (ytPlayer) {
+      if (escolherAnuncio()) comecarCarga(false); else semAnuncios();
+    } else {
+      preparar();
+    }
+  }
+
+  function criarPlayer() {
+    try {
+      ytPlayer = new YT.Player('rwYtPlayer', {
+        videoId: anuncioAtual.videoId,
+        width: '100%',
+        height: '100%',
+        playerVars: { controls: 0, disablekb: 1, modestbranding: 1, rel: 0, playsinline: 1, autoplay: 0 },
+        events: {
+          onReady: function () { apiEmCarga = false; comecarCarga(true); },
+          onStateChange: onEstadoVideoMudou,
+          onError: onErroPlayer
+        }
+      });
+    } catch (e) {
+      ytPlayer = null;
+      falhaApi();
+    }
+  }
+
+  function onErroPlayer(e) {
+    clearInterval(timerCarga);
+    if (anuncioAtual) falhados.add(anuncioAtual.videoId);
+    if (fase === 'transicao') {
+      if (escolherAnuncio()) { preCarregarProximo(); return; }
+      abortarAnuncio('Não foi possível reproduzir o anúncio');
+      return;
+    }
+    if (fase === 'anuncio') {
+      abortarAnuncio('Não foi possível reproduzir o anúncio');
+      return;
+    }
+    if (escolherAnuncio()) { comecarCarga(false); return; }
+    videoPronto = false;
+    indisponivel = true;
+    motivoIndisponivel = e && e.data ? 'erro ' + e.data : 'erro no vídeo';
+    atualizarBotao();
+    toast('Não foi possível carregar o anúncio (' + motivoIndisponivel + ')');
+  }
+
+  function comecarCarga(primeira) {
+    fase = 'precarga';
+    videoPronto = false;
+    precargaComecou = false;
+    ultimaFracao = 0;
+    ultimoAvanco = Date.now();
+    progressoCarga = 0;
+    atualizarBotao();
+    try {
+      ytPlayer.mute();
+      if (primeira) ytPlayer.playVideo(); else ytPlayer.loadVideoById(anuncioAtual.videoId);
+    } catch (e) {}
+    clearInterval(timerCarga);
+    timerCarga = setInterval(verificarCarga, 300);
+  }
+
+  function verificarCarga() {
+    if (fase !== 'precarga') { clearInterval(timerCarga); return; }
+    const parado = Date.now() - ultimoAvanco > STALL_MS;
+    if (!precargaComecou) {
+      if (parado) finalizarPrecarga();
+      return;
+    }
+    const f = ytPlayer.getVideoLoadedFraction ? ytPlayer.getVideoLoadedFraction() : 0;
+    progressoCarga = Math.min(99, Math.round(f * 100));
+    if (f > ultimaFracao) { ultimaFracao = f; ultimoAvanco = Date.now(); }
+    atualizarBotao();
+    if (f >= 0.99 || parado) finalizarPrecarga();
+  }
+
+  function finalizarPrecarga() {
+    clearInterval(timerCarga);
+    if (fase !== 'precarga') return;
+    fase = 'pronto';
+    try {
+      ytPlayer.pauseVideo();
+      ytPlayer.seekTo(0, true);
+    } catch (e) {}
+    setTimeout(() => { if (fase === 'pronto') { try { ytPlayer.pauseVideo(); } catch (e) {} } }, 150);
+    progressoCarga = 100;
+    videoPronto = true;
+    atualizarBotao();
+  }
+
+  function onEstadoVideoMudou(evento) {
+    const E = YT.PlayerState;
+    if (fase === 'pronto' && evento.data === E.PLAYING) { try { ytPlayer.pauseVideo(); } catch (e) {} return; }
+    if (fase === 'transicao' && evento.data === E.PLAYING) { try { ytPlayer.pauseVideo(); } catch (e) {} return; }
+    if (fase === 'precarga' && (evento.data === E.PLAYING || evento.data === E.BUFFERING)) precargaComecou = true;
+    if (fase === 'anuncio' && evento.data === E.PLAYING) {
+      iniciouReproducao = true;
+      clearTimeout(timerInicio);
+      clearInterval(timerRetry);
+      esconderAvisoToque();
+      $('rwAdLoading').style.display = 'none';
+      try { ytPlayer.unMute(); ytPlayer.setVolume(100); } catch (e) {}
+    }
+    if (evento.data !== E.ENDED) return;
+    if (fase === 'precarga') { finalizarPrecarga(); return; }
+    if (fase === 'anuncio') anuncioConcluido();
+  }
+
+  function vibrarRecompensa() {
+    if (navigator.vibrate) { try { navigator.vibrate([120, 60, 120]); } catch (e) {} }
+  }
+
+  function tocarSomRecompensa() {
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      const ctx = new Ctx();
+      const tom = (freq, inicio, duracao) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.0001, ctx.currentTime + inicio);
+        gain.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + inicio + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + inicio + duracao);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime + inicio);
+        osc.stop(ctx.currentTime + inicio + duracao + 0.05);
+      };
+      tom(880, 0, 0.12);
+      tom(1320, 0.12, 0.18);
+    } catch (e) {}
+  }
+
+  function pedirFullscreen() {
+    const el = $('rwAdOverlay');
+    const pedir = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+    const bloquear = () => {
+      if (screen.orientation && screen.orientation.lock) screen.orientation.lock('portrait').catch(() => {});
+    };
+    if (pedir) {
+      try {
+        const p = pedir.call(el);
+        if (p && p.then) p.then(bloquear).catch(bloquear); else bloquear();
+      } catch (e) { bloquear(); }
+    } else {
+      bloquear();
+    }
+  }
+
+  function sairFullscreen() {
+    if (screen.orientation && screen.orientation.unlock) {
+      try { screen.orientation.unlock(); } catch (e) {}
+    }
+    const sair = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+    if (sair && (document.fullscreenElement || document.webkitFullscreenElement)) {
+      try { const p = sair.call(document); if (p && p.catch) p.catch(() => {}); } catch (e) {}
+    }
+  }
+
+  let bloquearVoltar = false;
+  let consumindoVoltar = false;
+
+  function prenderVoltar() {
+    if (bloquearVoltar) return;
+    bloquearVoltar = true;
+    try { history.pushState({ rwAd: true }, ''); } catch (e) {}
+  }
+
+  function libertarVoltar() {
+    if (!bloquearVoltar) return;
+    bloquearVoltar = false;
+    if (history.state && history.state.rwAd) {
+      consumindoVoltar = true;
+      setTimeout(() => { consumindoVoltar = false; }, 600);
+      try { history.back(); } catch (e) { consumindoVoltar = false; }
+    }
+  }
+
+  window.addEventListener('popstate', function (e) {
+    if (consumindoVoltar) {
+      consumindoVoltar = false;
+      e.stopImmediatePropagation();
+      return;
+    }
+    if (bloquearVoltar) {
+      e.stopImmediatePropagation();
+      try { history.pushState({ rwAd: true }, ''); } catch (err) {}
+      toast('Termina o anúncio para continuares');
+    }
+  }, true);
+
+  function registrarEventoAnuncioRW(tipo) {
+    const anuncio = anuncioAtual;
+    if (!anuncio || !anuncio.id) return;
+    try {
+      const firestore = window.firebaseFirestore;
+      const { doc, setDoc, updateDoc, increment } = window.firebaseModules;
+      const agora = new Date();
+      const usuario = (typeof currentUser !== 'undefined') ? currentUser : null;
+      const logado = usuario && !usuario.isAnonymous;
+      const uid = (usuario && usuario.uid) ? usuario.uid : 'visitante';
+      const campo = tipo === 'clique' ? 'cliques' : 'exibicoes';
+      setDoc(doc(firestore, 'anuncio_usuarios', anuncio.id + '_' + uid), {
+        anuncioId: anuncio.id,
+        userId: uid,
+        userEmail: logado ? (usuario.email || '') : 'Visitante',
+        userName: logado ? (usuario.displayName || '') : '',
+        ultimaData: agora.toLocaleDateString('pt-BR'),
+        ultimaHora: agora.toLocaleTimeString('pt-BR'),
+        ultimoTimestamp: agora.getTime(),
+        [campo]: increment(1)
+      }, { merge: true }).catch(() => {});
+      updateDoc(doc(firestore, 'anuncios', anuncio.id), { [campo]: increment(1) }).catch(() => {});
+    } catch (e) {}
+  }
+
+  function abrirLink() {
+    const link = anuncioAtual && anuncioAtual.link;
+    if (!link) return;
+    registrarEventoAnuncioRW('clique');
+    if (typeof openLinkInGA === 'function') openLinkInGA(link);
+    else window.open(link, '_blank', 'noopener');
+  }
+
+  function armarTimerInicio() {
+    clearTimeout(timerInicio);
+    timerInicio = setTimeout(() => {
+      if (fase === 'anuncio' && !iniciouReproducao) abortarAnuncio('O anúncio não iniciou. Tenta novamente.');
+    }, LIMITE_INICIO_MS);
+  }
+
+  function mostrarBotaoPlay() {
+    $('rwAdOverlay').classList.add('rw-toque');
+    $('rwAdLoading').style.display = 'none';
+    $('rwAdPlay').style.display = 'flex';
+    armarTimerInicio();
+  }
+
+  function esconderAvisoToque() {
+    $('rwAdOverlay').classList.remove('rw-toque');
+    $('rwAdPlay').style.display = 'none';
+  }
+
+  function limparAvisosInicio() {
+    clearInterval(timerRetry);
+    esconderAvisoToque();
+    $('rwAdLoading').style.display = 'none';
+  }
+
+  function vigiarInicio() {
+    let ticks = 0;
+    clearInterval(timerRetry);
+    timerRetry = setInterval(() => {
+      if (fase !== 'anuncio') { clearInterval(timerRetry); return; }
+      let st;
+      try { st = ytPlayer.getPlayerState(); } catch (e) { return; }
+      if (st === YT.PlayerState.PLAYING) { clearInterval(timerRetry); return; }
+      ticks++;
+      if (st === YT.PlayerState.BUFFERING) {
+        if (ticks > 15) { clearInterval(timerRetry); mostrarBotaoPlay(); }
+        return;
+      }
+      if (ticks >= 2) { clearInterval(timerRetry); mostrarBotaoPlay(); }
+    }, 1000);
+  }
+
+  function aplicarTopoAnuncio(ad) {
+    const LOGO_PADRAO = 'https://portaldigital.vercel.app/logo.png';
+    const logo = $('rwAdTopoLogo');
+    const url = ad && /^https?:\/\//i.test(ad.logoUrl || '') ? ad.logoUrl : LOGO_PADRAO;
+    logo.onerror = function () { logo.onerror = null; logo.src = LOGO_PADRAO; };
+    logo.src = url;
+    $('rwAdTopoTitulo').textContent = (ad && ad.tituloExibido) || 'Portal Digital';
+    $('rwAdTopoSub').textContent = (ad && ad.subtitulo) || 'Visita o nosso portal';
+    $('rwAdAbrir').textContent = (ad && ad.textoBotao) || 'Abrir';
+  }
+
+  function iniciarReproducao() {
+    aplicarTopoAnuncio(anuncioAtual);
+    registrarEventoAnuncioRW('exibicao');
+    $('rwAdSkip').disabled = true;
+    $('rwAdFill').style.width = '0%';
+    $('rwAdTempo').textContent = '--:--';
+    $('rwAdTitulo').textContent = 'Vídeo ' + (lerInt(CH_PROGRESSO) + 1) + ' de ' + ANUNCIOS_NECESSARIOS;
+    iniciouReproducao = false;
+    esconderAvisoToque();
+    $('rwAdLoading').style.display = 'flex';
+    try {
+      ytPlayer.unMute();
+      ytPlayer.setVolume(100);
+      ytPlayer.seekTo(0, true);
+      ytPlayer.playVideo();
+    } catch (e) {}
+    armarTimerInicio();
+    vigiarInicio();
+    iniciarProgresso();
+  }
+
+  function abrirAnuncio() {
+    if (!videoPronto || cooldownRestante > 0) {
+      toast('O anúncio ainda não está disponível, aguarda um instante');
+      return;
+    }
+    if (!contaValida() || !estadoCarregado) {
+      toast('Inicia sessão e aguarda o carregamento dos teus pontos');
+      return;
+    }
+    if (limiteDiarioAtingido()) {
+      toast('Já atingiste o limite diário. Volta dentro de ' + tempoAteNovaJanela() + '.');
+      return;
+    }
+    fase = 'anuncio';
+    $('rwAdSucesso').style.display = 'none';
+    $('rwAdOverlay').classList.add('aberto');
+    prenderVoltar();
+    pedirFullscreen();
+    iniciarReproducao();
+  }
+
+  function preCarregarProximo() {
+    try {
+      ytPlayer.mute();
+      ytPlayer.loadVideoById(anuncioAtual.videoId);
+    } catch (e) {}
+  }
+
+  function iniciarProximoAnuncioAutomatico() {
+    if (fase !== 'transicao') return;
+    $('rwAdSucesso').style.display = 'none';
+    fase = 'anuncio';
+    iniciarReproducao();
+  }
+
+  function iniciarProgresso() {
+    const skipBtn = $('rwAdSkip');
+    const fill = $('rwAdFill');
+    const tempoTxt = $('rwAdTempo');
+    clearInterval(timerProgresso);
+    timerProgresso = setInterval(() => {
+      let duracao, atual;
+      try { duracao = ytPlayer.getDuration(); atual = ytPlayer.getCurrentTime(); } catch (e) { return; }
+      if (!duracao) return;
+      fill.style.width = Math.min(100, (atual / duracao) * 100) + '%';
+      const restante = Math.max(0, Math.ceil(duracao - atual));
+      tempoTxt.textContent = Math.floor(restante / 60) + ':' + String(restante % 60).padStart(2, '0');
+      if (atual >= SEGUNDOS_PARA_IGNORAR) skipBtn.disabled = false;
+    }, 250);
+  }
+
+  function mostrarResultado(icone, titulo, texto, som) {
+    fase = 'sucesso';
+    $('rwSucessoSpinner').style.display = 'none';
+    $('rwSucessoIcone').style.display = 'flex';
+    $('rwSucessoIcone').innerHTML = icone;
+    $('rwSucessoTitulo').textContent = titulo;
+    $('rwSucessoTexto').textContent = texto;
+    $('rwSucessoBotao').style.display = 'inline-block';
+    if (som) { vibrarRecompensa(); tocarSomRecompensa(); }
+  }
+
+  function anuncioConcluido() {
+    if (fase !== 'anuncio') return;
+    clearInterval(timerProgresso);
+    clearTimeout(timerInicio);
+    limparAvisosInicio();
+    try { ytPlayer.pauseVideo(); } catch (e) {}
+
+    const v = lerInt(CH_PROGRESSO) + 1;
+
+    if (v < ANUNCIOS_NECESSARIOS) {
+      gravar(CH_PROGRESSO, v);
+      atualizarPainel();
+      fase = 'transicao';
+      const anteriorId = anuncioAtual && anuncioAtual.videoId;
+      escolherAnuncio();
+      if (anuncioAtual && anuncioAtual.videoId !== anteriorId) preCarregarProximo();
+      $('rwSucessoIcone').style.display = 'none';
+      $('rwSucessoSpinner').style.display = 'block';
+      $('rwSucessoBotao').style.display = 'none';
+      $('rwSucessoTitulo').textContent = 'A carregar o próximo vídeo...';
+      $('rwSucessoTexto').textContent = '';
+      clearTimeout(timerTransicao);
+      timerTransicao = setTimeout(iniciarProximoAnuncioAutomatico, SEGUNDOS_TRANSICAO * 1000);
+      $('rwAdSucesso').style.display = 'flex';
+      return;
+    }
+
+    fase = 'creditando';
+    $('rwSucessoIcone').style.display = 'none';
+    $('rwSucessoSpinner').style.display = 'block';
+    $('rwSucessoBotao').style.display = 'none';
+    $('rwSucessoTitulo').textContent = 'A guardar os teus pontos...';
+    $('rwSucessoTexto').textContent = '';
+    $('rwAdSucesso').style.display = 'flex';
+
+    creditarAnuncio().then(function (r) {
+      if (r.status === 'ganhou') {
+        gravar(CH_PROGRESSO, 0);
+        const resto = MAX_ANUNCIOS_DIA - anunciosHoje();
+        mostrarResultado('✓', '🎉 Ganhaste ' + r.premio + ' pontos!',
+          'Já foram adicionados ao teu saldo. Hoje: ' + anunciosHoje() + ' de ' + MAX_ANUNCIOS_DIA + ' anúncios (' + pontosHoje() + ' / ' + LIMITE_DIARIO + ' pontos)' +
+          (resto <= 0 ? '. Este foi o último de hoje.' : '.'), true);
+      } else if (r.status === 'limite') {
+        gravar(CH_PROGRESSO, 0);
+        mostrarResultado('<svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM8.5 15.5l2-2.5 1.5 1.5 2.5-3.5 3 4.5H6.5l2-3z"/></svg>', 'Limite diário atingido',
+          'Já atingiste o limite de hoje. Volta dentro de ' + tempoAteNovaJanela() + ' para ganhar mais.', false);
+      } else if (r.status === 'login') {
+        mostrarResultado('🔒', 'Sessão necessária', 'Inicia sessão com uma conta verificada para receber os pontos.', false);
+      } else {
+        gravar(CH_PROGRESSO, ANUNCIOS_NECESSARIOS - 1);
+        mostrarResultado('⚠', 'Não foi possível guardar os pontos',
+          'Verifica a ligação e tenta outra vez. Não perdeste o progresso.', false);
+      }
+      atualizarPainel();
+      atualizarBotao();
+    });
+  }
+
+  function encerrarOverlay(msg) {
+    clearInterval(timerProgresso);
+    clearTimeout(timerTransicao);
+    clearTimeout(timerInicio);
+    limparAvisosInicio();
+    try { if (ytPlayer) ytPlayer.pauseVideo(); } catch (e) {}
+    fase = 'pronto';
+    sairFullscreen();
+    $('rwAdSucesso').style.display = 'none';
+    $('rwAdOverlay').classList.remove('aberto');
+    libertarVoltar();
+    if (msg) toast(msg);
+    iniciarCooldown();
+  }
+
+  function abortarAnuncio(msg) {
+    if (fase !== 'anuncio' && fase !== 'transicao') return;
+    encerrarOverlay(msg);
+  }
+
+  function iniciarCooldown() {
+    videoPronto = false;
+    progressoCarga = 0;
+    cooldownRestante = COOLDOWN_SEG;
+    escolherAnuncio();
+    comecarCarga(false);
+    clearInterval(timerCooldown);
+    timerCooldown = setInterval(() => {
+      cooldownRestante--;
+      if (cooldownRestante <= 0) {
+        clearInterval(timerCooldown);
+        cooldownRestante = 0;
+      }
+      atualizarBotao();
+    }, 1000);
+  }
+
+  $('rwBtnAnuncio').addEventListener('click', function () {
+    if (!contaValida()) return;
+    if (!estadoCarregado) { carregarEstado(); return; }
+    if (indisponivel) { tentarDeNovo(); return; }
+    abrirAnuncio();
+  });
+
+  $('rwAdSkip').addEventListener('click', function (e) {
+    e.stopPropagation();
+    abortarAnuncio('Anúncio ignorado — não conta para os pontos');
+  });
+
+  $('rwAdAbrir').addEventListener('click', function (e) {
+    e.stopPropagation();
+    abrirLink();
+    abortarAnuncio('Anúncio interrompido — não conta para os pontos');
+  });
+
+  $('rwAdOverlay').addEventListener('click', function () {
+    if (fase !== 'anuncio' || !ytPlayer) return;
+    let atual = 0;
+    try { atual = ytPlayer.getCurrentTime(); } catch (e) {}
+    if (atual < SEGUNDOS_PARA_CLIQUE) return;
+    abrirLink();
+    abortarAnuncio('Anúncio interrompido — não conta para os pontos');
+  });
+
+  $('rwSucessoBotao').addEventListener('click', function () {
+    if (fase !== 'sucesso') return;
+    encerrarOverlay();
+  });
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden && (fase === 'anuncio' || fase === 'transicao')) {
+      abortarAnuncio('Anúncio cancelado — saíste da app antes de terminar');
+    }
+  });
+
+  function abrirPagina() {
+    if (typeof closeSidebar === 'function') closeSidebar();
+    $('rwOverlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+    atualizarPainel();
+    atualizarBotao();
+    carregarEstado();
+    preparar();
+  }
+
+  function fecharPagina() {
+    $('rwOverlay').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  function emAnuncio() { return fase === 'anuncio' || fase === 'transicao' || fase === 'creditando' || fase === 'sucesso'; }
+
+  $('rwVoltar').addEventListener('click', fecharPagina);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && $('rwOverlay').classList.contains('active') && !emAnuncio()) fecharPagina();
+  });
+
+  atualizarPainel();
+
+  window.RewardedAds = { abrirPagina: abrirPagina };
 })();
 </script>
 </body>
