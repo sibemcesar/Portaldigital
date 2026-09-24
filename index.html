@@ -10518,6 +10518,24 @@ function esconderPreparandoLink() {
   const el = document.getElementById("pdPrepOverlay");
   if (el) el.classList.remove("active");
 }
+function precarregarLinkOculto(url) {
+  removerLinkOculto();
+  const f = document.createElement("iframe");
+  f.id = "pdPrepFrame";
+  f.setAttribute("sandbox", "allow-scripts allow-same-origin");
+  f.setAttribute("aria-hidden", "true");
+  f.tabIndex = -1;
+  f.style.cssText = "position:fixed;left:-9999px;top:0;width:1px;height:1px;border:0;opacity:0;pointer-events:none;";
+  f.src = url;
+  document.body.appendChild(f);
+}
+function removerLinkOculto() {
+  const f = document.getElementById("pdPrepFrame");
+  if (f) {
+    f.src = "about:blank";
+    f.remove();
+  }
+}
 function abrirLinkDownload(appType, url) {
   if (typeof Android !== "undefined" && Android.openApp) {
     const tempLink = document.createElement("a");
@@ -10606,6 +10624,7 @@ async function downloadGame(gameId, appType, url, cost) {
     await update(ref(database), updates);
     _syncPointsDisplay(newPointsTotal);
     mostrarPreparandoLink();
+    precarregarLinkOculto(url);
     const esperaLink = new Promise((resolve) => setTimeout(resolve, LINK_PREP_MS));
     try {
       const { doc: firestoreDoc, getDoc: fsGetDoc, setDoc } = window.firebaseModules;
@@ -10622,10 +10641,12 @@ async function downloadGame(gameId, appType, url, cost) {
       console.error("Erro ao incrementar downloads:", error.message || error);
     }
     await esperaLink;
+    removerLinkOculto();
     esconderPreparandoLink();
     abrirLinkDownload(appType, url);
     showCustomAlert(`Download iniciado! ${cost} pontos deduzidos. Pontos restantes: ${newPointsTotal}`);
   } catch (error) {
+    removerLinkOculto();
     esconderPreparandoLink();
     console.error("[SEGURAN\xC7A] Erro na transa\xE7\xE3o de download:", error);
     showCustomAlert("Erro ao processar download. Tente novamente.");
