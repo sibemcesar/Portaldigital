@@ -7346,17 +7346,59 @@ window.firebaseModules = {
       border: 0;
       pointer-events: none;
     }
-    #pdAdOverlay .pdad-rotulo {
+    #pdAdOverlay .pdad-topo {
       position: absolute;
-      top: 10px;
-      left: 12px;
-      font-size: 10px;
-      background: rgba(255,255,255,0.15);
-      padding: 3px 8px;
-      border-radius: 20px;
-      letter-spacing: 0.5px;
-      z-index: 3;
+      top: 0; left: 0; right: 0;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 14px;
+      padding-top: calc(16px + env(safe-area-inset-top, 0px));
+      background: #000;
+    }
+    #pdAdOverlay .pdad-topo img {
+      width: 46px;
+      height: 46px;
+      border-radius: 10px;
+      object-fit: cover;
+      background: #fff;
+      flex-shrink: 0;
+    }
+    #pdAdOverlay .pdad-topo .txt {
+      flex: 1;
+      min-width: 0;
+      font-size: 16px;
+      font-weight: 700;
       color: #fff;
+      line-height: 1.3;
+    }
+    #pdAdOverlay .pdad-topo .selo {
+      display: block;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #9ca3af;
+    }
+    #pdAdOverlay .pdad-topo small {
+      display: block;
+      font-weight: 400;
+      color: #d1d5db;
+      font-size: 12px;
+      margin-top: 2px;
+    }
+    #pdAdOverlay .pdad-topo button {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 10px 20px;
+      border-radius: 22px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      cursor: pointer;
     }
     #pdAdOverlay .pdad-corpo {
       padding: 14px 16px calc(14px + env(safe-area-inset-bottom, 0px));
@@ -7377,7 +7419,7 @@ window.firebaseModules = {
     #pdAdOverlay .pdad-fill {
       height: 100%;
       width: 0%;
-      background: #3B82F6;
+      background: #2563eb;
       transition: width 0.2s linear;
     }
     #pdAdOverlay .pdad-rodape {
@@ -7415,8 +7457,9 @@ window.firebaseModules = {
       border-radius: 30px;
       font-size: 14px;
       font-weight: 700;
+      white-space: nowrap;
       z-index: 5;
-      pointer-events: none;   
+      pointer-events: none;
     }
     #pdAdOverlay.pdad-toque .pdad-video iframe { pointer-events: auto; }
     #pdAdOverlay .pdad-loading {
@@ -8984,6 +9027,22 @@ window.firebaseModules = {
           <label class="form-label">Link de destino (Saiba mais)</label>
           <input type="url" class="form-input" id="adFormLink" placeholder="https://..." required>
         </div>
+        <div class="form-group">
+          <label class="form-label">URL da logo (aparece no topo do anúncio)</label>
+          <input type="url" class="form-input" id="adFormLogo" placeholder="https://.../logo.png">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Título exibido no anúncio</label>
+          <input type="text" class="form-input" id="adFormNome" placeholder="Portal Digital" maxlength="60">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Subtítulo exibido no anúncio</label>
+          <input type="text" class="form-input" id="adFormSub" placeholder="Visita o nosso portal" maxlength="90">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Texto do botão (abre o link de destino)</label>
+          <input type="text" class="form-input" id="adFormBtn" placeholder="Abrir" maxlength="20">
+        </div>
         <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
           <input type="checkbox" id="adFormAtivo" style="width: 18px; height: 18px;" checked>
           <label class="form-label" style="margin: 0;" for="adFormAtivo">Anúncio ativo</label>
@@ -9409,7 +9468,11 @@ window.firebaseModules = {
     <div class="pdad-caixa">
       <div class="pdad-fase">
         <div class="pdad-video">
-          <span class="pdad-rotulo">ANÚNCIO</span>
+          <div class="pdad-topo">
+            <img src="https://portaldigital.vercel.app/logo.png" alt="" id="pdAdTopoLogo">
+            <div class="txt"><span class="selo">ANÚNCIO</span><span id="pdAdTopoTitulo">Portal Digital</span><small id="pdAdTopoSub">Visita o nosso portal</small></div>
+            <button type="button" id="pdAdAbrir">Abrir</button>
+          </div>
           <button class="pdad-play" id="pdAdPlay" type="button">▶ Toque no vídeo para reproduzir</button>
           <div class="pdad-loading" id="pdAdLoading"><div class="pdad-spinner"></div><span id="pdAdLoadingTxt">A carregar anúncio...</span></div>
           <div id="pdAdYtPlayer"></div>
@@ -9480,8 +9543,8 @@ window.firebaseModules = {
       <div class="rw-ad-fase">
         <div class="rw-ad-video">
           <div class="rw-ad-topo">
-            <img src="https://portaldigital.vercel.app/logo.png" alt="Portal Digital">
-            <div class="txt"><span class="selo">ANÚNCIO</span>Portal Digital<small>Visita o nosso portal</small></div>
+            <img src="https://portaldigital.vercel.app/logo.png" alt="" id="rwAdTopoLogo">
+            <div class="txt"><span class="selo">ANÚNCIO</span><span id="rwAdTopoTitulo">Portal Digital</span><small id="rwAdTopoSub">Visita o nosso portal</small></div>
             <button type="button" id="rwAdAbrir">Abrir</button>
           </div>
           <div id="rwYtPlayer"></div>
@@ -15121,6 +15184,7 @@ document.addEventListener("keydown", (e) => {
   let VIDEO_ID = null;
   let LINK_ANUNCIO = null;
   let ANUNCIO_ATIVO_ID = null;
+  let ANUNCIO_ATIVO = null;
   let ANUNCIOS_ATIVOS = [];
   let ultimoAnuncioId = null;
   let anuncioExibido = null;
@@ -15162,6 +15226,7 @@ document.addEventListener("keydown", (e) => {
       VIDEO_ID = null;
       LINK_ANUNCIO = null;
       ANUNCIO_ATIVO_ID = null;
+      ANUNCIO_ATIVO = null;
       return;
     }
     let candidatos = lista;
@@ -15173,6 +15238,7 @@ document.addEventListener("keydown", (e) => {
     VIDEO_ID = escolhido.videoId;
     LINK_ANUNCIO = escolhido.link;
     ANUNCIO_ATIVO_ID = escolhido.id;
+    ANUNCIO_ATIVO = escolhido;
     ultimoAnuncioId = escolhido.id;
     anuncioDisponivel = true;
   }
@@ -15187,7 +15253,7 @@ document.addEventListener("keydown", (e) => {
       const snap = await getDocs(q);
       snap.forEach((d) => {
         const dados = d.data();
-        if (dados.videoId && dados.link) ANUNCIOS_ATIVOS.push({ id: d.id, videoId: dados.videoId, link: dados.link });
+        if (dados.videoId && dados.link) ANUNCIOS_ATIVOS.push({ id: d.id, videoId: dados.videoId, link: dados.link, logoUrl: dados.logoUrl || '', tituloExibido: dados.tituloExibido || '', subtitulo: dados.subtitulo || '', textoBotao: dados.textoBotao || '' });
       });
     } catch (e) {  }
     sortearAnuncio();
@@ -15357,9 +15423,22 @@ document.addEventListener("keydown", (e) => {
     if (playerPronto && fase === 'usado') { tentativasCarga = 0; recarregarAnuncio(); }
   }
 
+  // Preenche logo, título, subtítulo e texto do botão com os dados do anúncio (Gestão de Anúncios)
+  function aplicarTopoAnuncio(ad) {
+    const LOGO_PADRAO = 'https://portaldigital.vercel.app/logo.png';
+    const logo = $('pdAdTopoLogo');
+    const url = ad && /^https?:\/\//i.test(ad.logoUrl || '') ? ad.logoUrl : LOGO_PADRAO;
+    logo.onerror = function () { logo.onerror = null; logo.src = LOGO_PADRAO; };
+    logo.src = url;
+    $('pdAdTopoTitulo').textContent = (ad && ad.tituloExibido) || 'Portal Digital';
+    $('pdAdTopoSub').textContent = (ad && ad.subtitulo) || 'Visita o nosso portal';
+    $('pdAdAbrir').textContent = (ad && ad.textoBotao) || 'Abrir';
+  }
+
   function abrirAnuncio(idConteudo) {
     fase = 'anuncio';
-    anuncioExibido = { id: ANUNCIO_ATIVO_ID, link: LINK_ANUNCIO };
+    anuncioExibido = ANUNCIO_ATIVO || { id: ANUNCIO_ATIVO_ID, link: LINK_ANUNCIO };
+    aplicarTopoAnuncio(anuncioExibido);
     registrarEventoAnuncio('exibicao');
     clearInterval(timerCarga);
     anuncioDoConteudo = idConteudo;
@@ -15447,7 +15526,6 @@ document.addEventListener("keydown", (e) => {
       fill.style.width = Math.min(100, (atual / duracao) * 100) + '%';
       const restante = Math.max(0, Math.ceil(duracao - atual));
       tempoTxt.textContent = Math.floor(restante / 60) + ':' + String(restante % 60).padStart(2, '0');
-      if (assistido >= SEGUNDOS_PARA_CLIQUE) $('pdAdSub').textContent = 'Toque no vídeo para saber mais';
       if (assistido >= SEGUNDOS_PARA_IGNORAR) skipBtn.disabled = false;
     }, 250);
   }
@@ -15500,6 +15578,38 @@ document.addEventListener("keydown", (e) => {
       atualizarPorta();
     }
   }
+
+  // Igual ao demo: "Abrir" abre o link e interrompe o anúncio sem liberar o conteúdo
+  function interromperAnuncio() {
+    if (fase !== 'anuncio') return;
+    clearInterval(timerProgresso);
+    clearInterval(timerRetry);
+    clearTimeout(timerLimite);
+    esconderAvisoToque();
+    if (playerPronto) {
+      try { ytPlayer.mute(); ytPlayer.pauseVideo(); ytPlayer.seekTo(0, true); } catch (e) {}
+    }
+    sairFullscreen();
+    $('pdAdOverlay').classList.remove('aberto');
+    $('pdAdLoading').style.display = 'none';
+    usuarioTocou = false;
+    anuncioDoConteudo = null;
+    fase = 'pronto';
+    toast('Anúncio interrompido — não libera o conteúdo', 5000);
+    atualizarPorta();
+  }
+
+  $('pdAdAbrir').addEventListener('click', function (e) {
+    e.stopPropagation();
+    if (fase !== 'anuncio') return;
+    registrarEventoAnuncio('clique');
+    try {
+      openLinkInGA((anuncioExibido && anuncioExibido.link) || LINK_ANUNCIO);
+    } catch (err) {
+      toast('Não foi possível abrir o link', 5000);
+    }
+    interromperAnuncio();
+  });
 
   $('pdAdSkip').addEventListener('click', function (e) {
     e.stopPropagation();
@@ -15727,6 +15837,10 @@ function openAdFormModal(id) {
     document.getElementById("adFormTitulo").value = ad.titulo || "";
     document.getElementById("adFormVideo").value = ad.videoId || "";
     document.getElementById("adFormLink").value = ad.link || "";
+    document.getElementById("adFormLogo").value = ad.logoUrl || "";
+    document.getElementById("adFormNome").value = ad.tituloExibido || "";
+    document.getElementById("adFormSub").value = ad.subtitulo || "";
+    document.getElementById("adFormBtn").value = ad.textoBotao || "";
     document.getElementById("adFormAtivo").checked = !!ad.ativo;
   } else {
     document.getElementById("adFormAtivo").checked = true;
@@ -15746,6 +15860,14 @@ async function saveAdForm(event) {
   const videoInput = document.getElementById("adFormVideo").value.trim();
   const link = document.getElementById("adFormLink").value.trim();
   const ativo = document.getElementById("adFormAtivo").checked;
+  const logoUrl = document.getElementById("adFormLogo").value.trim();
+  const tituloExibido = document.getElementById("adFormNome").value.trim();
+  const subtitulo = document.getElementById("adFormSub").value.trim();
+  const textoBotao = document.getElementById("adFormBtn").value.trim();
+  if (logoUrl && !/^https?:\/\//i.test(logoUrl)) {
+    showCustomAlert("A URL da logo tem de começar por http:// ou https://");
+    return;
+  }
   const videoId = extractYoutubeId(videoInput) || videoInput;
   if (!titulo || !videoId || !link) {
     showCustomAlert("Preencha todos os campos.");
@@ -15755,13 +15877,17 @@ async function saveAdForm(event) {
   const firestore = window.firebaseFirestore;
   try {
     if (id) {
-      await updateDoc(doc(firestore, "anuncios", id), { titulo, videoId, link, ativo });
+      await updateDoc(doc(firestore, "anuncios", id), { titulo, videoId, link, ativo, logoUrl, tituloExibido, subtitulo, textoBotao });
     } else {
       await addDoc(collection(firestore, "anuncios"), {
         titulo,
         videoId,
         link,
         ativo,
+        logoUrl,
+        tituloExibido,
+        subtitulo,
+        textoBotao,
         exibicoes: 0,
         cliques: 0,
         criadoEm: Date.now(),
@@ -16083,7 +16209,7 @@ function renderAdStats() {
     } catch (e) {}
     return lista
       .filter((a) => a && a.videoId && a.link)
-      .map((a) => ({ videoId: a.videoId, link: a.link }))
+      .map((a) => ({ videoId: a.videoId, link: a.link, logoUrl: a.logoUrl || '', tituloExibido: a.tituloExibido || '', subtitulo: a.subtitulo || '', textoBotao: a.textoBotao || '' }))
       .filter((a, i, arr) => arr.findIndex((b) => b.videoId === a.videoId) === i);
   }
 
@@ -16165,7 +16291,12 @@ function renderAdStats() {
   function onErroPlayer(e) {
     clearInterval(timerCarga);
     if (anuncioAtual) falhados.add(anuncioAtual.videoId);
-    if (fase === 'anuncio' || fase === 'transicao') {
+    if (fase === 'transicao') {
+      if (escolherAnuncio()) { preCarregarProximo(); return; }
+      abortarAnuncio('Não foi possível reproduzir o anúncio');
+      return;
+    }
+    if (fase === 'anuncio') {
       abortarAnuncio('Não foi possível reproduzir o anúncio');
       return;
     }
@@ -16226,6 +16357,7 @@ function renderAdStats() {
   function onEstadoVideoMudou(evento) {
     const E = YT.PlayerState;
     if (fase === 'pronto' && evento.data === E.PLAYING) { try { ytPlayer.pauseVideo(); } catch (e) {} return; }
+    if (fase === 'transicao' && evento.data === E.PLAYING) { try { ytPlayer.pauseVideo(); } catch (e) {} return; }
     if (fase === 'precarga' && (evento.data === E.PLAYING || evento.data === E.BUFFERING)) precargaComecou = true;
     if (fase === 'anuncio' && evento.data === E.PLAYING) {
       iniciouReproducao = true;
@@ -16380,7 +16512,20 @@ function renderAdStats() {
     }, 1000);
   }
 
+  // Preenche logo, título, subtítulo e texto do botão com os dados do anúncio (Gestão de Anúncios)
+  function aplicarTopoAnuncio(ad) {
+    const LOGO_PADRAO = 'https://portaldigital.vercel.app/logo.png';
+    const logo = $('rwAdTopoLogo');
+    const url = ad && /^https?:\/\//i.test(ad.logoUrl || '') ? ad.logoUrl : LOGO_PADRAO;
+    logo.onerror = function () { logo.onerror = null; logo.src = LOGO_PADRAO; };
+    logo.src = url;
+    $('rwAdTopoTitulo').textContent = (ad && ad.tituloExibido) || 'Portal Digital';
+    $('rwAdTopoSub').textContent = (ad && ad.subtitulo) || 'Visita o nosso portal';
+    $('rwAdAbrir').textContent = (ad && ad.textoBotao) || 'Abrir';
+  }
+
   function iniciarReproducao() {
+    aplicarTopoAnuncio(anuncioAtual);
     $('rwAdSkip').disabled = true;
     $('rwAdFill').style.width = '0%';
     $('rwAdTempo').textContent = '--:--';
@@ -16415,6 +16560,13 @@ function renderAdStats() {
     prenderVoltar();
     pedirFullscreen();
     iniciarReproducao();
+  }
+
+  function preCarregarProximo() {
+    try {
+      ytPlayer.mute();
+      ytPlayer.loadVideoById(anuncioAtual.videoId);
+    } catch (e) {}
   }
 
   function iniciarProximoAnuncioAutomatico() {
@@ -16472,6 +16624,10 @@ function renderAdStats() {
       }
     } else {
       fase = 'transicao';
+      // sorteia outro anúncio para o próximo (não repete o que acabou de passar)
+      const anteriorId = anuncioAtual && anuncioAtual.videoId;
+      escolherAnuncio();
+      if (anuncioAtual && anuncioAtual.videoId !== anteriorId) preCarregarProximo();
       icone.style.display = 'none';
       spinner.style.display = 'block';
       botao.style.display = 'none';
