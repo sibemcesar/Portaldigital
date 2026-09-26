@@ -11437,6 +11437,129 @@
   window.RewardedAds = { abrirPagina: abrirPagina };
 })();
 </script>
+
+<style>
+  #bannerFixoApp {
+    display: flex;
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
+    background: var(--bg-card);
+    border-top: 1px solid var(--border-color);
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    z-index: 500;
+    box-shadow: var(--shadow-md);
+  }
+  #bannerFixoApp .bfa-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+  #bannerFixoApp .bfa-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    flex-shrink: 0;
+    object-fit: cover;
+    background: var(--bg-secondary);
+  }
+  #bannerFixoApp .bfa-texto {
+    min-width: 0;
+  }
+  #bannerFixoApp .bfa-texto strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #bannerFixoApp .bfa-texto span {
+    display: block;
+    font-size: 11px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: opacity 0.25s ease;
+  }
+  #bannerFixoApp .bfa-acoes {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  #bannerFixoApp .bfa-instalar {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    animation: bfaPulsar 1.6s ease-in-out infinite;
+  }
+  #bannerFixoApp .bfa-instalar:hover { background: var(--accent-hover); }
+  @keyframes bfaPulsar {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 var(--accent-light);
+    }
+    50% {
+      transform: scale(1.06);
+      box-shadow: 0 0 0 8px rgba(0,0,0,0);
+    }
+  }
+  #bannerFixoApp .bfa-close {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 18px;
+    padding: 4px 6px;
+    cursor: pointer;
+    line-height: 1;
+  }
+</style>
+
+<div id="bannerFixoApp">
+  <div class="bfa-info">
+    <img class="bfa-icon" src="logo.png" alt="Logo">
+    <div class="bfa-texto">
+      <strong>Portal Digital App</strong>
+      <span id="bfaSubtitulo">Experimenta grátis agora</span>
+    </div>
+  </div>
+  <div class="bfa-acoes">
+    <button class="bfa-instalar" onclick="window.open('https://www.mediafire.com/file/nj4zgph4ekr85lr/Portal+Digital+1.0.apk/file', '_blank')">Instalar</button>
+    <button class="bfa-close" onclick="document.getElementById('bannerFixoApp').style.display='none'">✕</button>
+  </div>
+</div>
+
+<script>
+  const bfaVantagens = [
+    'Experimenta grátis agora',
+    'Mais rápido e mais leve',
+    'Sem anúncios incómodos',
+    'Acesso a conteúdo exclusivo',
+    'Notificações só do que interessa'
+  ];
+  let bfaIndex = 0;
+  setInterval(() => {
+    bfaIndex = (bfaIndex + 1) % bfaVantagens.length;
+    const bfaEl = document.getElementById('bfaSubtitulo');
+    bfaEl.style.opacity = 0;
+    setTimeout(() => {
+      bfaEl.textContent = bfaVantagens[bfaIndex];
+      bfaEl.style.opacity = 1;
+    }, 250);
+  }, 2800);
+</script>
 </body>
 </html>
 
