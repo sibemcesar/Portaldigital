@@ -14288,7 +14288,9 @@ async function pdEnhanceProfile(container, user, createdAtMs, pre) {
     const fill = container.querySelector("#pdpXpFill");
     if (fill) setTimeout(() => { fill.style.width = nv.pct + "%"; }, 60);
 
-    const marcar = (sel, attr, val) => container.querySelectorAll(sel).forEach((el) => el.classList.toggle("sel", el.getAttribute(attr) === val));
+    // "container" aqui é o stage temporário (esvaziado depois do replaceChildren); usa o pai vivo do card
+    const raiz = () => (card && card.parentNode) || container;
+    const marcar = (sel, attr, val) => raiz().querySelectorAll(sel).forEach((el) => el.classList.toggle("sel", el.getAttribute(attr) === val));
     const cfg = pdpCfg(uid);
     const inUser = container.querySelector("#pdpInUser"), inBio = container.querySelector("#pdpInBio"), cont2 = container.querySelector("#pdpBioCont");
     inUser.value = cfg.user || "";
@@ -14297,7 +14299,7 @@ async function pdEnhanceProfile(container, user, createdAtMs, pre) {
     marcar(".pdp-cover-op", "data-capa", cfg.capa || "orig");
     marcar(".pdp-frame-op", "data-mold", cfg.moldura || "padrao");
     pdpAplicar(container, uid, nv.num);
-    const salvar = (patch) => { const c = Object.assign(pdpCfg(uid), patch); pdpSalvarCfg(uid, c); pdpAplicar(container, uid, nv.num); };
+    const salvar = (patch) => { const c = Object.assign(pdpCfg(uid), patch); pdpSalvarCfg(uid, c); pdpAplicar(raiz(), uid, nv.num); };
     inUser.addEventListener("input", () => { inUser.value = inUser.value.replace(/[^a-zA-Z0-9_.]/g, "").slice(0, 20); salvar({ user: inUser.value }); });
     inBio.addEventListener("input", () => { cont2.textContent = inBio.value.length + "/100"; salvar({ bio: inBio.value.slice(0, 100) }); });
     container.querySelectorAll(".pdp-cover-op").forEach((b) => b.addEventListener("click", () => { salvar({ capa: b.getAttribute("data-capa") }); marcar(".pdp-cover-op", "data-capa", b.getAttribute("data-capa")); }));
