@@ -128,6 +128,7 @@ window.firebaseModules = {
       --accent-primary: #1D4ED8;
       --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
       --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.15);
+      --ad-rgb: 255, 255, 255;
     }
 
     .dark {
@@ -139,6 +140,7 @@ window.firebaseModules = {
       --text-muted: #888888;
       --border-color: rgba(255, 255, 255, 0.15);
       --accent-primary: #60A5FA;
+      --ad-rgb: 15, 15, 15;
     }
 
     * {
@@ -475,9 +477,7 @@ window.firebaseModules = {
       display: flex;
       align-items: stretch;
       justify-content: space-around;
-      background: transparent;
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      background: var(--bg-primary);
       border: 1px solid var(--border-color);
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
       border-radius: 22px;
@@ -527,6 +527,19 @@ window.firebaseModules = {
     }
     .bottom-nav-item.active svg {
       fill: var(--text-primary);
+    }
+
+    .bottom-nav-avatar {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      border: 1.5px solid var(--text-muted);
+      transition: border-color 0.2s ease;
+    }
+    .bottom-nav-item.active .bottom-nav-avatar {
+      border-color: var(--text-primary);
     }
 
     .bottom-nav-item:active {
@@ -956,6 +969,39 @@ window.firebaseModules = {
       right: 12px;
       font-size: 16px;
     }
+
+
+    .content-load-bar { display: none !important; }
+    #pdTopLoader {
+      position: fixed; top: 0; left: 0; right: 0; height: 3px;
+      z-index: 10500; pointer-events: none;
+      opacity: 0; transition: opacity 0.25s ease;
+    }
+    #pdTopLoader.on { opacity: 1; transition: none; }
+    #pdTopLoader i {
+      display: block; width: 100%; height: 100%;
+      background: var(--accent-primary, #1D4ED8);
+      transform-origin: left center; transform: scaleX(0);
+      transition: transform 0.25s ease-out; will-change: transform;
+    }
+    #pdTouchBlocker {
+      position: fixed; inset: 0; z-index: 10499; display: none;
+      background: transparent; touch-action: none;
+    }
+    #pdTouchBlocker.on { display: block; }
+    @media (prefers-reduced-motion: reduce) {
+      #pdTopLoader i { transition: none; }
+    }
+
+    .search-genre-suggest { margin-bottom: 14px; }
+    .search-genre-title { font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; }
+    .search-genre-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .search-genre-chip {
+      border: 1px solid var(--border-color); background: var(--bg-card);
+      color: var(--text-primary); border-radius: 999px; padding: 7px 14px;
+      font-size: 14px; cursor: pointer; font-family: inherit;
+    }
+    .search-genre-chip:active { border-color: var(--accent-primary); color: var(--accent-primary); }
 
     .search-overlay-body {
       padding: 16px 20px;
@@ -3866,6 +3912,15 @@ window.firebaseModules = {
       color: var(--bg-primary);
     }
 
+
+    .signup-prompt-content { max-width: 340px; text-align: center; padding: 28px 22px 22px; }
+    .signup-prompt-icon { font-size: 40px; line-height: 1; margin-bottom: 10px; }
+    .signup-prompt-content h2 { font-size: 19px; margin-bottom: 8px; }
+    .signup-prompt-list { list-style: none; padding: 0; margin: 0 0 8px; text-align: left; color: var(--text-secondary); font-size: 14px; }
+    .signup-prompt-list li { padding: 6px 0; }
+    .comment-guest-cta { align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; background: var(--bg-secondary); border-top: 1px solid var(--border-color); color: var(--text-primary); font-size: 14px; font-weight: 600; cursor: pointer; }
+    .comment-guest-cta-btn { flex-shrink: 0; border: none; border-radius: 8px; padding: 8px 14px; background: var(--accent-primary); color: var(--bg-primary); font-family: 'Inter', sans-serif; font-weight: 600; cursor: pointer; }
+
     .custom-modal-btn.secondary {
       background: transparent;
       border: 1px solid var(--border-color);
@@ -5127,6 +5182,20 @@ window.firebaseModules = {
       animation: heartPulse 0.3s ease;
     }
 
+    .fav-icon {
+      display: inline-flex;
+      width: 24px;
+      height: 24px;
+      font-size: 24px;
+      color: #9e9e9e;
+      transition: color 0.2s ease;
+    }
+    .fav-icon svg { width: 100%; height: 100%; display: block; }
+    .fav-icon .fav-on { display: none; }
+    .favorite-btn.active .fav-icon { color: var(--accent-primary); }
+    .favorite-btn.active .fav-icon .fav-off { display: none; }
+    .favorite-btn.active .fav-icon .fav-on { display: block; }
+
     @keyframes heartPulse {
       0% { transform: scale(1); }
       50% { transform: scale(1.3); }
@@ -5235,6 +5304,21 @@ window.firebaseModules = {
 
     .footer-btn.like-active svg {
       animation: likeAnimation 0.3s ease;
+    }
+
+    .footer-btn.like-loading { pointer-events: none; color: #e91e63; }
+    .footer-btn.like-loading svg {
+      fill: #e91e63 !important;
+      transform-origin: center;
+      animation: likeWaiting 0.8s ease-in-out infinite;
+    }
+    @keyframes likeWaiting {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      35% { transform: scale(1.3); opacity: 0.85; }
+      65% { transform: scale(0.9); opacity: 0.7; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .footer-btn.like-loading svg { animation: none; opacity: 0.7; }
     }
 
     .footer-btn-wrapper {
@@ -5657,9 +5741,7 @@ window.firebaseModules = {
       margin-right: 8px;
     }
 
-    .favorites-heart-btn svg {
-      fill: #ff4757;
-    }
+    .favorites-heart-btn { color: #9e9e9e; }
 
     .profile-avatar-svg {
       width: 80px;
@@ -5947,6 +6029,65 @@ window.firebaseModules = {
       0%, 100% { transform: rotate(0deg); }
       50% { transform: rotate(180deg); }
     }
+
+    .profile-container > * { flex-shrink: 0; }
+    .pdp-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 16px; }
+    .pdp-card h3 { font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 0 0 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .pdp-card h3 small { font-size: 12px; font-weight: 500; color: var(--text-muted); }
+    .pdp-idbox { display: none; flex-direction: column; gap: 4px; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); }
+    .pdp-nivel-pill { display: inline-block; font-size: 12px; font-weight: 700; color: #fff; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); padding: 4px 12px; border-radius: 20px; }
+    .pdp-username { font-size: 14px; color: var(--accent-primary); font-weight: 700; }
+    .pdp-bio { font-size: 13px; color: var(--text-secondary); line-height: 1.4; word-break: break-word; }
+    .pdp-xp-top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 8px; }
+    .pdp-xp-nome { font-size: 18px; font-weight: 800; color: var(--text-primary); }
+    .pdp-xp-num { font-size: 12px; color: var(--text-muted); }
+    .pdp-xp-barra { height: 8px; background: var(--border-color); border-radius: 6px; overflow: hidden; }
+    .pdp-xp-fill { height: 100%; width: 0%; border-radius: 6px; background: linear-gradient(90deg, #2563eb, #7c3aed); transition: width .6s ease; }
+    .pdp-xp-dica { font-size: 11px; color: var(--text-muted); margin-top: 8px; line-height: 1.4; }
+    .pdp-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .pdp-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px 12px; text-align: center; }
+    .pdp-stat b { display: block; font-size: 22px; font-weight: 800; color: var(--text-primary); line-height: 1.1; }
+    .pdp-stat span { display: block; font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+    .pdp-genero { grid-column: 1 / -1; font-size: 13px; color: var(--text-secondary); text-align: center; padding: 10px; border: 1px dashed var(--border-color); border-radius: 12px; }
+    .pdp-genero b { color: var(--text-primary); }
+    .pdp-det > summary { list-style: none; cursor: pointer; font-size: 15px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; justify-content: space-between; }
+    .pdp-det > summary::-webkit-details-marker { display: none; }
+    .pdp-det > summary::after { content: ''; width: 8px; height: 8px; border-right: 2px solid var(--text-muted); border-bottom: 2px solid var(--text-muted); transform: rotate(45deg); transition: transform .2s; margin-right: 4px; }
+    .pdp-det[open] > summary::after { transform: rotate(-135deg); }
+    .pdp-sum { display: inline-flex; align-items: center; gap: 8px; }
+    .pdp-fl { display: inline-flex; vertical-align: -2px; margin-right: 4px; }
+    .pdp-det .pdp-corpo { margin-top: 14px; display: flex; flex-direction: column; gap: 14px; }
+    .pdp-lbl { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; display: flex; justify-content: space-between; }
+    .pdp-input { width: 100%; font-family: inherit; font-size: 14px; color: var(--text-primary); background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; outline: none; }
+    .pdp-input:focus { border-color: var(--accent-primary); }
+    textarea.pdp-input { resize: none; height: 64px; }
+    .pdp-opcoes { display: flex; flex-wrap: wrap; gap: 10px; }
+    .pdp-cover-op { width: 52px; height: 36px; border-radius: 10px; border: 2px solid transparent; cursor: pointer; padding: 0; background-size: cover; box-shadow: inset 0 0 0 1px var(--border-color); }
+    .pdp-cover-op.sel, .pdp-frame-op.sel { border-color: var(--accent-primary); }
+    .pdp-cover-orig { background: var(--bg-secondary); color: var(--text-muted); font-size: 10px; font-weight: 700; }
+    .pdp-frame-op { position: relative; width: 52px; height: 52px; border-radius: 50%; border: 2px solid transparent; background: var(--bg-secondary); cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center; }
+    .pdp-frame-op i { display: block; width: 34px; height: 34px; border-radius: 50%; border: 4px solid #9ca3af; box-sizing: border-box; }
+    .pdp-frame-op.bloq { opacity: .45; }
+    .pdp-frame-op .lk { position: absolute; right: -4px; bottom: -4px; width: 20px; height: 20px; border-radius: 50%; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; }
+    .pdp-ach { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .pdp-ach-item { text-align: center; padding: 10px 4px; border-radius: 12px; background: var(--bg-secondary); border: 1px solid var(--border-color); }
+    .pdp-ach-item .ic { line-height: 0; display: flex; justify-content: center; }
+    .pdp-ach-item .nm { font-size: 11px; font-weight: 700; color: var(--text-primary); margin-top: 6px; line-height: 1.2; }
+    .pdp-ach-item .ds { font-size: 10px; color: var(--text-muted); margin-top: 2px; line-height: 1.2; }
+    .pdp-ach-item.off { opacity: .45; filter: grayscale(1); }
+    .pdp-rec { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+    .pdp-rec-item { flex: 0 0 84px; cursor: pointer; text-align: center; }
+    .pdp-rec-item img { width: 84px; height: 84px; object-fit: cover; border-radius: 14px; background: var(--bg-secondary); display: block; }
+    .pdp-rec-item span { display: block; font-size: 11px; color: var(--text-secondary); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pdp-vazio { font-size: 13px; color: var(--text-muted); text-align: center; padding: 6px 0; }
+    .profile-avatar-svg.pdp-frame-azul { border-color: #3b82f6 !important; box-shadow: 0 0 14px rgba(59,130,246,.65) !important; }
+    .profile-avatar-svg.pdp-frame-esmeralda { border-color: #10b981 !important; box-shadow: 0 0 14px rgba(16,185,129,.65) !important; }
+    .profile-avatar-svg.pdp-frame-ouro { border-color: #fbbf24 !important; box-shadow: 0 0 16px rgba(251,191,36,.8) !important; }
+    .profile-avatar-svg.pdp-frame-neon { animation: pdpNeon 1.8s ease-in-out infinite; }
+    .profile-avatar-svg.pdp-frame-arco { animation: pdpArco 4s linear infinite; }
+    @keyframes pdpNeon { 0%,100% { border-color: #22d3ee; box-shadow: 0 0 10px #22d3ee, 0 0 22px rgba(34,211,238,.5); } 50% { border-color: #e879f9; box-shadow: 0 0 10px #e879f9, 0 0 22px rgba(232,121,249,.5); } }
+    @keyframes pdpArco { 0% { border-color: #ef4444; box-shadow: 0 0 14px #ef4444; } 20% { border-color: #f59e0b; box-shadow: 0 0 14px #f59e0b; } 40% { border-color: #22c55e; box-shadow: 0 0 14px #22c55e; } 60% { border-color: #06b6d4; box-shadow: 0 0 14px #06b6d4; } 80% { border-color: #8b5cf6; box-shadow: 0 0 14px #8b5cf6; } 100% { border-color: #ef4444; box-shadow: 0 0 14px #ef4444; } }
+    @media (prefers-reduced-motion: reduce) { .profile-avatar-svg.pdp-frame-neon, .profile-avatar-svg.pdp-frame-arco { animation: none; } }
 
     .profile-avatar {
       width: 80px;
@@ -7312,7 +7453,7 @@ window.firebaseModules = {
     #pdAdOverlay {
       position: fixed;
       inset: 0;
-      background: #000;
+      background: var(--bg-primary);
       display: flex;
       opacity: 0;
       z-index: -1;
@@ -7337,8 +7478,8 @@ window.firebaseModules = {
     }
     #pdAdOverlay .pdad-caixa {
       position: relative;
-      background: #000;
-      color: #fff;
+      background: var(--bg-primary);
+      color: var(--text-primary);
       width: 100%;
       height: 100%;
       overflow: hidden;
@@ -7355,7 +7496,7 @@ window.firebaseModules = {
     #pdAdOverlay .pdad-video {
       flex: 1;
       min-height: 0;
-      background: #000;
+      background: var(--bg-primary);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -7379,7 +7520,9 @@ window.firebaseModules = {
       gap: 12px;
       padding: 16px 14px;
       padding-top: calc(16px + env(safe-area-inset-top, 0px));
-      background: #000;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border-color);
+      overflow: hidden;
     }
     #pdAdOverlay .pdad-topo img {
       width: 46px;
@@ -7394,7 +7537,7 @@ window.firebaseModules = {
       min-width: 0;
       font-size: 16px;
       font-weight: 700;
-      color: #fff;
+      color: var(--text-primary);
       line-height: 1.3;
     }
     #pdAdOverlay .pdad-topo .selo {
@@ -7402,12 +7545,12 @@ window.firebaseModules = {
       font-size: 9px;
       font-weight: 700;
       letter-spacing: 0.5px;
-      color: #9ca3af;
+      color: var(--text-muted);
     }
     #pdAdOverlay .pdad-topo small {
       display: block;
       font-weight: 400;
-      color: #d1d5db;
+      color: var(--text-secondary);
       font-size: 12px;
       margin-top: 2px;
     }
@@ -7426,16 +7569,16 @@ window.firebaseModules = {
     }
     #pdAdOverlay .pdad-corpo {
       padding: 14px 16px calc(14px + env(safe-area-inset-bottom, 0px));
-      background: linear-gradient(to top, rgba(0,0,0,0.92), rgba(0,0,0,0.7) 70%, transparent);
+      background: linear-gradient(to top, rgba(var(--ad-rgb), 0.95), rgba(var(--ad-rgb), 0.78) 70%, rgba(var(--ad-rgb), 0));
       position: absolute;
       left: 0; right: 0; bottom: 0;
       z-index: 4;
     }
     #pdAdOverlay .pdad-titulo { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
-    #pdAdOverlay .pdad-sub { font-size: 12px; color: #9ca3af; margin-bottom: 14px; }
+    #pdAdOverlay .pdad-sub { font-size: 12px; color: var(--text-secondary); margin-bottom: 14px; }
     #pdAdOverlay .pdad-barra {
       height: 5px;
-      background: #374151;
+      background: var(--border-color);
       border-radius: 4px;
       overflow: hidden;
       margin-bottom: 10px;
@@ -7451,14 +7594,15 @@ window.firebaseModules = {
       align-items: center;
       justify-content: space-between;
       font-size: 12px;
-      color: #9ca3af;
+      color: var(--text-secondary);
     }
     #pdAdOverlay .pdad-skip {
       font-family: inherit;
       border: none;
       cursor: pointer;
-      background: rgba(255,255,255,0.1);
-      color: #fff;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      box-shadow: inset 0 0 0 1px var(--border-color);
       padding: 6px 12px;
       border-radius: 20px;
       font-size: 12px;
@@ -7494,16 +7638,39 @@ window.firebaseModules = {
       align-items: center;
       justify-content: center;
       gap: 10px;
-      color: #9ca3af;
+      color: var(--text-secondary);
       font-size: 12px;
       z-index: 2;
     }
     #pdAdOverlay .pdad-spinner {
       width: 30px; height: 30px;
       border-radius: 50%;
-      border: 3px solid rgba(255,255,255,0.15);
+      border: 3px solid var(--border-color);
       border-top-color: #60A5FA;
       animation: pdadSpin 0.9s linear infinite;
+    }
+
+    @keyframes adPulse { 0% { box-shadow: 0 0 0 0 rgba(37,99,235,.55); } 70% { box-shadow: 0 0 0 14px rgba(37,99,235,0); } 100% { box-shadow: 0 0 0 0 rgba(37,99,235,0); } }
+    @keyframes adWiggle { 0%, 84%, 100% { transform: none; } 88% { transform: scale(1.08) rotate(-3deg); } 92% { transform: scale(1.08) rotate(3deg); } 96% { transform: scale(1.05) rotate(-2deg); } }
+    @keyframes adShine { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+    @keyframes adStripes { to { background-position: 28px 0; } }
+    #pdAdOverlay.aberto .pdad-topo button { animation: adPulse 1.6s ease-out infinite, adWiggle 4s ease-in-out infinite; }
+    #pdAdOverlay.aberto .pdad-topo::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(100deg, transparent 30%, rgba(37,99,235,.18) 50%, transparent 70%);
+      transform: translateX(-100%);
+      animation: adShine 3s ease-in-out infinite;
+      pointer-events: none;
+    }
+    #pdAdOverlay.aberto .pdad-fill {
+      background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.28) 0 7px, transparent 7px 14px);
+      background-size: 28px 28px;
+      animation: adStripes .8s linear infinite;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #pdAdOverlay.aberto .pdad-topo button, #pdAdOverlay.aberto .pdad-topo::after, #pdAdOverlay.aberto .pdad-fill { animation: none; }
     }
     @keyframes pdadSpin { to { transform: rotate(360deg); } }
     .pdad-gate {
@@ -7791,7 +7958,7 @@ window.firebaseModules = {
     #rwAdOverlay {
       position: fixed;
       inset: 0;
-      background: #000;
+      background: var(--bg-primary);
       display: flex;
       opacity: 0;
       z-index: -1;
@@ -7816,8 +7983,8 @@ window.firebaseModules = {
     }
     #rwAdOverlay .rw-ad-caixa {
       position: relative;
-      background: #000;
-      color: #fff;
+      background: var(--bg-primary);
+      color: var(--text-primary);
       width: 100%;
       height: 100%;
       overflow: hidden;
@@ -7834,7 +8001,7 @@ window.firebaseModules = {
     #rwAdOverlay .rw-ad-video {
       flex: 1;
       min-height: 0;
-      background: #000;
+      background: var(--bg-primary);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -7858,7 +8025,9 @@ window.firebaseModules = {
       gap: 12px;
       padding: 16px 14px;
       padding-top: calc(16px + env(safe-area-inset-top, 0px));
-      background: #000;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border-color);
+      overflow: hidden;
     }
     #rwAdOverlay .rw-ad-topo img {
       width: 46px;
@@ -7873,7 +8042,7 @@ window.firebaseModules = {
       min-width: 0;
       font-size: 16px;
       font-weight: 700;
-      color: #fff;
+      color: var(--text-primary);
       line-height: 1.3;
     }
     #rwAdOverlay .rw-ad-topo .selo {
@@ -7881,12 +8050,12 @@ window.firebaseModules = {
       font-size: 9px;
       font-weight: 700;
       letter-spacing: 0.5px;
-      color: #9ca3af;
+      color: var(--text-muted);
     }
     #rwAdOverlay .rw-ad-topo small {
       display: block;
       font-weight: 400;
-      color: #d1d5db;
+      color: var(--text-secondary);
       font-size: 12px;
       margin-top: 2px;
     }
@@ -7908,13 +8077,13 @@ window.firebaseModules = {
       left: 0; right: 0; bottom: 0;
       z-index: 4;
       padding: 14px 16px calc(14px + env(safe-area-inset-bottom, 0px));
-      background: linear-gradient(to top, rgba(0,0,0,0.92), rgba(0,0,0,0.7) 70%, transparent);
+      background: linear-gradient(to top, rgba(var(--ad-rgb), 0.95), rgba(var(--ad-rgb), 0.78) 70%, rgba(var(--ad-rgb), 0));
     }
     #rwAdOverlay .rw-ad-titulo { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
-    #rwAdOverlay .rw-ad-sub { font-size: 12px; color: #9ca3af; margin-bottom: 14px; }
+    #rwAdOverlay .rw-ad-sub { font-size: 12px; color: var(--text-secondary); margin-bottom: 14px; }
     #rwAdOverlay .rw-ad-barra {
       height: 5px;
-      background: #374151;
+      background: var(--border-color);
       border-radius: 4px;
       overflow: hidden;
       margin-bottom: 10px;
@@ -7925,11 +8094,12 @@ window.firebaseModules = {
       align-items: center;
       justify-content: space-between;
       font-size: 12px;
-      color: #9ca3af;
+      color: var(--text-secondary);
     }
     #rwAdOverlay .rw-ad-skip {
-      background: rgba(255,255,255,0.1);
-      color: #fff;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      box-shadow: inset 0 0 0 1px var(--border-color);
       border: none;
       font-family: inherit;
       padding: 6px 12px;
@@ -7944,7 +8114,7 @@ window.firebaseModules = {
       position: absolute;
       inset: 0;
       z-index: 10;
-      background: #000;
+      background: var(--bg-primary);
       padding: 26px 20px;
       text-align: center;
       align-items: center;
@@ -7967,13 +8137,13 @@ window.firebaseModules = {
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      border: 3px solid rgba(255,255,255,0.15);
+      border: 3px solid var(--border-color);
       border-top-color: #2563eb;
       animation: rwSpin 0.9s linear infinite;
       margin: 0 auto 16px;
     }
-    #rwAdOverlay .rw-ad-sucesso h3 { margin: 0 0 6px; font-size: 16px; color: #fff; }
-    #rwAdOverlay .rw-ad-sucesso p { margin: 0 0 18px; font-size: 12px; color: #9ca3af; }
+    #rwAdOverlay .rw-ad-sucesso h3 { margin: 0 0 6px; font-size: 16px; color: var(--text-primary); }
+    #rwAdOverlay .rw-ad-sucesso p { margin: 0 0 18px; font-size: 12px; color: var(--text-secondary); }
     #rwAdOverlay .rw-ad-sucesso button {
       background: #2563eb;
       color: #fff;
@@ -8013,7 +8183,7 @@ window.firebaseModules = {
       align-items: center;
       justify-content: center;
       gap: 10px;
-      color: #9ca3af;
+      color: var(--text-secondary);
       font-size: 12px;
       z-index: 2;
     }
@@ -8021,9 +8191,32 @@ window.firebaseModules = {
       width: 30px;
       height: 30px;
       border-radius: 50%;
-      border: 3px solid rgba(255,255,255,0.15);
+      border: 3px solid var(--border-color);
       border-top-color: #60A5FA;
       animation: rwSpin 0.9s linear infinite;
+    }
+
+    @keyframes adPulse { 0% { box-shadow: 0 0 0 0 rgba(37,99,235,.55); } 70% { box-shadow: 0 0 0 14px rgba(37,99,235,0); } 100% { box-shadow: 0 0 0 0 rgba(37,99,235,0); } }
+    @keyframes adWiggle { 0%, 84%, 100% { transform: none; } 88% { transform: scale(1.08) rotate(-3deg); } 92% { transform: scale(1.08) rotate(3deg); } 96% { transform: scale(1.05) rotate(-2deg); } }
+    @keyframes adShine { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+    @keyframes adStripes { to { background-position: 28px 0; } }
+    #rwAdOverlay.aberto .rw-ad-topo button { animation: adPulse 1.6s ease-out infinite, adWiggle 4s ease-in-out infinite; }
+    #rwAdOverlay.aberto .rw-ad-topo::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(100deg, transparent 30%, rgba(37,99,235,.18) 50%, transparent 70%);
+      transform: translateX(-100%);
+      animation: adShine 3s ease-in-out infinite;
+      pointer-events: none;
+    }
+    #rwAdOverlay.aberto .rw-ad-fill {
+      background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.28) 0 7px, transparent 7px 14px);
+      background-size: 28px 28px;
+      animation: adStripes .8s linear infinite;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #rwAdOverlay.aberto .rw-ad-topo button, #rwAdOverlay.aberto .rw-ad-topo::after, #rwAdOverlay.aberto .rw-ad-fill { animation: none; }
     }
     @keyframes rwSpin { to { transform: rotate(360deg); } }
     #rwToast {
@@ -8232,6 +8425,7 @@ window.firebaseModules = {
         </div>
       </div>
       <div class="modal-body search-overlay-body">
+        <div id="searchGenreSuggest" class="search-genre-suggest" style="display: none;"></div>
         <div class="grid" id="searchOverlayGrid"></div>
         <div id="searchOverlayNoResults" class="no-results" style="display: none;">Nenhum resultado encontrado</div>
       </div>
@@ -8297,6 +8491,13 @@ window.firebaseModules = {
         <span class="live-dot"></span>
       </div>
       <div class="trending-scroll" id="trendingScroll"></div>
+    </div>
+    <div class="trending-section" id="forYouSection" style="display: none;">
+      <div class="trending-title">
+        <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+        Para você
+      </div>
+      <div class="trending-scroll" id="forYouScroll"></div>
     </div>
     <div class="grid" id="contentGrid">
       
@@ -8395,7 +8596,10 @@ window.firebaseModules = {
         </button>
         <h1 class="content-header-title" id="contentHeaderTitle">Carregando...</h1>
         <button class="favorite-btn" id="favoriteBtn" onclick="toggleFavorite()" title="Adicionar aos favoritos" style="padding: 8px;">
-          <svg id="favoriteIcon" viewBox="0 0 24 24" width="24" height="24" style="fill: #9e9e9e; transition: all 0.2s ease;"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          <span id="favoriteIcon" class="fav-icon" aria-hidden="true">
+            <svg class="fav-off" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 512 512"><path fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="32" d="M128 80V64a48.14 48.14 0 0 1 48-48h224a48.14 48.14 0 0 1 48 48v368l-80-64"/><path fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="32" d="M320 96H112a48.14 48.14 0 0 0-48 48v352l152-128l152 128V144a48.14 48.14 0 0 0-48-48Z"/></svg>
+            <svg class="fav-on" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 512 512"><path fill="currentColor" d="M400 0H176a64.11 64.11 0 0 0-62 48h228a74 74 0 0 1 74 74v304.89l22 17.6a16 16 0 0 0 19.34.5a16.41 16.41 0 0 0 6.66-13.42V64a64 64 0 0 0-64-64"/><path fill="currentColor" d="M320 80H112a64 64 0 0 0-64 64v351.62A16.36 16.36 0 0 0 54.6 509a16 16 0 0 0 19.71-.71L216 388.92l141.69 119.32a16 16 0 0 0 19.6.79a16.4 16.4 0 0 0 6.71-13.44V144a64 64 0 0 0-64-64"/></svg>
+          </span>
         </button>
         <button class="content-header-btn share-btn" onclick="shareContent()">
           <svg viewBox="0 0 24 24" width="24" height="24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
@@ -8478,6 +8682,10 @@ window.firebaseModules = {
           </button>
         </div>
         <textarea id="commentInput" class="comment-input" placeholder="Escreva um comentário..." rows="1"></textarea>
+      </div>
+      <div id="commentGuestCta" class="comment-guest-cta" style="display: none;" onclick="showSignupPrompt('comentar')">
+        <span>💬 Entre para comentar e ganhar pontos</span>
+        <button type="button" class="comment-guest-cta-btn">Criar conta</button>
       </div>
     </div>
   </div>
@@ -8585,7 +8793,8 @@ window.firebaseModules = {
           <form class="auth-form" onsubmit="handleLogin(event)">
             <div class="auth-input-group">
               <label>Email</label>
-              <input type="email" id="loginEmail" placeholder="seu@email.com" required>
+              <input type="text" inputmode="email" autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="email" id="loginEmail" placeholder="seu@gmail.com" required>
+              <small>Pode escrever só o nome: completamos com @gmail.com</small>
             </div>
 
             <div class="auth-input-group">
@@ -8635,8 +8844,8 @@ window.firebaseModules = {
 
             <div class="auth-input-group">
               <label>Email (Gmail)</label>
-              <input type="email" id="registerEmail" placeholder="seuemail@gmail.com" pattern="[a-zA-Z0-9._%+-]+@gmail\.com$" title="Por favor, use um email do Gmail" required>
-              <small>Apenas emails @gmail.com são aceitos</small>
+              <input type="text" inputmode="email" autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="email" id="registerEmail" placeholder="seuemail@gmail.com" required>
+              <small>Apenas emails @gmail.com são aceitos. Pode escrever só o nome</small>
             </div>
 
             <div class="auth-input-group">
@@ -8669,7 +8878,7 @@ window.firebaseModules = {
           <form class="auth-form" onsubmit="handleResetPasswordFromOverlay(event)">
             <div class="auth-input-group">
               <label>Email</label>
-              <input type="email" id="resetEmailOverlay" placeholder="seu@email.com" required>
+              <input type="text" inputmode="email" autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="email" id="resetEmailOverlay" placeholder="seu@gmail.com" required>
             </div>
 
             <button type="submit" class="auth-submit-btn">Enviar Link</button>
@@ -8972,7 +9181,7 @@ window.firebaseModules = {
         </button>
         <h1 class="content-header-title">Meu Perfil</h1>
         <button id="profileFavoritesBtn" class="content-header-btn favorites-heart-btn" onclick="closeProfileOverlay(); openFavoritesModal();" style="display: none;">
-          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 512 512" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="32" d="M128 80V64a48.14 48.14 0 0 1 48-48h224a48.14 48.14 0 0 1 48 48v368l-80-64"/><path fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="32" d="M320 96H112a48.14 48.14 0 0 0-48 48v352l152-128l152 128V144a48.14 48.14 0 0 0-48-48Z"/></svg>
         </button>
         <div id="profileHeaderPoints" class="profile-header-points">
           <svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/></svg>
@@ -10015,6 +10224,7 @@ function updateUIForUser() {
       profileFavoritesBtn.style.display = "flex";
       loadUserFavorites();
       loadUserLikes();
+      loadUserDownloadedIds();
       loadUserRatings();
       checkDailyReward();
     } else {
@@ -10059,7 +10269,33 @@ function updateUIForUser() {
   }
   updateSidebarProfileAvatar();
 }
+function updateNavProfileAvatar() {
+  const btn = document.getElementById("navAccountBtn");
+  if (!btn) return;
+  const icon = btn.querySelector("svg");
+  const old = btn.querySelector(".bottom-nav-avatar");
+  const hasPhoto = !!(currentUser && !currentUser.isAnonymous && userAvatar);
+  if (!hasPhoto) {
+    if (old) old.remove();
+    if (icon) icon.style.display = "";
+    return;
+  }
+  let img = old;
+  if (!img) {
+    img = document.createElement("img");
+    img.className = "bottom-nav-avatar";
+    img.alt = "Perfil";
+    img.onerror = () => {
+      img.remove();
+      if (icon) icon.style.display = "";
+    };
+    btn.insertBefore(img, btn.firstChild);
+  }
+  if (img.getAttribute("src") !== userAvatar) img.src = userAvatar;
+  if (icon) icon.style.display = "none";
+}
 function updateSidebarProfileAvatar() {
+  updateNavProfileAvatar();
   const avatarContainer = document.getElementById("sidebarProfileAvatar");
   if (!avatarContainer) return;
   if (userAvatar) {
@@ -10081,6 +10317,7 @@ async function loadGames() {
     });
     await loadDownloadCounts();
     await loadRatingCounts();
+    await loadLikeCounts();
     gamesLoaded = true;
     renderGrid();
     checkUrlForGameId();
@@ -10103,12 +10340,49 @@ async function loadDownloadCounts() {
       const gameId = doc.id;
       const downloadCount = doc.data().count || 0;
       if (allGames[gameId]) {
+        allGames[gameId].dailyDownloads = doc.data().daily || {};
         const existingDownloads = allGames[gameId].downloads || 0;
         allGames[gameId].downloads = Math.max(existingDownloads, downloadCount);
       }
     });
   } catch (error) {
     console.error("Erro ao carregar contagem de downloads:", error);
+  }
+}
+let likeCountsCache = null;
+async function loadLikeCounts() {
+  const TTL = 6 * 36e5;
+  const apply = (map) => {
+    Object.entries(map).forEach(([id, c]) => {
+      if (allGames[id]) allGames[id].likesCount = c;
+    });
+  };
+  if (likeCountsCache) {
+    apply(likeCountsCache);
+    return;
+  }
+  try {
+    const saved = JSON.parse(localStorage.getItem("gamePlusLikeCounts") || "null");
+    if (saved && saved.map && Date.now() - saved.t < TTL) {
+      likeCountsCache = saved.map;
+      apply(likeCountsCache);
+      return;
+    }
+  } catch (e) {
+  }
+  try {
+    const { collection, getDocs } = window.firebaseModules;
+    const snapshot = await getDocs(collection(window.firebaseFirestore, "gameLikes"));
+    const map = {};
+    snapshot.forEach((d) => { map[d.id] = d.data().count || 0; });
+    likeCountsCache = map;
+    apply(map);
+    try {
+      localStorage.setItem("gamePlusLikeCounts", JSON.stringify({ t: Date.now(), map }));
+    } catch (e) {
+    }
+  } catch (error) {
+    console.error("Erro ao carregar curtidas:", error);
   }
 }
 async function loadRatingCounts() {
@@ -10142,6 +10416,7 @@ async function loadGamesOnce() {
     });
     await loadDownloadCounts();
     await loadRatingCounts();
+    await loadLikeCounts();
     gamesLoaded = true;
     renderGrid();
     checkUrlForGameId();
@@ -10218,6 +10493,186 @@ function getRandomWeight(id) {
   }
   return gameRandomOrder[id];
 }
+function trendingScore(game, now) {
+  const DAY = 864e5;
+  const ageDays = game.createdAt ? Math.max(0, (now - game.createdAt) / DAY) : 30;
+  const daily = game.dailyDownloads || {};
+  let recent = 0;
+  for (let i = 0; i < 7; i++) {
+    const key = new Date(now - i * DAY).toISOString().slice(0, 10);
+    recent += (daily[key] || 0) * Math.pow(0.5, i / 3);
+  }
+  const ratingCount = game.ratingCount || 0;
+  const avg = ratingCount ? (game.ratingSum || 0) / ratingCount : 0;
+  const ratings = ratingCount * (avg / 5);
+  const likes = game.likesCount || 0;
+  const total = Math.sqrt(game.downloads || 0);
+  const raw = recent * 5 + likes * 2 + ratings * 2 + total;
+  return raw / Math.pow(ageDays + 2, 0.5);
+}
+let recModel = null;
+let recCache = null;
+let userDownloadedIds = [];
+const REC_STOP = new Set(["de", "da", "do", "das", "dos", "para", "com", "uma", "que", "nos", "nas", "por", "the", "and", "for"]);
+function recBuildModel() {
+  const ids = Object.keys(allGames);
+  if (recModel && recModel.n === ids.length) return recModel;
+  const docs = {};
+  const df = {};
+  ids.forEach((id) => {
+    const g = allGames[id];
+    const tf = {};
+    const add = (text, w) => normalizeText(text || "").split(" ").forEach((t) => {
+      if (t.length < 3 || REC_STOP.has(t)) return;
+      tf[t] = (tf[t] || 0) + w;
+    });
+    add(g.genero, 3);
+    add(g.type, 2);
+    add(g.titulo, 2);
+    add(g.descricao || g.description, 1);
+    docs[id] = tf;
+    Object.keys(tf).forEach((t) => { df[t] = (df[t] || 0) + 1; });
+  });
+  const n = ids.length || 1;
+  const vecs = {};
+  ids.forEach((id) => {
+    const v = {};
+    let norm = 0;
+    Object.entries(docs[id]).forEach(([t, f]) => {
+      const w = (1 + Math.log(f)) * Math.log(1 + n / df[t]);
+      v[t] = w;
+      norm += w * w;
+    });
+    norm = Math.sqrt(norm) || 1;
+    Object.keys(v).forEach((t) => { v[t] /= norm; });
+    vecs[id] = v;
+  });
+  recModel = { n: ids.length, vecs };
+  return recModel;
+}
+function recUserSignals() {
+  const w = {};
+  const add = (id, weight) => { if (allGames[id]) w[id] = (w[id] || 0) + weight; };
+  Object.keys(userLikes || {}).forEach((id) => add(id, 3));
+  Object.keys(userFavorites || {}).forEach((id) => add(id, 3));
+  userDownloadedIds.forEach((id) => add(id, 4));
+  (historyData || []).forEach((h, i) => add(h.id, 1.5 * Math.pow(0.9, i)));
+  return w;
+}
+function recComputeScores() {
+  const model = recBuildModel();
+  const signals = recUserSignals();
+  const sigIds = Object.keys(signals);
+  if (!sigIds.length) return null;
+  const profile = {};
+  sigIds.forEach((id) => {
+    const v = model.vecs[id];
+    if (!v) return;
+    Object.entries(v).forEach(([t, x]) => { profile[t] = (profile[t] || 0) + x * signals[id]; });
+  });
+  const pn = Math.sqrt(Object.values(profile).reduce((a, x) => a + x * x, 0)) || 1;
+  const maxDl = Math.max(1, ...Object.values(allGames).map((g) => g.downloads || 0));
+  const out = {};
+  Object.keys(allGames).forEach((id) => {
+    const v = model.vecs[id] || {};
+    let dot = 0;
+    for (const t in v) if (profile[t]) dot += v[t] * profile[t];
+    const cos = dot / pn;
+    const pop = Math.log(1 + (allGames[id].downloads || 0)) / Math.log(1 + maxDl);
+    out[id] = { cos, score: 0.75 * cos + 0.15 * pop + 0.1 * getRandomWeight(id), seen: !!signals[id] };
+  });
+  return out;
+}
+function getRecScores() {
+  if (!gamesLoaded) return null;
+  const sig = [
+    Object.keys(allGames).length,
+    Object.keys(userLikes || {}).length,
+    Object.keys(userFavorites || {}).length,
+    userDownloadedIds.length,
+    (historyData || []).length,
+    ((historyData || [])[0] || {}).id
+  ].join("|");
+  if (recCache && recCache.sig !== sig && typeof currentPage !== "undefined" && currentPage > 0) {
+    return recCache.scores;
+  }
+  if (!recCache || recCache.sig !== sig) recCache = { sig, scores: recComputeScores() };
+  return recCache.scores;
+}
+async function loadUserDownloadedIds() {
+  userDownloadedIds = [];
+  if (!currentUser || currentUser.isAnonymous) return;
+  try {
+    const { ref, get } = window.firebaseModules;
+    const snap = await get(ref(window.firebaseDatabase, `downloadClaims/${currentUser.uid}`));
+    if (snap.exists()) {
+      const ids = new Set();
+      Object.values(snap.val()).forEach((c) => { if (c && c.gameId) ids.add(c.gameId); });
+      userDownloadedIds = Array.from(ids);
+    }
+  } catch (e) {
+  }
+  refreshRecommendations();
+}
+function refreshRecommendations() {
+  if (!gamesLoaded) return;
+  const wrapper = document.querySelector(".content-wrapper");
+  const atTop = !wrapper || wrapper.scrollTop < 50;
+  if (typeof currentPage !== "undefined" && currentPage === 0 && atTop) {
+    renderGrid();
+  } else {
+    renderForYou();
+  }
+}
+function renderForYou() {
+  const section = document.getElementById("forYouSection");
+  const scroll = document.getElementById("forYouScroll");
+  if (!section || !scroll) return;
+  const rec = getRecScores();
+  if (!rec) {
+    section.style.display = "none";
+    return;
+  }
+  const ids = Object.keys(rec).filter((id) => !rec[id].seen && rec[id].cos > 0.05).sort((a, b) => rec[b].score - rec[a].score).slice(0, 10);
+  if (ids.length < 3) {
+    section.style.display = "none";
+    return;
+  }
+  const typeLabels = { aplicativos: "APLICATIVOS", jogos: "JOGOS", tutoriais: "TUTORIAIS", pc: "PC", outros: "OUTROS" };
+  section.style.display = "block";
+  scroll.innerHTML = "";
+  ids.forEach((id, index) => {
+    const game = allGames[id];
+    const card = document.createElement("div");
+    card.className = "card trending-card";
+    card.style.animationDelay = `${index * 0.05}s`;
+    card.addEventListener("click", () => openGameDetail(id));
+    card.innerHTML = `
+          <div class="card-img-container">
+            <img src="${game.poster}" alt="${escapeHtml(game.titulo || "")}" loading="lazy" onload="this.classList.add('loaded')" onerror="this.classList.add('loaded','img-error');this.src='logo.png'">
+            <div class="card-type type-${game.type}">${typeLabels[game.type] || game.type}</div>
+          </div>
+          <div class="card-info">
+            <div class="card-title">${escapeHtml(game.titulo || "")}</div>
+          </div>
+        `;
+    scroll.appendChild(card);
+  });
+}
+function pickDailyRecommendationId(gameIds, prevState) {
+  const prevId = prevState && prevState.gameId;
+  let pool = gameIds.filter((id) => id !== prevId);
+  if (!pool.length) pool = gameIds;
+  const rec = getRecScores();
+  if (rec) {
+    let cand = pool.filter((id) => rec[id] && !rec[id].seen);
+    const relevant = cand.filter((id) => rec[id].cos > 0.05);
+    if (relevant.length) cand = relevant;
+    const ranked = cand.sort((x, y) => rec[y].score - rec[x].score).slice(0, 5);
+    if (ranked.length) return ranked[Math.floor(Math.random() * ranked.length)];
+  }
+  return pool[Math.floor(Math.random() * pool.length)];
+}
 function renderTrending() {
   const section = document.getElementById("trendingSection");
   const scroll = document.getElementById("trendingScroll");
@@ -10230,7 +10685,9 @@ function renderTrending() {
     id,
     ...game
   }));
-  gamesArray.sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
+  const nowTs = Date.now();
+  gamesArray.forEach((g) => { g._trend = trendingScore(g, nowTs); });
+  gamesArray.sort((a, b) => b._trend - a._trend || (b.downloads || 0) - (a.downloads || 0));
   const topGames = gamesArray.slice(0, 10);
   if (topGames.length === 0) {
     section.style.display = "none";
@@ -10270,6 +10727,7 @@ function renderGrid() {
   const noResults = document.getElementById("noResults");
   const paginationControls = document.getElementById("paginationControls");
   renderTrending();
+  renderForYou();
   if (!gamesLoaded) {
     renderSkeletonLoading();
     noResults.style.display = "none";
@@ -10281,12 +10739,14 @@ function renderGrid() {
     id,
     ...game
   }));
-  gamesArray.sort((a, b) => getRandomWeight(a.id) - getRandomWeight(b.id));
-  const filtered = gamesArray.filter((game) => {
-    const matchFilter = currentFilter === "all" || game.type === currentFilter;
-    const matchSearch = game.titulo.toLowerCase().includes(searchTerm.toLowerCase()) || game.genero.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchFilter && matchSearch;
-  });
+  const recScores = getRecScores();
+  if (recScores) {
+    gamesArray.sort((a, b) => ((recScores[b.id] || {}).score || 0) - ((recScores[a.id] || {}).score || 0));
+  } else {
+    gamesArray.sort((a, b) => getRandomWeight(a.id) - getRandomWeight(b.id));
+  }
+  const typeFiltered = gamesArray.filter((game) => currentFilter === "all" || game.type === currentFilter);
+  const filtered = normalizeText(searchTerm) ? searchGames(typeFiltered, searchTerm) : typeFiltered;
   if (filtered.length === 0) {
     grid.style.display = "none";
     noResults.style.display = "block";
@@ -10380,17 +10840,7 @@ function setupPaginationVisibility() {
   if (paginationControls.style.display === "none") return;
   const cards = Array.from(grid.children);
   if (cards.length === 0) return;
-  const rows = [];
-  cards.forEach((card) => {
-    const top = card.offsetTop;
-    if (!rows.length || rows[rows.length - 1].top !== top) {
-      rows.push({ top, cards: [card] });
-    } else {
-      rows[rows.length - 1].cards.push(card);
-    }
-  });
-  const lastRow = rows.slice(-1);
-  const triggerCard = lastRow[0] ? lastRow[0].cards[0] : cards[0];
+  const triggerCard = cards[cards.length - 1];
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       paginationControls.classList.toggle("visible", entry.isIntersecting);
@@ -10471,7 +10921,7 @@ function goHome() {
 }
 function navOpenNotifications() {
   if (!currentUser || currentUser.isAnonymous) {
-    showCustomAlert("Voc\xEA precisa fazer login para ver as notifica\xE7\xF5es.");
+    showSignupPrompt("ver as suas notificações");
     return;
   }
   setActiveNavItem("navNotificationsBtn");
@@ -10479,7 +10929,7 @@ function navOpenNotifications() {
 }
 function navOpenFavorites() {
   if (!currentUser || currentUser.isAnonymous) {
-    showCustomAlert("Voc\xEA precisa fazer login para ver os seus favoritos.");
+    showSignupPrompt("guardar e ver os seus favoritos");
     return;
   }
   setActiveNavItem("navFavoritesBtn");
@@ -10619,6 +11069,7 @@ async function openGameDetail(id, skipPushState) {
   } else {
     commentInputWrapper.style.display = "none";
   }
+  applyGuestCommentUI();
   updateFavoriteButton();
   const minhaAvaliacao = userRatings[id];
   selectedRatingStars = minhaAvaliacao ? minhaAvaliacao.stars : 0;
@@ -10626,6 +11077,7 @@ async function openGameDetail(id, skipPushState) {
   const campoComentario = document.getElementById("ratingCommentInput");
   if (campoComentario) campoComentario.value = minhaAvaliacao ? minhaAvaliacao.comment || "" : "";
   if (minhaAvaliacao) hideRatingCommentField(); else showRatingCommentField();
+  applyGuestRatingUI();
   const aindaAberto = () => currentGameData && currentGameData.id === id;
   const pCurtidas = loadGameLikes(id).then(() => { if (aindaAberto()) updateLikeButton(); });
   const pAvaliacoes = loadGameRatings(id);
@@ -10824,7 +11276,7 @@ function abrirLinkDownload(appType, url) {
 async function downloadGame(gameId, appType, url, cost) {
   if (window._downloadEmCurso) return;
   if (!currentUser || currentUser.isAnonymous) {
-    showCustomAlert("Voc\xEA precisa fazer login com uma conta para baixar jogos.");
+    showSignupPrompt("baixar conteúdos");
     return;
   }
   if (userStatus === "pending") {
@@ -10871,6 +11323,7 @@ async function downloadGame(gameId, appType, url, cost) {
       downloadedAt: serverTime
     };
     await update(ref(database), updates);
+    if (!userDownloadedIds.includes(gameId)) userDownloadedIds.push(gameId);
     _syncPointsDisplay(newPointsTotal);
     mostrarPreparandoLink();
     precarregarLinkOculto(url);
@@ -10883,6 +11336,7 @@ async function downloadGame(gameId, appType, url, cost) {
       const currentDownloads = downloadSnap.exists() ? downloadSnap.data().count || 0 : 0;
       await setDoc(downloadDocRef, { count: currentDownloads + 1 }, { merge: true });
       console.log("Download count incrementado para:", gameId, "- Novo valor:", currentDownloads + 1);
+
       if (allGames[gameId]) {
         allGames[gameId].downloads = currentDownloads + 1;
       }
@@ -10916,7 +11370,11 @@ function closeOverlay(skipPushState) {
   }
   if (!skipPushState) {
     const newUrl = window.location.pathname;
-    window.history.pushState({}, document.title, newUrl);
+    if (window.history.state && window.history.state.gameId) {
+      window.history.replaceState({}, document.title, newUrl);
+    } else {
+      window.history.pushState({}, document.title, newUrl);
+    }
   }
 }
 function closeModal() {
@@ -11075,7 +11533,7 @@ async function deleteComment(gameId, commentId) {
 }
 async function postComment() {
   if (!currentUser || currentUser.isAnonymous) {
-    showCustomAlert("Voc\xEA precisa fazer login com uma conta para comentar.");
+    showSignupPrompt("comentar");
     return;
   }
   if (userStatus === "pending") {
@@ -11117,9 +11575,22 @@ function formatTimeAgo(timestamp) {
   if (hours < 24) return `${hours}h atr\xE1s`;
   return `${days}d atr\xE1s`;
 }
+function normalizeGmail(value) {
+  let v = String(value || "").trim();
+  if (!v) return v;
+  if (v.endsWith("@")) return v + "gmail.com";
+  if (!v.includes("@")) return v + "@gmail.com";
+  return v;
+}
+function normalizeEmailField(id) {
+  const input = document.getElementById(id);
+  const email = normalizeGmail(input.value);
+  input.value = email;
+  return email;
+}
 async function handleLogin(e) {
   e.preventDefault();
-  const email = document.getElementById("loginEmail").value;
+  const email = normalizeEmailField("loginEmail");
   const password = document.getElementById("loginPassword").value;
   showAuthLoading("A entrar...", "Verificando credenciais");
   try {
@@ -11219,6 +11690,7 @@ async function handlePublish(e) {
     if (editId) {
       const existingGame = allGames[editId];
       gameData.downloads = existingGame.downloads || 0;
+      if (existingGame.createdAt) gameData.createdAt = existingGame.createdAt;
       await setDoc(doc(firestore, "games", editId), gameData);
       showCustomAlert("Jogo atualizado com sucesso!");
     } else {
@@ -11369,7 +11841,7 @@ async function generateCode() {
 }
 async function redeemCode() {
   if (!currentUser || currentUser.isAnonymous) {
-    showCustomAlert("Voc\xEA precisa fazer login com uma conta para resgatar c\xF3digos.");
+    showSignupPrompt("resgatar códigos");
     return;
   }
   if (userStatus === "pending") {
@@ -11487,8 +11959,89 @@ function closeSearchOverlay() {
   overlay.classList.remove("active");
   document.body.style.overflow = "";
 }
+function normalizeText(s) {
+  return String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
+}
+function levenshtein(a, b, max) {
+  if (a === b) return 0;
+  if (Math.abs(a.length - b.length) > max) return max + 1;
+  let prev = [];
+  for (let j = 0; j <= b.length; j++) prev[j] = j;
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i];
+    let rowMin = i;
+    for (let j = 1; j <= b.length; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + cost);
+      if (cur[j] < rowMin) rowMin = cur[j];
+    }
+    if (rowMin > max) return max + 1;
+    prev = cur;
+  }
+  return prev[b.length];
+}
+function fuzzyTolerance(len) {
+  return len <= 3 ? 0 : len <= 7 ? 1 : 2;
+}
+function fuzzyWordMatch(qw, tw) {
+  if (tw.startsWith(qw)) return 2;
+  const tol = fuzzyTolerance(qw.length);
+  if (tol === 0) return 0;
+  if (levenshtein(qw, tw, tol) <= tol) return 1;
+  if (tw.length > qw.length && levenshtein(qw, tw.slice(0, qw.length), tol) <= tol) return 1;
+  return 0;
+}
+function scoreGameForQuery(game, query) {
+  const q = normalizeText(query);
+  if (!q) return 0;
+  const title = normalizeText(game.titulo);
+  const genre = normalizeText(game.genero);
+  const desc = normalizeText(game.descricao || game.description || "");
+  const qWords = q.split(" ");
+  const tWords = title.split(" ");
+  if (title === q) return 100;
+  if (title.startsWith(q)) return 80;
+  if (tWords.some((w) => w.startsWith(q))) return 60;
+  if (title.includes(q)) return 40;
+  if (genre.includes(q)) return 15;
+  let allTitle = true, fuzzyUsed = false;
+  for (const qw of qWords) {
+    let best = 0;
+    for (const tw of tWords) { best = Math.max(best, fuzzyWordMatch(qw, tw)); if (best === 2) break; }
+    if (best === 0) { allTitle = false; break; }
+    if (best === 1) fuzzyUsed = true;
+  }
+  if (allTitle) return fuzzyUsed ? 25 : 55;
+  const gWords = genre.split(" ");
+  if (qWords.every((qw) => gWords.some((gw) => fuzzyWordMatch(qw, gw) > 0))) return 12;
+  if (desc && qWords.every((qw) => qw.length > 3 && desc.includes(qw))) return 5;
+  return 0;
+}
+function searchGames(gamesArray, query) {
+  return gamesArray
+    .map((g) => ({ g, s: scoreGameForQuery(g, query) }))
+    .filter((x) => x.s > 0)
+    .sort((a, b) => b.s - a.s || (b.g.downloads || 0) - (a.g.downloads || 0))
+    .map((x) => x.g);
+}
+function suggestTitle(gamesArray, query) {
+  const q = normalizeText(query);
+  if (q.length < 3) return null;
+  let best = null, bestD = Infinity;
+  for (const g of gamesArray) {
+    const t = normalizeText(g.titulo);
+    const cands = [t, ...t.split(" ")];
+    for (const c of cands) {
+      const max = Math.max(1, fuzzyTolerance(q.length) + 1);
+      const d = levenshtein(q, c, max);
+      if (d <= max && d < bestD) { bestD = d; best = g.titulo; }
+    }
+  }
+  return best;
+}
 function renderSearchOverlayResults() {
   const term = document.getElementById("searchOverlayInput").value.trim().toLowerCase();
+  if (typeof window.renderSearchGenres === "function") window.renderSearchGenres(term);
   const grid = document.getElementById("searchOverlayGrid");
   const noResults = document.getElementById("searchOverlayNoResults");
   grid.innerHTML = "";
@@ -11498,10 +12051,25 @@ function renderSearchOverlayResults() {
     return;
   }
   const gamesArray = Object.entries(allGames || {}).map(([id, game]) => ({ id, ...game }));
-  const filtered = gamesArray.filter(
-    (game) => game.titulo.toLowerCase().includes(term) || game.genero.toLowerCase().includes(term)
-  );
+  const filtered = searchGames(gamesArray, term);
+  let didYouMean = document.getElementById("searchDidYouMean");
+  if (!didYouMean) {
+    didYouMean = document.createElement("div");
+    didYouMean.id = "searchDidYouMean";
+    didYouMean.style.cssText = "margin-top:12px;cursor:pointer;text-decoration:underline;";
+    noResults.appendChild(didYouMean);
+  }
+  didYouMean.textContent = "";
   if (filtered.length === 0) {
+    const sug = suggestTitle(gamesArray, term);
+    if (sug) {
+      didYouMean.textContent = "Voc\u00EA quis dizer: " + sug + "?";
+      didYouMean.onclick = function() {
+        const inp = document.getElementById("searchOverlayInput");
+        inp.value = sug;
+        renderSearchOverlayResults();
+      };
+    }
     grid.style.display = "none";
     noResults.style.display = "block";
     return;
@@ -11633,7 +12201,7 @@ async function enterAsVisitor() {
 }
 async function handleResetPasswordFromOverlay(e) {
   e.preventDefault();
-  const email = document.getElementById("resetEmailOverlay").value;
+  const email = normalizeEmailField("resetEmailOverlay");
   try {
     const { sendPasswordResetEmail } = window.firebaseModules;
     await sendPasswordResetEmail(window.firebaseAuth, email);
@@ -12034,7 +12602,7 @@ async function updateProfileAvatar() {
 async function handleRegister(e) {
   e.preventDefault();
   const name = document.getElementById("registerName").value.trim();
-  const email = document.getElementById("registerEmail").value.trim();
+  const email = normalizeEmailField("registerEmail");
   const password = document.getElementById("registerPassword").value;
   const passwordConfirm = document.getElementById("registerPasswordConfirm").value;
   if (!email.endsWith("@gmail.com")) {
@@ -12398,6 +12966,7 @@ function openCommunityComments(gameId) {
   } else {
     commentInputWrapper.style.display = "none";
   }
+  applyGuestCommentUI();
   const commentsHeader = document.querySelector("#commentsOverlay .content-header-title");
   if (commentsHeader) {
     commentsHeader.textContent = game.titulo;
@@ -12534,7 +13103,7 @@ async function deleteAd(id) {
 }
 async function openEarnPointsModal() {
   if (!currentUser || currentUser.isAnonymous) {
-    showCustomAlert("Voc\xEA precisa fazer login com uma conta para ganhar pontos.");
+    showSignupPrompt("ganhar pontos");
     return;
   }
   if (userStatus === "pending") {
@@ -13151,6 +13720,55 @@ function closeResetPasswordModal() {
   document.getElementById("resetPasswordModal").classList.remove("active");
   document.getElementById("resetPasswordForm").reset();
 }
+function isGuestUser() {
+  return !currentUser || currentUser.isAnonymous;
+}
+function showSignupPrompt(action) {
+  document.querySelectorAll(".signup-prompt-modal").forEach((m) => m.remove());
+  const modal = document.createElement("div");
+  modal.className = "custom-modal active signup-prompt-modal";
+  modal.innerHTML = `
+        <div class="custom-modal-content signup-prompt-content">
+          <div class="signup-prompt-icon">\u{1F381}</div>
+          <h2>Crie uma conta e comece a ganhar pontos</h2>
+          <p>Para ${action} precisa de uma conta. É grátis e leva menos de um minuto.</p>
+          <ul class="signup-prompt-list">
+            <li>\u2B50 Pontos de bónus ao verificar o seu e-mail</li>
+            <li>\u2764\uFE0F Favoritos guardados na sua conta</li>
+            <li>\u{1F4AC} Comente e avalie o que você gostou</li>
+            <li>\u{1F3AF} Até 150 pontos por dia a ver anúncios</li>
+          </ul>
+          <div class="custom-modal-buttons" style="justify-content:center;">
+            <button class="custom-modal-btn secondary" onclick="this.closest('.custom-modal').remove()">Agora não</button>
+            <button class="custom-modal-btn primary" id="signupPromptGo">Criar conta</button>
+          </div>
+        </div>
+      `;
+  document.body.appendChild(modal);
+  modal.addEventListener("click", (e) => { if (e.target === modal) modal.remove(); });
+  modal.querySelector("#signupPromptGo").addEventListener("click", () => {
+    modal.remove();
+    openRegisterModal();
+  });
+}
+function applyGuestCommentUI() {
+  const cta = document.getElementById("commentGuestCta");
+  if (cta) cta.style.display = isGuestUser() ? "flex" : "none";
+}
+function applyGuestRatingUI() {
+  const guest = isGuestUser();
+  const text = document.getElementById("ratingSubmitBtnText");
+  const commentInput = document.getElementById("ratingCommentInput");
+  const label = document.querySelector(".rating-form-label");
+  if (guest) {
+    if (commentInput) commentInput.style.display = "none";
+    if (text) text.textContent = "Criar conta para avaliar";
+    if (label) label.textContent = "Entre para avaliar este conteúdo";
+  } else {
+    if (text && text.textContent === "Criar conta para avaliar") text.textContent = "Enviar Avalia\u00E7\u00E3o";
+    if (label) label.textContent = "Avalie este conteúdo";
+  }
+}
 function showCustomAlert(message) {
   const modal = document.createElement("div");
   modal.className = "custom-modal active";
@@ -13482,6 +14100,216 @@ function openProfileOverlay() {
   document.getElementById("profileOverlay").classList.add("active");
   document.body.style.overflow = "hidden";
 }
+const PDP_NIVEIS = [
+  { nome: "Novato", xp: 0 }, { nome: "Explorador", xp: 60 }, { nome: "Aventureiro", xp: 160 },
+  { nome: "Veterano", xp: 320 }, { nome: "Elite", xp: 550 }, { nome: "Mestre", xp: 900 }, { nome: "Lenda", xp: 1400 }
+];
+const PDP_CAPAS = [
+  { id: "orig", nome: "Original", css: null },
+  { id: "oceano", nome: "Oceano", css: "linear-gradient(135deg,#0f2027,#203a43,#2c5364)" },
+  { id: "floresta", nome: "Floresta", css: "linear-gradient(135deg,#134e5e,#71b280)" },
+  { id: "lava", nome: "Lava", css: "linear-gradient(135deg,#7f1d1d,#ea580c)" },
+  { id: "violeta", nome: "Violeta", css: "linear-gradient(135deg,#312e81,#7c3aed)" },
+  { id: "rosa", nome: "Rosa", css: "linear-gradient(135deg,#831843,#ec4899)" },
+  { id: "grafite", nome: "Grafite", css: "linear-gradient(135deg,#111827,#374151)" },
+  { id: "aurora", nome: "Aurora", css: "linear-gradient(135deg,#0f766e,#2563eb,#7c3aed)" }
+];
+const PDP_MOLDURAS = [
+  { id: "padrao", nome: "Padrão", nivel: 1, cor: "#9ca3af" },
+  { id: "azul", nome: "Azul", nivel: 2, cor: "#3b82f6" },
+  { id: "esmeralda", nome: "Esmeralda", nivel: 3, cor: "#10b981" },
+  { id: "ouro", nome: "Ouro", nivel: 4, cor: "#fbbf24" },
+  { id: "neon", nome: "Neon", nivel: 5, cor: "#22d3ee" },
+  { id: "arco", nome: "Arco-íris", nivel: 6, cor: "#ec4899" }
+];
+const PDP_ICONS = {
+  download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+  package: '<path d="M16.5 9.4 7.5 4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>',
+  trophy: '<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>',
+  heart: '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>',
+  gem: '<path d="M2.7 10.3a2.41 2.41 0 0 0 0 3.41l7.59 7.59a2.41 2.41 0 0 0 3.41 0l7.59-7.59a2.41 2.41 0 0 0 0-3.41l-7.59-7.59a2.41 2.41 0 0 0-3.41 0Z"/>',
+  flame: '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
+  bolt: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+  star: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+  check: '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+  calendar: '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+  medal: '<circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>',
+  palette: '<circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>',
+  lock: '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'
+};
+function pdpIc(nome, tam, cor) {
+  return '<svg viewBox="0 0 24 24" width="' + tam + '" height="' + tam + '" fill="none" stroke="' + (cor || "currentColor") + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (PDP_ICONS[nome] || "") + "</svg>";
+}
+function pdpCfg(uid) { try { return JSON.parse(localStorage.getItem("pdp_cfg_" + uid) || "{}") || {}; } catch (e) { return {}; } }
+function pdpSalvarCfg(uid, c) { try { localStorage.setItem("pdp_cfg_" + uid, JSON.stringify(c)); } catch (e) {} }
+function pdpDiaKey(ts) {
+  const d = new Date(ts);
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
+function pdpDias(uid) { try { return JSON.parse(localStorage.getItem("pdp_dias_" + uid) || "[]") || []; } catch (e) { return []; } }
+function pdpRegistrarDia(ts, uid) {
+  uid = uid || (window.firebaseAuth && window.firebaseAuth.currentUser && window.firebaseAuth.currentUser.uid);
+  if (!uid || !ts || isNaN(Number(ts))) return;
+  const k = pdpDiaKey(Number(ts));
+  const dias = pdpDias(uid);
+  if (dias.indexOf(k) !== -1) return;
+  dias.push(k);
+  dias.sort();
+  try { localStorage.setItem("pdp_dias_" + uid, JSON.stringify(dias.slice(-400))); } catch (e) {}
+}
+function pdpSequencias(uid) {
+  const dias = pdpDias(uid);
+  if (!dias.length) return { atual: 0, melhor: 0 };
+  const n = (d) => Math.round(Date.parse(d + "T00:00:00Z") / 86400000);
+  const ns = dias.map(n);
+  let melhor = 1, run = 1;
+  for (let i = 1; i < ns.length; i++) {
+    run = ns[i] === ns[i - 1] + 1 ? run + 1 : 1;
+    if (run > melhor) melhor = run;
+  }
+  let atual = 0;
+  if (n(pdpDiaKey(Date.now())) - ns[ns.length - 1] <= 1) {
+    atual = 1;
+    for (let i = ns.length - 1; i > 0; i--) { if (ns[i] === ns[i - 1] + 1) atual++; else break; }
+  }
+  return { atual, melhor };
+}
+function pdpNivel(xp) {
+  let idx = 0;
+  PDP_NIVEIS.forEach((l, i) => { if (xp >= l.xp) idx = i; });
+  const atualXp = PDP_NIVEIS[idx].xp;
+  const prox = PDP_NIVEIS[idx + 1];
+  const pct = prox ? Math.min(100, Math.round(((xp - atualXp) / (prox.xp - atualXp)) * 100)) : 100;
+  return { idx, num: idx + 1, nome: PDP_NIVEIS[idx].nome, prox, pct };
+}
+function pdpConquistas(s) {
+  return [
+    { ic: "download", cor: "#3b82f6", nm: "Primeiro download", ds: "Baixe 1 app", ok: s.down >= 1 },
+    { ic: "package", cor: "#8b5cf6", nm: "Colecionador", ds: "Baixe 10 apps", ok: s.down >= 10 },
+    { ic: "trophy", cor: "#f59e0b", nm: "Viciado", ds: "Baixe 50 apps", ok: s.down >= 50 },
+    { ic: "heart", cor: "#ef4444", nm: "Curador", ds: "5 favoritos", ok: s.fav >= 5 },
+    { ic: "gem", cor: "#06b6d4", nm: "Grande coleção", ds: "20 favoritos", ok: s.fav >= 20 },
+    { ic: "flame", cor: "#f97316", nm: "Em chamas", ds: "3 dias seguidos", ok: s.melhor >= 3 },
+    { ic: "bolt", cor: "#eab308", nm: "Imparável", ds: "7 dias seguidos", ok: s.melhor >= 7 },
+    { ic: "star", cor: "#f59e0b", nm: "Lendário", ds: "30 dias seguidos", ok: s.melhor >= 30 },
+    { ic: "check", cor: "#10b981", nm: "Verificado", ds: "Conta aprovada", ok: !!s.verificado },
+    { ic: "calendar", cor: "#3b82f6", nm: "De casa", ds: "30 dias de conta", ok: s.dias >= 30 },
+    { ic: "medal", cor: "#f59e0b", nm: "Fiel", ds: "1 ano de conta", ok: s.dias >= 365 },
+    { ic: "palette", cor: "#ec4899", nm: "Com estilo", ds: "Personalize o perfil", ok: !!s.estilo }
+  ];
+}
+function pdpAplicar(container, uid, nivelNum) {
+  const cfg = pdpCfg(uid);
+  const card = container.querySelector(".profile-header-card");
+  if (card) {
+    const capa = PDP_CAPAS.find((c) => c.id === cfg.capa);
+    card.style.background = capa && capa.css ? capa.css : "";
+  }
+  const av = container.querySelector(".profile-avatar-svg");
+  if (av) {
+    PDP_MOLDURAS.forEach((m) => av.classList.remove("pdp-frame-" + m.id));
+    const m = PDP_MOLDURAS.find((x) => x.id === cfg.moldura);
+    if (m && m.id !== "padrao" && m.nivel <= nivelNum) av.classList.add("pdp-frame-" + m.id);
+  }
+  const u = container.querySelector("#pdpUserShow");
+  if (u) u.textContent = cfg.user ? "@" + cfg.user : "";
+  const b = container.querySelector("#pdpBioShow");
+  if (b) b.textContent = cfg.bio || "";
+  const box = container.querySelector("#pdpIdBox");
+  if (box) box.style.display = (cfg.user || cfg.bio) ? "flex" : "none";
+}
+function pdPrefetch(user) {
+  const { ref, get } = window.firebaseModules;
+  const db = window.firebaseDatabase;
+  const uid = user.uid;
+  const last = get(ref(db, "dailyRewardClaims/" + uid + "/lastClaimedAt")).then((s) => (s.exists() ? s.val() : null)).catch(() => null);
+  const claims = get(ref(db, "downloadClaims/" + uid)).then((s) => (s.exists() ? Object.values(s.val()).filter((c) => c && c.gameId) : [])).catch(() => (userDownloadedIds || []).map((id) => ({ gameId: id })));
+  return Promise.all([last, claims]).then((r) => ({ last: r[0], claims: r[1] }));
+}
+async function pdEnhanceProfile(container, user, createdAtMs, pre) {
+  try {
+    const uid = user.uid;
+    const dados = await (pre || pdPrefetch(user));
+    if (dados.last) pdpRegistrarDia(dados.last, uid);
+    const claims = dados.claims || [];
+    const card = container.querySelector(".profile-header-card");
+    if (!card || container.querySelector("[data-pdp]")) return;
+    const unicos = Array.from(new Set(claims.map((c) => c.gameId)));
+    const favIds = Object.keys(userFavorites || {});
+    const seq = pdpSequencias(uid);
+    const dias = createdAtMs && !isNaN(Number(createdAtMs)) ? Math.max(0, Math.floor((Date.now() - Number(createdAtMs)) / 86400000)) : 0;
+    const cfg0 = pdpCfg(uid);
+    const stats = {
+      down: unicos.length, fav: favIds.length, atual: seq.atual, melhor: seq.melhor, dias,
+      verificado: userStatus === "approved" || isPublisher,
+      estilo: !!(cfg0.bio || cfg0.user || (cfg0.capa && cfg0.capa !== "orig") || (cfg0.moldura && cfg0.moldura !== "padrao"))
+    };
+    const xp = stats.down * 15 + stats.fav * 5 + stats.melhor * 10 + Math.min(dias, 365);
+    const nv = pdpNivel(xp);
+    const cont = {};
+    unicos.concat(favIds).forEach((id) => {
+      const g = allGames && allGames[id];
+      const gen = g && g.genero ? String(g.genero).trim() : "";
+      if (gen) cont[gen] = (cont[gen] || 0) + 1;
+    });
+    const genFav = Object.keys(cont).sort((a, b) => cont[b] - cont[a])[0];
+    const rec = [];
+    claims.slice().sort((a, b) => (b.downloadedAt || 0) - (a.downloadedAt || 0)).forEach((c) => {
+      if (rec.length < 8 && !rec.some((r) => r.id === c.gameId) && allGames && allGames[c.gameId]) rec.push({ id: c.gameId, g: allGames[c.gameId] });
+    });
+    const conq = pdpConquistas(stats);
+    const feitas = conq.filter((c) => c.ok).length;
+
+
+    const cardNivel = '<div class="pdp-card" data-pdp="1"><div class="pdp-idbox" id="pdpIdBox"><div class="pdp-username" id="pdpUserShow"></div><div class="pdp-bio" id="pdpBioShow"></div></div><h3>Nível <small>' + xp + ' XP</small></h3>' +
+      '<div class="pdp-xp-top"><span class="pdp-xp-nome">' + nv.nome + '</span><span class="pdp-xp-num">' + (nv.prox ? "faltam " + (nv.prox.xp - xp) + " XP para " + nv.prox.nome : "Nível máximo!") + '</span></div>' +
+      '<div class="pdp-xp-barra"><div class="pdp-xp-fill" id="pdpXpFill"></div></div>' +
+      '<div class="pdp-xp-dica">Ganhe XP baixando apps (+15), favoritando (+5), mantendo sequência diária (+10 por dia da melhor sequência) e com o tempo de conta.</div></div>';
+    const cardStats = '<div class="pdp-stats">' +
+      '<div class="pdp-stat"><b>' + stats.down + '</b><span>Apps baixados</span></div>' +
+      '<div class="pdp-stat"><b>' + stats.fav + '</b><span>Favoritos</span></div>' +
+      '<div class="pdp-stat"><b><span class="pdp-fl">' + pdpIc("flame", 18, "#f97316") + '</span>' + stats.atual + '</b><span>Sequência atual (melhor: ' + stats.melhor + ')</span></div>' +
+      '<div class="pdp-stat"><b>' + dias + '</b><span>Dias de conta</span></div>' +
+      (genFav ? '<div class="pdp-genero">Género favorito: <b>' + escapeHtml(genFav) + '</b></div>' : "") + '</div>';
+    const capasHtml = PDP_CAPAS.map((c) => '<button type="button" class="pdp-cover-op' + (c.css ? "" : " pdp-cover-orig") + '" data-capa="' + c.id + '" title="' + c.nome + '"' + (c.css ? ' style="background:' + c.css + '"' : "") + ">" + (c.css ? "" : "Orig.") + "</button>").join("");
+    const moldHtml = PDP_MOLDURAS.map((m) => '<button type="button" class="pdp-frame-op' + (m.nivel > nv.num ? " bloq" : "") + '" data-mold="' + m.id + '" title="' + m.nome + (m.nivel > nv.num ? " (nível " + m.nivel + ")" : "") + '"><i style="border-color:' + m.cor + '"></i>' + (m.nivel > nv.num ? '<span class="lk">' + pdpIc("lock", 12, "currentColor") + '</span>' : "") + '</button>').join("");
+    const cardPers = '<details class="pdp-card pdp-det" data-pdp="1"><summary><span class="pdp-sum">' + pdpIc("palette", 18, "var(--accent-primary)") + 'Personalizar perfil</span></summary><div class="pdp-corpo">' +
+      '<div><div class="pdp-lbl">Nome de usuário</div><input class="pdp-input" id="pdpInUser" maxlength="20" placeholder="@seunome" autocomplete="off"></div>' +
+      '<div><div class="pdp-lbl"><span>Bio</span><span id="pdpBioCont">0/100</span></div><textarea class="pdp-input" id="pdpInBio" maxlength="100" placeholder="Fale um pouco sobre você"></textarea></div>' +
+      '<div><div class="pdp-lbl">Capa</div><div class="pdp-opcoes" id="pdpCapas">' + capasHtml + '</div></div>' +
+      '<div><div class="pdp-lbl">Moldura do avatar</div><div class="pdp-opcoes" id="pdpMolds">' + moldHtml + '</div></div>' +
+      '<div class="pdp-xp-dica">Estas escolhas ficam guardadas neste aparelho.</div></div></details>';
+    const achHtml = conq.map((c) => '<div class="pdp-ach-item' + (c.ok ? "" : " off") + '"><div class="ic">' + pdpIc(c.ic, 26, c.cor) + '</div><div class="nm">' + c.nm + '</div><div class="ds">' + c.ds + "</div></div>").join("");
+    const cardConq = '<div class="pdp-card" data-pdp="1"><h3>Conquistas <small>' + feitas + "/" + conq.length + '</small></h3><div class="pdp-ach">' + achHtml + "</div></div>";
+    const recHtml = rec.length ? '<div class="pdp-rec">' + rec.map((r) => '<div class="pdp-rec-item" data-gid="' + escapeHtml(r.id) + '"><img src="' + escapeHtml(r.g.poster || "") + '" alt="" loading="lazy"><span>' + escapeHtml(r.g.titulo || "") + "</span></div>").join("") + "</div>" : '<div class="pdp-vazio">Ainda não baixou nada.</div>';
+    const cardRec = '<div class="pdp-card" data-pdp="1"><h3>Últimos downloads</h3>' + recHtml + "</div>";
+
+    card.insertAdjacentHTML("afterend", cardNivel + cardStats + cardPers + cardConq + cardRec);
+    const fill = container.querySelector("#pdpXpFill");
+    if (fill) setTimeout(() => { fill.style.width = nv.pct + "%"; }, 60);
+
+    const marcar = (sel, attr, val) => container.querySelectorAll(sel).forEach((el) => el.classList.toggle("sel", el.getAttribute(attr) === val));
+    const cfg = pdpCfg(uid);
+    const inUser = container.querySelector("#pdpInUser"), inBio = container.querySelector("#pdpInBio"), cont2 = container.querySelector("#pdpBioCont");
+    inUser.value = cfg.user || "";
+    inBio.value = cfg.bio || "";
+    cont2.textContent = inBio.value.length + "/100";
+    marcar(".pdp-cover-op", "data-capa", cfg.capa || "orig");
+    marcar(".pdp-frame-op", "data-mold", cfg.moldura || "padrao");
+    pdpAplicar(container, uid, nv.num);
+    const salvar = (patch) => { const c = Object.assign(pdpCfg(uid), patch); pdpSalvarCfg(uid, c); pdpAplicar(container, uid, nv.num); };
+    inUser.addEventListener("input", () => { inUser.value = inUser.value.replace(/[^a-zA-Z0-9_.]/g, "").slice(0, 20); salvar({ user: inUser.value }); });
+    inBio.addEventListener("input", () => { cont2.textContent = inBio.value.length + "/100"; salvar({ bio: inBio.value.slice(0, 100) }); });
+    container.querySelectorAll(".pdp-cover-op").forEach((b) => b.addEventListener("click", () => { salvar({ capa: b.getAttribute("data-capa") }); marcar(".pdp-cover-op", "data-capa", b.getAttribute("data-capa")); }));
+    container.querySelectorAll(".pdp-frame-op").forEach((b) => b.addEventListener("click", () => {
+      const m = PDP_MOLDURAS.find((x) => x.id === b.getAttribute("data-mold"));
+      if (m.nivel > nv.num) { showCustomAlert('Você desbloqueia a moldura "' + m.nome + '" no nível ' + m.nivel + "."); return; }
+      salvar({ moldura: m.id });
+      marcar(".pdp-frame-op", "data-mold", m.id);
+    }));
+    container.querySelectorAll(".pdp-rec-item").forEach((el) => el.addEventListener("click", () => { closeProfileOverlay(); openGameDetail(el.getAttribute("data-gid")); }));
+  } catch (e) { console.log("Perfil+ indisponível:", e); }
+}
 function getDefaultAvatarSVG() {
   return `<svg viewBox="0 0 212 212" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect width="212" height="212" fill="#D8D8D8"/>
@@ -13540,6 +14368,9 @@ function getProfileSkeletonHTML() {
 }
 async function loadProfileData(user, container) {
   container.innerHTML = getProfileSkeletonHTML();
+  const tok = (window.__pdLoadTok = (window.__pdLoadTok || 0) + 1);
+  let pdPre = null;
+  try { pdPre = pdPrefetch(user); } catch (e) {}
   try {
     const displayName = userName || user.displayName || user.email?.split("@")[0] || "Usu\xE1rio";
     const email = user.email || "";
@@ -13554,6 +14385,7 @@ async function loadProfileData(user, container) {
       const snapshot = await get(userRef);
       if (snapshot.exists()) {
         createdAt = new Date(snapshot.val()).toLocaleDateString("pt-BR");
+        window.__pdCreatedAtMs = snapshot.val();
       }
     } catch (e) {
       console.log("N\xE3o foi poss\xEDvel buscar data de cria\xE7\xE3o");
@@ -13576,7 +14408,8 @@ async function loadProfileData(user, container) {
     }
     document.getElementById("profileHeaderPointsValue").textContent = points;
     const avatarContent = userAvatar ? '<img src="' + userAvatar + '" alt="Avatar"><div class="profile-avatar-edit-hint">Alterar</div>' : getDefaultAvatarSVG() + '<div class="profile-avatar-edit-hint">Alterar</div>';
-    container.innerHTML = `
+    const stage = document.createElement("div");
+    stage.innerHTML = `
           <div class="profile-header-card">
             <div class="profile-avatar-svg ${avatarStatusClass}" onclick="updateProfileAvatar()">${avatarContent}</div>
             <div class="profile-user-info-scroll">
@@ -13623,6 +14456,10 @@ async function loadProfileData(user, container) {
             Sair da Conta
           </button>
         `;
+    await pdEnhanceProfile(stage, user, window.__pdCreatedAtMs, pdPre);
+    window.__pdCreatedAtMs = null;
+    if (tok !== window.__pdLoadTok) return;
+    container.replaceChildren(...stage.childNodes);
   } catch (error) {
     console.error("Error loading profile:", error);
     const displayName = userName || user.displayName || user.email?.split("@")[0] || "Usu\xE1rio";
@@ -13684,7 +14521,7 @@ function openReportProblemModal(prefillUrl = "") {
   const auth = window.firebaseAuth;
   const user = auth.currentUser;
   if (!user || user.isAnonymous) {
-    showCustomAlert("Voc\xEA precisa estar logado para reportar um problema.");
+    showSignupPrompt("reportar um problema");
     return;
   }
   document.getElementById("reportLink").value = prefillUrl;
@@ -13711,7 +14548,7 @@ async function handleReportProblem(event) {
   const auth = window.firebaseAuth;
   const user = auth.currentUser;
   if (!user || user.isAnonymous) {
-    showCustomAlert("Voc\xEA precisa estar logado para reportar um problema.");
+    showSignupPrompt("reportar um problema");
     return;
   }
   const link = document.getElementById("reportLink").value.trim();
@@ -13998,7 +14835,7 @@ async function openRatingModal() {
   const auth = window.firebaseAuth;
   const user = auth.currentUser;
   if (!user || user.isAnonymous) {
-    showCustomAlert("Voc\xEA precisa ter uma conta verificada para avaliar o aplicativo.");
+    showSignupPrompt("avaliar o aplicativo");
     return;
   }
   const { ref, get } = window.firebaseModules;
@@ -14415,6 +15252,10 @@ function renderRatingStarsInput() {
       `).join("");
 }
 function selectRatingStars(n) {
+  if (isGuestUser()) {
+    showSignupPrompt("avaliar");
+    return;
+  }
   selectedRatingStars = n;
   renderRatingStarsInput();
   showRatingCommentField();
@@ -14465,6 +15306,7 @@ async function loadGameRatings(gameId) {
   } else {
     showRatingCommentField();
   }
+  applyGuestRatingUI();
   const ratingList = document.getElementById("ratingList");
   if (!ratingList) return;
   ratingList.innerHTML = '<div class="rating-empty-msg">Carregando avalia\xE7\xF5es...</div>';
@@ -14507,7 +15349,7 @@ function renderRatingList(items) {
 }
 async function submitRating() {
   if (!currentUser || currentUser.isAnonymous) {
-    showCustomAlert("Voc\xEA precisa fazer login com uma conta para avaliar.");
+    showSignupPrompt("avaliar");
     return;
   }
   if (userStatus === "pending") {
@@ -14591,6 +15433,7 @@ async function loadUserFavorites() {
     console.error("Erro ao carregar favoritos:", e);
     userFavorites = {};
   }
+  refreshRecommendations();
 }
 async function loadUserLikes() {
   if (!currentUser || currentUser.isAnonymous) return;
@@ -14607,10 +15450,11 @@ async function loadUserLikes() {
     console.error("Erro ao carregar likes:", e);
     userLikes = {};
   }
+  refreshRecommendations();
 }
 async function toggleFavorite() {
   if (!currentUser || currentUser.isAnonymous) {
-    showCustomAlert("Voc\xEA precisa fazer login para adicionar favoritos.");
+    showSignupPrompt("guardar favoritos");
     return;
   }
   if (!currentGameData) return;
@@ -14648,17 +15492,11 @@ function updateFavoriteButton() {
   const icon = document.getElementById("favoriteIcon");
   if (!btn || !icon) return;
   const isFavorite = userFavorites[currentGameData.id];
-  if (isFavorite) {
-    icon.style.fill = "#e91e63";
-    btn.classList.add("active");
-  } else {
-    icon.style.fill = "#9e9e9e";
-    btn.classList.remove("active");
-  }
+  btn.classList.toggle("active", !!isFavorite);
 }
 async function toggleLike() {
   if (!currentUser || currentUser.isAnonymous) {
-    showCustomAlert("Voc\xEA precisa fazer login para curtir.");
+    showSignupPrompt("curtir");
     return;
   }
   if (userStatus === "pending") {
@@ -14666,6 +15504,16 @@ async function toggleLike() {
     return;
   }
   if (!currentGameData) return;
+  if (window._likePending) return;
+  window._likePending = true;
+  const likeFooterBtn = document.getElementById("footerLikeBtn");
+  if (likeFooterBtn) likeFooterBtn.classList.add("like-loading");
+  const releaseLike = () => {
+    clearTimeout(window._likeSafety);
+    window._likePending = false;
+    if (likeFooterBtn) likeFooterBtn.classList.remove("like-loading");
+  };
+  window._likeSafety = setTimeout(releaseLike, 12000);
   const gameId = currentGameData.id;
   const { doc, setDoc, getDoc, updateDoc } = window.firebaseModules;
   const firestore = window.firebaseFirestore;
@@ -14691,9 +15539,11 @@ async function toggleLike() {
     await setDoc(userLikesRef, { games: userLikes }, { merge: true });
     await setDoc(gameLikesRef, { count: currentLikes }, { merge: true });
     currentGameLikes = currentLikes;
+    releaseLike();
     updateLikeButton();
   } catch (e) {
     console.error("Erro ao atualizar like:", e);
+    releaseLike();
     showCustomAlert("Erro ao curtir.");
   }
 }
@@ -15186,7 +16036,7 @@ async function claimDailyReward() {
   closeSidebar();
   closeDailyRewardModal();
   if (!currentUser || currentUser.isAnonymous) {
-    showCustomAlert("Voc\xEA precisa fazer login para resgatar a recompensa di\xE1ria.");
+    showSignupPrompt("resgatar a recompensa diária");
     return;
   }
   if (userStatus === "pending") {
@@ -15269,6 +16119,7 @@ Volte em ${formatTimeRemaining(nextRewardTime - freshServerTime)}`);
       }
       return;
     }
+    try { pdpRegistrarDia(serverTime); } catch (e) {}
     _syncPointsDisplay(newPointsTotal);
     dailyRewardClaimed = true;
     nextRewardTime = serverTime + DAILY_REWARD_COOLDOWN;
@@ -15344,7 +16195,7 @@ function checkDailyRecommendation(attempt) {
       }
       return;
     }
-    const randomId = gameIds[Math.floor(Math.random() * gameIds.length)];
+    const randomId = pickDailyRecommendationId(gameIds, state);
     const game = allGames[randomId];
     if (!game) return;
     saveDailyRecommendationState({ date: today, gameId: randomId });
@@ -15576,6 +16427,42 @@ document.addEventListener("keydown", (e) => {
 
   const $ = (id) => document.getElementById(id);
 
+  const TS_PRIOR_A = 1, TS_PRIOR_B = 19;
+
+  function _gauss() {
+    let u = 0, v = 0;
+    while (!u) u = Math.random();
+    while (!v) v = Math.random();
+    return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+  }
+  function _gamaAmostra(k) {
+    if (k < 1) return _gamaAmostra(k + 1) * Math.pow(Math.random(), 1 / k);
+    const d = k - 1 / 3, c = 1 / Math.sqrt(9 * d);
+    for (;;) {
+      let x, v;
+      do { x = _gauss(); v = 1 + c * x; } while (v <= 0);
+      v = v * v * v;
+      const u = Math.random();
+      if (u < 1 - 0.0331 * x * x * x * x) return d * v;
+      if (Math.log(u) < 0.5 * x * x + d * (1 - v + Math.log(v))) return d * v;
+    }
+  }
+  function _betaAmostra(a, b) {
+    const x = _gamaAmostra(a), y = _gamaAmostra(b);
+    return x / (x + y);
+  }
+  function escolherPorThompson(lista) {
+    if (lista.length === 1) return lista[0];
+    let melhor = lista[0], melhorV = -1;
+    for (const ad of lista) {
+      const ex = Math.max(0, Number(ad.exibicoes) || 0);
+      const cl = Math.min(ex, Math.max(0, Number(ad.cliques) || 0));
+      const v = _betaAmostra(TS_PRIOR_A + cl, TS_PRIOR_B + (ex - cl));
+      if (v > melhorV) { melhorV = v; melhor = ad; }
+    }
+    return melhor;
+  }
+
   function sortearAnuncio() {
     const lista = ANUNCIOS_ATIVOS;
     if (!lista.length) {
@@ -15591,7 +16478,7 @@ document.addEventListener("keydown", (e) => {
       const outros = lista.filter((a) => a.id !== ultimoAnuncioId);
       if (outros.length) candidatos = outros;
     }
-    const escolhido = candidatos[Math.floor(Math.random() * candidatos.length)];
+    const escolhido = escolherPorThompson(candidatos);
     VIDEO_ID = escolhido.videoId;
     LINK_ANUNCIO = escolhido.link;
     ANUNCIO_ATIVO_ID = escolhido.id;
@@ -15610,7 +16497,7 @@ document.addEventListener("keydown", (e) => {
       const snap = await getDocs(q);
       snap.forEach((d) => {
         const dados = d.data();
-        if (dados.videoId && dados.link) ANUNCIOS_ATIVOS.push({ id: d.id, videoId: dados.videoId, link: dados.link, logoUrl: dados.logoUrl || '', tituloExibido: dados.tituloExibido || '', subtitulo: dados.subtitulo || '', textoBotao: dados.textoBotao || '' });
+        if (dados.videoId && dados.link) ANUNCIOS_ATIVOS.push({ id: d.id, videoId: dados.videoId, link: dados.link, logoUrl: dados.logoUrl || '', tituloExibido: dados.tituloExibido || '', subtitulo: dados.subtitulo || '', textoBotao: dados.textoBotao || '', exibicoes: Number(dados.exibicoes) || 0, cliques: Number(dados.cliques) || 0 });
       });
     } catch (e) {  }
     sortearAnuncio();
@@ -15628,6 +16515,7 @@ document.addEventListener("keydown", (e) => {
       const logado = usuario && !usuario.isAnonymous;
       const uid = (usuario && usuario.uid) ? usuario.uid : 'visitante';
       const campo = tipo === 'clique' ? 'cliques' : 'exibicoes';
+      anuncio[campo] = (Number(anuncio[campo]) || 0) + 1;
       setDoc(doc(firestore, 'anuncio_usuarios', anuncio.id + '_' + uid), {
         anuncioId: anuncio.id,
         userId: uid,
@@ -16048,6 +16936,7 @@ document.addEventListener("keydown", (e) => {
   }
 
   window.PortalAd = {
+    escolherPorThompson: escolherPorThompson,
     preparar: function (game) {
       if (ehGratis(game)) garantirCarga();
     },
@@ -16638,7 +17527,7 @@ function renderAdStats() {
     } catch (e) {}
     return lista
       .filter((a) => a && a.videoId && a.link)
-      .map((a) => ({ id: a.id, videoId: a.videoId, link: a.link, logoUrl: a.logoUrl || '', tituloExibido: a.tituloExibido || '', subtitulo: a.subtitulo || '', textoBotao: a.textoBotao || '' }))
+      .map((a) => ({ id: a.id, videoId: a.videoId, link: a.link, logoUrl: a.logoUrl || '', tituloExibido: a.tituloExibido || '', subtitulo: a.subtitulo || '', textoBotao: a.textoBotao || '', exibicoes: Number(a.exibicoes) || 0, cliques: Number(a.cliques) || 0 }))
       .filter((a, i, arr) => arr.findIndex((b) => b.videoId === a.videoId) === i);
   }
 
@@ -16647,7 +17536,9 @@ function renderAdStats() {
     if (!livres.length) return false;
     const outros = livres.filter((a) => !anuncioAtual || a.videoId !== anuncioAtual.videoId);
     const pool = outros.length ? outros : livres;
-    anuncioAtual = pool[Math.floor(Math.random() * pool.length)];
+    anuncioAtual = (window.PortalAd && window.PortalAd.escolherPorThompson)
+      ? window.PortalAd.escolherPorThompson(pool)
+      : pool[Math.floor(Math.random() * pool.length)];
     return true;
   }
 
@@ -16894,6 +17785,11 @@ function renderAdStats() {
       const logado = usuario && !usuario.isAnonymous;
       const uid = (usuario && usuario.uid) ? usuario.uid : 'visitante';
       const campo = tipo === 'clique' ? 'cliques' : 'exibicoes';
+      anuncio[campo] = (Number(anuncio[campo]) || 0) + 1;
+      try {
+        const orig = (window.PortalAd.listarAnuncios() || []).find((x) => x.id === anuncio.id);
+        if (orig) orig[campo] = (Number(orig[campo]) || 0) + 1;
+      } catch (e) {}
       setDoc(doc(firestore, 'anuncio_usuarios', anuncio.id + '_' + uid), {
         anuncioId: anuncio.id,
         userId: uid,
@@ -17210,6 +18106,310 @@ function renderAdStats() {
   atualizarPainel();
 
   window.RewardedAds = { abrirPagina: abrirPagina };
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+
+  var bar = document.createElement("div");
+  bar.id = "pdTopLoader";
+  bar.setAttribute("aria-hidden", "true");
+  var fill = document.createElement("i");
+  bar.appendChild(fill);
+  var blocker = document.createElement("div");
+  blocker.id = "pdTouchBlocker";
+  blocker.setAttribute("aria-hidden", "true");
+  document.body.appendChild(bar);
+  document.body.appendChild(blocker);
+
+  var MIN_VISIBLE_MS = 300;
+  var SAFETY_MS = 8000;
+  var seq = 0;
+  var tokens = {};
+
+  var progress = 0, trickle = null, hideT = null, resetT = null, barOn = false;
+
+  function setProgress(v) {
+    progress = v;
+    fill.style.transform = "scaleX(" + v + ")";
+  }
+  function showBar() {
+    clearTimeout(hideT); clearTimeout(resetT); clearInterval(trickle);
+    barOn = true;
+    bar.classList.add("on");
+    fill.style.transition = "none";
+    setProgress(0);
+    void fill.offsetWidth;
+    fill.style.transition = "";
+    setProgress(0.15);
+    trickle = setInterval(function () {
+      setProgress(progress + (0.92 - progress) * 0.14);
+    }, 200);
+  }
+  function completeBar() {
+    barOn = false;
+    clearInterval(trickle); trickle = null;
+    setProgress(1);
+    hideT = setTimeout(function () {
+      bar.classList.remove("on");
+      resetT = setTimeout(function () {
+        fill.style.transition = "none";
+        setProgress(0);
+      }, 300);
+    }, 250);
+  }
+
+  function refresh() {
+    var any = false, blocking = false;
+    for (var k in tokens) {
+      any = true;
+      if (tokens[k].blocking) blocking = true;
+    }
+    if (any && !barOn) showBar();
+    else if (!any && barOn) completeBar();
+    blocker.classList.toggle("on", blocking);
+  }
+
+  function start(opts) {
+    opts = opts || {};
+    var id = ++seq;
+    var t = { t0: Date.now(), blocking: opts.block !== false, timers: [] };
+    tokens[id] = t;
+    if (typeof opts.blockMs === "number") {
+      t.timers.push(setTimeout(function () {
+        if (tokens[id]) { t.blocking = false; refresh(); }
+      }, opts.blockMs));
+    }
+    t.timers.push(setTimeout(function () { finish(id); }, opts.maxMs || SAFETY_MS));
+    refresh();
+    return id;
+  }
+
+  function finish(id) {
+    var t = tokens[id];
+    if (!t) return;
+    t.timers.forEach(clearTimeout);
+    delete tokens[id];
+    refresh();
+  }
+
+  function end(id) {
+    var t = tokens[id];
+    if (!t) return;
+    var wait = MIN_VISIBLE_MS - (Date.now() - t.t0);
+    if (wait > 0) {
+      t.blocking = false;
+      refresh();
+      setTimeout(function () { finish(id); }, wait);
+    } else {
+      finish(id);
+    }
+  }
+
+  function wrap(name, opts) {
+    opts = opts || {};
+    var orig = window[name];
+    if (typeof orig !== "function" || orig.__pdWrapped) return false;
+    var w = function () {
+      var id = start(opts);
+      var r;
+      try { r = orig.apply(this, arguments); }
+      catch (e) { finish(id); throw e; }
+      if (r && typeof r.then === "function") {
+        r.then(function () { end(id); }, function () { end(id); });
+      } else {
+        setTimeout(function () { end(id); }, opts.syncMs || 450);
+      }
+      return r;
+    };
+    w.__pdWrapped = true;
+    window[name] = w;
+    return true;
+  }
+
+  window.PDLoader = { start: start, end: end, wrap: wrap };
+
+  [
+    "openSearchOverlay", "openNotificationsOverlay", "openProfileOverlay",
+    "openAboutOverlay", "openFavoritesOverlay", "openHistoryModal",
+    "openFaqModal", "openPublishModal", "openGenerateCodeModal",
+    "openRedeemCodeModal", "openTransferModal",
+    "openCommunityModal", "openEarnPointsModal", "openManageModal",
+    "openManageUsersModal", "openManageAdModal", "openManageAdsModal",
+    "openViewReportsModal", "openRatingModal"
+  ].forEach(function (n) { wrap(n); });
+
+  wrap("openGameDetail", { blockMs: 700 });
+
+  var genreCache = { n: -1, list: [] };
+
+  function norm(s) {
+    return typeof normalizeText === "function"
+      ? normalizeText(s)
+      : String(s || "").toLowerCase().trim();
+  }
+
+  function buildGenres() {
+    var games = window.allGames || (typeof allGames !== "undefined" ? allGames : null) || {};
+    var ids = Object.keys(games);
+    var map = {};
+    ids.forEach(function (id) {
+      var raw = games[id] && games[id].genero;
+      if (!raw) return;
+      String(raw).split(/[,;\/|]+/).forEach(function (part) {
+        var label = part.trim();
+        var key = norm(label);
+        if (!key) return;
+        if (!map[key]) map[key] = { key: key, count: 0, labels: {} };
+        map[key].count++;
+        map[key].labels[label] = (map[key].labels[label] || 0) + 1;
+      });
+    });
+    var list = Object.keys(map).map(function (k) {
+      var g = map[k], best = "", bestC = -1;
+      for (var l in g.labels) if (g.labels[l] > bestC) { best = l; bestC = g.labels[l]; }
+      return { key: g.key, label: best, count: g.count };
+    });
+    list.sort(function (a, b) { return b.count - a.count || a.label.localeCompare(b.label); });
+    genreCache = { n: ids.length, list: list };
+    return list;
+  }
+
+  window.renderSearchGenres = function (term) {
+    var box = document.getElementById("searchGenreSuggest");
+    if (!box) return;
+    var list = buildGenres();
+    var q = norm(term);
+    var items;
+    if (!q) {
+      items = list.slice(0, 12);
+    } else {
+      items = list.filter(function (g) { return g.key.indexOf(q) !== -1 && g.key !== q; }).slice(0, 6);
+    }
+    box.textContent = "";
+    if (!items.length) { box.style.display = "none"; return; }
+    var title = document.createElement("div");
+    title.className = "search-genre-title";
+    title.textContent = "Géneros";
+    var chips = document.createElement("div");
+    chips.className = "search-genre-chips";
+    items.forEach(function (g) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "search-genre-chip";
+      b.textContent = g.label;
+      b.addEventListener("click", function () {
+        var inp = document.getElementById("searchOverlayInput");
+        inp.value = g.label;
+        renderSearchOverlayResults();
+      });
+      chips.appendChild(b);
+    });
+    box.appendChild(title);
+    box.appendChild(chips);
+    box.style.display = "block";
+  };
+})();
+</script>
+<script>
+(function () {
+  "use strict";
+  var CLOSERS = {
+    searchOverlay: "closeSearchOverlay",
+    commentsOverlay: "closeCommentsOverlay",
+    downloadsOverlay: "closeDownloadsOverlay",
+    publishOverlay: "closePublishModal",
+    manageOverlay: "closeManageModal",
+    generateCodeOverlay: "closeGenerateCodeModal",
+    redeemOverlay: "closeRedeemCodeModal",
+    historyOverlay: "closeHistoryOverlay",
+    communityOverlay: "closeCommunityOverlay",
+    profileOverlay: "closeProfileOverlay",
+    aboutOverlay: "closeAboutOverlay",
+    manageUsersOverlay: "closeManageUsersModal",
+    bulkEmailOverlay: "closeBulkEmailModal",
+    manageAdsOverlay: "closeManageAdsModal",
+    adStatsOverlay: "closeAdStatsModal",
+    viewUserProfileOverlay: "closeViewUserProfile",
+    sendNotificationOverlay: "closeSendNotificationOverlay",
+    notificationsOverlay: "closeNotificationsOverlay",
+    ratingOverlay: "closeRatingOverlay",
+    favoritesOverlay: "closeFavoritesOverlay",
+    reportProblemOverlay: "closeReportProblemOverlay",
+    reportsOverlay: "closeViewReportsModal",
+    transferOverlay: "closeTransferModal"
+  };
+
+  var lastState = history.state;
+  var consuming = false;
+  var open = {};
+
+  ["pushState", "replaceState"].forEach(function (m) {
+    var orig = history[m];
+    history[m] = function (st) {
+      lastState = st;
+      return orig.apply(history, arguments);
+    };
+  });
+
+  function isActive(el) { return el.classList.contains("active"); }
+
+  function goBackSilently() {
+    consuming = true;
+    try { history.back(); } catch (e) { consuming = false; }
+  }
+
+  function closeById(id) {
+    var el = document.getElementById(id);
+    if (!el || !isActive(el)) return;
+    var fn = window[CLOSERS[id]];
+    if (typeof fn === "function") {
+      try { fn(); } catch (e) { el.classList.remove("active"); }
+    } else {
+      el.classList.remove("active");
+    }
+  }
+
+  var observer = new MutationObserver(function (records) {
+    var opens = [], closes = [], seen = {};
+    records.forEach(function (r) {
+      var id = r.target.id;
+      if (!CLOSERS[id] || seen[id]) return;
+      var now = isActive(r.target);
+      if (now && !open[id]) { open[id] = true; opens.push(id); seen[id] = true; }
+      else if (!now && open[id]) { open[id] = false; closes.push(id); seen[id] = true; }
+    });
+    while (closes.length && opens.length && lastState && lastState.pdOv === closes[0]) {
+      closes.shift();
+      history.replaceState({ pdOv: opens.shift() }, "");
+    }
+    closes.forEach(function (id) {
+      if (lastState && lastState.pdOv === id) goBackSilently();
+    });
+    opens.forEach(function (id) {
+      try { history.pushState({ pdOv: id }, ""); } catch (e) {}
+    });
+  });
+
+  Object.keys(CLOSERS).forEach(function (id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    open[id] = isActive(el);
+    observer.observe(el, { attributes: true, attributeFilter: ["class"] });
+  });
+
+  window.addEventListener("popstate", function (e) {
+    var prev = lastState, cur = e.state;
+    lastState = cur;
+    if (consuming) {
+      consuming = false;
+      if (cur && cur.pdOv && !open[cur.pdOv]) goBackSilently();
+      return;
+    }
+    if (prev && prev.pdOv) closeById(prev.pdOv);
+    if (cur && cur.pdOv && !open[cur.pdOv]) goBackSilently();
+  }, true);
 })();
 </script>
 </body>
