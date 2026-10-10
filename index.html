@@ -247,6 +247,15 @@ window.firebaseModules = {
       border-right: 1px solid var(--border-color);
     }
     .sidebar.open { left: 0; }
+    .sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 99;
+      background: transparent;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .sidebar.open + .sidebar-backdrop { display: block; }
 
     .sidebar-header {
       display: flex;
@@ -491,6 +500,13 @@ window.firebaseModules = {
       z-index: 5;
     }
 
+    body.view-list .bottom-nav {
+      display: none;
+    }
+    body.view-list .content-wrapper {
+      padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    }
+
     .bottom-nav-item {
       flex: 1;
       display: flex;
@@ -731,48 +747,101 @@ window.firebaseModules = {
     .grid.blog-view {
       grid-template-columns: 1fr;
       max-width: 720px;
-      gap: 14px;
+      gap: 12px;
     }
+
+    body.view-list .search-input {
+      border-radius: 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      padding: 14px 52px 14px 18px;
+      transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    body.view-list .search-input:hover {
+      border-color: var(--accent-primary);
+      box-shadow: var(--shadow-md);
+    }
+    body.view-list .search-input:focus {
+      background: var(--bg-card);
+      border-color: var(--accent-primary);
+      box-shadow: var(--shadow-md);
+    }
+    body.view-list .search-icon {
+      right: 8px;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      background: var(--bg-hover);
+      font-size: 15px;
+    }
+    body.view-list .search-overlay-wrapper .search-input {
+      padding: 12px 48px 12px 16px;
+    }
+    body.view-list .search-overlay-wrapper .search-icon {
+      right: 8px;
+    }
+    body.view-list #searchOverlayGrid.blog-view {
+      gap: 12px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .grid.blog-view { display: flex; flex-direction: column; gap: 22px; }
+    .genre-section { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+    .genre-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 2px; }
+    .genre-header-title { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .genre-header-dot { width: 4px; height: 18px; border-radius: 2px; background: var(--accent-primary); flex-shrink: 0; }
+    .genre-header-name { font-size: 16px; font-weight: 700; color: var(--text-primary, inherit); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .genre-header-count { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 10px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); }
+    .genre-see-all { display: inline-flex; align-items: center; gap: 2px; background: none; border: none; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--accent-primary); padding: 4px 2px; font-family: inherit; }
+    .genre-see-all svg, .genre-back-btn svg { width: 18px; height: 18px; fill: currentColor; }
+    .genre-cards { display: flex; flex-direction: column; gap: 12px; }
+    .genre-see-all-bar { width: 100%; padding: 10px; border-radius: 12px; border: 1px dashed var(--border-color); background: var(--bg-card); color: var(--accent-primary); font-weight: 600; font-size: 13px; cursor: pointer; font-family: inherit; }
+    .genre-back-btn { align-self: flex-start; display: inline-flex; align-items: center; gap: 4px; padding: 8px 14px 8px 8px; border-radius: 20px; border: 1px solid var(--border-color); background: var(--bg-card); color: inherit; font-weight: 600; font-size: 13px; cursor: pointer; font-family: inherit; }
 
     .blog-card {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
+      align-items: stretch;
       padding: 0;
+    }
+
+    .blog-card:hover {
+      padding: 0;
+    }
+
+    .blog-card:active {
+      transform: scale(0.985);
     }
 
     .blog-card-img-container {
       position: relative;
-      width: 100%;
+      flex: 0 0 104px;
+      width: 104px;
+      min-height: 146px;
       background: var(--bg-secondary);
-      display: flex;
+      overflow: hidden;
     }
 
     .blog-card-img-container img {
-      position: static;
-      display: block;
+      position: absolute;
+      inset: 0;
       width: 100%;
-      height: auto;
-      object-fit: contain;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .blog-card-img-container img.loaded {
-      opacity: 1;
-    }
-
-    .blog-card-img-container img.img-error {
-      opacity: 1;
-      object-fit: contain;
-      padding: 60px 24%;
-      filter: opacity(0.35);
+      height: 100%;
+      object-fit: cover;
     }
 
     .blog-card-img-container .card-type {
-      top: 8px;
-      right: 8px;
-      font-size: 10px;
-      padding: 4px 8px;
+      top: 6px;
+      left: 6px;
+      right: auto;
+      font-size: 9px;
+      padding: 3px 6px;
+      border-radius: 6px;
     }
 
     .blog-card-info {
@@ -781,18 +850,45 @@ window.firebaseModules = {
       display: flex;
       flex-direction: column;
       gap: 6px;
-      padding: 12px;
+      padding: 12px 12px 10px;
+    }
+
+    .blog-card-genre {
+      align-self: flex-start;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      max-width: 100%;
+      padding: 2px 8px 2px 6px;
+      border-radius: 999px;
+      font-size: 10.5px;
+      font-weight: 600;
+      line-height: 1.3;
+      color: var(--accent-primary);
+      background: rgba(29, 78, 216, 0.12);
+      background: color-mix(in srgb, var(--accent-primary) 14%, transparent);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .blog-card-genre svg {
+      width: 11px;
+      height: 11px;
+      fill: currentColor;
+      flex-shrink: 0;
     }
 
     .blog-card-title {
       font-size: 15px;
       font-weight: 700;
       color: var(--text-primary);
-      line-height: 1.3;
+      line-height: 1.25;
       display: -webkit-box;
-      -webkit-line-clamp: 1;
+      -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
+      overflow-wrap: anywhere;
     }
 
     .blog-card-desc {
@@ -800,37 +896,88 @@ window.firebaseModules = {
       color: var(--text-secondary);
       line-height: 1.4;
       display: -webkit-box;
-      -webkit-line-clamp: 3;
+      -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
 
-    .blog-card-meta {
-      font-size: 11px;
-      color: var(--text-muted);
+    .blog-card-stats {
+      margin-top: auto;
       display: flex;
-      gap: 6px;
       align-items: center;
-      flex-wrap: wrap;
+      gap: 12px;
+      padding-top: 4px;
     }
 
-    .blog-card-meta svg {
-      width: 12px;
-      height: 12px;
-      fill: var(--text-muted);
+    .blog-card-stat {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      min-width: 0;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    .blog-card-stat svg {
+      width: 15px;
+      height: 15px;
+      fill: var(--accent-primary);
       flex-shrink: 0;
     }
 
-    .blog-card-more-btn {
-      align-self: flex-start;
-      margin-top: 2px;
-      background: none;
-      border: none;
-      padding: 0;
+    .blog-card-stat.star svg {
+      fill: #FFB800;
+    }
+
+    .blog-card-go {
+      margin-left: auto;
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       color: var(--accent-primary);
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
+      background: rgba(29, 78, 216, 0.12);
+      background: color-mix(in srgb, var(--accent-primary) 14%, transparent);
+    }
+
+    .blog-card-go svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    .trending-list-card {
+      flex: 0 0 min(300px, 86%);
+      width: min(300px, 86%);
+      scroll-snap-align: start;
+    }
+    .trending-list-card .blog-card-img-container {
+      flex: 0 0 92px;
+      width: 92px;
+      min-height: 124px;
+    }
+    .trending-list-card .blog-card-info {
+      gap: 5px;
+      padding: 10px 10px 9px;
+    }
+    .trending-list-card .blog-card-title {
+      font-size: 14px;
+    }
+    .trending-list-card .blog-card-stats {
+      gap: 10px;
+    }
+    .trending-list-card .blog-card-stat {
+      font-size: 11px;
+    }
+    .trending-list-card .trending-rank {
+      top: auto;
+      bottom: 6px;
+      left: 6px;
     }
 
     .trending-section {
@@ -869,6 +1016,8 @@ window.firebaseModules = {
       gap: 12px;
       overflow-x: auto;
       padding: 0 20px 6px;
+      scroll-padding-left: 20px;
+      scroll-padding-right: 20px;
       scroll-snap-type: x proximity;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
@@ -1060,40 +1209,241 @@ window.firebaseModules = {
       fill: #2196F3;
     }
 
-    .modal-header {
-      padding: 24px;
-      border-bottom: 1px solid var(--border-color);
+    .modal-hero {
+      position: relative;
+      overflow: hidden;
+      background: var(--bg-primary);
     }
-
+    .modal-hero-bg {
+      position: absolute;
+      inset: -24px;
+      background: center / cover no-repeat;
+      filter: blur(26px) saturate(1.4);
+      opacity: 0.5;
+      transform: scale(1.15);
+    }
+    .modal-hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(var(--ad-rgb), 0) 0%, rgba(var(--ad-rgb), 0.35) 55%, var(--bg-secondary) 100%);
+      pointer-events: none;
+    }
+    .modal-hero-inner {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: flex-end;
+      gap: 16px;
+      padding: 20px 16px 20px;
+    }
+    .modal-cover {
+      flex: 0 0 120px;
+      aspect-ratio: 3 / 4;
+      border-radius: 16px;
+      overflow: hidden;
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+    }
+    .modal-cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .modal-hero-text {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-bottom: 2px;
+    }
+    .modal-genres {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .modal-genre-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px 4px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.2;
+      color: var(--accent-primary);
+      background: rgba(29, 78, 216, 0.12);
+      background: color-mix(in srgb, var(--accent-primary) 14%, transparent);
+      border: 1px solid rgba(29, 78, 216, 0.25);
+      border: 1px solid color-mix(in srgb, var(--accent-primary) 30%, transparent);
+      font-family: inherit;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.1s ease, background 0.15s ease;
+    }
+    .modal-genre-chip:active {
+      transform: scale(0.95);
+      background: color-mix(in srgb, var(--accent-primary) 26%, transparent);
+    }
+    .modal-genre-chip svg {
+      width: 13px;
+      height: 13px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
     .modal-title {
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 700;
       color: var(--text-primary);
-      margin-bottom: 12px;
+      margin: 0;
       line-height: 1.2;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      overflow-wrap: anywhere;
     }
 
     .modal-meta {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      padding: 4px 16px 0;
+    }
+    .modal-meta-item {
       display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      font-size: 14px;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+      padding: 12px 4px 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+    }
+    .stat-ico {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--c, var(--accent-primary));
+      background: rgba(128, 128, 128, 0.15);
+      background: color-mix(in srgb, var(--c, var(--accent-primary)) 16%, transparent);
+    }
+    .stat-ico svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+    .stat-val {
+      max-width: 100%;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .stat-lbl {
+      font-size: 10px;
+      font-weight: 600;
+      line-height: 1;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
       color: var(--text-muted);
     }
 
-    .modal-meta-item {
+    .related-section {
+      margin: 0 0 16px;
+    }
+    .related-head {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 10px;
+      margin-bottom: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .related-head .info-card-ico {
+      flex: 0 0 32px;
+      width: 32px;
+      height: 32px;
+    }
+    .related-head .info-card-ico svg {
+      width: 18px;
+      height: 18px;
+    }
+    .related-scroll {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      margin: 0 -16px;
+      padding: 0 16px 6px;
+      scroll-padding-left: 16px;
+      scroll-padding-right: 16px;
+      scroll-snap-type: x proximity;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .related-scroll::-webkit-scrollbar {
+      display: none;
+    }
+    .related-card {
+      flex: 0 0 132px;
+      width: 132px;
+      scroll-snap-align: start;
+    }
+    .related-card .card-img-container {
+      padding-top: 135%;
+    }
+    .related-card .card-info {
+      padding: 8px 9px 10px;
+      border-radius: 0;
+      background: var(--bg-card);
+    }
+    .related-card .card-title {
+      font-size: 12px;
+      -webkit-line-clamp: 2;
+      min-height: 2.6em;
     }
 
-    .modal-meta-label {
-      color: var(--text-secondary);
-      font-weight: 600;
+    .info-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+    }
+    .info-card-ico {
+      flex: 0 0 36px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-primary);
+      background: rgba(29, 78, 216, 0.12);
+      background: color-mix(in srgb, var(--accent-primary) 14%, transparent);
+    }
+    .info-card-ico svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
     }
 
     .modal-body {
-      padding: 24px;
+      padding: 16px;
     }
 
     .video-container {
@@ -1101,8 +1451,8 @@ window.firebaseModules = {
       background: #000;
       overflow: hidden;
       aspect-ratio: 16 / 9;
-      margin-bottom: 24px;
-      border-radius: 8px;
+      margin-bottom: 12px;
+      border-radius: 16px;
     }
 
     .video-container iframe {
@@ -1210,30 +1560,58 @@ window.firebaseModules = {
     }
 
     .modal-description {
-      font-size: 15px;
-      line-height: 1.7;
+      flex: 1;
+      min-width: 0;
+      font-size: 14.5px;
+      line-height: 1.65;
       color: var(--text-secondary);
-      margin-bottom: 16px;
+      overflow-wrap: anywhere;
     }
 
     .rating-section {
-      border-top: 1px solid var(--border-color);
-      padding-top: 16px;
-      margin-top: 4px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 16px;
       margin-bottom: 16px;
     }
 
     .rating-summary {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 18px;
+      gap: 16px;
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
     }
 
     .rating-average {
-      font-size: 24px;
+      min-width: 64px;
+      text-align: center;
+      font-size: 40px;
       font-weight: 700;
+      line-height: 1;
       color: var(--text-primary);
+    }
+
+    .rating-summary-side {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .rating-count-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-muted);
+    }
+
+    .rating-count-row svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+      flex-shrink: 0;
     }
 
     .rating-stars-display {
@@ -1252,10 +1630,27 @@ window.firebaseModules = {
     }
 
     .rating-form-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       font-size: 14px;
       font-weight: 600;
       color: var(--text-primary);
-      margin-bottom: 8px;
+      margin-bottom: 10px;
+    }
+
+    .rating-form-label svg {
+      width: 18px;
+      height: 18px;
+      fill: #FFB800;
+      flex-shrink: 0;
+    }
+
+    .rating-send-ico {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+      flex-shrink: 0;
     }
 
     .rating-stars-input {
@@ -8608,32 +9003,63 @@ window.firebaseModules = {
           <svg viewBox="0 0 24 24" width="24" height="24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
         </button>
       </div>
-      <div class="modal-header">
-        <h2 class="modal-title" id="modalTitle">Título</h2>
-        <div class="modal-meta" id="modalMeta"></div>
+      <div class="modal-hero" id="modalHero">
+        <div class="modal-hero-bg" id="modalHeroBg"></div>
+        <div class="modal-hero-inner">
+          <div class="modal-cover">
+            <img id="modalCover" src="logo.png" alt="">
+          </div>
+          <div class="modal-hero-text">
+            <div class="modal-genres" id="modalGenres"></div>
+            <h2 class="modal-title" id="modalTitle">Título</h2>
+          </div>
+        </div>
       </div>
+      <div class="modal-meta" id="modalMeta"></div>
       <div class="modal-body">
         <div id="videoContainer" class="video-container" style="display: none;"></div>
 
         <div class="game-info active" id="gameInfo">
-          <div class="modal-description" id="modalDescription"></div>
+          <div class="info-card">
+            <div class="info-card-ico">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+            </div>
+            <div class="modal-description" id="modalDescription"></div>
+          </div>
 
           <div class="rating-section">
             <div class="rating-summary">
               <div class="rating-average" id="ratingAverageValue">0.0</div>
-              <div class="rating-stars-display" id="ratingStarsDisplay"></div>
-              <div class="rating-count" id="ratingCountValue">0 avaliações</div>
+              <div class="rating-summary-side">
+                <div class="rating-stars-display" id="ratingStarsDisplay"></div>
+                <div class="rating-count-row">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                  <span class="rating-count" id="ratingCountValue">0 avaliações</span>
+                </div>
+              </div>
             </div>
 
-            <div class="rating-form-label">Avalie este conteúdo</div>
+            <div class="rating-form-label">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+              <span>Avalie este conteúdo</span>
+            </div>
             <div class="rating-stars-input" id="ratingStarsInput"></div>
             <textarea id="ratingCommentInput" class="rating-comment-input" placeholder="Escreva um comentário (opcional)..." rows="2" maxlength="200" oninput="handleRatingCommentInput(this)"></textarea>
             <button class="btn-main rating-submit-btn" id="ratingSubmitBtn" onclick="submitRating()">
+              <svg class="rating-send-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
               <span id="ratingSubmitBtnText">Enviar Avaliação</span>
               <span class="rating-btn-spinner" id="ratingSubmitBtnSpinner"></span>
             </button>
 
             <div class="rating-list" id="ratingList"></div>
+          </div>
+
+          <div class="related-section" id="relatedSection" style="display: none;">
+            <div class="related-head">
+              <span class="info-card-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg></span>
+              <span>Você também pode gostar</span>
+            </div>
+            <div class="related-scroll" id="relatedScroll"></div>
           </div>
         </div>
 
@@ -10032,6 +10458,7 @@ try {
   console.error("Erro ao carregar prefer\xEAncia de visualiza\xE7\xE3o:", e);
 }
 function updateGridViewToggleIcon() {
+  document.body.classList.toggle("view-list", gridViewMode === "blog");
   const icon = document.getElementById("gridViewToggleIcon");
   const btn = document.getElementById("gridViewToggleBtn");
   if (!icon) return;
@@ -10051,6 +10478,7 @@ function toggleGridViewMode() {
     console.error("Erro ao salvar prefer\xEAncia de visualiza\xE7\xE3o:", e);
   }
   updateGridViewToggleIcon();
+  currentGenreView = null;
   renderGrid();
 }
 updateGridViewToggleIcon();
@@ -10624,6 +11052,28 @@ function refreshRecommendations() {
     renderForYou();
   }
 }
+function buildCompactListCard(game, rank) {
+  const typeLabels = { aplicativos: "APLICATIVOS", jogos: "JOGOS", tutoriais: "TUTORIAIS", pc: "PC", outros: "OUTROS" };
+  const ratingCount = game.ratingCount || 0;
+  const avgRating = ratingCount > 0 ? (game.ratingSum || 0) / ratingCount : 0;
+  const genre = String(game.genero || "").split(/[,\/|;\u2022]+/).map((g) => g.trim()).filter(Boolean)[0] || "";
+  return `
+          <div class="blog-card-img-container">
+            ${rank ? `<div class="trending-rank">${rank}</div>` : ""}
+            <img src="${escapeHtml(game.poster || "logo.png")}" alt="${escapeHtml(game.titulo || "")}" loading="lazy" onload="this.classList.add('loaded')" onerror="this.onerror=null;this.classList.add('loaded','img-error');this.src='logo.png'">
+            <div class="card-type type-${game.type}">${typeLabels[game.type] || game.type}</div>
+          </div>
+          <div class="blog-card-info">
+            ${genre ? `<span class="blog-card-genre"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/></svg>${escapeHtml(genre)}</span>` : ""}
+            <div class="blog-card-title">${escapeHtml(game.titulo || "")}</div>
+            <div class="blog-card-stats">
+              <span class="blog-card-stat" title="Tamanho"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 20h20v-4H2v4zm2-3h2v2H4v-2zM2 4v4h20V4H2zm4 3H4V5h2v2zm-4 7h20v-4H2v4zm2-3h2v2H4v-2z"/></svg>${escapeHtml(String(game.size || "N/A"))}</span>
+              <span class="blog-card-stat" title="Downloads"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>${game.downloads || 0}</span>
+              <span class="blog-card-stat star" title="${ratingCount} avalia\xE7\xF5es"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${RATING_STAR_PATH}"/></svg>${avgRating.toFixed(1)}</span>
+            </div>
+          </div>
+        `;
+}
 function renderForYou() {
   const section = document.getElementById("forYouSection");
   const scroll = document.getElementById("forYouScroll");
@@ -10647,6 +11097,12 @@ function renderForYou() {
     card.className = "card trending-card";
     card.style.animationDelay = `${index * 0.05}s`;
     card.addEventListener("click", () => openGameDetail(id));
+    if (gridViewMode === "blog") {
+      card.className = "card blog-card trending-list-card";
+      card.innerHTML = buildCompactListCard(game, 0);
+      scroll.appendChild(card);
+      return;
+    }
     card.innerHTML = `
           <div class="card-img-container">
             <img src="${game.poster}" alt="${escapeHtml(game.titulo || "")}" loading="lazy" onload="this.classList.add('loaded')" onerror="this.classList.add('loaded','img-error');this.src='logo.png'">
@@ -10709,6 +11165,12 @@ function renderTrending() {
     card.addEventListener("click", function() {
       openGameDetail(game.id);
     });
+    if (gridViewMode === "blog") {
+      card.className = "card blog-card trending-list-card";
+      card.innerHTML = buildCompactListCard(game, index + 1);
+      scroll.appendChild(card);
+      return;
+    }
     card.innerHTML = `
           <div class="card-img-container">
             <div class="trending-rank">${index + 1}</div>
@@ -10720,6 +11182,115 @@ function renderTrending() {
           </div>
         `;
     scroll.appendChild(card);
+  });
+}
+let currentGenreView = null;
+let currentGenreViewCtx = "";
+const GENRE_PREVIEW_LIMIT = 3;
+function getPrimaryGenre(game) {
+  const tok = String(game.genero || "").split(/[,\/|;•]+/).map((g) => g.trim()).filter(Boolean)[0];
+  return tok || "Outros";
+}
+function buildBlogCardEl(game, index, typeLabels, beforeOpen) {
+  const card = document.createElement("div");
+  card.style.animationDelay = `${Math.min(index, 12) * 0.05}s`;
+  card.className = "card blog-card";
+  card.addEventListener("click", function() {
+    if (beforeOpen) beforeOpen();
+    openGameDetail(game.id);
+  });
+  const ratingCount = game.ratingCount || 0;
+  const ratingSum = game.ratingSum || 0;
+  const avgRating = ratingCount > 0 ? ratingSum / ratingCount : 0;
+  const description = game.descricao ? escapeHtml(game.descricao) : "Sem descri\xE7\xE3o dispon\xEDvel.";
+  card.innerHTML = `
+      <div class="blog-card-img-container">
+        <img src="${game.poster}" alt="${escapeHtml(game.titulo)}" loading="lazy" onload="this.classList.add('loaded')" onerror="this.classList.add('loaded','img-error');this.src='logo.png'">
+        <div class="card-type type-${game.type}">${typeLabels[game.type] || game.type}</div>
+      </div>
+      <div class="blog-card-info">
+        <div class="blog-card-title">${escapeHtml(game.titulo)}</div>
+        <div class="blog-card-desc">${description}</div>
+        <div class="blog-card-stats">
+          <span class="blog-card-stat" title="Tamanho"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 20h20v-4H2v4zm2-3h2v2H4v-2zM2 4v4h20V4H2zm4 3H4V5h2v2zm-4 7h20v-4H2v4zm2-3h2v2H4v-2z"/></svg>${escapeHtml(String(game.size || "N/A"))}</span>
+          <span class="blog-card-stat" title="Downloads"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>${game.downloads || 0}</span>
+          <span class="blog-card-stat star" title="${ratingCount} avalia\xE7\xF5es"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${RATING_STAR_PATH}"/></svg>${avgRating.toFixed(1)}</span>
+          <span class="blog-card-go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg></span>
+        </div>
+      </div>
+    `;
+  return card;
+}
+function openGenreView(key) {
+  currentGenreView = key;
+  currentGenreViewCtx = currentFilter + "|" + searchTerm;
+  renderGrid();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+function closeGenreView() {
+  currentGenreView = null;
+  renderGrid();
+}
+function renderGenreGroups(grid, filtered, typeLabels) {
+  const groups = new Map();
+  filtered.forEach((game) => {
+    const name = getPrimaryGenre(game);
+    const key = normalizeText(name) || "outros";
+    if (!groups.has(key)) groups.set(key, { name, games: [] });
+    groups.get(key).games.push(game);
+  });
+  if (currentGenreView && (currentGenreViewCtx !== currentFilter + "|" + searchTerm || !groups.has(currentGenreView))) {
+    currentGenreView = null;
+  }
+  const mkHeader = (name, count, actionHtml) => {
+    const h = document.createElement("div");
+    h.className = "genre-header";
+    h.innerHTML = `<div class="genre-header-title"><span class="genre-header-dot"></span><span class="genre-header-name">${escapeHtml(name)}</span><span class="genre-header-count">${count}</span></div>${actionHtml || ""}`;
+    return h;
+  };
+  if (currentGenreView) {
+    const g = groups.get(currentGenreView);
+    const bar = document.createElement("button");
+    bar.type = "button";
+    bar.className = "genre-back-btn";
+    bar.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6z"/></svg>Todos os g\xEAneros';
+    bar.addEventListener("click", closeGenreView);
+    grid.appendChild(bar);
+    const section = document.createElement("section");
+    section.className = "genre-section";
+    section.appendChild(mkHeader(g.name, g.games.length));
+    const list = document.createElement("div");
+    list.className = "genre-cards";
+    g.games.forEach((game, i) => list.appendChild(buildBlogCardEl(game, i, typeLabels)));
+    section.appendChild(list);
+    grid.appendChild(section);
+    return;
+  }
+  const sorted = Array.from(groups.entries()).sort((a, b) => {
+    if (a[0] === "outros") return 1;
+    if (b[0] === "outros") return -1;
+    return b[1].games.length - a[1].games.length;
+  });
+  sorted.forEach(([key, g]) => {
+    const section = document.createElement("section");
+    section.className = "genre-section";
+    const more = g.games.length > GENRE_PREVIEW_LIMIT;
+    const header = mkHeader(g.name, g.games.length, more ? `<button type="button" class="genre-see-all">Ver todos<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg></button>` : "");
+    if (more) header.querySelector(".genre-see-all").addEventListener("click", () => openGenreView(key));
+    section.appendChild(header);
+    const list = document.createElement("div");
+    list.className = "genre-cards";
+    g.games.slice(0, GENRE_PREVIEW_LIMIT).forEach((game, i) => list.appendChild(buildBlogCardEl(game, i, typeLabels)));
+    section.appendChild(list);
+    if (more) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "genre-see-all-bar";
+      btn.textContent = `Ver todos os ${g.games.length} em ${g.name}`;
+      btn.addEventListener("click", () => openGenreView(key));
+      section.appendChild(btn);
+    }
+    grid.appendChild(section);
   });
 }
 function renderGrid() {
@@ -10761,11 +11332,13 @@ function renderGrid() {
   if (currentPage < 0) {
     currentPage = 0;
   }
-  const startIndex = currentPage * gamesPerPage;
-  const endIndex = Math.min(startIndex + gamesPerPage, totalGames);
+  const noPageLimit = gridViewMode === "blog";
+  if (noPageLimit) currentPage = 0;
+  const startIndex = noPageLimit ? 0 : currentPage * gamesPerPage;
+  const endIndex = noPageLimit ? totalGames : Math.min(startIndex + gamesPerPage, totalGames);
   const paginatedGames = filtered.slice(startIndex, endIndex);
   updatePaginationUI(startIndex, endIndex, totalGames, totalPages);
-  grid.style.display = "grid";
+  grid.style.display = gridViewMode === "blog" ? "flex" : "grid";
   grid.classList.toggle("blog-view", gridViewMode === "blog");
   noResults.style.display = "none";
   const typeLabels = {
@@ -10775,9 +11348,15 @@ function renderGrid() {
     pc: "PC",
     outros: "OUTROS"
   };
+  if (gridViewMode === "blog") {
+    paginationControls.style.display = "none";
+    renderGenreGroups(grid, filtered, typeLabels);
+    setupPaginationVisibility();
+    return;
+  }
   paginatedGames.forEach((game, index) => {
     const card = document.createElement("div");
-    card.style.animationDelay = `${index * 0.05}s`;
+    card.style.animationDelay = `${Math.min(index, 12) * 0.05}s`;
     card.addEventListener("click", function() {
       openGameDetail(game.id);
     });
@@ -10787,22 +11366,22 @@ function renderGrid() {
       const ratingSum = game.ratingSum || 0;
       const avgRating = ratingCount > 0 ? ratingSum / ratingCount : 0;
       const description = game.descricao ? escapeHtml(game.descricao) : "Sem descri\xE7\xE3o dispon\xEDvel.";
+      const _bgTok = String(game.genero || "").split(/[,\/|;\u2022]+/).map((g) => g.trim()).filter(Boolean)[0] || "";
       card.innerHTML = `
           <div class="blog-card-img-container">
             <img src="${game.poster}" alt="${escapeHtml(game.titulo)}" loading="lazy" onload="this.classList.add('loaded')" onerror="this.classList.add('loaded','img-error');this.src='logo.png'">
             <div class="card-type type-${game.type}">${typeLabels[game.type] || game.type}</div>
           </div>
           <div class="blog-card-info">
+            ${_bgTok ? `<span class="blog-card-genre"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/></svg>${escapeHtml(_bgTok)}</span>` : ""}
             <div class="blog-card-title">${escapeHtml(game.titulo)}</div>
             <div class="blog-card-desc">${description}</div>
-            <div class="blog-card-meta">
-              <span>${game.size || "N/A"}</span>
-              <span>\u2022</span>
-              <span><svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/></svg>${game.downloads || 0}</span>
-              <span>\u2022</span>
-              <span title="${ratingCount} avalia\xE7\xF5es"><svg viewBox="0 0 24 24"><path d="${RATING_STAR_PATH}"/></svg>${avgRating.toFixed(1)} (${ratingCount})</span>
+            <div class="blog-card-stats">
+              <span class="blog-card-stat" title="Tamanho"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 20h20v-4H2v4zm2-3h2v2H4v-2zM2 4v4h20V4H2zm4 3H4V5h2v2zm-4 7h20v-4H2v4zm2-3h2v2H4v-2z"/></svg>${escapeHtml(String(game.size || "N/A"))}</span>
+              <span class="blog-card-stat" title="Downloads"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>${game.downloads || 0}</span>
+              <span class="blog-card-stat star" title="${ratingCount} avalia\xE7\xF5es"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${RATING_STAR_PATH}"/></svg>${avgRating.toFixed(1)}</span>
+              <span class="blog-card-go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg></span>
             </div>
-            <button type="button" class="blog-card-more-btn">Ver mais</button>
           </div>
         `;
     } else {
@@ -10857,6 +11436,10 @@ function updatePaginationUI(startIndex, endIndex, totalGames, totalPages) {
   const paginationText = document.getElementById("paginationText");
   const prevBtn = document.getElementById("prevPageBtn");
   const nextBtn = document.getElementById("nextPageBtn");
+  if (gridViewMode === "blog") {
+    paginationControls.style.display = "none";
+    return;
+  }
   if (totalGames > gamesPerPage) {
     paginationControls.style.display = "flex";
     paginationText.textContent = `${startIndex + 1} - ${endIndex} de ${totalGames}`;
@@ -10913,6 +11496,7 @@ function goHome() {
   const allBtn = document.querySelector('.filter-btn[data-filter="all"]');
   if (allBtn) allBtn.classList.add("active");
   currentFilter = "all";
+  currentGenreView = null;
   currentPage = 0;
   renderGrid();
   const wrapper = document.querySelector(".content-wrapper");
@@ -10952,6 +11536,54 @@ document.getElementById("commentInput").addEventListener("input", (e) => {
     commentBtnRow.style.display = "none";
   }
 });
+function searchByGenre(genre) {
+  if (!genre) return;
+  closeOverlay();
+  openSearchOverlay();
+  const inp = document.getElementById("searchOverlayInput");
+  inp.value = genre;
+  renderSearchOverlayResults();
+}
+function renderRelatedGames(id, game) {
+  const section = document.getElementById("relatedSection");
+  const scroll = document.getElementById("relatedScroll");
+  if (!section || !scroll) return;
+  scroll.innerHTML = "";
+  section.style.display = "none";
+  const split = (str) => String(str || "").split(/[,\/|;\u2022]+/).map((g) => normalizeText(g)).filter(Boolean);
+  const mine = split(game.genero);
+  if (!mine.length) return;
+  const related = Object.entries(allGames || {}).filter(([gid]) => gid !== id).map(([gid, g]) => {
+    const shared = split(g.genero).filter((t) => mine.includes(t)).length;
+    return { id: gid, g, shared };
+  }).filter((r) => r.shared > 0).sort((a, b) => b.shared - a.shared || (b.g.downloads || 0) - (a.g.downloads || 0)).slice(0, 10);
+  if (!related.length) return;
+  const typeLabels = { aplicativos: "APLICATIVOS", jogos: "JOGOS", tutoriais: "TUTORIAIS", pc: "PC", outros: "OUTROS" };
+  scroll.innerHTML = related.map(({ id: gid, g }) => `
+        <div class="card related-card" data-gid="${escapeHtml(gid)}">
+          <div class="card-img-container">
+            <img src="${escapeHtml(g.poster || "logo.png")}" alt="${escapeHtml(g.titulo || "")}" loading="lazy" onload="this.classList.add('loaded')" onerror="this.onerror=null;this.classList.add('loaded','img-error');this.src='logo.png'">
+            <div class="card-type type-${escapeHtml(g.type || "outros")}">${typeLabels[g.type] || escapeHtml(g.type || "")}</div>
+          </div>
+          <div class="card-info">
+            <div class="card-title">${escapeHtml(g.titulo || "")}</div>
+            <div class="card-meta">
+              <span>${escapeHtml(String(g.size || "N/A"))}</span>
+              <span>\u2022</span>
+              <span><svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/></svg>${g.downloads || 0}</span>
+            </div>
+          </div>
+        </div>`).join("");
+  scroll.scrollLeft = 0;
+  scroll.querySelectorAll(".related-card").forEach((el) => {
+    el.addEventListener("click", () => {
+      openGameDetail(el.dataset.gid);
+      const ov = document.getElementById("overlay");
+      if (ov) ov.scrollTop = 0;
+    });
+  });
+  section.style.display = "block";
+}
 async function openGameDetail(id, skipPushState) {
   const game = allGames[id];
   if (!game) return;
@@ -10964,26 +11596,48 @@ async function openGameDetail(id, skipPushState) {
   }
   document.getElementById("contentHeaderTitle").textContent = game.titulo;
   document.getElementById("modalTitle").textContent = game.titulo;
+  const _heroPoster = game.poster || "logo.png";
+  const _coverImg = document.getElementById("modalCover");
+  _coverImg.onerror = function () {
+    this.onerror = null;
+    this.src = "logo.png";
+  };
+  _coverImg.alt = game.titulo || "";
+  _coverImg.src = _heroPoster;
+  document.getElementById("modalHeroBg").style.backgroundImage = "url(" + JSON.stringify(_heroPoster) + ")";
+  const _genres = String(game.genero || "").split(/[,\/|;\u2022]+/).map((g) => g.trim()).filter(Boolean).slice(0, 3);
+  renderRelatedGames(id, game);
+  document.getElementById("modalGenres").innerHTML = _genres.map((g) => `<button type="button" class="modal-genre-chip" data-genre="${escapeHtml(g)}" onclick="searchByGenre(this.dataset.genre)" title="Pesquisar ${escapeHtml(g)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/></svg>${escapeHtml(g)}</button>`).join("");
+  const _fmtStat = (v) => {
+    const n = Number(v);
+    if (!isFinite(n)) return escapeHtml(String(v));
+    try {
+      return new Intl.NumberFormat("pt-PT", { notation: "compact", maximumFractionDigits: 1 }).format(n);
+    } catch (e) {
+      return String(n);
+    }
+  };
+  const _cost = game.cost || 0;
   document.getElementById("modalMeta").innerHTML = `
-        <div class="modal-meta-item">
-          <span class="modal-meta-label">Tamanho:</span>
-          <span>${game.size}</span>
+        <div class="modal-meta-item" title="Tamanho" style="--c:var(--accent-primary)">
+          <span class="stat-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 20h20v-4H2v4zm2-3h2v2H4v-2zM2 4v4h20V4H2zm4 3H4V5h2v2zm-4 7h20v-4H2v4zm2-3h2v2H4v-2z"/></svg></span>
+          <span class="stat-val">${escapeHtml(String(game.size || "\u2014"))}</span>
+          <span class="stat-lbl">Tamanho</span>
         </div>
-        <div class="modal-meta-item">
-          <span class="modal-meta-label">G\xEAnero:</span>
-          <span>${game.genero}</span>
+        <div class="modal-meta-item" title="Downloads" style="--c:var(--accent-primary)">
+          <span class="stat-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg></span>
+          <span class="stat-val">${_fmtStat(game.downloads || 0)}</span>
+          <span class="stat-lbl">Downloads</span>
         </div>
-        <div class="modal-meta-item">
-          <span class="modal-meta-label">Downloads:</span>
-          <span>${game.downloads || 0}</span>
+        <div class="modal-meta-item" title="Curtidas" style="--c:#EC4899">
+          <span class="stat-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></span>
+          <span class="stat-val" id="likeCountMeta">0</span>
+          <span class="stat-lbl">Curtidas</span>
         </div>
-        <div class="modal-meta-item">
-          <span class="modal-meta-label">Curtidas:</span>
-          <span id="likeCountMeta">0</span>
-        </div>
-        <div class="modal-meta-item">
-          <span class="modal-meta-label">Custo:</span>
-          <span>${game.cost || 0} pontos</span>
+        <div class="modal-meta-item" title="Custo em pontos" style="--c:#F59E0B">
+          <span class="stat-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/></svg></span>
+          <span class="stat-val">${_cost > 0 ? _fmtStat(_cost) : "Gr\xE1tis"}</span>
+          <span class="stat-lbl">${_cost > 0 ? "Pontos" : "Custo"}</span>
         </div>
       `;
   document.getElementById("modalDescription").textContent = game.descricao;
@@ -12074,7 +12728,9 @@ function renderSearchOverlayResults() {
     noResults.style.display = "block";
     return;
   }
-  grid.style.display = "grid";
+  const listMode = gridViewMode === "blog";
+  grid.style.display = listMode ? "flex" : "grid";
+  grid.classList.toggle("blog-view", listMode);
   noResults.style.display = "none";
   const typeLabels = {
     aplicativos: "APLICATIVOS",
@@ -12084,6 +12740,10 @@ function renderSearchOverlayResults() {
     outros: "OUTROS"
   };
   filtered.forEach((game, index) => {
+    if (listMode) {
+      grid.appendChild(buildBlogCardEl(game, index, typeLabels, closeSearchOverlay));
+      return;
+    }
     const card = document.createElement("div");
     card.className = "card";
     card.style.animationDelay = `${index * 0.05}s`;
@@ -14288,7 +14948,6 @@ async function pdEnhanceProfile(container, user, createdAtMs, pre) {
     const fill = container.querySelector("#pdpXpFill");
     if (fill) setTimeout(() => { fill.style.width = nv.pct + "%"; }, 60);
 
-    // "container" aqui é o stage temporário (esvaziado depois do replaceChildren); usa o pai vivo do card
     const raiz = () => (card && card.parentNode) || container;
     const marcar = (sel, attr, val) => raiz().querySelectorAll(sel).forEach((el) => el.classList.toggle("sel", el.getAttribute(attr) === val));
     const cfg = pdpCfg(uid);
@@ -16286,18 +16945,23 @@ document.addEventListener("click", (e) => {
   }
 });
 const sidebar = document.getElementById("sidebar");
+if (!document.getElementById("sidebarBackdrop")) {
+  sidebar.insertAdjacentHTML("afterend", '<div id="sidebarBackdrop" class="sidebar-backdrop" onclick="closeSidebar()"></div>');
+}
 let startX = 0;
 let endX = 0;
 let startY = 0;
 let endY = 0;
 sidebar.addEventListener("touchstart", (e) => {
   startX = e.touches[0].clientX;
+  endX = startX;
 });
 sidebar.addEventListener("touchmove", (e) => {
   endX = e.touches[0].clientX;
 });
 sidebar.addEventListener("touchend", () => {
   const diffX = endX - startX;
+  endX = startX;
   if (diffX < -50) {
     sidebar.classList.remove("open");
   }
@@ -16305,6 +16969,8 @@ sidebar.addEventListener("touchend", () => {
 document.addEventListener("touchstart", (e) => {
   startX = e.touches[0].clientX;
   startY = e.touches[0].clientY;
+  endX = startX;
+  endY = startY;
 });
 document.addEventListener("touchmove", (e) => {
   endX = e.touches[0].clientX;
