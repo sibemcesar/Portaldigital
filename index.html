@@ -16646,6 +16646,31 @@ function pdpIc(nome, tam, cor) {
 }
 function pdpCfg(uid) { try { return JSON.parse(localStorage.getItem("pdp_cfg_" + uid) || "{}") || {}; } catch (e) { return {}; } }
 function pdpSalvarCfg(uid, c) { try { localStorage.setItem("pdp_cfg_" + uid, JSON.stringify(c)); } catch (e) {} }
+// O localStorage é só cache: a fonte da verdade é publicProfiles/<uid> no Firebase.
+const __pdpSync = {};
+function pdpSyncFromDb(uid) {
+  if (!uid) return Promise.resolve(false);
+  if (__pdpSync[uid]) return __pdpSync[uid];
+  __pdpSync[uid] = (async () => {
+    try {
+      const { ref, get } = window.firebaseModules;
+      const s = await get(ref(window.firebaseDatabase, "publicProfiles/" + uid));
+      if (!s.exists()) return true;
+      const r = s.val() || {};
+      const patch = {};
+      if (typeof r.username === "string" && r.username) patch.user = r.username;
+      if (typeof r.bio === "string" && r.bio) patch.bio = r.bio;
+      if (typeof r.capa === "string" && r.capa) patch.capa = r.capa;
+      if (typeof r.moldura === "string" && r.moldura) patch.moldura = r.moldura;
+      if (Object.keys(patch).length) pdpSalvarCfg(uid, Object.assign(pdpCfg(uid), patch));
+      return true;
+    } catch (e) {
+      delete __pdpSync[uid]; // tenta de novo mais tarde (ex.: conta ainda não verificada)
+      return false;
+    }
+  })();
+  return __pdpSync[uid];
+}
 function pdpDiaKey(ts) {
   const d = new Date(ts);
   return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
@@ -16733,6 +16758,7 @@ function pdPrefetch(user) {
 async function pdEnhanceProfile(container, user, createdAtMs, pre) {
   try {
     const uid = user.uid;
+    await pdpSyncFromDb(uid);
     const dados = await (pre || pdPrefetch(user));
     if (dados.last) pdpRegistrarDia(dados.last, uid);
     const claims = dados.claims || [];
@@ -21967,6 +21993,7 @@ async function ppPublish() {
     };
     if (createdAt && !isNaN(Number(createdAt))) base.createdAt = Number(createdAt);
     const snap = window.__ppSnap;
+    await pdpSyncFromDb(user.uid);
     const cfg = pdpCfg(user.uid);
     Object.assign(base, {
       username: cfg.user || "",
@@ -22110,11 +22137,12 @@ function ppAvatarChanged() {
     if (d) d.textContent = ppNudgeText(u.uid);
   });
 }
-function ppMaybePromptSetup() {
+async function ppMaybePromptSetup() {
   const u = currentUser;
   if (!u || u.isAnonymous || !reqIsVerified()) return;
   const ov = document.getElementById("requestsOverlay");
   if (!ov || !ov.classList.contains("active")) return;
+  await pdpSyncFromDb(u.uid);
   if (!ppProfileIncomplete(u.uid)) return;
   const st = ppSetupState(u.uid);
   if ((st.n || 0) >= 3 || Date.now() - (st.t || 0) < 864e5) return;
@@ -22123,9 +22151,10 @@ function ppMaybePromptSetup() {
 function ppSetupCount() {
   document.getElementById("ppSetupCount").textContent = document.getElementById("ppSetupBio").value.length + "/100";
 }
-function ppOpenSetup() {
+async function ppOpenSetup() {
   const u = currentUser;
   if (!u || u.isAnonymous) return;
+  await pdpSyncFromDb(u.uid);
   const c = pdpCfg(u.uid);
   document.getElementById("ppSetupUser").value = c.user || "";
   document.getElementById("ppSetupBio").value = c.bio || "";
