@@ -37,7 +37,7 @@ if (!isWebView()) {
 
   <script type="module">import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously, onAuthStateChanged, signOut, sendPasswordResetEmail, updateProfile, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getDatabase, ref, set, get, update, remove, onValue, push, limitToLast, query as rtdbQuery, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getDatabase, ref, set, get, update, remove, onValue, push, limitToLast, query as rtdbQuery, orderByChild, equalTo, serverTimestamp as rtdbServerTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc, query, where, orderBy, limit, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 const firebaseConfig = {
   apiKey: "AIzaSyBgEfuLNpU5j9EIcvQ9Qs_reEvtXGPIbO0",
@@ -77,6 +77,7 @@ window.firebaseModules = {
   rtdbQuery,
   orderByChild,
   equalTo,
+  rtdbServerTimestamp,
   collection,
   doc,
   getDoc,
@@ -590,7 +591,7 @@ window.firebaseModules = {
       50% { opacity: 0.55; transform: scale(0.94); }
     }
 
-        .bottom-nav-item.bottom-nav-center { gap: 2px; overflow: visible; }
+    .bottom-nav-item.bottom-nav-center { gap: 2px; overflow: visible; }
     .bottom-nav-item.bottom-nav-center span { line-height: 12px; }
     .bottom-nav-item.bottom-nav-center:active { opacity: 1; }
     .bottom-nav-center .nav-center-circle {
@@ -614,67 +615,89 @@ window.firebaseModules = {
     }
     .bottom-nav-center:active .nav-center-circle { transform: scale(0.92); }
 
-        .req-tabs, .req-types { display: flex; gap: 8px; overflow-x: auto; flex-shrink: 0; -webkit-overflow-scrolling: touch; }
-    .req-tabs { padding: 12px 16px 0; }
-    .req-tabs::-webkit-scrollbar, .req-types::-webkit-scrollbar { display: none; }
-    .req-tab {
-      flex-shrink: 0;
-      padding: 7px 14px;
-      border-radius: 999px;
-      border: 1px solid var(--border-color);
-      background: var(--bg-secondary);
-      color: var(--text-secondary);
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .req-tab.active { background: var(--accent-primary); border-color: var(--accent-primary); color: var(--bg-primary); }
-    .req-card {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .req-card.done { opacity: 0.8; }
-    .req-card-top { display: flex; align-items: center; gap: 10px; }
-    .req-avatar {
-      width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; overflow: hidden;
-      background: var(--bg-primary); display: flex; align-items: center; justify-content: center;
-    }
-    .req-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .req-avatar svg { width: 20px; height: 20px; fill: var(--text-muted); }
-    .req-meta { flex: 1; min-width: 0; }
-    .req-author { font-size: 14px; font-weight: 600; color: var(--text-primary); line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .req-time { font-size: 11.5px; color: var(--text-muted); }
-    .req-tipo { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: rgba(29, 78, 216, 0.12); color: var(--accent-primary); flex-shrink: 0; }
-    .req-text { font-size: 15px; line-height: 1.5; color: var(--text-primary); white-space: pre-wrap; word-break: break-word; }
-    .req-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-    .req-status { font-size: 12px; font-weight: 700; color: var(--text-muted); }
-    .req-status.done { color: #10b981; }
-    .req-actions { display: flex; gap: 8px; }
-    .req-action-btn {
-      border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-secondary);
-      border-radius: 8px; padding: 6px 10px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer;
-    }
-    .req-action-btn.danger { color: #ef4444; }
-    .req-compose {
-      flex-shrink: 0; display: flex; flex-direction: column; gap: 10px;
-      padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
-      background: var(--bg-primary); border-top: 1px solid var(--border-color);
-    }
-    .req-compose-row { display: flex; gap: 10px; align-items: flex-end; }
-    .req-compose-row .comment-input { flex: 1; }
-    .req-counter { font-size: 11px; color: var(--text-muted); text-align: right; margin-top: -4px; }
+    .req-hero { flex-shrink: 0; margin: 12px 16px 0; padding: 16px; border-radius: 20px; color: #fff; background: linear-gradient(135deg, #1D4ED8 0%, #7c3aed 100%); display: flex; align-items: center; gap: 14px; position: relative; overflow: hidden; box-shadow: 0 8px 20px rgba(29, 78, 216, 0.25); }
+    .req-hero::after { content: ""; position: absolute; right: -30px; top: -44px; width: 124px; height: 124px; border-radius: 50%; background: rgba(255, 255, 255, 0.12); }
+    .req-hero-txt { flex: 1; min-width: 0; position: relative; z-index: 1; }
+    .req-hero-txt strong { display: block; font-size: 16px; font-weight: 700; margin-bottom: 3px; }
+    .req-hero-txt span { font-size: 12.5px; line-height: 1.35; opacity: 0.92; }
+    .req-hero-stats { display: flex; gap: 8px; position: relative; z-index: 1; }
+    .req-stat { min-width: 60px; text-align: center; padding: 8px 10px; border-radius: 14px; background: rgba(255, 255, 255, 0.18); }
+    .req-stat b { display: block; font-size: 19px; font-weight: 800; line-height: 1.1; }
+    .req-stat small { font-size: 10.5px; font-weight: 600; opacity: 0.92; }
 
-        .view-user-profile-overlay.pp-overlay { z-index: 3200; }
+    .req-tabs, .req-types { display: flex; overflow-x: auto; flex-shrink: 0; -webkit-overflow-scrolling: touch; }
+    .req-tabs::-webkit-scrollbar, .req-types::-webkit-scrollbar { display: none; }
+    .req-tab { border: none; background: none; font-family: 'Inter', sans-serif; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    .req-tabs { margin: 12px 16px 0; padding: 4px; gap: 4px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 14px; }
+    .req-tabs .req-tab { flex: 1; min-width: 0; padding: 8px 4px; border-radius: 10px; font-size: 12.5px; font-weight: 600; color: var(--text-secondary); white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; gap: 5px; transition: background .2s, color .2s; }
+    .req-tabs .req-tab.active { background: var(--bg-card); color: var(--accent-primary); box-shadow: 0 1px 6px rgba(0, 0, 0, 0.14); }
+    .req-count { font-style: normal; font-size: 10.5px; font-weight: 700; min-width: 18px; padding: 1px 5px; border-radius: 99px; background: rgba(128, 128, 128, 0.2); color: var(--text-secondary); }
+    .req-tab.active .req-count { background: var(--accent-primary); color: var(--bg-primary); }
+
+    .t-jogo { --tc: #7c3aed; --tb: rgba(124, 58, 237, 0.14); }
+    .t-app { --tc: #0284c7; --tb: rgba(2, 132, 199, 0.14); }
+    .t-tutorial { --tc: #d97706; --tb: rgba(217, 119, 6, 0.15); }
+    .t-outro { --tc: #059669; --tb: rgba(5, 150, 105, 0.14); }
+    .dark .t-jogo { --tc: #a78bfa; --tb: rgba(167, 139, 250, 0.18); }
+    .dark .t-app { --tc: #38bdf8; --tb: rgba(56, 189, 248, 0.18); }
+    .dark .t-tutorial { --tc: #fbbf24; --tb: rgba(251, 191, 36, 0.18); }
+    .dark .t-outro { --tc: #34d399; --tb: rgba(52, 211, 153, 0.18); }
+
+    .req-card { position: relative; overflow: hidden; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 18px; padding: 14px 14px 12px 18px; display: flex; flex-direction: column; gap: 10px; box-shadow: var(--shadow-sm); }
+    .req-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--tc, var(--accent-primary)); }
+    .req-card.req-new { animation: reqIn .35s ease both; }
+    @keyframes reqIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+    @media (prefers-reduced-motion: reduce) { .req-card.req-new { animation: none; } }
+    .req-card-top { display: flex; align-items: center; gap: 10px; }
+    .req-avatar { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; overflow: hidden; background: var(--bg-secondary); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 2px var(--bg-card), 0 0 0 4px var(--tc, var(--accent-primary)); margin: 2px 2px 2px 3px; }
+    .req-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .req-avatar svg { width: 22px; height: 22px; fill: var(--text-muted); }
+    .req-meta { flex: 1; min-width: 0; }
+    .req-author { font-size: 14px; font-weight: 700; color: var(--text-primary); line-height: 1.25; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .req-time { font-size: 11.5px; color: var(--text-muted); margin-top: 1px; }
+    .req-status { flex-shrink: 0; display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: rgba(245, 158, 11, 0.16); color: #b45309; }
+    .req-status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .req-status.done { background: rgba(16, 185, 129, 0.16); color: #047857; }
+    .req-status.done::before { display: none; }
+    .req-status svg { width: 12px; height: 12px; fill: currentColor; }
+    .dark .req-status { color: #fbbf24; }
+    .dark .req-status.done { color: #34d399; }
+    .req-text { font-size: 15px; line-height: 1.55; color: var(--text-primary); white-space: pre-wrap; word-break: break-word; padding: 10px 12px; border-radius: 12px; background: var(--bg-secondary); }
+    .req-card.done .req-text { color: var(--text-secondary); }
+    .req-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+    .req-tipo { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; padding: 4px 10px 4px 8px; border-radius: 999px; background: var(--tb, rgba(29, 78, 216, 0.12)); color: var(--tc, var(--accent-primary)); }
+    .req-tipo svg, .req-types .req-tab svg { width: 15px; height: 15px; fill: currentColor; flex-shrink: 0; }
+    .req-actions { display: flex; gap: 6px; margin-left: auto; }
+    .req-action-btn { border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-secondary); border-radius: 999px; padding: 6px 12px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    .req-action-btn:active { transform: scale(0.96); }
+    .req-action-btn.ok { color: #047857; border-color: rgba(16, 185, 129, 0.45); background: rgba(16, 185, 129, 0.1); }
+    .dark .req-action-btn.ok { color: #34d399; }
+    .req-action-btn.danger { color: #ef4444; border-color: rgba(239, 68, 68, 0.35); background: rgba(239, 68, 68, 0.08); }
+
+    .req-empty { margin: auto; text-align: center; padding: 40px 24px; color: var(--text-secondary); }
+    .req-empty-ic { width: 76px; height: 76px; margin: 0 auto 14px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--bg-secondary); border: 1px dashed var(--border-color); }
+    .req-empty-ic svg { width: 36px; height: 36px; fill: var(--text-muted); }
+    .req-empty h3 { font-size: 17px; color: var(--text-primary); margin-bottom: 6px; }
+    .req-empty p { font-size: 14px; line-height: 1.45; }
+
+    .req-compose { flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px)); background: var(--bg-primary); border-top: 1px solid var(--border-color); box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.06); }
+    .req-types { gap: 8px; }
+    .req-types .req-tab { flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; border-radius: 999px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-secondary); font-size: 13px; font-weight: 600; transition: all .2s; }
+    .req-types .req-tab.active { border-color: var(--tc); background: var(--tb); color: var(--tc); }
+    .req-compose-row { display: flex; gap: 8px; align-items: flex-end; padding: 6px 6px 6px 14px; background: var(--bg-secondary); border: 1.5px solid var(--border-color); border-radius: 24px; transition: border-color .2s; }
+    .req-compose-row:focus-within { border-color: var(--accent-primary); }
+    .req-compose-row .comment-input { flex: 1; min-height: 38px; padding: 8px 0; background: transparent; border: none; border-radius: 0; }
+    .req-compose-row .comment-input:focus { border: none; }
+    .req-compose-row .comment-btn { width: 42px; height: 42px; min-width: 42px; background: linear-gradient(135deg, #1D4ED8, #7c3aed); color: #fff; }
+    .req-counter { font-size: 11px; color: var(--text-muted); text-align: right; margin-top: -4px; padding-right: 6px; }
+
+    .view-user-profile-overlay.pp-overlay { z-index: 3200; }
     .req-click { cursor: pointer; }
     #publicProfileBody > * { flex-shrink: 0; }
     .pp-field { margin-bottom: 12px; }
     .pp-field label { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+    #ppSetupPhotoPreview { width: 56px; height: 56px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: var(--bg-card); border: 1px solid var(--border-color); }
+    #ppSetupPhotoPreview svg, #ppSetupPhotoPreview img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .pp-nudge { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; border-color: var(--accent-primary); }
     .pp-nudge-t { font-size: 15px; font-weight: 700; color: var(--text-primary); }
     .pp-nudge-d { font-size: 13px; color: var(--text-secondary); line-height: 1.4; }
@@ -7464,6 +7487,20 @@ window.firebaseModules = {
       transform: translateY(0);
     }
 
+    .notifications-footer {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .notifications-footer-btn.danger {
+      background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+    }
+
+    .notifications-footer-btn.danger:hover {
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+    }
+
     .favorites-overlay {
       display: flex;
       position: fixed;
@@ -7534,6 +7571,150 @@ window.firebaseModules = {
       padding: 10px 16px;
       border-radius: 10px;
     }
+
+
+    .notifications-list-container { min-height: 0; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+    .pn-card {
+      flex: 0 0 auto;
+      position: relative;
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 6px 14px;
+      padding: 16px;
+      border-radius: 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      box-shadow: 0 1px 2px rgba(0,0,0,.04);
+      overflow: hidden;
+      animation: pn-in .42s cubic-bezier(.2,.8,.2,1) both;
+      animation-delay: calc(var(--i, 0) * 55ms);
+    }
+    @keyframes pn-in { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
+    .pn-card.pn-unread { border-color: rgba(59,130,246,.45); box-shadow: 0 6px 22px -8px rgba(59,130,246,.35); }
+    .pn-card.pn-read { opacity: .78; }
+    .pn-ico {
+      width: 44px; height: 44px; border-radius: 14px;
+      display: grid; place-items: center;
+      background: rgba(59,130,246,.14); color: #3b82f6;
+      position: relative;
+    }
+    .pn-ico svg { width: 22px; height: 22px; fill: currentColor; }
+    .pn-unread .pn-ico::after {
+      content: ""; position: absolute; top: -3px; right: -3px;
+      width: 11px; height: 11px; border-radius: 50%;
+      background: #ef4444; border: 2px solid var(--bg-card);
+    }
+    .pn-transfer .pn-ico { background: rgba(16,185,129,.15); color: #10b981; }
+    .pn-body { min-width: 0; }
+    .pn-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .pn-title { font-size: 16px; font-weight: 700; line-height: 1.3; color: var(--text-primary); word-break: break-word; }
+    .pn-time { font-size: 12px; color: var(--text-muted); white-space: nowrap; padding-top: 3px; }
+    .pn-pill {
+      display: inline-block; margin-left: 6px; vertical-align: 2px;
+      font-size: 10.5px; font-weight: 700; letter-spacing: .02em;
+      padding: 2px 8px; border-radius: 999px;
+      background: rgba(168,85,247,.16); color: #a855f7;
+    }
+    .pn-msg { margin-top: 6px; font-size: 14.5px; line-height: 1.55; color: var(--text-secondary); white-space: pre-wrap; word-break: break-word; }
+    .pn-msg a.notification-link { color: #3b82f6; text-decoration: underline; word-break: break-all; }
+    .pn-foot { grid-column: 1 / -1; display: flex; gap: 8px; justify-content: flex-end; margin-top: 6px; }
+    .pn-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      border: 0; cursor: pointer; font: inherit; font-size: 12.5px; font-weight: 600;
+      padding: 7px 12px; border-radius: 999px;
+      background: var(--bg-secondary); color: var(--text-secondary);
+      transition: transform .15s ease, background .2s ease;
+    }
+    .pn-chip svg { width: 15px; height: 15px; fill: currentColor; }
+    .pn-chip:active { transform: scale(.95); }
+    .pn-chip.pn-del:hover { background: rgba(239,68,68,.14); color: #ef4444; }
+    .pn-chip.pn-ok:hover { background: rgba(59,130,246,.14); color: #3b82f6; }
+
+    .pn-card.pn-points {
+      display: block; padding: 0; border: 0; color: #fff;
+      background: linear-gradient(135deg, #7c3aed 0%, #db2777 55%, #f59e0b 120%);
+      box-shadow: 0 14px 34px -12px rgba(219,39,119,.55);
+    }
+    .pn-card.pn-points.pn-read { opacity: .85; filter: saturate(.8); }
+    .pn-card.pn-points::before, .pn-card.pn-points::after {
+      content: ""; position: absolute; border-radius: 50%; pointer-events: none;
+      background: rgba(255,255,255,.12);
+    }
+    .pn-card.pn-points::before { width: 190px; height: 190px; right: -70px; top: -80px; }
+    .pn-card.pn-points::after { width: 120px; height: 120px; left: -40px; bottom: -60px; }
+    .pn-pts-in { position: relative; z-index: 1; padding: 18px 18px 16px; }
+    .pn-pts-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .92; }
+    .pn-pts-head span:first-child { display: inline-flex; align-items: center; gap: 7px; }
+    .pn-pts-head svg { width: 18px; height: 18px; fill: currentColor; }
+    .pn-pts-head .pn-time { color: rgba(255,255,255,.8); text-transform: none; letter-spacing: 0; font-weight: 500; }
+    .pn-pts-new { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #fde047; box-shadow: 0 0 0 4px rgba(253,224,71,.3); margin-right: 2px; }
+    .pn-pts-amount { margin: 14px 0 2px; display: flex; align-items: baseline; gap: 8px; }
+    .pn-pts-amount b { font-size: 54px; line-height: 1; font-weight: 800; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+    .pn-pts-amount small { font-size: 16px; font-weight: 600; opacity: .9; }
+    .pn-pts-sub { font-size: 14px; opacity: .92; }
+    .pn-code {
+      margin-top: 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 10px 12px; border-radius: 14px; background: rgba(0,0,0,.22);
+      border: 1px dashed rgba(255,255,255,.45);
+      font-size: 12px;
+    }
+    .pn-code em { font-style: normal; opacity: .8; }
+    .pn-code code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 14px; letter-spacing: .08em; }
+    .pn-pts-actions { margin-top: 14px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 10px; }
+    .pn-btn { white-space: nowrap; padding-left: 8px; padding-right: 8px; }
+    .pn-btn {
+      border: 0; cursor: pointer; font: inherit; font-weight: 700; font-size: 14px;
+      padding: 13px 12px; border-radius: 14px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      transition: transform .15s ease, opacity .2s ease;
+    }
+    .pn-btn svg { width: 18px; height: 18px; fill: currentColor; }
+    .pn-btn:active { transform: scale(.96); }
+    .pn-btn:disabled { opacity: .6; cursor: default; }
+    .pn-btn.pn-main { background: #fff; color: #be185d; box-shadow: 0 6px 16px -6px rgba(0,0,0,.4); }
+    .pn-btn.pn-ghost { background: rgba(255,255,255,.2); color: #fff; backdrop-filter: blur(4px); }
+    .pn-pts-foot { margin-top: 12px; display: flex; justify-content: flex-end; gap: 6px; }
+    .pn-pts-foot .pn-chip { background: rgba(255,255,255,.16); color: #fff; }
+    .pn-pts-foot .pn-chip:hover { background: rgba(255,255,255,.28); color: #fff; }
+    .cv-section { display: flex; flex-direction: column; gap: 12px; }
+    .cv-head h4 { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+    .cv-head p { font-size: 13px; line-height: 1.45; color: var(--text-secondary); margin-top: 2px; }
+    .cv-list { display: flex; flex-direction: column; gap: 16px; }
+    .cv-empty { text-align: center; font-size: 13.5px; color: var(--text-muted); padding: 18px 0; }
+    .cv-val { display: inline-flex; align-items: center; gap: 8px; margin-top: 6px; padding: 6px 12px; border-radius: 999px; background: rgba(0,0,0,.22); font-size: 14px; }
+    .cv-val strong { font-size: 16px; font-weight: 800; }
+    .cv-sep { position: relative; margin: 16px -18px 14px; border-top: 2px dashed rgba(255,255,255,.4); }
+    .cv-sep::before, .cv-sep::after { content: ""; position: absolute; top: -12px; width: 22px; height: 22px; border-radius: 50%; background: var(--bg-primary); }
+    .cv-sep::before { left: -11px; }
+    .cv-sep::after { right: -11px; }
+    .cv-card .pn-code code { font-size: 18px; letter-spacing: .1em; font-weight: 700; }
+    .cv-actions { margin-top: 14px; }
+    .cv-actions .pn-btn { width: 100%; }
+    .cv-filter { display: flex; flex-direction: column; gap: 10px; padding: 14px; border-radius: 16px; background: var(--bg-secondary, rgba(255,255,255,.06)); border: 1px solid var(--border-color, rgba(128,128,128,.25)); }
+    .cv-filter-top { display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 700; color: var(--text-primary); }
+    .cv-filter-top svg { color: #be185d; }
+    .cv-seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 4px; border-radius: 12px; background: rgba(128,128,128,.16); }
+    .cv-seg button { border: 0; padding: 9px 6px; border-radius: 9px; background: transparent; color: var(--text-secondary); font-size: 13.5px; font-weight: 600; cursor: pointer; transition: background .2s, color .2s, transform .1s; }
+    .cv-seg button:active { transform: scale(.96); }
+    .cv-seg button.active { background: linear-gradient(135deg, #be185d, #ec4899); color: #fff; box-shadow: 0 4px 12px -4px rgba(190,24,93,.6); }
+    .cv-filter-val { display: flex; align-items: center; gap: 8px; padding: 0 12px; border-radius: 12px; border: 1.5px solid #be185d; background: var(--bg-primary, transparent); animation: cvFade .2s ease; }
+    .cv-filter-val input { flex: 1; min-width: 0; padding: 11px 0; border: 0; outline: 0; background: transparent; color: var(--text-primary); font-size: 16px; font-weight: 700; }
+    .cv-filter-val em { font-style: normal; font-size: 13px; font-weight: 700; color: #be185d; }
+    @keyframes cvFade { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+    .cv-busy { position: fixed; inset: 0; z-index: 100000; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,.55); backdrop-filter: blur(3px); }
+    .cv-busy.active { display: flex; }
+    .cv-busy-box { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 26px 32px; border-radius: 18px; background: var(--bg-secondary, #1f1f1f); color: var(--text-primary, #fff); box-shadow: 0 20px 50px -10px rgba(0,0,0,.6); text-align: center; }
+    .cv-busy-txt { font-size: 15px; font-weight: 700; }
+    .cv-busy-box small { font-size: 12.5px; color: var(--text-secondary, #aaa); }
+    .cv-spin { width: 46px; height: 46px; border-radius: 50%; border: 4px solid rgba(190,24,93,.25); border-top-color: #be185d; animation: cvSpin .8s linear infinite; }
+    @keyframes cvSpin { to { transform: rotate(360deg); } }
+    .cv-badge { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; padding: 4px 10px; border-radius: 999px; background: rgba(0,0,0,.28); font-size: 12px; font-weight: 700; word-break: break-all; }
+    .cv-badge.used { background: rgba(0,0,0,.45); }
+    .cv-card.cv-used { filter: saturate(.35) brightness(.85); }
+    .cv-card .pn-btn.pn-ghost { margin-top: 8px; }
+    .cv-rel-input { width: 100%; padding: 10px 12px; margin: 0 0 14px; border-radius: 10px; border: 1px solid var(--border-color, #ccc); background: var(--bg-secondary, #fff); color: var(--text-primary); font-size: 15px; box-sizing: border-box; }
+    @media (max-width: 360px) { .pn-pts-actions { grid-template-columns: 1fr; } .pn-pts-amount b { font-size: 46px; } }
+    @media (prefers-reduced-motion: reduce) { .pn-card { animation: none; } }
 
     .send-notification-overlay {
       display: none;
@@ -8255,6 +8436,88 @@ window.firebaseModules = {
     }
     .pdad-gate-btn:active { background: #1E40AF; }
     .pdad-gate-btn:disabled { background: #d1d5db; color: #6b7280; cursor: default; }
+    .pdad-gate-link {
+      display: block;
+      width: 100%;
+      margin-top: 10px;
+      padding: 8px;
+      background: none;
+      border: none;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: #2563EB;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .afree-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 10200;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.55);
+    }
+    .afree-overlay.active { display: flex; }
+    .afree-sheet {
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border-radius: 18px 18px 0 0;
+      padding: 20px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+      box-sizing: border-box;
+    }
+    .afree-title { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .afree-sub { font-size: 13px; color: var(--text-secondary); line-height: 1.45; margin: 0 0 14px; }
+    .afree-balance { font-size: 13px; color: var(--text-secondary); margin: 0 0 12px; }
+    .afree-balance b { color: var(--text-primary); }
+    .afree-plan {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 14px;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      font-family: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+    .afree-plan:active { transform: scale(0.99); }
+    .afree-plan.afree-best { border-color: #2563EB; box-shadow: 0 0 0 1px #2563EB inset; }
+    .afree-plan.afree-off { opacity: 0.5; cursor: default; }
+    .afree-plan-days { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .afree-plan-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+    .afree-plan-cost { font-size: 16px; font-weight: 700; white-space: nowrap; }
+    .afree-tag { font-size: 10px; font-weight: 700; background: #2563EB; color: #fff; padding: 2px 8px; border-radius: 999px; }
+    .afree-note { font-size: 12px; color: #ef4444; margin: 4px 0 10px; min-height: 0; }
+    .afree-row { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border-color); font-size: 14px; }
+    .afree-row span:first-child { color: var(--text-secondary); }
+    .afree-row b { text-align: right; }
+    .afree-warn { font-size: 12px; color: var(--text-secondary); margin: 12px 0 14px; line-height: 1.45; }
+    .afree-actions { display: flex; gap: 10px; }
+    .afree-btn {
+      flex: 1;
+      padding: 13px 14px;
+      border: none;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      background: #2563EB;
+      color: #fff;
+    }
+    .afree-btn.secondary { background: transparent; color: var(--text-primary); border: 1px solid var(--border-color); }
+    .afree-btn:disabled { opacity: 0.6; cursor: default; }
     .pdprep-overlay {
       position: fixed;
       inset: 0;
@@ -8794,7 +9057,7 @@ window.firebaseModules = {
       text-align: center;
     }
 
-        .pq-progress { height: 6px; background: var(--border-color); flex-shrink: 0; }
+    .pq-progress { height: 6px; background: var(--border-color); flex-shrink: 0; }
     .pq-progress > div { height: 100%; width: 0; background: var(--accent-primary); transition: width .25s ease; }
     .pq-stage { flex: 1; overflow-y: auto; padding: 20px 16px; -webkit-overflow-scrolling: touch; }
     .pq-count { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
@@ -8826,7 +9089,7 @@ window.firebaseModules = {
     .pq-invite-actions .custom-modal-btn { width: 100%; }
     .pq-link-btn { background: none; border: none; color: var(--text-muted); font-family: 'Inter', sans-serif; font-size: 13px; cursor: pointer; padding: 8px; }
 
-        .pq-tabs { display: flex; gap: 8px; padding: 12px 16px; background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+    .pq-tabs { display: flex; gap: 8px; padding: 12px 16px; background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
     .pq-tab { flex: 1; padding: 10px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-secondary); font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; cursor: pointer; }
     .pq-tab.active { background: var(--accent-primary); border-color: var(--accent-primary); color: var(--bg-primary); }
     .pq-admin-body { flex: 1; overflow-y: auto; padding: 16px; -webkit-overflow-scrolling: touch; }
@@ -8897,7 +9160,7 @@ window.firebaseModules = {
       </svg>
       Ver
     </button>
-    <div class="header-points-badge profile-header-points" id="headerPointsBadge" onclick="openProfileOverlay()" title="Ver perfil e pontos">
+    <div class="header-points-badge profile-header-points" id="headerPointsBadge" onclick="openRedeemCodeModal()" title="Resgatar pontos">
       <svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/></svg>
       <span id="headerPointsValue">0</span>
     </div>
@@ -8993,6 +9256,11 @@ window.firebaseModules = {
     <button class="btn" id="rewardedAdsBtn" onclick="RewardedAds.abrirPagina()">
       <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
       Ganhar Pontos
+    </button>
+
+    <button class="btn" id="adFreeBtn" onclick="openAdFreeSheet()">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM4 12c0-4.42 3.58-8 8-8 1.85 0 3.55.63 4.9 1.69L5.69 16.9C4.63 15.55 4 13.85 4 12zm8 8c-1.85 0-3.55-.63-4.9-1.69L18.31 7.1C19.37 8.45 20 10.15 20 12c0 4.42-3.58 8-8 8z"/></svg>
+      <span id="adFreeBtnText">Remover Anúncios</span>
     </button>
 
     <button class="btn" onclick="openHistoryModal()">
@@ -9384,6 +9652,7 @@ window.firebaseModules = {
           <div class="pdad-gate-titulo">Conteúdo gratuito</div>
           <div class="pdad-gate-texto">Assista a um anúncio curto para liberar os links de download.</div>
           <button type="button" class="pdad-gate-btn" id="pdAdGateBtn" disabled>⏳ A carregar anúncio...</button>
+          <button type="button" class="pdad-gate-link" onclick="openAdFreeSheet()">Sem anúncios · a partir de 1000 pts</button>
         </div>
         <div id="downloadSectionsContainer"></div>
       </div>
@@ -9730,6 +9999,8 @@ window.firebaseModules = {
         <div class="generate-code-input-section">
           <label>Quantidade de Pontos</label>
           <input type="number" id="codePoints" min="1" value="50" placeholder="Digite a quantidade" required>
+          <label style="margin-top:12px;display:block">Valor do cartão (Kz)</label>
+          <input type="number" id="codeValue" min="1" inputmode="numeric" placeholder="Ex: 500" required>
           <button class="generate-code-btn" onclick="generateCode()">
             <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
             Gerar Código
@@ -9740,7 +10011,7 @@ window.firebaseModules = {
           <h4> Código Gerado com Sucesso!</h4>
           <div id="codeDisplay" class="generated-code-display"></div>
           <p class="generated-code-hint">
-            Compartilhe este código com seus usuários. Cada código pode ser usado apenas uma vez.
+            Compartilhe este código com seus usuários. Cada código pode ser usado apenas uma vez. O cartão já aparece em Resgatar Pontos, com o código oculto, para os usuários comprarem.
           </p>
           <button class="generated-code-copy-btn" onclick="copyGeneratedCode()">
             <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
@@ -9762,11 +10033,14 @@ window.firebaseModules = {
           <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
         </button>
         <h1 class="content-header-title">Resgatar Pontos</h1>
-        <div style="width: 40px;"></div>
+        <button class="content-header-btn" id="redeemToggleBtn" onclick="toggleRedeemForm()" aria-label="Resgatar com código" title="Resgatar com código">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 00-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1z"/></svg>
+        </button>
       </div>
 
       <div class="redeem-container">
         
+<div id="redeemFormWrap" style="display:none">
         <div class="redeem-header-box">
           <div class="icon">🎁</div>
           <h3>Resgate seu Código</h3>
@@ -9775,35 +10049,44 @@ window.firebaseModules = {
 
         <div class="redeem-input-section">
           <label>Código de Resgate</label>
-          <input type="text" id="redeemCodeInput" placeholder="Digite o código aqui" required>
+          <input type="text" id="redeemCodeInput" placeholder="0000 0000 0000" autocomplete="off" enterkeyhint="done" oninput="cvFormatRedeemInput(this)" required>
           <button class="redeem-btn" onclick="redeemCode()">
             <svg viewBox="0 0 24 24"><path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 00-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"/></svg>
             Resgatar Código
           </button>
         </div>
+        </div>
 
-        <div class="buy-points-box">
-          <div class="header">
-            <span class="icon"></span>
-            <h4>Comprar Pontos</h4>
+        <div class="cv-filter">
+          <div class="cv-filter-top">
+            <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/></svg>
+            <span>Filtrar por pontos</span>
           </div>
-          <p>É possível comprar pontos por um preço acessível! Para mais informações, entre em contacto connosco:</p>
+          <div class="cv-seg" id="cvSeg" role="tablist">
+            <button type="button" class="active" data-m="all" onclick="cvSetMode('all')">Todos</button>
+            <button type="button" data-m="above" onclick="cvSetMode('above')">Acima de</button>
+            <button type="button" data-m="below" onclick="cvSetMode('below')">Abaixo de</button>
+          </div>
+          <div class="cv-filter-val" id="cvFilterValBox" style="display:none">
+            <input type="number" id="cvFilterVal" min="1" inputmode="numeric" placeholder="Ex.: 100" oninput="cvApplyFilter()">
+            <em>pts</em>
+          </div>
+        </div>
 
-          <div class="contact-item" style="text-decoration: none; cursor: pointer;" >
-            <span class="icon">📞</span>
-            <div class="info">
-              <div class="label">Unitel</div>
-              <div class="number">932 535 389</div>
-            </div>
+        <div class="cv-section" id="cvMineSection" style="display:none">
+          <div class="cv-head">
+            <h4 id="cvMineTitle">Meus cartões</h4>
+            <p id="cvMineDesc">Cartões liberados para a sua conta depois do pagamento. Toque em Resgatar para receber os pontos.</p>
           </div>
+          <div id="cvMine" class="cv-list"></div>
+        </div>
 
-          <div class="contact-item" style="text-decoration: none; cursor: pointer;" onclick="openLinkInGA('https://wa.me/244955597211')">
-            <span class="icon">💬</span>
-            <div class="info">
-              <div class="label">WhatsApp</div>
-              <div class="number">955 597 211</div>
-            </div>
+        <div class="cv-section">
+          <div class="cv-head">
+            <h4>Cartões disponíveis</h4>
+            <p>Toque em Comprar para pedir um cartão pelo WhatsApp. Depois do pagamento, o cartão fica liberado aqui em "Meus cartões".</p>
           </div>
+          <div id="cvList" class="cv-list"><div class="cv-empty">A carregar cartões...</div></div>
         </div>
       </div>
     </div>
@@ -10076,7 +10359,7 @@ window.firebaseModules = {
     </div>
   </div>
 
-    <div id="surveyInviteModal" class="custom-modal">
+  <div id="surveyInviteModal" class="custom-modal">
     <div class="custom-modal-content pq-invite-content">
       <div class="pq-invite-icon">📝</div>
       <h2>Ajuda-nos a melhorar</h2>
@@ -10090,7 +10373,7 @@ window.firebaseModules = {
     </div>
   </div>
 
-    <div id="surveyOverlay" class="manage-users-overlay">
+  <div id="surveyOverlay" class="manage-users-overlay">
     <div class="manage-users-overlay-content">
       <div class="content-header">
         <button class="content-header-btn back-btn" onclick="closeSurveyOverlay()" aria-label="Fechar">
@@ -10108,7 +10391,7 @@ window.firebaseModules = {
     </div>
   </div>
 
-    <div id="surveyAdminOverlay" class="manage-users-overlay">
+  <div id="surveyAdminOverlay" class="manage-users-overlay">
     <div class="manage-users-overlay-content">
       <div class="content-header">
         <button class="content-header-btn back-btn" onclick="closeSurveyAdmin()">
@@ -10131,7 +10414,7 @@ window.firebaseModules = {
     </div>
   </div>
 
-    <div id="pqQuestionModal" class="custom-modal">
+  <div id="pqQuestionModal" class="custom-modal">
     <div class="custom-modal-content" style="max-width: 450px;">
       <h2 id="pqQFormTitle">Nova pergunta</h2>
       <div class="form-group">
@@ -10261,7 +10544,14 @@ window.firebaseModules = {
   <div id="profileSetupModal" class="custom-modal">
     <div class="custom-modal-content" style="max-width: 380px;">
       <h2 style="margin-top: 0;">Complete o seu perfil</h2>
-      <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.45; margin: 0 0 16px;">Escolha um nome de usuário e escreva uma bio curta. Eles aparecem no seu perfil público, nos pedidos e nos comentários.</p>
+      <p id="ppSetupIntro" style="color: var(--text-secondary); font-size: 14px; line-height: 1.45; margin: 0 0 16px;">Escolha um nome de usuário e escreva uma bio curta. Eles aparecem no seu perfil público, nos pedidos e nos comentários.</p>
+      <div class="pp-field" id="ppSetupPhotoBox" style="display: none;">
+        <label><span>Foto de perfil</span></label>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div id="ppSetupPhotoPreview"></div>
+          <button type="button" class="custom-modal-btn secondary" style="flex: 1; margin: 0;" onclick="updateProfileAvatar()">Adicionar foto</button>
+        </div>
+      </div>
       <div class="pp-field">
         <label for="ppSetupUser">Nome de usuário</label>
         <input id="ppSetupUser" class="comment-input" maxlength="20" placeholder="@seunome" autocomplete="off">
@@ -10353,6 +10643,10 @@ window.firebaseModules = {
         <button class="notifications-footer-btn" onclick="markAllNotificationsAsRead()" id="markAllReadBtn">
           <svg viewBox="0 0 24 24" width="20" height="20" style="fill: currentColor;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
           Marcar todas como lidas
+        </button>
+        <button class="notifications-footer-btn danger" onclick="dismissAllNotifications()" id="deleteAllBtn">
+          <svg viewBox="0 0 24 24" width="20" height="20" style="fill: currentColor;"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+          Apagar todas
         </button>
       </div>
     </div>
@@ -10494,19 +10788,29 @@ window.firebaseModules = {
         <h1 class="content-header-title">Pedidos</h1>
         <div style="width: 40px;"></div>
       </div>
+      <div class="req-hero">
+        <div class="req-hero-txt">
+          <strong>Peça o que você quer ver</strong>
+          <span>Jogos, apps ou tutoriais: diga o que falta no Portal Digital.</span>
+        </div>
+        <div class="req-hero-stats">
+          <div class="req-stat"><b id="reqStatOpen">0</b><small>Abertos</small></div>
+          <div class="req-stat"><b id="reqStatDone">0</b><small>Atendidos</small></div>
+        </div>
+      </div>
       <div class="req-tabs" id="reqTabs">
-        <button class="req-tab active" data-f="todos" onclick="setRequestsFilter('todos')">Todos</button>
-        <button class="req-tab" data-f="abertos" onclick="setRequestsFilter('abertos')">Abertos</button>
-        <button class="req-tab" data-f="atendidos" onclick="setRequestsFilter('atendidos')">Atendidos</button>
-        <button class="req-tab" data-f="meus" onclick="setRequestsFilter('meus')">Meus pedidos</button>
+        <button class="req-tab active" data-f="todos" onclick="setRequestsFilter('todos')">Todos <i class="req-count" data-c="todos">0</i></button>
+        <button class="req-tab" data-f="abertos" onclick="setRequestsFilter('abertos')">Abertos <i class="req-count" data-c="abertos">0</i></button>
+        <button class="req-tab" data-f="atendidos" onclick="setRequestsFilter('atendidos')">Atendidos <i class="req-count" data-c="atendidos">0</i></button>
+        <button class="req-tab" data-f="meus" onclick="setRequestsFilter('meus')">Meus <i class="req-count" data-c="meus">0</i></button>
       </div>
       <div id="requestsList" class="favorites-list-container"></div>
       <div class="req-compose">
         <div class="req-types" id="reqTypes">
-          <button class="req-tab active" data-t="Jogo" onclick="setRequestType('Jogo')">Jogo</button>
-          <button class="req-tab" data-t="App" onclick="setRequestType('App')">App</button>
-          <button class="req-tab" data-t="Tutorial" onclick="setRequestType('Tutorial')">Tutorial</button>
-          <button class="req-tab" data-t="Outro" onclick="setRequestType('Outro')">Outro</button>
+          <button class="req-tab t-jogo active" data-t="Jogo" onclick="setRequestType('Jogo')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>Jogo</button>
+          <button class="req-tab t-app" data-t="App" onclick="setRequestType('App')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>App</button>
+          <button class="req-tab t-tutorial" data-t="Tutorial" onclick="setRequestType('Tutorial')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg>Tutorial</button>
+          <button class="req-tab t-outro" data-t="Outro" onclick="setRequestType('Outro')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg>Outro</button>
         </div>
         <div class="req-compose-row">
           <textarea id="reqInput" class="comment-input" rows="2" maxlength="300" placeholder="O que você quer ver no Portal Digital?" oninput="reqUpdateCounter()"></textarea>
@@ -10673,9 +10977,8 @@ window.firebaseModules = {
           </div>
 
           <div id="transferEmailGroup" class="transfer-form-group">
-            <label class="transfer-form-label">Email do destinatário (conta verificada)</label>
-            <input type="email" class="transfer-form-input" id="transferEmail" placeholder="email@gmail.com" list="transferEmailList" autocomplete="off">
-            <datalist id="transferEmailList"></datalist>
+            <label class="transfer-form-label">Email do destinatário</label>
+            <input type="email" class="transfer-form-input" id="transferEmail" placeholder="email@gmail.com">
           </div>
 
           <div id="transferAllInfo" class="transfer-form-group" style="display: none;">
@@ -10684,7 +10987,7 @@ window.firebaseModules = {
                 <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
                 <strong>Transferência em Massa</strong>
               </div>
-              <p>Os pontos serão enviados para <strong id="totalUsersCount">todos os usuários</strong> registrados no sistema. Esta aç������o pode levar alguns segundos.</p>
+              <p>Os pontos serão enviados para <strong id="totalUsersCount">todos os usuários</strong> verificados no sistema. Esta ação pode levar alguns segundos.</p>
             </div>
           </div>
 
@@ -10821,6 +11124,7 @@ let manualThemeOverride = false;
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("sw.js").catch((err) => {
+      console.error("Erro ao registrar o Service Worker:", err);
     });
   });
 }
@@ -10841,6 +11145,7 @@ function saveThemePreference(theme) {
   try {
     localStorage.setItem(THEME_STORAGE_KEY, theme);
   } catch (e) {
+    console.error("Erro ao salvar prefer\xEAncia de tema:", e);
   }
 }
 function applyTheme() {
@@ -10880,6 +11185,7 @@ try {
     gridViewMode = savedGridView;
   }
 } catch (e) {
+  console.error("Erro ao carregar prefer\xEAncia de visualiza\xE7\xE3o:", e);
 }
 function updateGridViewToggleIcon() {
   document.body.classList.toggle("view-list", gridViewMode === "blog");
@@ -10899,6 +11205,7 @@ function toggleGridViewMode() {
   try {
     localStorage.setItem(GRID_VIEW_STORAGE_KEY, gridViewMode);
   } catch (e) {
+    console.error("Erro ao salvar prefer\xEAncia de visualiza\xE7\xE3o:", e);
   }
   updateGridViewToggleIcon();
   currentGenreView = null;
@@ -10982,10 +11289,29 @@ function checkUrlForAuth() {
   }
   return false;
 }
+function hasSharedGameLink() {
+  return !!new URLSearchParams(window.location.search).get("id");
+}
+async function autoVisitorForSharedLink() {
+  showAuthLoading("A abrir o conteúdo", "A preparar o catálogo...");
+  try {
+    const { signInAnonymously } = window.firebaseModules;
+    await signInAnonymously(window.firebaseAuth);
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    hideAuthLoading();
+  } catch (error) {
+    hideAuthLoading();
+    console.error("Erro no login anônimo do link compartilhado:", error);
+    showAuthOverlay();
+  }
+}
 window.addEventListener("load", () => {
   const { onAuthStateChanged } = window.firebaseModules;
   const auth = window.firebaseAuth;
+  let authFirstCheckDone = false;
   onAuthStateChanged(auth, async (user) => {
+    const firstCheck = !authFirstCheckDone;
+    authFirstCheckDone = true;
     if (user) {
       currentUser = user;
       isPublisher = PUBLISHER_EMAILS.includes(user.email);
@@ -11003,7 +11329,11 @@ window.addEventListener("load", () => {
     } else {
       const hasAuthParam = checkUrlForAuth();
       if (!hasAuthParam) {
-        showAuthOverlay();
+        if (firstCheck && hasSharedGameLink()) {
+          autoVisitorForSharedLink();
+        } else {
+          showAuthOverlay();
+        }
       }
     }
     setTimeout(maybeShowSocialAdModal, 2e3);
@@ -11022,6 +11352,9 @@ async function loadUserData() {
     userName = userData.name || "";
     userAvatar = userData.avatar || "";
     userSurveyDone = !!userData.surveyReward;
+    userAdFreeUntil = Number(userData.adFreeUntil) || 0;
+    adFreeSyncOffset();
+    updateAdFreeUI();
     if (!userName && currentUser.displayName) {
       userName = currentUser.displayName;
       await update(userRef, { name: userName });
@@ -11033,6 +11366,8 @@ async function loadUserData() {
     userName = currentUser.displayName || "";
     userAvatar = "";
     userSurveyDone = false;
+    userAdFreeUntil = 0;
+    updateAdFreeUI();
     updatePointsDisplay();
     await set(userRef, {
       points: 0,
@@ -11061,6 +11396,7 @@ async function loadUserPoints() {
 }
 async function updateUserPoints(newPoints) {
   if (!currentUser) return;
+  console.warn("[SEGURAN\xC7A] Tentativa de atualiza\xE7\xE3o direta de pontos bloqueada");
   throw new Error("Opera\xE7\xE3o n\xE3o permitida: Use as fun\xE7\xF5es de transa\xE7\xE3o apropriadas");
 }
 function _syncPointsDisplay(newPoints) {
@@ -11218,6 +11554,7 @@ async function loadGames() {
       setTimeout(checkDailyRecommendation, 5e3);
     }
   }, (error) => {
+    console.error("Erro ao carregar jogos:", error);
     loadGamesOnce();
   });
 }
@@ -11237,6 +11574,7 @@ async function loadDownloadCounts() {
       }
     });
   } catch (error) {
+    console.error("Erro ao carregar contagem de downloads:", error);
   }
 }
 let likeCountsCache = null;
@@ -11272,6 +11610,7 @@ async function loadLikeCounts() {
     } catch (e) {
     }
   } catch (error) {
+    console.error("Erro ao carregar curtidas:", error);
   }
 }
 async function loadRatingCounts() {
@@ -11289,6 +11628,7 @@ async function loadRatingCounts() {
       }
     });
   } catch (error) {
+    console.error("Erro ao carregar contagem de avaliações:", error);
   }
 }
 async function loadGamesOnce() {
@@ -11313,6 +11653,7 @@ async function loadGamesOnce() {
       setTimeout(checkDailyRecommendation, 5e3);
     }
   } catch (error) {
+    console.error("Erro ao carregar jogos (fallback):", error);
   }
 }
 function loadHistory() {
@@ -11323,6 +11664,7 @@ function loadHistory() {
       historyData = JSON.parse(saved);
     }
   } catch (e) {
+    console.error("Erro ao carregar hist\xF3rico:", e);
     historyData = [];
   }
 }
@@ -11331,6 +11673,7 @@ function saveHistory() {
     const storage = window["localStorage"];
     storage.setItem("gamePlusHistory", JSON.stringify(historyData));
   } catch (e) {
+    console.error("Erro ao salvar hist\xF3rico:", e);
   }
 }
 function addToHistory(id) {
@@ -12014,6 +12357,7 @@ function renderGrid() {
   try {
     setupGridInfiniteScroll();
   } catch (e) {
+    console.error("Scroll infinito indispon\xEDvel:", e);
     appendGridCards(filtered.length);
   }
   setupPaginationVisibility();
@@ -12692,7 +13036,7 @@ async function openGameDetail(id, skipPushState) {
   const aindaAberto = () => currentGameData && currentGameData.id === id;
   const pCurtidas = loadGameLikes(id).then(() => { if (aindaAberto()) updateLikeButton(); });
   const pAvaliacoes = loadGameRatings(id);
-  try { await Promise.all([pCurtidas, pAvaliacoes]); } catch (e) {}
+  try { await Promise.all([pCurtidas, pAvaliacoes]); } catch (e) {  }
   if (aindaAberto()) overlayEl.classList.remove("is-loading");
 }
 function extractYoutubeId(url) {
@@ -12951,6 +13295,7 @@ async function downloadGame(gameId, appType, url, cost) {
         allGames[gameId].downloads = currentDownloads + 1;
       }
     } catch (error) {
+      console.error("Erro ao incrementar downloads:", error.message || error);
     }
     await esperaLink;
     removerLinkOculto();
@@ -12959,6 +13304,7 @@ async function downloadGame(gameId, appType, url, cost) {
   } catch (error) {
     removerLinkOculto();
     esconderPreparandoLink();
+    console.error("[SEGURAN\xC7A] Erro na transa\xE7\xE3o de download:", error);
     showCustomAlert("Erro ao processar download. Tente novamente.");
   } finally {
     window._downloadEmCurso = false;
@@ -13258,6 +13604,8 @@ async function logout() {
       userPoints = 0;
       userStatus = "pending";
       userName = "";
+      userAdFreeUntil = 0;
+      updateAdFreeUI();
       showAuthOverlay();
     } catch (error) {
       showCustomAlert("Erro ao sair: " + error.message);
@@ -13311,6 +13659,7 @@ async function handlePublish(e) {
     document.getElementById("publishForm").reset();
     document.getElementById("editGameId").value = "";
   } catch (error) {
+    console.error("Erro completo:", error);
     showCustomAlert("Erro ao publicar: " + error.message);
   }
 }
@@ -13423,50 +13772,463 @@ async function deleteGame(id) {
     }
   });
 }
+function cvRnd10() {
+  const a = new Uint32Array(1);
+  do { crypto.getRandomValues(a); } while (a[0] >= 4294967290);
+  return a[0] % 10;
+}
+function cvLuhn(base) {
+  let sum = 0;
+  for (let i = base.length - 1, dbl = true; i >= 0; i--, dbl = !dbl) {
+    let n = +base[i];
+    if (dbl) { n *= 2; if (n > 9) n -= 9; }
+    sum += n;
+  }
+  return (10 - (sum % 10)) % 10;
+}
+function cvLuhnValid(code) { return /^\d{12}$/.test(code) && cvLuhn(code.slice(0, 11)) === +code[11]; }
+function cvGroup(c) { return String(c).replace(/(\d{4})(?=\d)/g, "$1 "); }
+function cvMask(last3) { return "\u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 \u2022" + last3; }
+function cvKz(n) { return String(Number(n) || 0).replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " Kz"; }
+function cvFormatRedeemInput(el) {
+  const v = el.value;
+  if (/^[\d\s]*$/.test(v)) el.value = cvGroup(v.replace(/\s/g, "").slice(0, 12));
+}
+async function cvNewCode(database) {
+  const { ref, get } = window.firebaseModules;
+  for (let t = 0; t < 8; t++) {
+    let b = "";
+    for (let i = 0; i < 11; i++) b += cvRnd10();
+    if (b[0] === "0") continue;
+    const c = b + cvLuhn(b);
+    const snap = await get(ref(database, "codes/" + c));
+    if (!snap.exists()) return c;
+  }
+  throw new Error("N\u00e3o foi poss\u00edvel gerar um c\u00f3digo \u00fanico. Tente de novo.");
+}
+let cvGenBusy = false;
 async function generateCode() {
   if (!isPublisher) {
     showCustomAlert("Apenas publicadores podem gerar c\xF3digos.");
     return;
   }
+  if (cvGenBusy) return;
   const points = parseInt(document.getElementById("codePoints").value);
-  if (points < 1) {
+  const value = parseInt(document.getElementById("codeValue").value);
+  if (!(points >= 1)) {
     showCustomAlert("Digite uma quantidade v\xE1lida de pontos.");
     return;
   }
+  if (!(value >= 1)) {
+    showCustomAlert("Digite o valor do cart\u00e3o em Kz.");
+    return;
+  }
+  cvGenBusy = true;
   const { ref, set, push } = window.firebaseModules;
   const database = window.firebaseDatabase;
-  const codeData = {
-    points,
-    createdBy: currentUser.uid,
-    createdAt: Date.now(),
-    used: false
-  };
-  const codesRef = ref(database, "codes");
-  const newCodeRef = push(codesRef);
-  await set(newCodeRef, codeData);
-  const codeId = newCodeRef.key;
-  document.getElementById("codeDisplay").textContent = codeId;
-    window._lastGenCode = { id: codeId, points: points };
-  document.getElementById("generatedCodeResult").classList.add("active");
+  try {
+    const code = await cvNewCode(database);
+    const createdAt = Date.now();
+    await set(ref(database, "codes/" + code), {
+      points,
+      value,
+      createdBy: currentUser.uid,
+      createdAt,
+      used: false
+    });
+    let listingId = null;
+    try {
+      const lref = push(ref(database, "cartoesVenda"));
+      await set(lref, { points, value, last3: code.slice(-3), createdAt, createdBy: currentUser.uid });
+      listingId = lref.key;
+    } catch (e) {
+      showCustomAlert("C\u00f3digo criado, mas n\u00e3o foi poss\u00edvel public\u00e1-lo na lista de cart\u00f5es (verifique as regras do Firebase para cartoesVenda).");
+    }
+    document.getElementById("codeDisplay").textContent = cvGroup(code);
+    window._lastGenCode = { id: code, points, value, listingId };
+    document.getElementById("generatedCodeResult").classList.add("active");
+  } catch (e) {
+    showCustomAlert("Erro ao gerar c\u00f3digo: " + (e && (e.code || e.message) || "tente novamente"));
+  }
+  cvGenBusy = false;
 }
 
-function ppCodeActions(n) {
-  const id = String(n.id).replace(/'/g, "");
-  return `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
-    <button onclick="event.stopPropagation();redeemNotifCode('${id}')" style="padding:8px 12px;border-radius:8px;border:none;cursor:pointer;background:#16a34a;color:#fff;font-weight:600">Resgatar os pontos</button>
-    <button onclick="event.stopPropagation();copyNotifCode('${id}')" style="padding:8px 12px;border-radius:8px;border:none;cursor:pointer;background:#374151;color:#fff;font-weight:600">Copiar o código de resgate</button>
+const CV_GAP_MS = 3000, CV_WIN_MS = 900000, CV_MAX_TRIES = 10;
+async function cvTicket(code) {
+  const { ref, get, set, rtdbServerTimestamp } = window.firebaseModules;
+  const tref = ref(window.firebaseDatabase, "tentativas/" + currentUser.uid);
+  const cur = (await get(tref)).val();
+  const now = await getServerTimestamp();
+  if (cur && now - cur.ts < CV_GAP_MS) {
+    throw { cvMsg: "Aguarde " + Math.ceil((CV_GAP_MS - (now - cur.ts)) / 1000) + " segundos antes de tentar de novo." };
+  }
+  const fresh = !cur || now - cur.ws >= CV_WIN_MS;
+  if (!fresh && cur.n >= CV_MAX_TRIES) {
+    throw { cvMsg: "Muitas tentativas. Tente de novo em " + Math.ceil((cur.ws + CV_WIN_MS - now) / 60000) + " minuto(s)." };
+  }
+  try {
+    await set(tref, fresh
+      ? { code, ts: rtdbServerTimestamp(), ws: rtdbServerTimestamp(), n: 1 }
+      : { code, ts: rtdbServerTimestamp(), ws: cur.ws, n: cur.n + 1 });
+  } catch (e) {
+    throw { cvMsg: "Muitas tentativas. Aguarde um pouco e tente de novo." };
+  }
+}
+const CV_WA = "244932535389";
+let cvItems = [];
+async function cvLoadList() {
+  const box = document.getElementById("cvList");
+  if (!box) return;
+  try {
+    const { ref, get, rtdbQuery, limitToLast } = window.firebaseModules;
+    const snap = await get(rtdbQuery(ref(window.firebaseDatabase, "cartoesVenda"), limitToLast(30)));
+    cvItems = [];
+    snap.forEach((c) => {
+      const v = c.val();
+      if (v && v.points > 0) cvItems.push({ id: c.key, ...v });
+    });
+    cvItems.sort((a, b) => (a.points || 0) - (b.points || 0) || (a.value || 0) - (b.value || 0) || (a.createdAt || 0) - (b.createdAt || 0));
+  } catch (e) {
+    box.innerHTML = '<div class="cv-empty">N\u00e3o foi poss\u00edvel carregar os cart\u00f5es.</div>';
+    return;
+  }
+  cvRender();
+  cvLoadMine();
+}
+function cvRender() {
+  const box = document.getElementById("cvList");
+  if (!box) return;
+  const items = cvItems.filter(cvPass);
+  if (!items.length) {
+    box.innerHTML = '<div class="cv-empty">' + (cvItems.length ? "Nenhum cart\u00e3o com esse filtro." : "Nenhum cart\u00e3o dispon\u00edvel no momento.") + '</div>';
+    return;
+  }
+  const chat = '<svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>';
+  box.innerHTML = items.map((c, i) => {
+    const id = String(c.id).replace(/[^A-Za-z0-9_-]/g, "");
+    const last3 = String(c.last3 || "").replace(/\D/g, "").slice(-3);
+    const pts = Number(c.points) || 0;
+    const admin = isPublisher ? `<div class="pn-pts-foot"><button class="pn-chip" onclick="cvReleaseAsk('${id}')">${PN_ICONS.check}Liberar</button><button class="pn-chip pn-del" onclick="cvRemove('${id}')">${PN_ICONS.trash}Remover</button></div>` : "";
+    return `<div class="pn-card pn-points cv-card" style="--i:${i}">
+      <div class="pn-pts-in">
+        <div class="pn-pts-head"><span>${PN_ICONS.gift}Cart\u00e3o de pontos</span><span class="pn-time">${formatTimeAgo(c.createdAt || Date.now())}</span></div>
+        <div class="pn-pts-amount"><b>+${pts.toLocaleString("pt-PT")}</b><small>pontos</small></div>
+        <div class="cv-val">Valor <strong>${cvKz(c.value)}</strong></div>
+        <div class="cv-sep"></div>
+        <div class="pn-code"><em>C\u00f3digo</em><code>${cvMask(last3)}</code></div>
+        <div class="cv-actions"><button class="pn-btn pn-main" onclick="cvBuy('${id}')">${chat}Comprar</button></div>
+        ${admin}
+      </div>
+    </div>`;
+  }).join("");
+}
+function cvBuy(id) {
+  if (!currentUser || currentUser.isAnonymous) { showSignupPrompt("comprar pontos"); return; }
+  const c = cvItems.find((x) => String(x.id).replace(/[^A-Za-z0-9_-]/g, "") === id);
+  if (!c) return;
+  const name = currentUser.displayName || (currentUser.email || "").split("@")[0] || "Usu\u00e1rio";
+  const last3 = String(c.last3 || "").replace(/\D/g, "").slice(-3);
+  const msg = "Ol\u00e1! Quero comprar um cart\u00e3o de pontos do Portal Digital.\n\n" +
+    "Cart\u00e3o com final " + last3 + "\nPontos: " + c.points + "\nValor: " + cvKz(c.value) + "\n\n" +
+    "Nome: " + name + "\nEmail: " + (currentUser.email || "") + "\n\nComo posso pagar?";
+  openLinkInGA("https://wa.me/" + CV_WA + "?text=" + encodeURIComponent(msg));
+}
+function cvRemove(id) {
+  if (!isPublisher) return;
+  showCustomConfirm("Remover este cart\u00e3o da lista de venda? O c\u00f3digo continua v\u00e1lido.", async () => {
+    try {
+      const { ref, remove } = window.firebaseModules;
+      await remove(ref(window.firebaseDatabase, "cartoesVenda/" + id));
+      cvLoadList();
+    } catch (e) {
+      showCustomAlert("Erro ao remover: " + (e && (e.code || e.message) || "tente novamente"));
+    }
+  });
+}
+
+let cvFilterMode = "all", cvFilterVal = 0;
+function cvPass(c) {
+  if (cvFilterMode === "all" || !(cvFilterVal > 0)) return true;
+  const p = Number(c.points) || 0;
+  return cvFilterMode === "above" ? p >= cvFilterVal : p <= cvFilterVal;
+}
+function cvSetMode(m) {
+  document.querySelectorAll("#cvSeg button").forEach((x) => x.classList.toggle("active", x.dataset.m === m));
+  const box = document.getElementById("cvFilterValBox");
+  box.style.display = m === "all" ? "none" : "";
+  if (m !== "all") { const i = document.getElementById("cvFilterVal"); setTimeout(() => i.focus(), 30); }
+  cvFilterMode = m;
+  cvApplyFilter();
+}
+function cvApplyFilter() {
+  cvFilterVal = parseInt(document.getElementById("cvFilterVal").value) || 0;
+  cvRender();
+  cvRenderMine();
+}
+let cvMineItems = [];
+async function cvLoadMine() {
+  const sec = document.getElementById("cvMineSection");
+  const box = document.getElementById("cvMine");
+  if (!sec || !box) return;
+  if (!currentUser || currentUser.isAnonymous) { sec.style.display = "none"; return; }
+  try {
+    const { ref, get } = window.firebaseModules;
+    const db = window.firebaseDatabase;
+    const list = [];
+    if (isPublisher) {
+      const snap = await get(ref(db, "cartoesLiberados"));
+      snap.forEach((u) => { u.forEach((c) => { const v = c.val(); if (v && v.code) list.push({ id: c.key, uid: u.key, ...v }); }); });
+      await Promise.all(list.map(async (x) => {
+        try { x.usado = !!(await get(ref(db, "codeRedemptions/" + x.uid + "/" + x.code))).exists() || !!(await get(ref(db, "codes/" + x.code + "/used"))).val(); } catch (e) { x.usado = false; }
+      }));
+    } else {
+      const snap = await get(ref(db, "cartoesLiberados/" + currentUser.uid));
+      snap.forEach((c) => { const v = c.val(); if (v && v.code) list.push({ id: c.key, uid: currentUser.uid, ...v }); });
+      await Promise.all(list.map(async (x) => {
+        try { x.usado = !!(await get(ref(db, "codeRedemptions/" + currentUser.uid + "/" + x.code))).exists(); } catch (e) { x.usado = false; }
+      }));
+    }
+    list.sort((a, b) => (a.usado - b.usado) || (a.points || 0) - (b.points || 0) || (a.liberadoEm || 0) - (b.liberadoEm || 0));
+    cvMineItems = list;
+  } catch (e) {
+    sec.style.display = "none";
+    return;
+  }
+  cvRenderMine();
+}
+function cvRenderMine() {
+  const sec = document.getElementById("cvMineSection");
+  const box = document.getElementById("cvMine");
+  if (!sec || !box) return;
+  document.getElementById("cvMineTitle").textContent = isPublisher ? "Cartões liberados" : "Meus cartões";
+  document.getElementById("cvMineDesc").textContent = isPublisher
+    ? "Cartões liberados para utilizadores. Use Retirar para ocultá-los."
+    : "Cartões liberados para a sua conta depois do pagamento. Toque em Resgatar para receber os pontos.";
+  if (!cvMineItems.length) { sec.style.display = "none"; return; }
+  sec.style.display = "";
+  const mine = cvMineItems.filter(cvPass);
+  if (!mine.length) { box.innerHTML = '<div class="cv-empty">Nenhum cart\u00e3o com esse filtro.</div>'; return; }
+  box.innerHTML = mine.map((c, i) => {
+    const id = pnEsc(String(c.id).replace(/[^A-Za-z0-9_-]/g, ""));
+    const code = String(c.code).replace(/\D/g, "");
+    const pts = Number(c.points) || 0;
+    const usado = !!c.usado;
+    const badge = usado ? '<div class="cv-badge used">' + PN_ICONS.check + 'Usado</div>' : "";
+    const who = isPublisher ? '<div class="cv-badge">' + pnEsc(c.email || c.uid) + '</div>' : "";
+    const act = usado || isPublisher
+      ? ""
+      : `<div class="cv-actions"><button class="pn-btn pn-main" onclick="cvRedeemMine('${id}', this)">${PN_ICONS.star}Resgatar</button><button class="pn-btn pn-ghost" onclick="cvCopyMine('${id}', this)">${PN_ICONS.copy}Copiar código</button></div>`;
+    const adm = isPublisher ? `<div class="pn-pts-foot"><button class="pn-chip pn-del" onclick="cvRetire('${id}', '${pnEsc(c.uid)}')">${PN_ICONS.trash}Retirar</button></div>` : "";
+    return `<div class="pn-card pn-points cv-card ${usado ? "cv-used" : ""}" style="--i:${i}">
+      <div class="pn-pts-in">
+        <div class="pn-pts-head"><span>${PN_ICONS.gift}Cartão de pontos</span><span class="pn-time">${formatTimeAgo(c.liberadoEm || Date.now())}</span></div>
+        <div class="pn-pts-amount"><b>+${pts.toLocaleString("pt-PT")}</b><small>pontos</small></div>
+        <div class="cv-val">Valor <strong>${cvKz(c.value)}</strong></div>
+        ${badge}${who}
+        <div class="cv-sep"></div>
+        <div class="pn-code"><em>Código</em><code>${cvGroup(code)}</code></div>
+        ${act}${adm}
+      </div>
+    </div>`;
+  }).join("");
+}
+function cvMineFind(id) {
+  return cvMineItems.find((x) => String(x.id).replace(/[^A-Za-z0-9_-]/g, "") === id);
+}
+async function cvRedeemMine(id, btn) {
+  const c = cvMineFind(id);
+  if (!c) return;
+  const label = btn ? btn.innerHTML : "";
+  if (btn) { btn.disabled = true; btn.textContent = "A resgatar..."; }
+  try {
+    await redeemCode(String(c.code));
+  } finally {
+    if (btn && btn.isConnected) { btn.disabled = false; btn.innerHTML = label; }
+    cvLoadMine();
+  }
+}
+function cvCopyMine(id, btn) {
+  const c = cvMineFind(id);
+  if (!c) return;
+  copiarTextoSimples(String(c.code));
+  if (btn) {
+    const label = btn.innerHTML;
+    btn.innerHTML = PN_ICONS.check + "Copiado!";
+    setTimeout(() => { if (btn.isConnected) btn.innerHTML = label; }, 1600);
+  }
+}
+function cvReleaseAsk(id) {
+  if (!isPublisher) return;
+  const modal = document.createElement("div");
+  modal.className = "custom-modal active";
+  modal.innerHTML = `
+    <div class="custom-modal-content">
+      <p style="margin: 0 0 12px 0;">Liberar este cartão para qual utilizador? Escreva o e-mail da conta dele.</p>
+      <input type="email" class="cv-rel-input" id="cvRelEmail" placeholder="email@exemplo.com" autocomplete="off" autocapitalize="off">
+      <div class="custom-modal-buttons">
+        <button class="custom-modal-btn secondary" onclick="this.closest('.custom-modal').remove()">Cancelar</button>
+        <button class="custom-modal-btn primary" id="cvRelOk">Liberar</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  const inp = modal.querySelector("#cvRelEmail");
+  inp.focus();
+  modal.querySelector("#cvRelOk").addEventListener("click", async () => {
+    const email = inp.value.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { inp.style.borderColor = "#ef4444"; return; }
+    const okBtn = modal.querySelector("#cvRelOk");
+    okBtn.disabled = true; okBtn.textContent = "A liberar...";
+    try {
+      const msg = await cvRelease(id, email);
+      modal.remove();
+      showCustomAlert(msg);
+      cvLoadList();
+    } catch (e) {
+      okBtn.disabled = false; okBtn.textContent = "Liberar";
+      modal.remove();
+      showCustomAlert((e && e.cvMsg) || "Erro ao liberar: " + (e && (e.code || e.message) || "tente novamente"));
+    }
+  });
+}
+async function cvRelease(id, email) {
+  if (!isPublisher) throw { cvMsg: "Sem permissão." };
+  const { ref, get, update, rtdbQuery, orderByChild, equalTo } = window.firebaseModules;
+  const db = window.firebaseDatabase;
+  const c = cvItems.find((x) => String(x.id).replace(/[^A-Za-z0-9_-]/g, "") === id);
+  if (!c) throw { cvMsg: "Cartão não encontrado na lista." };
+  const usersSnap = await get(ref(db, "users"));
+  let uid = null;
+  usersSnap.forEach((u) => {
+    const v = u.val() || {};
+    if (!uid && String(v.email || "").trim().toLowerCase() === email) uid = u.key;
+  });
+  if (!uid) throw { cvMsg: "Não existe nenhuma conta com o e-mail " + pnEsc(email) + "." };
+  const last3 = String(c.last3 || "");
+  let code = null;
+  const match = (key, v) => {
+    if (!code && v && String(key).slice(-3) === last3 && v.points === c.points && v.value === c.value && v.createdAt === c.createdAt && !v.used && !v.reservadoPara) code = key;
+  };
+  try {
+    const q = await get(rtdbQuery(ref(db, "codes"), orderByChild("createdAt"), equalTo(c.createdAt)));
+    q.forEach((x) => match(x.key, x.val()));
+  } catch (e) {
+    const all = await get(ref(db, "codes"));
+    all.forEach((x) => match(x.key, x.val()));
+  }
+  if (!code) throw { cvMsg: "Não encontrei o código deste cartão (talvez já usado ou já liberado)." };
+  const now = Date.now();
+  const updates = {};
+  updates["codes/" + code + "/reservadoPara"] = uid;
+  updates["codes/" + code + "/reservadoEmail"] = email;
+  updates["cartoesLiberados/" + uid + "/" + id] = {
+    code, points: c.points, value: c.value, last3, createdAt: c.createdAt, email, liberadoEm: now
+  };
+  updates["cartoesVenda/" + id] = null;
+  await update(ref(db), updates);
+  return "Cartão liberado para " + pnEsc(email) + ". Ele já aparece em Resgatar Pontos > Meus cartões.";
+}
+function cvRetire(id, uid) {
+  if (!isPublisher) return;
+  const c = cvMineItems.find((x) => String(x.id).replace(/[^A-Za-z0-9_-]/g, "") === id && x.uid === uid);
+  if (!c) return;
+  const msg = c.usado
+    ? "Ocultar este cartão usado da lista do utilizador?"
+    : "Retirar este cartão do utilizador? Ele volta para a lista de venda e deixa de estar reservado.";
+  showCustomConfirm(msg, async () => {
+    try {
+      const { ref, update } = window.firebaseModules;
+      const updates = {};
+      updates["cartoesLiberados/" + uid + "/" + c.id] = null;
+      if (!c.usado) {
+        updates["codes/" + c.code + "/reservadoPara"] = null;
+        updates["codes/" + c.code + "/reservadoEmail"] = null;
+        updates["cartoesVenda/" + c.id] = { points: c.points, value: c.value, last3: c.last3, createdAt: c.createdAt, createdBy: currentUser.uid };
+      }
+      await update(ref(window.firebaseDatabase), updates);
+      cvLoadList();
+    } catch (e) {
+      showCustomAlert("Erro: " + (e && (e.code || e.message) || "tente novamente"));
+    }
+  });
+}
+
+const PN_ICONS = {
+  bell: '<svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>',
+  gift: '<svg viewBox="0 0 24 24"><path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 0 0-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"/></svg>',
+  swap: '<svg viewBox="0 0 24 24"><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/></svg>',
+  copy: '<svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>',
+  check: '<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>',
+  trash: '<svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>',
+  star: '<svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>'
+};
+function pnEsc(v) {
+  return String(v == null ? "" : v).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+function pnMaskCode(c) {
+  c = String(c || "");
+  return c.length > 6 ? "\u2022\u2022\u2022\u2022" + c.slice(-4) : c;
+}
+function pnFooter(notif, cls) {
+  const id = String(notif.id).replace(/'/g, "");
+  const ok = notif.isRead ? "" : `<button class="pn-chip pn-ok" onclick="markNotificationAsRead('${id}')">${PN_ICONS.check}Lida</button>`;
+  return `<div class="${cls}">${ok}<button class="pn-chip pn-del" onclick="dismissNotification('${id}')">${PN_ICONS.trash}Apagar</button></div>`;
+}
+function ppPointsCard(notif, idx) {
+  const id = String(notif.id).replace(/'/g, "");
+  const pts = Number(notif.points) || 0;
+  const unread = !notif.isRead;
+  return `<div class="pn-card pn-points ${unread ? "pn-unread" : "pn-read"}" style="--i:${idx}">
+    <div class="pn-pts-in">
+      <div class="pn-pts-head">
+        <span>${unread ? '<i class="pn-pts-new"></i>' : ""}${PN_ICONS.gift}Presente de pontos</span>
+        <span class="pn-time">${formatTimeAgo(notif.createdAt)}</span>
+      </div>
+      <div class="pn-pts-amount"><b>+${pts.toLocaleString("pt-PT")}</b><small>pontos</small></div>
+      <div class="pn-pts-sub">Você recebeu ${pts.toLocaleString("pt-PT")} pontos! Resgate agora ou guarde o código.</div>
+      <div class="pn-code"><em>Código de resgate</em><code>${pnEsc(pnMaskCode(notif.codigo))}</code></div>
+      <div class="pn-pts-actions">
+        <button class="pn-btn pn-main" onclick="redeemNotifCode('${id}', this)">${PN_ICONS.star}Resgatar os pontos</button>
+        <button class="pn-btn pn-ghost" onclick="copyNotifCode('${id}', this)">${PN_ICONS.copy}Copiar código</button>
+      </div>
+      ${pnFooter(notif, "pn-pts-foot")}
+    </div>
   </div>`;
 }
-async function redeemNotifCode(id) {
+function ppNotifCard(notif, idx) {
+  const unread = !notif.isRead;
+  const isTransfer = notif.type === "transfer";
+  const personal = notif.isPersonal ? '<span class="pn-pill">Para você</span>' : "";
+  return `<div class="pn-card ${unread ? "pn-unread" : "pn-read"} ${isTransfer ? "pn-transfer" : ""}" style="--i:${idx}">
+    <div class="pn-ico">${isTransfer ? PN_ICONS.swap : PN_ICONS.bell}</div>
+    <div class="pn-body">
+      <div class="pn-top"><div class="pn-title">${notif.title}${personal}</div><div class="pn-time">${formatTimeAgo(notif.createdAt)}</div></div>
+      <div class="pn-msg">${convertUrlsToLinks(notif.message || "")}</div>
+    </div>
+    ${pnFooter(notif, "pn-foot")}
+  </div>`;
+}
+async function redeemNotifCode(id, btn) {
   const n = userNotifications.find(x => String(x.id) === String(id));
   if (!n || !n.codigo) return;
-  await redeemCode(n.codigo, id);
+  const label = btn ? btn.innerHTML : "";
+  if (btn) { btn.disabled = true; btn.textContent = "A resgatar..."; }
+  try {
+    await redeemCode(n.codigo, id);
+  } finally {
+    if (btn && btn.isConnected) { btn.disabled = false; btn.innerHTML = label; }
+  }
 }
-function copyNotifCode(id) {
+function copyNotifCode(id, btn) {
   const n = userNotifications.find(x => String(x.id) === String(id));
   if (!n || !n.codigo) return;
   copiarTextoSimples(n.codigo);
-  showCustomAlert("Código copiado!");
+  if (btn) {
+    const label = btn.innerHTML;
+    btn.innerHTML = PN_ICONS.check + "Copiado!";
+    setTimeout(() => { if (btn.isConnected) btn.innerHTML = label; }, 1600);
+  } else {
+    showCustomAlert("Código copiado!");
+  }
 }
 async function openSendCodeModal() {
   const g = window._lastGenCode;
@@ -13481,13 +14243,13 @@ async function openSendCodeModal() {
     const list = [];
     snap.forEach(c => {
       const u = c.val() || {};
-      if (isVerifiedAccount(u)) list.push({ uid: c.key, name: u.name || u.userName || u.email.split("@")[0], email: u.email });
+      if (u.status === "approved" || u.status === "pending") list.push({ uid: c.key, name: u.name || u.userName || u.email || c.key, email: u.email || "" });
     });
     list.sort((a, b) => String(a.name).localeCompare(String(b.name)));
     sel.innerHTML = '<option value="">Selecione um usuário</option>';
     list.forEach(u => {
       const o = document.createElement("option");
-      o.value = u.uid; o.dataset.name = u.name; o.textContent = u.name + " (" + u.email + ")";
+      o.value = u.uid; o.textContent = u.email && u.email !== u.name ? `${u.name} (${u.email})` : u.name;
       sel.appendChild(o);
     });
   } catch (e) {
@@ -13514,10 +14276,13 @@ async function sendCodeToUser() {
       codigo: g.id,
       points: g.points,
       targetUserId: uid,
-      targetUserName: sel.options[sel.selectedIndex].dataset.name || sel.options[sel.selectedIndex].textContent,
+      targetUserName: sel.options[sel.selectedIndex].textContent,
       createdBy: currentUser ? currentUser.email : null,
       createdAt: Date.now()
     });
+    if (g.listingId) {
+      try { await window.firebaseModules.remove(ref(window.firebaseDatabase, "cartoesVenda/" + g.listingId)); } catch (e) {}
+    }
     closeSendCodeModal();
     showCustomAlert("Pontos enviados para " + sel.options[sel.selectedIndex].textContent + "!");
   } catch (e) {
@@ -13526,7 +14291,36 @@ async function sendCodeToUser() {
   btn.disabled = false;
 }
 
+let cvRedeemBusy = false;
+function cvBusyShow() {
+  let o = document.getElementById("cvBusyOverlay");
+  if (!o) {
+    o = document.createElement("div");
+    o.id = "cvBusyOverlay";
+    o.className = "cv-busy";
+    o.innerHTML = '<div class="cv-busy-box"><div class="cv-spin"></div><div class="cv-busy-txt">A resgatar os pontos...</div><small>Aguarde um momento</small></div>';
+    document.body.appendChild(o);
+  }
+  o.classList.add("active");
+  document.querySelectorAll("#redeemOverlay button, #redeemOverlay input").forEach((el) => { if (!el.disabled) { el.disabled = true; el.dataset.cvBusy = "1"; } });
+}
+function cvBusyHide() {
+  const o = document.getElementById("cvBusyOverlay");
+  if (o) o.classList.remove("active");
+  document.querySelectorAll("[data-cv-busy]").forEach((el) => { el.disabled = false; delete el.dataset.cvBusy; });
+}
 async function redeemCode(codeArg, notifId) {
+  if (cvRedeemBusy) return;
+  cvRedeemBusy = true;
+  cvBusyShow();
+  try {
+    await cvRedeemInner(codeArg, notifId);
+  } finally {
+    cvRedeemBusy = false;
+    cvBusyHide();
+  }
+}
+async function cvRedeemInner(codeArg, notifId) {
   if (!currentUser || currentUser.isAnonymous) {
     showSignupPrompt("resgatar códigos");
     return;
@@ -13535,14 +14329,19 @@ async function redeemCode(codeArg, notifId) {
     showCustomAlert("Sua conta ainda est\xE1 aguardando aprova\xE7\xE3o do administrador. Por favor, aguarde.");
     return;
   }
-  const code = (typeof codeArg === "string" ? codeArg : document.getElementById("redeemCodeInput").value).trim();
+  const code = (typeof codeArg === "string" ? codeArg : document.getElementById("redeemCodeInput").value).replace(/\s+/g, "");
   if (!code) {
     showCustomAlert("Digite um c\xF3digo.");
+    return;
+  }
+  if (/^\d{12}$/.test(code) && !cvLuhnValid(code)) {
+    showCustomAlert("C\xF3digo inv\xE1lido. Confira os n\xFAmeros e tente de novo.");
     return;
   }
   const { ref, get, update } = window.firebaseModules;
   const database = window.firebaseDatabase;
   try {
+    await cvTicket(code);
     const codeRef = ref(database, `codes/${code}`);
     const codeSnapshot = await get(codeRef);
     if (!codeSnapshot.exists()) {
@@ -13585,7 +14384,10 @@ async function redeemCode(codeArg, notifId) {
     if (notifId) { try { dismissNotification(notifId); } catch (e) {} }
     closeRedeemCodeModal();
   } catch (error) {
-    showCustomAlert("Erro ao resgatar c\xF3digo. Tente novamente.");
+    if (error && error.cvMsg) { showCustomAlert(error.cvMsg); return; }
+    if (error && /permission|PERMISSION/i.test(String(error.code || error.message || ""))) { showCustomAlert("Este c\xF3digo \xE9 inv\xE1lido ou est\xE1 reservado para outra conta."); return; }
+    console.error("[SEGURAN\xC7A] Erro na transa\xE7\xE3o de resgate de c\xF3digo:", error);
+    showCustomAlert("Erro ao resgatar c\xF3digo: " + (error && (error.code || error.message) || "tente novamente"));
   }
 }
 function toggleSidebar() {
@@ -13627,6 +14429,7 @@ function dismissSocialAdForever() {
   try {
     window["localStorage"].setItem(SOCIAL_AD_DISMISS_KEY, "true");
   } catch (e) {
+    console.error("Erro ao salvar prefer\xEAncia do an\xFAncio social:", e);
   }
   closeSocialAdModal();
 }
@@ -13887,6 +14690,7 @@ async function enterAsVisitor() {
     closeAuthOverlay();
   } catch (error) {
     hideAuthLoading();
+    console.error("Erro no login an\xF4nimo:", error);
     showCustomAlert("Erro ao conectar. Tente novamente.");
   }
 }
@@ -13973,6 +14777,7 @@ async function sendVerificationLink() {
     await sendEmailVerification(user);
     showVerificationLinkSent(user.email);
   } catch (error) {
+    console.error("Erro ao enviar email:", error);
     let errorMsg = "Erro ao enviar email de verifica\uFFFD\uFFFD\xE3o.";
     if (error.code === "auth/too-many-requests") {
       errorMsg = "Muitas tentativas. Aguarde alguns minutos e tente novamente.";
@@ -14056,6 +14861,7 @@ async function resendVerificationLink() {
       }, 3e4);
     }
   } catch (error) {
+    console.error("Erro ao reenviar email:", error);
     if (error.code === "auth/too-many-requests") {
       showCustomAlert("Muitas tentativas. Aguarde alguns minutos.");
     } else {
@@ -14091,6 +14897,7 @@ async function checkEmailVerification() {
       }
     }
   } catch (error) {
+    console.error("Erro ao verificar:", error);
     showCustomAlert("Erro ao verificar. Tente novamente.");
     if (btn) {
       btn.disabled = false;
@@ -14170,6 +14977,7 @@ async function approveAccountAfterEmailVerification() {
           </div>
         `;
   } catch (error) {
+    console.error("Erro ao aprovar conta:", error);
     showCustomAlert("Email verificado, mas houve um erro ao ativar sua conta. Entre em contato com o suporte.");
   }
 }
@@ -14264,6 +15072,7 @@ async function updateProfileAvatar() {
       userAvatar = imageUrl;
       ppSchedulePublish();
       updateSidebarProfileAvatar();
+      if (typeof ppAvatarChanged === "function") ppAvatarChanged();
       if (avatarElement) {
         const statusClass = avatarElement.className.split(" ").find((c) => c.startsWith("status-")) || "status-pending";
         avatarElement.className = "profile-avatar-svg " + statusClass;
@@ -14271,6 +15080,7 @@ async function updateProfileAvatar() {
       }
       showCustomAlert("Foto de perfil atualizada com sucesso!");
     } catch (error) {
+      console.error("Erro ao atualizar avatar:", error);
       showCustomAlert("Erro ao atualizar foto de perfil. Tente novamente.");
       if (avatarElement) {
         const statusClass = avatarElement.className.split(" ").find((c) => c.startsWith("status-")) || "status-pending";
@@ -14316,6 +15126,7 @@ async function handleRegister(e) {
       try {
         avatarUrl = await uploadImageToImgBB(selectedAvatarFile);
       } catch (uploadError) {
+        console.error("Erro ao fazer upload do avatar:", uploadError);
       }
     }
     await set(ref(database, `users/${user.uid}`), {
@@ -14487,8 +15298,18 @@ function copyGeneratedCode() {
 function openRedeemCodeModal() {
   closeSidebar();
   document.getElementById("redeemCodeInput").value = "";
+  toggleRedeemForm(false);
+  { const v = document.getElementById("cvFilterVal"); if (v) { v.value = ""; document.getElementById("cvFilterValBox").style.display = "none"; document.querySelectorAll("#cvSeg button").forEach((x) => x.classList.toggle("active", x.dataset.m === "all")); cvFilterMode = "all"; cvFilterVal = 0; } }
   document.getElementById("redeemOverlay").classList.add("active");
   document.body.style.overflow = "hidden";
+  cvLoadList();
+}
+function toggleRedeemForm(force) {
+  const w = document.getElementById("redeemFormWrap");
+  if (!w) return;
+  const show = typeof force === "boolean" ? force : w.style.display === "none";
+  w.style.display = show ? "" : "none";
+  if (show) { const i = document.getElementById("redeemCodeInput"); if (i) setTimeout(() => i.focus(), 50); }
 }
 function closeRedeemCodeModal() {
   document.getElementById("redeemOverlay").classList.remove("active");
@@ -14982,6 +15803,7 @@ async function claimAdPoints() {
 
 Voc\xEA pode assistir mais ${remaining} an\xFAncio(s) hoje.`);
   } catch (error) {
+    console.error("[SEGURAN\xC7A] Erro na transa\xE7\xE3o de pontos de an\xFAncio:", error);
     closeAdInterstitial();
     showCustomAlert("Erro ao processar pontos. Tente novamente.");
   }
@@ -15678,16 +16500,19 @@ async function loadUsersForNotification() {
     if (snapshot.exists()) {
       const users = snapshot.val();
       const select = document.getElementById("notificationTargetUser");
-      const userList = Object.entries(users).filter(([id, user]) => isVerifiedAccount(user)).map(([id, user]) => ({
+      const userList = Object.entries(users).filter(([id, user]) => user.status === "approved" || user.status === "pending").map(([id, user]) => ({
         id,
         name: user.name || "Sem nome",
-        email: user.email
+        email: user.email || "",
+        status: user.status
       })).sort((a, b) => a.name.localeCompare(b.name));
       select.innerHTML = '<option value="">Selecione um usu\xE1rio...</option>' + userList.map((user) => {
-        return `<option value="${user.id}">${user.name} (${user.email}) \u2713</option>`;
+        const statusLabel = user.status === "approved" ? "\u2713" : "\u23F3";
+        return `<option value="${user.id}">${user.name} (${user.email}) ${statusLabel}</option>`;
       }).join("");
     }
   } catch (error) {
+    console.error("Erro ao carregar usu\xE1rios:", error);
   }
 }
 async function handleSendNotification(e) {
@@ -15965,7 +16790,7 @@ async function pdEnhanceProfile(container, user, createdAtMs, pre) {
     const recHtml = rec.length ? '<div class="pdp-rec">' + rec.map((r) => '<div class="pdp-rec-item" data-gid="' + escapeHtml(r.id) + '"><img src="' + escapeHtml(r.g.poster || "") + '" alt="" loading="lazy"><span>' + escapeHtml(r.g.titulo || "") + "</span></div>").join("") + "</div>" : '<div class="pdp-vazio">Ainda não baixou nada.</div>';
     const cardRec = '<div class="pdp-card" data-pdp="1"><h3>Últimos downloads</h3>' + recHtml + "</div>";
 
-    const cardNudge = (!cfg0.user || !cfg0.bio) ? '<div class="pdp-card pp-nudge" data-pdp="1"><div class="pp-nudge-t">Complete o seu perfil</div><div class="pp-nudge-d">Adicione um nome de usuário e uma bio para o seu perfil ficar mais interessante.</div><button type="button" class="custom-modal-btn primary" onclick="ppOpenSetup()">Completar agora</button></div>' : "";
+    const cardNudge = ppProfileIncomplete(uid) ? '<div class="pdp-card pp-nudge" data-pdp="1"><div class="pp-nudge-t">Complete o seu perfil</div><div class="pp-nudge-d">' + ppNudgeText(uid) + '</div><button type="button" class="custom-modal-btn primary" onclick="ppNudgeAction()">Completar agora</button></div>' : "";
     card.insertAdjacentHTML("afterend", cardNudge + cardNivel + cardStats + cardPers + cardConq + cardRec);
     const fill = container.querySelector("#pdpXpFill");
     if (fill) setTimeout(() => { fill.style.width = nv.pct + "%"; }, 60);
@@ -16143,6 +16968,7 @@ async function loadProfileData(user, container) {
     if (tok !== window.__pdLoadTok) return;
     container.replaceChildren(...stage.childNodes);
   } catch (error) {
+    console.error("Error loading profile:", error);
     const displayName = userName || user.displayName || user.email?.split("@")[0] || "Usu\xE1rio";
     const email = user.email || "";
     document.getElementById("profileHeaderPointsValue").textContent = userPoints || 0;
@@ -16264,6 +17090,7 @@ async function handleReportProblem(event) {
     closeReportProblemOverlay();
     showCustomAlert(" Report enviado com sucesso! Os administradores ir\xE3o analisar o problema.");
   } catch (error) {
+    console.error("Error submitting report:", error);
     showCustomAlert("Erro ao enviar report. Tente novamente.");
   } finally {
     submitBtn.disabled = false;
@@ -16305,6 +17132,7 @@ async function updateReportsBadge() {
       badge.style.display = "none";
     }
   } catch (error) {
+    console.error("Error updating reports badge:", error);
     badge.style.display = "none";
   }
 }
@@ -16338,6 +17166,7 @@ async function loadReports() {
     allReports.sort((a, b) => b.createdAt - a.createdAt);
     renderReports();
   } catch (error) {
+    console.error("Error loading reports:", error);
     reportsList.innerHTML = `
           <div class="reports-empty">
             <svg viewBox="0 0 24 24" style="fill: #f44336;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
@@ -16452,6 +17281,7 @@ async function markReportResolved(reportId) {
     updateReportsBadge();
     showCustomAlert(" Report marcado como resolvido!");
   } catch (error) {
+    console.error("Error resolving report:", error);
     showCustomAlert("Erro ao atualizar report.");
   }
 }
@@ -16471,6 +17301,7 @@ async function deleteReport(reportId) {
     updateReportsBadge();
     showCustomAlert("Report exclu\xEDdo com sucesso!");
   } catch (error) {
+    console.error("Error deleting report:", error);
     showCustomAlert("Erro ao excluir report.");
   }
 }
@@ -16693,6 +17524,7 @@ async function confirmRating() {
     showCustomAlert(successMsg);
     renderRatingOverlay();
   } catch (e) {
+    console.error("Erro ao enviar avalia\xE7\xE3o:", e);
     showCustomAlert("Erro ao enviar avalia\xE7\xE3o. Tente novamente.");
   }
 }
@@ -16794,33 +17626,11 @@ function renderNotifications() {
     return;
   }
   const hasUnread = userNotifications.some((n) => !n.isRead);
-  notificationsFooter.style.display = hasUnread ? "block" : "none";
-  notificationsList.innerHTML = userNotifications.map((notif) => {
-    const timeAgo = formatTimeAgo(notif.createdAt);
-    const isUnread = !notif.isRead;
-    const itemClass = isUnread ? "notification-item unread" : "notification-item read";
-    const unreadIndicator = isUnread ? '<span class="notification-unread-indicator"></span>' : "";
-    const personalBadge = notif.isPersonal ? '<span style="background: #9c27b0; color: white; font-size: 11px; padding: 3px 8px; border-radius: 6px; margin-left: 8px;">Para voc\xEA</span>' : "";
-    const markReadBtn = isUnread ? `<button class="notification-action-btn mark-read" onclick="markNotificationAsRead('${notif.id}')">
-               \u2713 Marcar como lida
-             </button>` : "";
-    return `
-          <div class="${itemClass}">
-            <div class="notification-header">
-              <div>
-                <div class="notification-title">${unreadIndicator}${notif.title}${personalBadge}</div>
-                <div class="notification-time">${timeAgo}</div>
-              </div>
-            </div>
-            <div class="notification-message">${convertUrlsToLinks(notif.message)}</div>${notif.type === "codigo" && notif.codigo ? ppCodeActions(notif) : ""}
-            <div class="notification-actions">
-              ${markReadBtn}
-              <button class="notification-action-btn delete" onclick="dismissNotification('${notif.id}')">
-                 Apagar
-              </button>
-            </div>
-          </div>
-        `;
+  notificationsFooter.style.display = "flex";
+  const markAllBtn = document.getElementById("markAllReadBtn");
+  if (markAllBtn) markAllBtn.style.display = hasUnread ? "flex" : "none";
+  notificationsList.innerHTML = userNotifications.map((notif, idx) => {
+    return notif.type === "codigo" && notif.codigo ? ppPointsCard(notif, idx) : ppNotifCard(notif, idx);
   }).join("");
 }
 async function markNotificationAsRead(notificationId) {
@@ -16855,17 +17665,240 @@ async function markAllNotificationsAsRead() {
     showCustomAlert("Erro ao marcar notifica\xE7\xF5es: " + error.message);
   }
 }
+async function removeNotificationsPermanently(list) {
+  const { ref, update } = window.firebaseModules;
+  const database = window.firebaseDatabase;
+  const uid = currentUser.uid;
+  const canHardDelete = (n) => n.targetUserId === uid && n.type !== "transfer";
+  const removed = new Set();
+  const hard = list.filter(canHardDelete);
+  if (hard.length) {
+    const paths = {};
+    hard.forEach((n) => {
+      paths[`notifications/${n.id}`] = null;
+      paths[`dismissedNotifications/${uid}/${n.id}`] = null;
+      paths[`readNotifications/${uid}/${n.id}`] = null;
+    });
+    try {
+      await update(ref(database), paths);
+      hard.forEach((n) => removed.add(n.id));
+    } catch (e) {
+      console.warn("Nao foi possivel apagar do servidor, a usar marca de apagada:", e);
+    }
+  }
+  const rest = list.filter((n) => !removed.has(n.id));
+  if (rest.length) {
+    const marks = {};
+    rest.forEach((n) => {
+      marks[`dismissedNotifications/${uid}/${n.id}`] = true;
+    });
+    await update(ref(database), marks);
+  }
+  list.forEach((n) => {
+    dismissedNotifications[n.id] = true;
+  });
+}
 async function dismissNotification(notificationId) {
   try {
-    const { ref, set } = window.firebaseModules;
-    const database = window.firebaseDatabase;
-    await set(ref(database, `dismissedNotifications/${currentUser.uid}/${notificationId}`), true);
-    dismissedNotifications[notificationId] = true;
+    const notif = userNotifications.find((n) => n.id === notificationId);
+    if (!notif) return;
+    await removeNotificationsPermanently([notif]);
     userNotifications = userNotifications.filter((n) => n.id !== notificationId);
     updateNotificationBadge();
     renderNotifications();
   } catch (error) {
     showCustomAlert("Erro ao apagar notifica\xE7\xE3o: " + error.message);
+  }
+}
+function dismissAllNotifications() {
+  if (!userNotifications.length) return;
+  showConfirmModal(
+    "Apagar todas as notifica\xE7\xF5es?",
+    `Vais apagar ${userNotifications.length} notifica\xE7\xE3o(\xF5es) de forma permanente. Esta a\xE7\xE3o n\xE3o pode ser desfeita.`,
+    async () => {
+      try {
+        const all = userNotifications.slice();
+        await removeNotificationsPermanently(all);
+        userNotifications = [];
+        updateNotificationBadge();
+        renderNotifications();
+      } catch (error) {
+        showCustomAlert("Erro ao apagar notifica\xE7\xF5es: " + error.message);
+      }
+    }
+  );
+}
+let userAdFreeUntil = 0;
+let adFreeServerOffset = 0;
+let adFreeBusy = false;
+const AD_FREE_PLANS = [
+  { days: 7, cost: 1000 },
+  { days: 15, cost: 1500 },
+  { days: 30, cost: 2500 }
+];
+function adFreeSyncOffset() {
+  try {
+    getServerTimestamp().then((t) => {
+      adFreeServerOffset = t - Date.now();
+      updateAdFreeUI();
+    }).catch(() => {});
+  } catch (e) {}
+}
+function isAdFreeActive() {
+  return userAdFreeUntil > Date.now() + adFreeServerOffset;
+}
+function adFreeFmtDate(ms) {
+  return new Date(ms).toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric" });
+}
+function adFreeDaysLeft() {
+  const left = userAdFreeUntil - (Date.now() + adFreeServerOffset);
+  return Math.max(0, Math.ceil(left / 86400000));
+}
+function updateAdFreeUI() {
+  const t = document.getElementById("adFreeBtnText");
+  if (!t) return;
+  t.textContent = isAdFreeActive() ? "Sem anúncios até " + adFreeFmtDate(userAdFreeUntil) : "Remover Anúncios";
+}
+function adFreeEnsureSheet() {
+  let el = document.getElementById("adFreeOverlay");
+  if (el) return el;
+  el = document.createElement("div");
+  el.id = "adFreeOverlay";
+  el.className = "afree-overlay";
+  el.innerHTML = '<div class="afree-sheet" id="adFreeSheet"></div>';
+  el.addEventListener("click", (e) => {
+    if (e.target === el) closeAdFreeSheet();
+  });
+  document.body.appendChild(el);
+  return el;
+}
+function openAdFreeSheet() {
+  if (!currentUser || currentUser.isAnonymous) {
+    showSignupPrompt("remover os anúncios");
+    return;
+  }
+  try { closeSidebar(); } catch (e) {}
+  adFreeSyncOffset();
+  adFreeEnsureSheet().classList.add("active");
+  adFreeRenderPlans();
+}
+function closeAdFreeSheet() {
+  const el = document.getElementById("adFreeOverlay");
+  if (el) el.classList.remove("active");
+}
+function adFreeRenderPlans(note) {
+  const sheet = document.getElementById("adFreeSheet");
+  if (!sheet) return;
+  const active = isAdFreeActive();
+  const status = active
+    ? `Ativo até <b>${adFreeFmtDate(userAdFreeUntil)}</b> (${adFreeDaysLeft()} dias). Comprar mais soma ao tempo que resta.`
+    : "Baixe conteúdos grátis sem assistir ao anúncio.";
+  const cards = AD_FREE_PLANS.map((p) => {
+    const ok = userPoints >= p.cost;
+    const perDay = Math.round(p.cost / p.days);
+    return `<button type="button" class="afree-plan ${p.days === 30 ? "afree-best" : ""} ${ok ? "" : "afree-off"}" ${ok ? "" : "disabled"} onclick="adFreeSelect(${p.days})">
+      <div>
+        <div class="afree-plan-days">${p.days} dias${p.days === 30 ? '<span class="afree-tag">Melhor valor</span>' : ""}</div>
+        <div class="afree-plan-sub">${ok ? "≈ " + perDay + " pts por dia" : "Pontos insuficientes"}</div>
+      </div>
+      <div class="afree-plan-cost">${p.cost} pts</div>
+    </button>`;
+  }).join("");
+  sheet.innerHTML = `
+    <h2 class="afree-title">Remover anúncios</h2>
+    <p class="afree-sub">${status}</p>
+    <p class="afree-balance">O seu saldo: <b>${userPoints || 0} pts</b></p>
+    ${cards}
+    <div class="afree-note">${note || ""}</div>
+    <div class="afree-actions"><button type="button" class="afree-btn secondary" onclick="closeAdFreeSheet()">Fechar</button></div>`;
+}
+function adFreeSelect(days) {
+  const plan = AD_FREE_PLANS.find((p) => p.days === days);
+  const sheet = document.getElementById("adFreeSheet");
+  if (!plan || !sheet) return;
+  if (userPoints < plan.cost) {
+    adFreeRenderPlans("Pontos insuficientes para este plano.");
+    return;
+  }
+  const now = Date.now() + adFreeServerOffset;
+  const base = userAdFreeUntil > now ? userAdFreeUntil : now;
+  const until = base + plan.days * 86400000;
+  sheet.innerHTML = `
+    <h2 class="afree-title">Confirmar compra</h2>
+    <div class="afree-row"><span>Plano</span><b>${plan.days} dias sem anúncios</b></div>
+    <div class="afree-row"><span>Custo</span><b>${plan.cost} pts</b></div>
+    <div class="afree-row"><span>Saldo depois</span><b>${userPoints - plan.cost} pts</b></div>
+    <div class="afree-row"><span>Sem anúncios até</span><b>${adFreeFmtDate(until)}</b></div>
+    <p class="afree-warn">Os pontos são descontados da sua conta agora. Esta compra não tem reembolso.</p>
+    <div class="afree-note" id="adFreeNote"></div>
+    <div class="afree-actions">
+      <button type="button" class="afree-btn secondary" onclick="adFreeRenderPlans()">Voltar</button>
+      <button type="button" class="afree-btn" id="adFreeConfirmBtn" onclick="adFreeConfirm(${plan.days})">Confirmar</button>
+    </div>`;
+}
+async function adFreeConfirm(days) {
+  if (adFreeBusy) return;
+  const plan = AD_FREE_PLANS.find((p) => p.days === days);
+  if (!plan || !currentUser || currentUser.isAnonymous) return;
+  const btn = document.getElementById("adFreeConfirmBtn");
+  const note = document.getElementById("adFreeNote");
+  if (!navigator.onLine) {
+    if (note) note.textContent = "Sem ligação à internet. Tente novamente.";
+    return;
+  }
+  adFreeBusy = true;
+  if (btn) { btn.disabled = true; btn.textContent = "A processar..."; }
+  try {
+    const { ref, get, update } = window.firebaseModules;
+    const database = window.firebaseDatabase;
+    const uid = currentUser.uid;
+    const snap = await get(ref(database, `users/${uid}`));
+    const data = snap.val() || {};
+    const points = Number(data.points) || 0;
+    if (points < plan.cost) {
+      _syncPointsDisplay(points);
+      adFreeRenderPlans("Pontos insuficientes para este plano.");
+      return;
+    }
+    const serverNow = await getServerTimestamp();
+    const currentUntil = Number(data.adFreeUntil) || 0;
+    const base = currentUntil > serverNow ? currentUntil : serverNow;
+    const until = base + plan.days * 86400000;
+    const newPoints = points - plan.cost;
+    const updates = {};
+    updates[`users/${uid}/points`] = newPoints;
+    updates[`users/${uid}/adFreeUntil`] = until;
+    updates[`users/${uid}/adFreePlan`] = plan.days;
+    updates[`adFreePurchases/${uid}/${serverNow}_${plan.days}`] = {
+      plan: plan.days,
+      cost: plan.cost,
+      until,
+      purchasedAt: serverNow,
+      previousPoints: points,
+      newPoints
+    };
+    await update(ref(database), updates);
+    userAdFreeUntil = until;
+    _syncPointsDisplay(newPoints);
+    updateAdFreeUI();
+    try {
+      if (window.PortalAd && typeof currentGameData !== "undefined" && currentGameData) {
+        window.PortalAd.aplicarPorta(currentGameData);
+      }
+    } catch (e) {}
+    const sheet = document.getElementById("adFreeSheet");
+    if (sheet) {
+      sheet.innerHTML = `
+        <h2 class="afree-title">Anúncios removidos</h2>
+        <p class="afree-sub">Sem anúncios até <b>${adFreeFmtDate(until)}</b>. O seu novo saldo é <b>${newPoints} pts</b>.</p>
+        <div class="afree-actions"><button type="button" class="afree-btn" onclick="closeAdFreeSheet()">Fechar</button></div>`;
+    }
+  } catch (error) {
+    console.error("[ANUNCIOS] Erro na compra:", error);
+    if (btn) { btn.disabled = false; btn.textContent = "Confirmar"; }
+    if (note) note.textContent = "Não foi possível concluir a compra. Tente novamente.";
+  } finally {
+    adFreeBusy = false;
   }
 }
 let userFavorites = {};
@@ -16913,6 +17946,7 @@ async function loadUserRatings() {
       userRatings = {};
     }
   } catch (e) {
+    console.error("Erro ao carregar avalia\xE7\xF5es do usu\xE1rio:", e);
     userRatings = {};
   }
 }
@@ -16955,6 +17989,7 @@ async function loadGameRatings(gameId) {
       count = data.count || 0;
     }
   } catch (e) {
+    console.error("Erro ao carregar m\xE9dia de avalia\xE7\xF5es:", e);
   }
   if (!currentGameData || currentGameData.id !== gameId) return;
   const average = count > 0 ? sum / count : 0;
@@ -16993,6 +18028,7 @@ async function loadGameRatings(gameId) {
     items.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
     renderRatingList(items.slice(0, 20));
   } catch (e) {
+    console.error("Erro ao carregar avalia\xE7\xF5es:", e);
     ratingList.innerHTML = "";
   }
 }
@@ -17076,6 +18112,7 @@ async function submitRating() {
     showCustomAlert(previousRating ? "Avalia\xE7\xE3o atualizada!" : "Avalia\xE7\xE3o enviada!");
     await loadGameRatings(gameId);
   } catch (e) {
+    console.error("Erro ao enviar avalia\xE7\xE3o:", e);
     showCustomAlert("Erro ao enviar avalia\xE7\xE3o.");
   } finally {
     setRatingSubmitLoading(false);
@@ -17101,6 +18138,7 @@ async function loadUserFavorites() {
       userFavorites = {};
     }
   } catch (e) {
+    console.error("Erro ao carregar favoritos:", e);
     userFavorites = {};
   }
   refreshRecommendations();
@@ -17117,6 +18155,7 @@ async function loadUserLikes() {
       userLikes = {};
     }
   } catch (e) {
+    console.error("Erro ao carregar likes:", e);
     userLikes = {};
   }
   refreshRecommendations();
@@ -17151,6 +18190,7 @@ async function toggleFavorite() {
       showCustomAlert("Adicionado aos favoritos!");
     }
   } catch (e) {
+    console.error("Erro ao atualizar favorito:", e);
     showCustomAlert("Erro ao atualizar favorito.");
   }
 }
@@ -17210,6 +18250,7 @@ async function toggleLike() {
     releaseLike();
     updateLikeButton();
   } catch (e) {
+    console.error("Erro ao atualizar like:", e);
     releaseLike();
     showCustomAlert("Erro ao curtir.");
   }
@@ -17345,12 +18386,10 @@ async function removeFavorite(gameId) {
     renderFavoritesList();
     updateFavoriteButton();
   } catch (e) {
+    console.error("Erro ao remover favorito:", e);
   }
 }
 let allUsersForTransfer = [];
-function isVerifiedAccount(u) {
-  return !!(u && u.email && (u.emailVerified === true || u.status === "approved"));
-}
 function toggleTransferType() {
   const transferType = document.querySelector('input[name="transferType"]:checked').value;
   const emailGroup = document.getElementById("transferEmailGroup");
@@ -17382,7 +18421,7 @@ async function updateTransferUsersCount() {
       allUsersForTransfer = [];
       usersSnapshot.forEach((child) => {
         const userData = child.val();
-        if (child.key !== currentUser.uid && isVerifiedAccount(userData)) {
+        if (child.key !== currentUser.uid && userData && userData.status === "approved") {
           allUsersForTransfer.push({
             uid: child.key,
             email: userData.email || "",
@@ -17391,19 +18430,10 @@ async function updateTransferUsersCount() {
           });
         }
       });
-      document.getElementById("totalUsersCount").textContent = `${allUsersForTransfer.length} usu\xE1rios verificados`;
-      const dl = document.getElementById("transferEmailList");
-      if (dl) {
-        dl.innerHTML = "";
-        allUsersForTransfer.slice().sort((a, b) => a.name.localeCompare(b.name)).forEach((u) => {
-          const opt = document.createElement("option");
-          opt.value = u.email;
-          opt.label = u.name;
-          dl.appendChild(opt);
-        });
-      }
+      document.getElementById("totalUsersCount").textContent = `${allUsersForTransfer.length} usu\xE1rios`;
     }
   } catch (e) {
+    console.error("Erro ao contar usu\xE1rios:", e);
   }
 }
 function openTransferModal() {
@@ -17420,7 +18450,6 @@ function openTransferModal() {
   document.getElementById("transferEmail").value = "";
   document.getElementById("transferAmount").value = "";
   selectTransferType("individual");
-  updateTransferUsersCount();
   document.getElementById("transferOverlay").classList.add("active");
 }
 function closeTransferModal() {
@@ -17497,10 +18526,6 @@ async function handleTransferToIndividual(amount) {
       showCustomAlert("Usu\xE1rio com esse email n\xE3o encontrado no sistema.");
       return;
     }
-    if (!isVerifiedAccount(recipientData)) {
-      showCustomAlert("Esta conta ainda n\xE3o est\xE1 verificada. S\xF3 \xE9 poss\xEDvel transferir pontos para contas verificadas.");
-      return;
-    }
     const recipientCurrentPoints = recipientData.points || 0;
     const recipientNewPoints = recipientCurrentPoints + amount;
     const serverTime = await getServerTimestamp();
@@ -17526,6 +18551,7 @@ ${amount} pontos enviados para ${recipientEmail}.
 Novo saldo do destinat\xE1rio: ${recipientNewPoints} pontos.`);
     closeTransferModal();
   } catch (error) {
+    console.error("[SEGURAN\xC7A] Erro na transfer\xEAncia:", error);
     showCustomAlert("Erro ao realizar transfer\xEAncia: " + error.message);
   }
 }
@@ -17580,6 +18606,7 @@ async function executeMassTransfer(amount) {
         successCount++;
         submitBtn.textContent = `Transferindo... (${successCount}/${allUsersForTransfer.length})`;
       } catch (err) {
+        console.error(`Erro ao transferir para ${user.email}:`, err);
         errorCount++;
       }
     }
@@ -17597,6 +18624,7 @@ Erros: ${errorCount} usu\xE1rios`);
     }
     closeTransferModal();
   } catch (error) {
+    console.error("[SEGURAN\xC7A] Erro na transfer\xEAncia em massa:", error);
     showCustomAlert("Erro ao realizar transfer\xEAncia: " + error.message);
   } finally {
     submitBtn.disabled = false;
@@ -17634,6 +18662,7 @@ async function checkDailyReward() {
       showDailyRewardModal();
     }
   } catch (e) {
+    console.error("Erro ao verificar recompensa di\xE1ria:", e);
   }
 }
 async function getServerTimestamp() {
@@ -17645,6 +18674,7 @@ async function getServerTimestamp() {
     const offset = snapshot.val() || 0;
     return Date.now() + offset;
   } catch (e) {
+    console.error("Erro ao obter timestamp do servidor:", e);
     return Date.now();
   }
 }
@@ -17802,6 +18832,7 @@ Volte em ${formatTimeRemaining(nextRewardTime - freshServerTime)}`);
     startRewardCountdown();
     showCustomAlert("\u{1F381} Recompensa di\xE1ria resgatada!\n\n+20 pontos adicionados \xE0 sua conta!");
   } catch (e) {
+    console.error("[SEGURAN\xC7A] Erro ao resgatar recompensa:", e);
     showCustomAlert("Erro ao resgatar recompensa. Tente novamente.");
   }
 }
@@ -17821,6 +18852,7 @@ function saveDailyRecommendationState(state) {
   try {
     localStorage.setItem(DAILY_REC_STORAGE_KEY, JSON.stringify(state));
   } catch (e) {
+    console.error("Erro ao salvar recomenda\xE7\xE3o di\xE1ria:", e);
   }
 }
 function isAnyModalOpen() {
@@ -17926,6 +18958,7 @@ function clearDailyRecommendationState() {
   try {
     localStorage.removeItem(DAILY_REC_STORAGE_KEY);
   } catch (e) {
+    console.error("Erro ao limpar recomenda\xE7\xE3o di\xE1ria:", e);
   }
 }
 function closeDailyRecommendationModal() {
@@ -18185,7 +19218,7 @@ document.addEventListener("keydown", (e) => {
         const dados = d.data();
         if (dados.videoId && dados.link) ANUNCIOS_ATIVOS.push({ id: d.id, videoId: dados.videoId, link: dados.link, logoUrl: dados.logoUrl || '', tituloExibido: dados.tituloExibido || '', subtitulo: dados.subtitulo || '', textoBotao: dados.textoBotao || '', exibicoes: Number(dados.exibicoes) || 0, cliques: Number(dados.cliques) || 0 });
       });
-    } catch (e) {}
+    } catch (e) {  }
     sortearAnuncio();
     atualizarPorta();
   }
@@ -18213,7 +19246,7 @@ document.addEventListener("keydown", (e) => {
         [campo]: increment(1)
       }, { merge: true }).catch(() => {});
       updateDoc(doc(firestore, 'anuncios', anuncio.id), { [campo]: increment(1) }).catch(() => {});
-    } catch (e) {}
+    } catch (e) {  }
   }
 
   function toast(msg, ms) {
@@ -18413,7 +19446,7 @@ document.addEventListener("keydown", (e) => {
       ytPlayer.setVolume(100);
       if (ytPlayer.getCurrentTime() > 0.5) ytPlayer.seekTo(0, true);
       ytPlayer.playVideo();
-    } catch (e) {}
+    } catch (e) {  }
 
     let ticks = 0;
     clearInterval(timerRetry);
@@ -18569,8 +19602,12 @@ document.addEventListener("keydown", (e) => {
     }
   }
 
+  function semAnuncios() {
+    return typeof isAdFreeActive === 'function' && isAdFreeActive();
+  }
+
   function portaBloqueada(game) {
-    return ehGratis(game) && anuncioDisponivel && liberadoPara !== game.id && !falhou;
+    return ehGratis(game) && !semAnuncios() && anuncioDisponivel && liberadoPara !== game.id && !falhou;
   }
 
   function atualizarPorta() {
@@ -18624,7 +19661,7 @@ document.addEventListener("keydown", (e) => {
   window.PortalAd = {
     escolherPorThompson: escolherPorThompson,
     preparar: function (game) {
-      if (ehGratis(game)) garantirCarga();
+      if (ehGratis(game) && !semAnuncios()) garantirCarga();
     },
 
     aplicarPorta: function (game) {
@@ -18884,7 +19921,7 @@ async function openAdStatsModal(id) {
         ultimaHora: u.ultimaHora || ""
       };
     });
-  } catch (e) {}
+  } catch (e) {  }
   try {
     const snapAntigo = await getDocs(query(collection(firestore, "anuncio_eventos"), where("anuncioId", "==", id)));
     snapAntigo.forEach((d) => {
@@ -18899,7 +19936,7 @@ async function openAdStatsModal(id) {
         u.ultimaHora = ev.hora || "";
       }
     });
-  } catch (e) {}
+  } catch (e) {  }
   allAdStatsUsers = Object.values(porUsuario);
   renderAdStats();
 }
@@ -19071,6 +20108,7 @@ function renderAdStats() {
       aplicarEstado(snap.exists() ? snap.val() : {});
       estadoCarregado = true;
     } catch (e) {
+      console.error('[ANÚNCIOS] Erro ao carregar pontos:', e);
       estadoCarregado = false;
     }
     carregandoEstado = false;
@@ -19136,6 +20174,7 @@ function renderAdStats() {
       _syncPointsDisplay(novoSaldo);
       return { status: 'ganhou', premio: premio };
     } catch (e) {
+      console.error('[SEGURANÇA] Pontos do anúncio bloqueados ou falharam:', e);
       return { status: 'erro' };
     }
   }
@@ -20165,6 +21204,7 @@ async function pqLoadConfig(force) {
     if (snap.exists()) data = snap.data();
     ok = true;
   } catch (e) {
+    console.warn("[Inquérito] Não foi possível ler a configuração:", e);
   }
   pqConfig = pqNormalizeCfg(data);
   if (ok) pqCacheSave(pqConfig);
@@ -20458,6 +21498,7 @@ async function pqSubmit() {
     updateSurveyUI();
     showCustomAlert("Obrigado pela tua opinião! Ganhaste +" + pqPoints + " pontos. Total: " + newTotal + " pontos.");
   } catch (e) {
+    console.error("[Inquérito] Erro ao enviar:", e);
     showCustomAlert("Não foi possível enviar o inquérito.<br><small>Falhou ao: " + pqStep + "<br>Erro: " + String((e && (e.code || e.message)) || e).slice(0, 120).replace(/</g, "&lt;") + "</small>");
   } finally {
     pqSending = false;
@@ -20521,6 +21562,7 @@ async function pqLoadRespostas() {
     pqRespostas = snap.docs.map(d => Object.assign({ id: d.id }, d.data()));
     if (pqAdminTab === "resultados") pqRenderResultados();
   } catch (e) {
+    console.error("[Inquérito] Erro ao carregar respostas:", e);
     body.innerHTML = '<div class="manage-users-empty"><p>Não foi possível carregar as respostas. Verifica as regras do Firestore para a coleção pesquisa_respostas.</p></div>';
   }
 }
@@ -20696,6 +21738,7 @@ async function pqAdminSave() {
     pqRenderPerguntas();
     showCustomAlert("Inquérito guardado.");
   } catch (e) {
+    console.error("[Inquérito] Erro ao guardar:", e);
     showCustomAlert("Não foi possível guardar. Verifica as regras do Firestore para pesquisa_config.");
   } finally {
     btn.disabled = false;
@@ -20778,18 +21821,37 @@ function reqUpdateCounter() {
   const el = document.getElementById("reqInput");
   document.getElementById("reqCounter").textContent = el.value.length + "/" + REQ_MAX;
 }
+const REQ_TIPOS = {
+  Jogo: { c: "t-jogo", i: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>' },
+  App: { c: "t-app", i: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>' },
+  Tutorial: { c: "t-tutorial", i: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg>' },
+  Outro: { c: "t-outro", i: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg>' }
+};
+const reqSeen = new Set();
 function renderRequests() {
   const list = document.getElementById("requestsList");
   if (!list) return;
   const uid = currentUser ? currentUser.uid : null;
-  let items = Object.entries(reqData).map(([id, r]) => ({ id, ...r })).filter((r) => r && r.text);
-  items.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+  const all = Object.entries(reqData).map(([id, r]) => ({ id, ...r })).filter((r) => r && r.text);
+  all.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+  const cnt = {
+    todos: all.length,
+    abertos: all.filter((r) => r.status !== "atendido").length,
+    atendidos: all.filter((r) => r.status === "atendido").length,
+    meus: all.filter((r) => uid && r.authorId === uid).length
+  };
+  document.querySelectorAll("#reqTabs .req-count").forEach((el) => { el.textContent = cnt[el.dataset.c]; });
+  const stOpen = document.getElementById("reqStatOpen");
+  const stDone = document.getElementById("reqStatDone");
+  if (stOpen) stOpen.textContent = cnt.abertos;
+  if (stDone) stDone.textContent = cnt.atendidos;
+  let items = all.slice();
   if (reqFilter === "abertos") items = items.filter((r) => r.status !== "atendido");
   else if (reqFilter === "atendidos") items = items.filter((r) => r.status === "atendido");
   else if (reqFilter === "meus") items = items.filter((r) => r.authorId === uid);
   if (!items.length) {
-    const msg = reqFilter === "meus" ? "Você ainda não fez nenhum pedido." : "Seja o primeiro a pedir algo!";
-    list.innerHTML = '<div class="overlay-empty-state"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 14h-3v3h-2v-3H8v-2h3v-3h2v3h3v2zm-3-7V3.5L18.5 9H13z"/></svg><h3>Nenhum pedido</h3><p>' + msg + '</p></div>';
+    const msg = reqFilter === "meus" ? "Você ainda não fez nenhum pedido." : reqFilter === "atendidos" ? "Ainda não há pedidos atendidos." : "Seja o primeiro a pedir algo!";
+    list.innerHTML = '<div class="req-empty"><div class="req-empty-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3H4.99c-1.11 0-1.98.89-1.98 2L3 19c0 1.1.88 2 1.99 2H19c1.1 0 2-.9 2-2V5c0-1.11-.9-2-2-2zm0 12h-4c0 1.66-1.35 3-3 3s-3-1.34-3-3H4.99V5H19v10z"/></svg></div><h3>Nenhum pedido</h3><p>' + msg + '</p></div>';
     return;
   }
   list.innerHTML = items.map((r) => {
@@ -20803,17 +21865,20 @@ function renderRequests() {
     const id = reqEsc(r.id);
     const canDelete = isPublisher || (uid && r.authorId === uid);
     let actions = "";
-    if (isPublisher) actions += '<button class="req-action-btn" onclick="toggleRequestStatus(\'' + id + '\')">' + (done ? "Reabrir" : "Marcar atendido") + '</button>';
+    if (isPublisher) actions += '<button class="req-action-btn' + (done ? "" : " ok") + '" onclick="toggleRequestStatus(\'' + id + '\')">' + (done ? "Reabrir" : "Marcar atendido") + '</button>';
     if (canDelete) actions += '<button class="req-action-btn danger" onclick="deleteRequest(\'' + id + '\')">Apagar</button>';
-    return '<div class="req-card' + (done ? " done" : "") + '">' +
+    const tp = REQ_TIPOS[r.tipo] || REQ_TIPOS.Outro;
+    const isNew = !reqSeen.has(r.id);
+    reqSeen.add(r.id);
+    return '<div class="req-card ' + tp.c + (done ? " done" : "") + (isNew ? " req-new" : "") + '">' +
       '<div class="req-card-top">' +
         '<div class="req-avatar req-click" onclick="openPublicProfile(\'' + reqEsc(r.authorId) + '\')">' + avatar + '</div>' +
         '<div class="req-meta req-click" onclick="openPublicProfile(\'' + reqEsc(r.authorId) + '\')"><div class="req-author">' + name + '</div><div class="req-time">' + formatTimeAgo(r.timestamp || Date.now()) + '</div></div>' +
-        '<span class="req-tipo">' + reqEsc(r.tipo || "Outro") + '</span>' +
+        '<span class="req-status' + (done ? " done" : "") + '">' + (done ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Atendido' : "Em aberto") + '</span>' +
       '</div>' +
       '<div class="req-text">' + reqEsc(r.text) + '</div>' +
       '<div class="req-footer">' +
-        '<span class="req-status' + (done ? " done" : "") + '">' + (done ? "✓ Atendido" : "Em aberto") + '</span>' +
+        '<span class="req-tipo">' + tp.i + reqEsc(r.tipo || "Outro") + '</span>' +
         '<div class="req-actions">' + actions + '</div>' +
       '</div>' +
     '</div>';
@@ -21009,7 +22074,42 @@ function ppRender(uid, prof, reqs) {
 <script>
 function ppSetupState(uid) { try { return JSON.parse(localStorage.getItem("pd_setup_" + uid) || "{}") || {}; } catch (e) { return {}; } }
 function ppSetupSave_(uid, st) { try { localStorage.setItem("pd_setup_" + uid, JSON.stringify(st)); } catch (e) {} }
-function ppProfileIncomplete(uid) { const c = pdpCfg(uid); return !c.user || !c.bio; }
+function ppProfileIncomplete(uid) { const c = pdpCfg(uid); return !userAvatar || !c.user || !c.bio; }
+let ppSetupPhotoAdded = false;
+function ppNudgeText(uid) {
+  const c = pdpCfg(uid);
+  const itens = [];
+  if (!userAvatar) itens.push("uma foto de perfil");
+  if (!c.user) itens.push("um nome de usuário");
+  if (!c.bio) itens.push("uma bio");
+  const lista = itens.length > 1 ? itens.slice(0, -1).join(", ") + " e " + itens[itens.length - 1] : (itens[0] || "");
+  return "Adicione " + lista + " para o seu perfil ficar mais interessante.";
+}
+function ppSetupIntroText() {
+  return (userAvatar ? "Escolha" : "Adicione uma foto, escolha") + " um nome de usuário e escreva uma bio curta. Eles aparecem no seu perfil público, nos pedidos e nos comentários.";
+}
+function ppNudgeAction() {
+  const u = currentUser;
+  if (!u || u.isAnonymous) return;
+  const c = pdpCfg(u.uid);
+  if (c.user && c.bio && !userAvatar) { updateProfileAvatar(); return; }
+  ppOpenSetup();
+}
+function ppAvatarChanged() {
+  const u = currentUser;
+  const modal = document.getElementById("profileSetupModal");
+  if (modal && modal.classList.contains("active")) {
+    ppSetupPhotoAdded = true;
+    document.getElementById("ppSetupPhotoBox").style.display = "none";
+    document.getElementById("ppSetupIntro").textContent = ppSetupIntroText();
+  }
+  if (!u) return;
+  document.querySelectorAll(".pp-nudge").forEach((el) => {
+    if (!ppProfileIncomplete(u.uid)) { el.remove(); return; }
+    const d = el.querySelector(".pp-nudge-d");
+    if (d) d.textContent = ppNudgeText(u.uid);
+  });
+}
 function ppMaybePromptSetup() {
   const u = currentUser;
   if (!u || u.isAnonymous || !reqIsVerified()) return;
@@ -21030,6 +22130,11 @@ function ppOpenSetup() {
   document.getElementById("ppSetupUser").value = c.user || "";
   document.getElementById("ppSetupBio").value = c.bio || "";
   ppSetupCount();
+  ppSetupPhotoAdded = false;
+  document.getElementById("ppSetupIntro").textContent = ppSetupIntroText();
+  const photoBox = document.getElementById("ppSetupPhotoBox");
+  photoBox.style.display = userAvatar ? "none" : "block";
+  if (!userAvatar) document.getElementById("ppSetupPhotoPreview").innerHTML = getDefaultAvatarSVG();
   document.getElementById("profileSetupModal").classList.add("active");
 }
 function ppSetupClose() {
@@ -21045,7 +22150,11 @@ function ppSetupSave() {
   if (!u || u.isAnonymous) return;
   const user = document.getElementById("ppSetupUser").value.trim().replace(/^@/, "");
   const bio = document.getElementById("ppSetupBio").value.trim().slice(0, 100);
-  if (!user && !bio) { showCustomAlert("Preencha o nome de usuário ou a bio."); return; }
+  if (!user && !bio) {
+    if (ppSetupPhotoAdded) { ppSetupClose(); return; }
+    showCustomAlert("Preencha o nome de usuário ou a bio.");
+    return;
+  }
   if (user && !/^[a-zA-Z0-9_.]{3,20}$/.test(user)) {
     showCustomAlert("O nome de usuário deve ter de 3 a 20 caracteres: letras, números, ponto ou underscore.");
     return;
@@ -21061,5 +22170,25 @@ function ppSetupSave() {
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
