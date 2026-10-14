@@ -29,8 +29,6 @@
 }
 if (!isWebView()) {
   window.location.href = "https://portaldigital.vercel.app/web.html";
-} else {
-  console.log("Rodando dentro do WebView");
 }
 </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -39,7 +37,7 @@ if (!isWebView()) {
 
   <script type="module">import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously, onAuthStateChanged, signOut, sendPasswordResetEmail, updateProfile, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getDatabase, ref, set, get, update, remove, onValue, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getDatabase, ref, set, get, update, remove, onValue, push, limitToLast, query as rtdbQuery, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc, query, where, orderBy, limit, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 const firebaseConfig = {
   apiKey: "AIzaSyBgEfuLNpU5j9EIcvQ9Qs_reEvtXGPIbO0",
@@ -75,6 +73,10 @@ window.firebaseModules = {
   remove,
   onValue,
   push,
+  limitToLast,
+  rtdbQuery,
+  orderByChild,
+  equalTo,
   collection,
   doc,
   getDoc,
@@ -490,7 +492,7 @@ window.firebaseModules = {
       border: 1px solid var(--border-color);
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
       border-radius: 22px;
-      overflow: hidden;
+      overflow: visible;
       flex-shrink: 0;
       margin: 0 14px calc(14px + env(safe-area-inset-bottom, 0px));
       position: fixed;
@@ -587,6 +589,106 @@ window.firebaseModules = {
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.55; transform: scale(0.94); }
     }
+
+        .bottom-nav-item.bottom-nav-center { gap: 2px; overflow: visible; }
+    .bottom-nav-item.bottom-nav-center span { line-height: 12px; }
+    .bottom-nav-item.bottom-nav-center:active { opacity: 1; }
+    .bottom-nav-center .nav-center-circle {
+      width: 50px;
+      height: 50px;
+      box-sizing: border-box;
+      border-radius: 50%;
+      background: var(--accent-primary);
+      border: 4px solid var(--bg-primary);
+      box-shadow: 0 6px 16px rgba(29, 78, 216, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: -26px;
+      transition: transform 0.15s ease;
+    }
+    .bottom-nav-item.bottom-nav-center .nav-center-circle svg {
+      width: 22px;
+      height: 22px;
+      fill: var(--bg-primary);
+    }
+    .bottom-nav-center:active .nav-center-circle { transform: scale(0.92); }
+
+        .req-tabs, .req-types { display: flex; gap: 8px; overflow-x: auto; flex-shrink: 0; -webkit-overflow-scrolling: touch; }
+    .req-tabs { padding: 12px 16px 0; }
+    .req-tabs::-webkit-scrollbar, .req-types::-webkit-scrollbar { display: none; }
+    .req-tab {
+      flex-shrink: 0;
+      padding: 7px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .req-tab.active { background: var(--accent-primary); border-color: var(--accent-primary); color: var(--bg-primary); }
+    .req-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .req-card.done { opacity: 0.8; }
+    .req-card-top { display: flex; align-items: center; gap: 10px; }
+    .req-avatar {
+      width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; overflow: hidden;
+      background: var(--bg-primary); display: flex; align-items: center; justify-content: center;
+    }
+    .req-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .req-avatar svg { width: 20px; height: 20px; fill: var(--text-muted); }
+    .req-meta { flex: 1; min-width: 0; }
+    .req-author { font-size: 14px; font-weight: 600; color: var(--text-primary); line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .req-time { font-size: 11.5px; color: var(--text-muted); }
+    .req-tipo { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: rgba(29, 78, 216, 0.12); color: var(--accent-primary); flex-shrink: 0; }
+    .req-text { font-size: 15px; line-height: 1.5; color: var(--text-primary); white-space: pre-wrap; word-break: break-word; }
+    .req-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .req-status { font-size: 12px; font-weight: 700; color: var(--text-muted); }
+    .req-status.done { color: #10b981; }
+    .req-actions { display: flex; gap: 8px; }
+    .req-action-btn {
+      border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-secondary);
+      border-radius: 8px; padding: 6px 10px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer;
+    }
+    .req-action-btn.danger { color: #ef4444; }
+    .req-compose {
+      flex-shrink: 0; display: flex; flex-direction: column; gap: 10px;
+      padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+      background: var(--bg-primary); border-top: 1px solid var(--border-color);
+    }
+    .req-compose-row { display: flex; gap: 10px; align-items: flex-end; }
+    .req-compose-row .comment-input { flex: 1; }
+    .req-counter { font-size: 11px; color: var(--text-muted); text-align: right; margin-top: -4px; }
+
+        .view-user-profile-overlay.pp-overlay { z-index: 3200; }
+    .req-click { cursor: pointer; }
+    #publicProfileBody > * { flex-shrink: 0; }
+    .pp-field { margin-bottom: 12px; }
+    .pp-field label { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+    .pp-nudge { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; border-color: var(--accent-primary); }
+    .pp-nudge-t { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+    .pp-nudge-d { font-size: 13px; color: var(--text-secondary); line-height: 1.4; }
+    #publicProfileBody { overflow-x: hidden; }
+    #publicProfileBody .profile-header-card { overflow: hidden; }
+    #publicProfileBody .pdp-ach { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .pp-username { position: relative; z-index: 1; color: rgba(255,255,255,0.92); font-size: 14px; font-weight: 700; margin: -2px 0 8px; }
+    .pp-bio { position: relative; z-index: 1; color: rgba(255,255,255,0.88); font-size: 13px; line-height: 1.4; margin: 0 0 10px; padding: 0 10px; word-break: break-word; }
+    .pp-since { position: relative; z-index: 1; color: rgba(255,255,255,0.78); font-size: 12px; margin: 8px 0 10px; }
+    .pp-pill { position: relative; z-index: 1; margin-bottom: 2px; }
+    .pp-req { padding: 10px 0; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 6px; }
+    .pp-req.first { border-top: none; padding-top: 0; }
+    .pp-req-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .pp-req-text { font-size: 14px; line-height: 1.45; color: var(--text-primary); white-space: pre-wrap; word-break: break-word; }
 
     @media (max-width: 600px) {
       .grid {
@@ -801,6 +903,10 @@ window.firebaseModules = {
     .genre-see-all svg, .genre-back-btn svg { width: 18px; height: 18px; fill: currentColor; }
     .genre-cards { display: flex; flex-direction: column; gap: 12px; }
     .genre-see-all-bar { width: 100%; padding: 10px; border-radius: 12px; border: 1px dashed var(--border-color); background: var(--bg-card); color: var(--accent-primary); font-weight: 600; font-size: 13px; cursor: pointer; font-family: inherit; }
+    .genre-header.genre-toggle { cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none; }
+    .genre-chevron { width: 20px; height: 20px; fill: currentColor; color: var(--text-muted); transition: transform .2s ease; flex-shrink: 0; }
+    .genre-section.collapsed .genre-chevron { transform: rotate(-90deg); }
+    .genre-section.collapsed .genre-cards, .genre-section.collapsed .genre-see-all-bar { display: none; }
     .genre-back-btn { align-self: flex-start; display: inline-flex; align-items: center; gap: 4px; padding: 8px 14px 8px 8px; border-radius: 20px; border: 1px solid var(--border-color); background: var(--bg-card); color: inherit; font-weight: 600; font-size: 13px; cursor: pointer; font-family: inherit; }
 
     .blog-card {
@@ -1047,6 +1153,62 @@ window.firebaseModules = {
     .trending-card .card-title {
       font-size: 12px;
       -webkit-line-clamp: 1;
+    }
+
+    .card-badge {
+      position: absolute;
+      left: 6px;
+      bottom: 6px;
+      z-index: 2;
+      padding: 3px 7px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      color: #fff;
+      background: #16a34a;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    }
+    .card-badge.badge-updated { background: #2563eb; }
+    .card-badge.badge-hot { background: #e11d48; }
+    .discovery-row {
+      grid-column: 1 / -1;
+      margin: 4px -20px;
+      min-width: 0;
+    }
+    @media (max-width: 600px) {
+      .discovery-row { margin: 4px -12px; }
+    }
+    .new-since-banner {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      width: 100%;
+    }
+    .new-since-banner .nsb-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #16a34a;
+      flex-shrink: 0;
+      animation: pulse-indicator 1.5s infinite;
+    }
+    .new-since-banner .nsb-text { flex: 1; }
+    .new-since-banner .nsb-action {
+      color: var(--accent-primary);
+      font-weight: 700;
+      flex-shrink: 0;
     }
 
     .trending-rank {
@@ -1566,6 +1728,7 @@ window.firebaseModules = {
       line-height: 1.65;
       color: var(--text-secondary);
       overflow-wrap: anywhere;
+      white-space: pre-line;
     }
 
     .rating-section {
@@ -8630,6 +8793,70 @@ window.firebaseModules = {
       max-width: 90vw;
       text-align: center;
     }
+
+        .pq-progress { height: 6px; background: var(--border-color); flex-shrink: 0; }
+    .pq-progress > div { height: 100%; width: 0; background: var(--accent-primary); transition: width .25s ease; }
+    .pq-stage { flex: 1; overflow-y: auto; padding: 20px 16px; -webkit-overflow-scrolling: touch; }
+    .pq-count { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+    .pq-bloco { font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-primary); margin-bottom: 10px; }
+    .pq-title { font-size: 18px; font-weight: 600; line-height: 1.4; color: var(--text-primary); margin-bottom: 6px; }
+    .pq-hint { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+    .pq-opt { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; padding: 14px; margin-bottom: 10px; background: var(--bg-card); border: 2px solid var(--border-color); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 15px; cursor: pointer; }
+    .pq-opt .pq-mark { width: 20px; height: 20px; flex-shrink: 0; border: 2px solid var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 13px; color: transparent; }
+    .pq-opt .pq-mark.radio { border-radius: 50%; }
+    .pq-opt .pq-mark.check { border-radius: 6px; }
+    .pq-opt.sel { border-color: var(--accent-primary); background: rgba(29, 78, 216, .10); }
+    .pq-opt.sel .pq-mark { border-color: var(--accent-primary); background: var(--accent-primary); color: var(--bg-primary); }
+    .pq-opt:disabled { opacity: .45; }
+    .pq-scale { display: flex; gap: 8px; }
+    .pq-scale button { flex: 1; padding: 16px 0; font-size: 18px; font-weight: 700; background: var(--bg-card); border: 2px solid var(--border-color); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; cursor: pointer; }
+    .pq-scale button.sel { border-color: var(--accent-primary); background: var(--accent-primary); color: var(--bg-primary); }
+    .pq-scale-legend { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: var(--text-muted); }
+    .pq-textarea { width: 100%; min-height: 140px; padding: 14px; background: var(--bg-card); border: 2px solid var(--border-color); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 15px; resize: vertical; }
+    .pq-textarea:focus { outline: none; border-color: var(--accent-primary); }
+    .pq-chars { margin-top: 6px; font-size: 12px; color: var(--text-muted); text-align: right; }
+    .pq-error { min-height: 18px; margin-top: 10px; font-size: 13px; color: #DC2626; }
+    .pq-footer { display: flex; gap: 10px; padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px)); background: var(--bg-primary); border-top: 1px solid var(--border-color); flex-shrink: 0; }
+    .pq-footer .custom-modal-btn { flex: 1; padding: 14px 20px; font-size: 15px; }
+    .pq-footer .custom-modal-btn:disabled { opacity: .5; }
+    .pq-invite-content { max-width: 340px; text-align: center; padding: 28px 22px 22px; }
+    .pq-invite-icon { font-size: 40px; line-height: 1; margin-bottom: 10px; }
+    .pq-invite-pts { display: inline-block; margin: 4px 0 14px; padding: 6px 14px; border-radius: 999px; background: var(--accent-primary); color: var(--bg-primary); font-weight: 700; font-size: 15px; }
+    .pq-invite-actions { display: flex; flex-direction: column; gap: 8px; }
+    .pq-invite-actions .custom-modal-btn { width: 100%; }
+    .pq-link-btn { background: none; border: none; color: var(--text-muted); font-family: 'Inter', sans-serif; font-size: 13px; cursor: pointer; padding: 8px; }
+
+        .pq-tabs { display: flex; gap: 8px; padding: 12px 16px; background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+    .pq-tab { flex: 1; padding: 10px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-secondary); font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; cursor: pointer; }
+    .pq-tab.active { background: var(--accent-primary); border-color: var(--accent-primary); color: var(--bg-primary); }
+    .pq-admin-body { flex: 1; overflow-y: auto; padding: 16px; -webkit-overflow-scrolling: touch; }
+    .pq-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+    .pq-card h4 { font-size: 14px; line-height: 1.4; color: var(--text-primary); margin-bottom: 4px; }
+    .pq-card .pq-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+    .pq-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .pq-row label { font-size: 14px; color: var(--text-primary); font-weight: 500; }
+    .pq-num { width: 90px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-size: 15px; font-family: 'Inter', sans-serif; text-align: right; }
+    .pq-bar-line { margin-bottom: 8px; }
+    .pq-bar-label { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--text-secondary); margin-bottom: 3px; }
+    .pq-bar { height: 8px; border-radius: 99px; background: var(--border-color); overflow: hidden; }
+    .pq-bar > div { height: 100%; background: var(--accent-primary); border-radius: 99px; }
+    .pq-avg { font-size: 28px; font-weight: 700; color: var(--accent-primary); margin-bottom: 8px; }
+    .pq-avg small { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+    .pq-text-item { padding: 10px 12px; background: var(--bg-secondary); border-radius: 10px; margin-bottom: 8px; font-size: 14px; color: var(--text-primary); line-height: 1.45; word-break: break-word; }
+    .pq-text-item small { display: block; margin-top: 4px; font-size: 11px; color: var(--text-muted); }
+    .pq-aq { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+    .pq-aq.off { opacity: .55; }
+    .pq-aq-top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+    .pq-aq-n { width: 22px; height: 22px; border-radius: 50%; background: var(--accent-primary); color: var(--bg-primary); font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+    .pq-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 99px; background: var(--bg-secondary); color: var(--text-secondary); border: 1px solid var(--border-color); }
+    .pq-aq-text { font-size: 14px; line-height: 1.4; color: var(--text-primary); margin-bottom: 10px; }
+    .pq-aq-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .pq-mini { padding: 7px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: transparent; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .pq-mini:disabled { opacity: .35; }
+    .pq-mini.danger { color: #DC2626; border-color: #DC2626; }
+    .pq-save-bar { display: flex; gap: 10px; padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px)); background: var(--bg-primary); border-top: 1px solid var(--border-color); flex-shrink: 0; }
+    .pq-save-bar .custom-modal-btn { flex: 1; padding: 13px; }
+    .pq-dirty { font-size: 12px; color: #D97706; margin: 0 0 10px; }
   </style>
   <script>
   (function () {
@@ -8776,6 +9003,16 @@ window.firebaseModules = {
     <button class="btn" onclick="openCommunityModal()">
       <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
       Comunidade
+    </button>
+
+    <button class="btn" id="surveyBtn" onclick="openSurvey()" style="display: none;">
+      <svg viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+      Inquérito · Ganhe pontos
+    </button>
+
+    <button class="btn" id="surveyAdminBtn" onclick="openSurveyAdmin()" style="display: none;">
+      <svg viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+      Inquérito (ADM)
     </button>
 
     <button class="btn" id="reportProblemBtn" onclick="openReportProblemModal()" style="display: none;">
@@ -8970,6 +9207,12 @@ window.firebaseModules = {
       <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/></svg>
       <span id="navNotificationsBadge" class="bottom-nav-badge">0</span>
       <span>Alertas</span>
+    </button>
+    <button class="bottom-nav-item bottom-nav-center" id="navRequestsBtn" onclick="navOpenRequests()">
+      <div class="nav-center-circle">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 14h-3v3h-2v-3H8v-2h3v-3h2v3h3v2zm-3-7V3.5L18.5 9H13z"/></svg>
+      </div>
+      <span>Pedidos</span>
     </button>
     <button class="bottom-nav-item" id="navFavoritesBtn" onclick="navOpenFavorites()">
       <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
@@ -9503,6 +9746,10 @@ window.firebaseModules = {
             <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
             Copiar Código
           </button>
+          <button class="generated-code-copy-btn" style="margin-left:8px" onclick="openSendCodeModal()">
+            <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            Enviar para um usuário
+          </button>
         </div>
       </div>
     </div>
@@ -9829,6 +10076,107 @@ window.firebaseModules = {
     </div>
   </div>
 
+    <div id="surveyInviteModal" class="custom-modal">
+    <div class="custom-modal-content pq-invite-content">
+      <div class="pq-invite-icon">📝</div>
+      <h2>Ajuda-nos a melhorar</h2>
+      <p>Responde a um inquérito rápido (cerca de 2 minutos) e ganha pontos.</p>
+      <div class="pq-invite-pts" id="pqInvitePts">+300 pontos</div>
+      <div class="pq-invite-actions">
+        <button class="custom-modal-btn primary" onclick="openSurvey()">Responder agora</button>
+        <button class="custom-modal-btn secondary" onclick="pqInviteLater()">Lembrar mais tarde</button>
+        <button class="pq-link-btn" onclick="pqInviteNever()">Não quero responder</button>
+      </div>
+    </div>
+  </div>
+
+    <div id="surveyOverlay" class="manage-users-overlay">
+    <div class="manage-users-overlay-content">
+      <div class="content-header">
+        <button class="content-header-btn back-btn" onclick="closeSurveyOverlay()" aria-label="Fechar">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+        <h1 class="content-header-title">Inquérito</h1>
+        <span style="width:40px"></span>
+      </div>
+      <div class="pq-progress"><div id="pqProgressBar"></div></div>
+      <div class="pq-stage" id="pqStage"></div>
+      <div class="pq-footer">
+        <button class="custom-modal-btn secondary" id="pqBackBtn" onclick="pqPrev()">Voltar</button>
+        <button class="custom-modal-btn primary" id="pqNextBtn" onclick="pqNext()">Seguinte</button>
+      </div>
+    </div>
+  </div>
+
+    <div id="surveyAdminOverlay" class="manage-users-overlay">
+    <div class="manage-users-overlay-content">
+      <div class="content-header">
+        <button class="content-header-btn back-btn" onclick="closeSurveyAdmin()">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <h1 class="content-header-title">Inquérito</h1>
+        <button class="content-header-btn" onclick="pqOpenQForm(-1)" title="Nova pergunta">
+          <svg viewBox="0 0 24 24" width="22" height="22"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+        </button>
+      </div>
+      <div class="pq-tabs">
+        <button class="pq-tab active" id="pqTabResultados" onclick="pqAdminSetTab('resultados')">Resultados</button>
+        <button class="pq-tab" id="pqTabPerguntas" onclick="pqAdminSetTab('perguntas')">Perguntas</button>
+      </div>
+      <div class="pq-admin-body" id="pqAdminBody"></div>
+      <div class="pq-save-bar" id="pqSaveBar" style="display:none;">
+        <button class="custom-modal-btn secondary" onclick="pqPreviewDraft()">Pré-visualizar</button>
+        <button class="custom-modal-btn primary" id="pqSaveBtn" onclick="pqAdminSave()">Guardar alterações</button>
+      </div>
+    </div>
+  </div>
+
+    <div id="pqQuestionModal" class="custom-modal">
+    <div class="custom-modal-content" style="max-width: 450px;">
+      <h2 id="pqQFormTitle">Nova pergunta</h2>
+      <div class="form-group">
+        <label class="form-label">Bloco (título do grupo)</label>
+        <input type="text" class="form-input" id="pqQBloco" maxlength="60" placeholder="Ex: Pontos e anúncios">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Pergunta</label>
+        <textarea class="form-textarea" id="pqQTexto" maxlength="200" style="min-height:80px;"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tipo</label>
+        <select class="form-select" id="pqQTipo" onchange="pqQFormTypeChange()">
+          <option value="unica">Escolha única</option>
+          <option value="multipla">Múltipla escolha</option>
+          <option value="escala">Escala (1 a 5)</option>
+          <option value="texto">Texto livre</option>
+        </select>
+      </div>
+      <div class="form-group" id="pqQOpcoesWrap">
+        <label class="form-label">Opções (uma por linha)</label>
+        <textarea class="form-textarea" id="pqQOpcoes" style="min-height:110px;"></textarea>
+      </div>
+      <div class="form-group" id="pqQMaxWrap">
+        <label class="form-label">Máximo de opções escolhidas (0 = sem limite)</label>
+        <input type="number" class="form-input" id="pqQMax" min="0" max="20" value="0">
+      </div>
+      <div class="form-group" id="pqQMinWrap">
+        <label class="form-label">Mínimo de caracteres (0 = sem mínimo)</label>
+        <input type="number" class="form-input" id="pqQMin" min="0" max="500" value="0">
+      </div>
+      <div class="form-group">
+        <label style="display:flex;align-items:center;gap:10px;color:var(--text-primary);"><input type="checkbox" id="pqQObrig" checked> Resposta obrigatória</label>
+      </div>
+      <div class="form-group">
+        <label style="display:flex;align-items:center;gap:10px;color:var(--text-primary);"><input type="checkbox" id="pqQAtiva" checked> Pergunta ativa</label>
+      </div>
+      <div class="custom-modal-buttons">
+        <button class="custom-modal-btn secondary" onclick="pqCloseQForm()">Cancelar</button>
+        <button class="custom-modal-btn secondary" id="pqQDeleteBtn" onclick="pqDeleteQ()" style="color:#DC2626;border-color:#DC2626;">Eliminar</button>
+        <button class="custom-modal-btn primary" onclick="pqSaveQForm()">OK</button>
+      </div>
+    </div>
+  </div>
+
   <div id="adFormModal" class="custom-modal">
     <div class="custom-modal-content" style="max-width: 450px;">
       <h2 id="adFormTitle">Novo Anúncio</h2>
@@ -9910,6 +10258,38 @@ window.firebaseModules = {
     </div>
   </div>
 
+  <div id="profileSetupModal" class="custom-modal">
+    <div class="custom-modal-content" style="max-width: 380px;">
+      <h2 style="margin-top: 0;">Complete o seu perfil</h2>
+      <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.45; margin: 0 0 16px;">Escolha um nome de usuário e escreva uma bio curta. Eles aparecem no seu perfil público, nos pedidos e nos comentários.</p>
+      <div class="pp-field">
+        <label for="ppSetupUser">Nome de usuário</label>
+        <input id="ppSetupUser" class="comment-input" maxlength="20" placeholder="@seunome" autocomplete="off">
+      </div>
+      <div class="pp-field">
+        <label for="ppSetupBio"><span>Bio</span><span id="ppSetupCount">0/100</span></label>
+        <textarea id="ppSetupBio" class="comment-input" rows="3" maxlength="100" placeholder="Fale um pouco sobre você" oninput="ppSetupCount()"></textarea>
+      </div>
+      <div class="custom-modal-buttons">
+        <button class="custom-modal-btn secondary" onclick="ppSetupLater()">Agora não</button>
+        <button class="custom-modal-btn primary" onclick="ppSetupSave()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="publicProfileOverlay" class="view-user-profile-overlay pp-overlay">
+    <div class="view-user-profile-content">
+      <div class="content-header">
+        <button class="content-header-btn back-btn" onclick="closePublicProfile()">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <h1 class="content-header-title">Perfil</h1>
+        <div style="width: 40px;"></div>
+      </div>
+      <div class="view-user-profile-body" id="publicProfileBody"></div>
+    </div>
+  </div>
+
   <div id="sendNotificationOverlay" class="send-notification-overlay">
     <div class="send-notification-overlay-content">
       <div class="content-header">
@@ -9974,6 +10354,18 @@ window.firebaseModules = {
           <svg viewBox="0 0 24 24" width="20" height="20" style="fill: currentColor;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
           Marcar todas como lidas
         </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="sendCodeModal" class="custom-modal">
+    <div class="custom-modal-content" style="padding:20px;max-width:360px;margin:auto">
+      <h3 style="margin:0 0 8px">Enviar pontos</h3>
+      <p style="margin:0 0 12px">Enviar <b><span id="sendCodePts">0</span> pontos</b> para:</p>
+      <select id="sendCodeUser" style="width:100%;padding:10px;border-radius:8px"></select>
+      <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+        <button onclick="closeSendCodeModal()" style="padding:10px 14px;border-radius:8px;border:none;cursor:pointer">Cancelar</button>
+        <button id="sendCodeBtn" onclick="sendCodeToUser()" style="padding:10px 14px;border-radius:8px;border:none;cursor:pointer;background:#2563eb;color:#fff">Enviar</button>
       </div>
     </div>
   </div>
@@ -10090,6 +10482,40 @@ window.firebaseModules = {
         <div style="width: 40px;"></div>
       </div>
       <div id="favoritesList" class="favorites-list-container"></div>
+    </div>
+  </div>
+
+  <div id="requestsOverlay" class="favorites-overlay requests-overlay">
+    <div class="favorites-overlay-content">
+      <div class="content-header">
+        <button class="content-header-btn back-btn" onclick="closeRequestsOverlay()">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <h1 class="content-header-title">Pedidos</h1>
+        <div style="width: 40px;"></div>
+      </div>
+      <div class="req-tabs" id="reqTabs">
+        <button class="req-tab active" data-f="todos" onclick="setRequestsFilter('todos')">Todos</button>
+        <button class="req-tab" data-f="abertos" onclick="setRequestsFilter('abertos')">Abertos</button>
+        <button class="req-tab" data-f="atendidos" onclick="setRequestsFilter('atendidos')">Atendidos</button>
+        <button class="req-tab" data-f="meus" onclick="setRequestsFilter('meus')">Meus pedidos</button>
+      </div>
+      <div id="requestsList" class="favorites-list-container"></div>
+      <div class="req-compose">
+        <div class="req-types" id="reqTypes">
+          <button class="req-tab active" data-t="Jogo" onclick="setRequestType('Jogo')">Jogo</button>
+          <button class="req-tab" data-t="App" onclick="setRequestType('App')">App</button>
+          <button class="req-tab" data-t="Tutorial" onclick="setRequestType('Tutorial')">Tutorial</button>
+          <button class="req-tab" data-t="Outro" onclick="setRequestType('Outro')">Outro</button>
+        </div>
+        <div class="req-compose-row">
+          <textarea id="reqInput" class="comment-input" rows="2" maxlength="300" placeholder="O que você quer ver no Portal Digital?" oninput="reqUpdateCounter()"></textarea>
+          <button id="reqSendBtn" class="comment-btn" onclick="submitRequest()" aria-label="Enviar pedido">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          </button>
+        </div>
+        <div class="req-counter" id="reqCounter">0/300</div>
+      </div>
     </div>
   </div>
 
@@ -10247,8 +10673,9 @@ window.firebaseModules = {
           </div>
 
           <div id="transferEmailGroup" class="transfer-form-group">
-            <label class="transfer-form-label">Email do destinatário</label>
-            <input type="email" class="transfer-form-input" id="transferEmail" placeholder="email@gmail.com">
+            <label class="transfer-form-label">Email do destinatário (conta verificada)</label>
+            <input type="email" class="transfer-form-input" id="transferEmail" placeholder="email@gmail.com" list="transferEmailList" autocomplete="off">
+            <datalist id="transferEmailList"></datalist>
           </div>
 
           <div id="transferAllInfo" class="transfer-form-group" style="display: none;">
@@ -10394,7 +10821,6 @@ let manualThemeOverride = false;
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("sw.js").catch((err) => {
-      console.error("Erro ao registrar o Service Worker:", err);
     });
   });
 }
@@ -10415,7 +10841,6 @@ function saveThemePreference(theme) {
   try {
     localStorage.setItem(THEME_STORAGE_KEY, theme);
   } catch (e) {
-    console.error("Erro ao salvar prefer\xEAncia de tema:", e);
   }
 }
 function applyTheme() {
@@ -10455,7 +10880,6 @@ try {
     gridViewMode = savedGridView;
   }
 } catch (e) {
-  console.error("Erro ao carregar prefer\xEAncia de visualiza\xE7\xE3o:", e);
 }
 function updateGridViewToggleIcon() {
   document.body.classList.toggle("view-list", gridViewMode === "blog");
@@ -10475,7 +10899,6 @@ function toggleGridViewMode() {
   try {
     localStorage.setItem(GRID_VIEW_STORAGE_KEY, gridViewMode);
   } catch (e) {
-    console.error("Erro ao salvar prefer\xEAncia de visualiza\xE7\xE3o:", e);
   }
   updateGridViewToggleIcon();
   currentGenreView = null;
@@ -10489,7 +10912,45 @@ let allGames = {};
 let currentFilter = "all";
 let searchTerm = "";
 let currentPage = 0;
-const gamesPerPage = 8;
+var gridInfinite = { list: [], shown: 0, typeLabels: {} };
+var gridLoadToken = 0;
+var gridLoadingMore = false;
+var GRID_LOAD_MIN_MS = 450;
+var GRID_LOAD_MAX_MS = 4000;
+var trendingShownIds = new Set();
+var forYouShownIds = new Set();
+var showOnlyNew = false;
+var PD_VISIT_GAP_MS = 30 * 60 * 1000;
+var pdSinceTs = 0;
+var pdFirstVisit = false;
+(function pdInitVisit() {
+  try {
+    const now = Date.now();
+    const lastSeen = Number(localStorage.getItem("pd_lastSeen")) || 0;
+    const since = Number(localStorage.getItem("pd_since")) || 0;
+    if (!lastSeen) {
+      pdFirstVisit = true;
+      pdSinceTs = now - 3 * 864e5;
+      localStorage.setItem("pd_since", String(pdSinceTs));
+    } else if (now - lastSeen > PD_VISIT_GAP_MS) {
+      pdSinceTs = lastSeen;
+      localStorage.setItem("pd_since", String(lastSeen));
+    } else {
+      pdSinceTs = since || lastSeen;
+    }
+    localStorage.setItem("pd_lastSeen", String(now));
+    const touch = () => {
+      try { localStorage.setItem("pd_lastSeen", String(Date.now())); } catch (e) {}
+    };
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") touch();
+    });
+    window.addEventListener("pagehide", touch);
+  } catch (e) {
+    pdSinceTs = Date.now() - 3 * 864e5;
+  }
+})();
+const gamesPerPage = 10;
 let userPoints = 0;
 let userStatus = "pending";
 let gamesLoaded = false;
@@ -10536,6 +10997,7 @@ window.addEventListener("load", () => {
         closeAuthOverlay();
       }
       updateUIForUser();
+      try { ppPublish(); } catch (e) {}
       loadGames();
       loadHistory();
     } else {
@@ -10559,6 +11021,7 @@ async function loadUserData() {
     userStatus = userData.status || "pending";
     userName = userData.name || "";
     userAvatar = userData.avatar || "";
+    userSurveyDone = !!userData.surveyReward;
     if (!userName && currentUser.displayName) {
       userName = currentUser.displayName;
       await update(userRef, { name: userName });
@@ -10569,6 +11032,7 @@ async function loadUserData() {
     userStatus = "pending";
     userName = currentUser.displayName || "";
     userAvatar = "";
+    userSurveyDone = false;
     updatePointsDisplay();
     await set(userRef, {
       points: 0,
@@ -10597,7 +11061,6 @@ async function loadUserPoints() {
 }
 async function updateUserPoints(newPoints) {
   if (!currentUser) return;
-  console.warn("[SEGURAN\xC7A] Tentativa de atualiza\xE7\xE3o direta de pontos bloqueada");
   throw new Error("Opera\xE7\xE3o n\xE3o permitida: Use as fun\xE7\xF5es de transa\xE7\xE3o apropriadas");
 }
 function _syncPointsDisplay(newPoints) {
@@ -10626,6 +11089,7 @@ function updateUIForUser() {
   const reportProblemBtn = document.getElementById("reportProblemBtn");
   const viewReportsBtn = document.getElementById("viewReportsBtn");
   const headerPointsBadge = document.getElementById("headerPointsBadge");
+  if (typeof updateSurveyUI === "function") updateSurveyUI();
   if (!currentUser || currentUser.isAnonymous) {
     loginBtn.style.display = "flex";
     registerBtn.style.display = "flex";
@@ -10754,7 +11218,6 @@ async function loadGames() {
       setTimeout(checkDailyRecommendation, 5e3);
     }
   }, (error) => {
-    console.error("Erro ao carregar jogos:", error);
     loadGamesOnce();
   });
 }
@@ -10774,7 +11237,6 @@ async function loadDownloadCounts() {
       }
     });
   } catch (error) {
-    console.error("Erro ao carregar contagem de downloads:", error);
   }
 }
 let likeCountsCache = null;
@@ -10810,7 +11272,6 @@ async function loadLikeCounts() {
     } catch (e) {
     }
   } catch (error) {
-    console.error("Erro ao carregar curtidas:", error);
   }
 }
 async function loadRatingCounts() {
@@ -10828,7 +11289,6 @@ async function loadRatingCounts() {
       }
     });
   } catch (error) {
-    console.error("Erro ao carregar contagem de avaliações:", error);
   }
 }
 async function loadGamesOnce() {
@@ -10853,7 +11313,6 @@ async function loadGamesOnce() {
       setTimeout(checkDailyRecommendation, 5e3);
     }
   } catch (error) {
-    console.error("Erro ao carregar jogos (fallback):", error);
   }
 }
 function loadHistory() {
@@ -10864,7 +11323,6 @@ function loadHistory() {
       historyData = JSON.parse(saved);
     }
   } catch (e) {
-    console.error("Erro ao carregar hist\xF3rico:", e);
     historyData = [];
   }
 }
@@ -10873,7 +11331,6 @@ function saveHistory() {
     const storage = window["localStorage"];
     storage.setItem("gamePlusHistory", JSON.stringify(historyData));
   } catch (e) {
-    console.error("Erro ao salvar hist\xF3rico:", e);
   }
 }
 function addToHistory(id) {
@@ -10978,6 +11435,136 @@ function recBuildModel() {
   recModel = { n: ids.length, vecs };
   return recModel;
 }
+
+var CL_KEY = "pd_card_learn_v1";
+var CL_PRIOR_A = 1, CL_PRIOR_B = 19;
+var cardLearnRev = 0;
+var cardLearn = (function() {
+  try {
+    const o = JSON.parse(localStorage.getItem(CL_KEY));
+    if (o && o.pos && o.games) return o;
+  } catch (e) {}
+  return { pos: {}, games: {} };
+})();
+var _clSeen = new Set();
+var _clSaveTimer = null;
+var _clObserver = null;
+function clBucket(position) {
+  const p = Math.max(0, Number(position) || 0);
+  return p < 3 ? 0 : p < 6 ? 1 : p < 12 ? 2 : 3;
+}
+function clSave() {
+  clearTimeout(_clSaveTimer);
+  _clSaveTimer = setTimeout(() => {
+    try {
+      const ids = Object.keys(cardLearn.games);
+      if (ids.length > 600) {
+        ids.sort((a, b) => (cardLearn.games[a].t || 0) - (cardLearn.games[b].t || 0))
+          .slice(0, ids.length - 600).forEach((id) => { delete cardLearn.games[id]; });
+      }
+      localStorage.setItem(CL_KEY, JSON.stringify(cardLearn));
+    } catch (e) {}
+  }, 800);
+}
+function clPosStat(section, bucket) {
+  const k = section + "|" + bucket;
+  return cardLearn.pos[k] || (cardLearn.pos[k] = { i: 0, c: 0 });
+}
+function clExamination(section, bucket) {
+  const ctr = (b) => {
+    const st = cardLearn.pos[section + "|" + b];
+    return ((st ? st.c : 0) + CL_PRIOR_A) / ((st ? st.i : 0) + CL_PRIOR_A + CL_PRIOR_B);
+  };
+  let best = 0;
+  for (let b = 0; b < 4; b++) best = Math.max(best, ctr(b));
+  return Math.min(1, Math.max(0.2, ctr(bucket) / best));
+}
+function clGame(id) {
+  return cardLearn.games[id] || (cardLearn.games[id] = { i: 0, c: 0, ei: 0, ec: 0, t: 0 });
+}
+function recordCardImpression(id, section, position) {
+  if (!id || !allGames[id]) return;
+  const key = id + "|" + section;
+  if (_clSeen.has(key)) return;
+  _clSeen.add(key);
+  const b = clBucket(position);
+  const theta = clExamination(section, b);
+  const g = clGame(id);
+  g.i++;
+  g.ei += theta;
+  g.t = Date.now();
+  clPosStat(section, b).i++;
+  clSave();
+}
+function recordCardClick(id, section, position) {
+  if (!id || !allGames[id]) return;
+  const b = clBucket(position);
+  const g = clGame(id);
+  g.c++;
+  g.t = Date.now();
+  if (!_clSeen.has(id + "|" + section)) { _clSeen.add(id + "|" + section); g.i++; g.ei += clExamination(section, b); clPosStat(section, b).i++; }
+  clPosStat(section, b).c++;
+  cardLearnRev++;
+  clSave();
+}
+function clGetObserver() {
+  if (_clObserver || typeof IntersectionObserver === "undefined") return _clObserver;
+  _clObserver = new IntersectionObserver((entries) => {
+    entries.forEach((en) => {
+      if (!en.isIntersecting) return;
+      const el = en.target;
+      _clObserver.unobserve(el);
+      recordCardImpression(el.dataset.clId, el.dataset.clSec, el.dataset.clPos);
+    });
+  }, { threshold: 0.5 });
+  return _clObserver;
+}
+function trackCard(card, id, section, position) {
+  card.dataset.clId = id;
+  card.dataset.clSec = section;
+  card.dataset.clPos = String(position);
+  card.addEventListener("click", () => recordCardClick(id, section, position));
+  const obs = clGetObserver();
+  if (obs) obs.observe(card);
+}
+function clGauss() {
+  let u = 0, v = 0;
+  while (!u) u = Math.random();
+  while (!v) v = Math.random();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+function clGamma(k) {
+  if (k < 1) return clGamma(k + 1) * Math.pow(Math.random(), 1 / k);
+  const d = k - 1 / 3, c = 1 / Math.sqrt(9 * d);
+  for (;;) {
+    let x, v;
+    do { x = clGauss(); v = 1 + c * x; } while (v <= 0);
+    v = v * v * v;
+    const u = Math.random();
+    if (u < 1 - 0.0331 * x * x * x * x) return d * v;
+    if (Math.log(u) < 0.5 * x * x + d * (1 - v + Math.log(v))) return d * v;
+  }
+}
+function clBeta(a, b) {
+  const x = clGamma(a), y = clGamma(b);
+  return x / (x + y);
+}
+function thompsonCardSample(id) {
+  const g = cardLearn.games[id];
+  const cl = g ? g.c : 0;
+  const ex = g ? Math.max(g.ei, cl) : 0;
+  return clBeta(CL_PRIOR_A + cl, CL_PRIOR_B + (ex - cl));
+}
+function clGenreClicks() {
+  const m = {};
+  Object.keys(cardLearn.games).forEach((id) => {
+    const g = cardLearn.games[id];
+    if (!g.c || !allGames[id]) return;
+    const k = normalizeText(getPrimaryGenre(allGames[id])) || "outros";
+    m[k] = (m[k] || 0) + g.c;
+  });
+  return m;
+}
 function recUserSignals() {
   const w = {};
   const add = (id, weight) => { if (allGames[id]) w[id] = (w[id] || 0) + weight; };
@@ -11007,7 +11594,7 @@ function recComputeScores() {
     for (const t in v) if (profile[t]) dot += v[t] * profile[t];
     const cos = dot / pn;
     const pop = Math.log(1 + (allGames[id].downloads || 0)) / Math.log(1 + maxDl);
-    out[id] = { cos, score: 0.75 * cos + 0.15 * pop + 0.1 * getRandomWeight(id), seen: !!signals[id] };
+    out[id] = { cos, score: 0.75 * cos + 0.15 * pop + 0.1 * Math.min(1, thompsonCardSample(id) / 0.25), seen: !!signals[id] };
   });
   return out;
 }
@@ -11019,7 +11606,8 @@ function getRecScores() {
     Object.keys(userFavorites || {}).length,
     userDownloadedIds.length,
     (historyData || []).length,
-    ((historyData || [])[0] || {}).id
+    ((historyData || [])[0] || {}).id,
+    cardLearnRev
   ].join("|");
   if (recCache && recCache.sig !== sig && typeof currentPage !== "undefined" && currentPage > 0) {
     return recCache.scores;
@@ -11062,6 +11650,7 @@ function buildCompactListCard(game, rank) {
             ${rank ? `<div class="trending-rank">${rank}</div>` : ""}
             <img src="${escapeHtml(game.poster || "logo.png")}" alt="${escapeHtml(game.titulo || "")}" loading="lazy" onload="this.classList.add('loaded')" onerror="this.onerror=null;this.classList.add('loaded','img-error');this.src='logo.png'">
             <div class="card-type type-${game.type}">${typeLabels[game.type] || game.type}</div>
+            ${badgeHtml(game)}
           </div>
           <div class="blog-card-info">
             ${genre ? `<span class="blog-card-genre"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/></svg>${escapeHtml(genre)}</span>` : ""}
@@ -11069,12 +11658,13 @@ function buildCompactListCard(game, rank) {
             <div class="blog-card-stats">
               <span class="blog-card-stat" title="Tamanho"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 20h20v-4H2v4zm2-3h2v2H4v-2zM2 4v4h20V4H2zm4 3H4V5h2v2zm-4 7h20v-4H2v4zm2-3h2v2H4v-2z"/></svg>${escapeHtml(String(game.size || "N/A"))}</span>
               <span class="blog-card-stat" title="Downloads"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>${game.downloads || 0}</span>
-              <span class="blog-card-stat star" title="${ratingCount} avalia\xE7\xF5es"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${RATING_STAR_PATH}"/></svg>${avgRating.toFixed(1)}</span>
+              ${pdBlogRatingHtml(game)}
             </div>
           </div>
         `;
 }
 function renderForYou() {
+  forYouShownIds = new Set();
   const section = document.getElementById("forYouSection");
   const scroll = document.getElementById("forYouScroll");
   if (!section || !scroll) return;
@@ -11088,6 +11678,7 @@ function renderForYou() {
     section.style.display = "none";
     return;
   }
+  forYouShownIds = new Set(ids);
   const typeLabels = { aplicativos: "APLICATIVOS", jogos: "JOGOS", tutoriais: "TUTORIAIS", pc: "PC", outros: "OUTROS" };
   section.style.display = "block";
   scroll.innerHTML = "";
@@ -11097,6 +11688,7 @@ function renderForYou() {
     card.className = "card trending-card";
     card.style.animationDelay = `${index * 0.05}s`;
     card.addEventListener("click", () => openGameDetail(id));
+    trackCard(card, id, "foryou", index);
     if (gridViewMode === "blog") {
       card.className = "card blog-card trending-list-card";
       card.innerHTML = buildCompactListCard(game, 0);
@@ -11107,6 +11699,7 @@ function renderForYou() {
           <div class="card-img-container">
             <img src="${game.poster}" alt="${escapeHtml(game.titulo || "")}" loading="lazy" onload="this.classList.add('loaded')" onerror="this.classList.add('loaded','img-error');this.src='logo.png'">
             <div class="card-type type-${game.type}">${typeLabels[game.type] || game.type}</div>
+            ${badgeHtml(game)}
           </div>
           <div class="card-info">
             <div class="card-title">${escapeHtml(game.titulo || "")}</div>
@@ -11130,6 +11723,7 @@ function pickDailyRecommendationId(gameIds, prevState) {
   return pool[Math.floor(Math.random() * pool.length)];
 }
 function renderTrending() {
+  trendingShownIds = new Set();
   const section = document.getElementById("trendingSection");
   const scroll = document.getElementById("trendingScroll");
   if (!section || !scroll) return;
@@ -11145,6 +11739,7 @@ function renderTrending() {
   gamesArray.forEach((g) => { g._trend = trendingScore(g, nowTs); });
   gamesArray.sort((a, b) => b._trend - a._trend || (b.downloads || 0) - (a.downloads || 0));
   const topGames = gamesArray.slice(0, 10);
+  trendingShownIds = new Set(topGames.map((g) => g.id));
   if (topGames.length === 0) {
     section.style.display = "none";
     return;
@@ -11165,6 +11760,7 @@ function renderTrending() {
     card.addEventListener("click", function() {
       openGameDetail(game.id);
     });
+    trackCard(card, game.id, "trending", index);
     if (gridViewMode === "blog") {
       card.className = "card blog-card trending-list-card";
       card.innerHTML = buildCompactListCard(game, index + 1);
@@ -11176,6 +11772,7 @@ function renderTrending() {
             <div class="trending-rank">${index + 1}</div>
             <img src="${game.poster}" alt="${game.titulo}" loading="lazy" onload="this.classList.add('loaded')" onerror="this.classList.add('loaded','img-error');this.src='logo.png'">
             <div class="card-type type-${game.type}">${typeLabels[game.type] || game.type}</div>
+            ${badgeHtml(game)}
           </div>
           <div class="card-info">
             <div class="card-title">${game.titulo}</div>
@@ -11187,12 +11784,15 @@ function renderTrending() {
 let currentGenreView = null;
 let currentGenreViewCtx = "";
 const GENRE_PREVIEW_LIMIT = 3;
+const GENRE_OPEN_DEFAULT = 3;
+var genreToggleState = new Map();
 function getPrimaryGenre(game) {
   const tok = String(game.genero || "").split(/[,\/|;•]+/).map((g) => g.trim()).filter(Boolean)[0];
   return tok || "Outros";
 }
 function buildBlogCardEl(game, index, typeLabels, beforeOpen) {
   const card = document.createElement("div");
+  trackCard(card, game.id, "list", index);
   card.style.animationDelay = `${Math.min(index, 12) * 0.05}s`;
   card.className = "card blog-card";
   card.addEventListener("click", function() {
@@ -11207,6 +11807,7 @@ function buildBlogCardEl(game, index, typeLabels, beforeOpen) {
       <div class="blog-card-img-container">
         <img src="${game.poster}" alt="${escapeHtml(game.titulo)}" loading="lazy" onload="this.classList.add('loaded')" onerror="this.classList.add('loaded','img-error');this.src='logo.png'">
         <div class="card-type type-${game.type}">${typeLabels[game.type] || game.type}</div>
+            ${badgeHtml(game)}
       </div>
       <div class="blog-card-info">
         <div class="blog-card-title">${escapeHtml(game.titulo)}</div>
@@ -11214,7 +11815,7 @@ function buildBlogCardEl(game, index, typeLabels, beforeOpen) {
         <div class="blog-card-stats">
           <span class="blog-card-stat" title="Tamanho"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 20h20v-4H2v4zm2-3h2v2H4v-2zM2 4v4h20V4H2zm4 3H4V5h2v2zm-4 7h20v-4H2v4zm2-3h2v2H4v-2z"/></svg>${escapeHtml(String(game.size || "N/A"))}</span>
           <span class="blog-card-stat" title="Downloads"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>${game.downloads || 0}</span>
-          <span class="blog-card-stat star" title="${ratingCount} avalia\xE7\xF5es"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${RATING_STAR_PATH}"/></svg>${avgRating.toFixed(1)}</span>
+          ${pdBlogRatingHtml(game)}
           <span class="blog-card-go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg></span>
         </div>
       </div>
@@ -11266,16 +11867,34 @@ function renderGenreGroups(grid, filtered, typeLabels) {
     grid.appendChild(section);
     return;
   }
+  const affinity = {};
+  const sigs = recUserSignals();
+  Object.keys(sigs).forEach((id) => {
+    const k = normalizeText(getPrimaryGenre(allGames[id])) || "outros";
+    affinity[k] = (affinity[k] || 0) + sigs[id];
+  });
+  const learned = clGenreClicks();
+  Object.keys(learned).forEach((k) => { affinity[k] = (affinity[k] || 0) + 1.5 * learned[k]; });
   const sorted = Array.from(groups.entries()).sort((a, b) => {
     if (a[0] === "outros") return 1;
     if (b[0] === "outros") return -1;
-    return b[1].games.length - a[1].games.length;
+    const d = (affinity[b[0]] || 0) - (affinity[a[0]] || 0);
+    return d || b[1].games.length - a[1].games.length;
   });
-  sorted.forEach(([key, g]) => {
+  sorted.forEach(([key, g], gi) => {
     const section = document.createElement("section");
     section.className = "genre-section";
+    const isOpen = genreToggleState.has(key) ? genreToggleState.get(key) : gi < GENRE_OPEN_DEFAULT;
+    if (!isOpen) section.classList.add("collapsed");
     const more = g.games.length > GENRE_PREVIEW_LIMIT;
-    const header = mkHeader(g.name, g.games.length, more ? `<button type="button" class="genre-see-all">Ver todos<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg></button>` : "");
+    const header = mkHeader(g.name, g.games.length, (more ? `<button type="button" class="genre-see-all">Ver todos<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg></button>` : "") + `<svg class="genre-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>`);
+    header.classList.add("genre-toggle");
+    header.setAttribute("role", "button");
+    header.addEventListener("click", (e) => {
+      if (e.target.closest(".genre-see-all")) return;
+      const collapsed = section.classList.toggle("collapsed");
+      genreToggleState.set(key, !collapsed);
+    });
     if (more) header.querySelector(".genre-see-all").addEventListener("click", () => openGenreView(key));
     section.appendChild(header);
     const list = document.createElement("div");
@@ -11294,6 +11913,12 @@ function renderGenreGroups(grid, filtered, typeLabels) {
   });
 }
 function renderGrid() {
+  gridLoadToken++;
+  gridLoadingMore = false;
+  if (window._gridMoreObserver) {
+    window._gridMoreObserver.disconnect();
+    window._gridMoreObserver = null;
+  }
   const grid = document.getElementById("contentGrid");
   const noResults = document.getElementById("noResults");
   const paginationControls = document.getElementById("paginationControls");
@@ -11314,10 +11939,35 @@ function renderGrid() {
   if (recScores) {
     gamesArray.sort((a, b) => ((recScores[b.id] || {}).score || 0) - ((recScores[a.id] || {}).score || 0));
   } else {
-    gamesArray.sort((a, b) => getRandomWeight(a.id) - getRandomWeight(b.id));
+    pdColdStartSort(gamesArray);
   }
-  const typeFiltered = gamesArray.filter((game) => currentFilter === "all" || game.type === currentFilter);
-  const filtered = normalizeText(searchTerm) ? searchGames(typeFiltered, searchTerm) : typeFiltered;
+  const hasSearch = !!normalizeText(searchTerm);
+  if (recScores && !hasSearch) {
+    const unseenGames = [];
+    const seenGames = [];
+    gamesArray.forEach((g) => ((recScores[g.id] || {}).seen ? seenGames : unseenGames).push(g));
+    gamesArray = unseenGames.concat(seenGames);
+  }
+  let typeFiltered = gamesArray.filter((game) => currentFilter === "all" || game.type === currentFilter);
+  const gridMode = gridViewMode !== "blog" && !hasSearch;
+  const newCount = gridMode ? typeFiltered.filter(isNewGame).length : 0;
+  if (gridMode && showOnlyNew) {
+    const onlyNew = typeFiltered.filter(isNewGame);
+    if (onlyNew.length) typeFiltered = onlyNew;
+    else showOnlyNew = false;
+  }
+  let filtered = hasSearch ? searchGames(typeFiltered, searchTerm) : typeFiltered;
+  let discoveryRows = {};
+  if (gridMode) {
+    if (!showOnlyNew) {
+      const deduped = filtered.filter((g) => !trendingShownIds.has(g.id) && !forYouShownIds.has(g.id));
+      if (deduped.length) filtered = deduped;
+      const built = buildDiscoveryRows(filtered, recScores);
+      filtered = built.list;
+      discoveryRows = built.rows;
+    }
+    filtered = diversifyGames(filtered);
+  }
   if (filtered.length === 0) {
     grid.style.display = "none";
     noResults.style.display = "block";
@@ -11334,9 +11984,8 @@ function renderGrid() {
   }
   const noPageLimit = gridViewMode === "blog";
   if (noPageLimit) currentPage = 0;
-  const startIndex = noPageLimit ? 0 : currentPage * gamesPerPage;
-  const endIndex = noPageLimit ? totalGames : Math.min(startIndex + gamesPerPage, totalGames);
-  const paginatedGames = filtered.slice(startIndex, endIndex);
+  const startIndex = 0;
+  const endIndex = noPageLimit ? totalGames : Math.min((currentPage + 1) * gamesPerPage, totalGames);
   updatePaginationUI(startIndex, endIndex, totalGames, totalPages);
   grid.style.display = gridViewMode === "blog" ? "flex" : "grid";
   grid.classList.toggle("blog-view", gridViewMode === "blog");
@@ -11350,46 +11999,267 @@ function renderGrid() {
   };
   if (gridViewMode === "blog") {
     paginationControls.style.display = "none";
+    gridInfinite = { list: [], shown: 0, typeLabels };
+    setupGridInfiniteScroll();
     renderGenreGroups(grid, filtered, typeLabels);
     setupPaginationVisibility();
     return;
   }
-  paginatedGames.forEach((game, index) => {
-    const card = document.createElement("div");
-    card.style.animationDelay = `${Math.min(index, 12) * 0.05}s`;
-    card.addEventListener("click", function() {
-      openGameDetail(game.id);
-    });
-    if (gridViewMode === "blog") {
-      card.className = "card blog-card";
-      const ratingCount = game.ratingCount || 0;
-      const ratingSum = game.ratingSum || 0;
-      const avgRating = ratingCount > 0 ? ratingSum / ratingCount : 0;
-      const description = game.descricao ? escapeHtml(game.descricao) : "Sem descri\xE7\xE3o dispon\xEDvel.";
-      const _bgTok = String(game.genero || "").split(/[,\/|;\u2022]+/).map((g) => g.trim()).filter(Boolean)[0] || "";
-      card.innerHTML = `
-          <div class="blog-card-img-container">
-            <img src="${game.poster}" alt="${escapeHtml(game.titulo)}" loading="lazy" onload="this.classList.add('loaded')" onerror="this.classList.add('loaded','img-error');this.src='logo.png'">
+  gridInfinite = { list: filtered, shown: 0, typeLabels, rows: discoveryRows };
+  if (gridMode) {
+    const banner = buildNewBanner(newCount, showOnlyNew);
+    if (banner) grid.appendChild(banner);
+  }
+  appendGridCards(endIndex);
+  try {
+    setupGridInfiniteScroll();
+  } catch (e) {
+    appendGridCards(filtered.length);
+  }
+  setupPaginationVisibility();
+}
+var PD_MIN_RATINGS = 3;
+function pdRating(game) {
+  const count = (game && game.ratingCount) || 0;
+  if (count < PD_MIN_RATINGS) return null;
+  return { avg: (game.ratingSum || 0) / count, count };
+}
+function pdRatingMeta(game) {
+  const r = pdRating(game);
+  if (!r) return "";
+  return `<span>\u2022</span>
+              <span title="${r.count} avalia\xE7\xF5es"><svg viewBox="0 0 24 24"><path d="${RATING_STAR_PATH}"/></svg>${r.avg.toFixed(1)} (${r.count})</span>`;
+}
+function pdBlogRatingHtml(game) {
+  const r = pdRating(game);
+  if (!r) return "";
+  return `<span class="blog-card-stat star" title="${r.count} avalia\xE7\xF5es"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${RATING_STAR_PATH}"/></svg>${r.avg.toFixed(1)} (${r.count})</span>`;
+}
+function pdColdStartSort(arr) {
+  const now = Date.now();
+  let maxT = 0;
+  arr.forEach((g) => {
+    g._cs = trendingScore(g, now);
+    if (g._cs > maxT) maxT = g._cs;
+  });
+  arr.forEach((g) => {
+    const c = g.ratingCount || 0;
+    const bayes = ((g.ratingSum || 0) + 3 * 4) / (c + 3);
+    const trend = maxT ? Math.sqrt(g._cs / maxT) : 0;
+    g._cs = 0.65 * trend + 0.35 * (bayes / 5);
+  });
+  arr.sort((a, b) => b._cs - a._cs || (b.downloads || 0) - (a.downloads || 0));
+}
+function pdToMs(v) {
+  if (!v) return 0;
+  if (typeof v === "number") return v;
+  if (typeof v.toMillis === "function") return v.toMillis();
+  if (typeof v.seconds === "number") return v.seconds * 1000;
+  const t = Date.parse(v);
+  return isNaN(t) ? 0 : t;
+}
+function isNewGame(g) {
+  const created = pdToMs(g && g.createdAt);
+  if (!created) return false;
+  const floor = Math.max(pdSinceTs || 0, Date.now() - 14 * 864e5);
+  return created > floor;
+}
+function isUpdatedGame(g) {
+  const upd = pdToMs(g && g.updatedAt);
+  if (!upd) return false;
+  const created = pdToMs(g.createdAt);
+  return upd > Date.now() - 7 * 864e5 && upd > created + 36e5;
+}
+function downloadsToday(g) {
+  const daily = (g && g.dailyDownloads) || {};
+  const DAY = 864e5;
+  const now = Date.now();
+  const today = daily[new Date(now).toISOString().slice(0, 10)] || 0;
+  if (today < 5) return 0;
+  let prev = 0;
+  for (let i = 1; i <= 6; i++) prev += daily[new Date(now - i * DAY).toISOString().slice(0, 10)] || 0;
+  return today >= 2 * (prev / 6) ? today : 0;
+}
+function getCardBadge(g) {
+  if (isNewGame(g)) return { cls: "", text: "NOVO" };
+  if (isUpdatedGame(g)) return { cls: "badge-updated", text: "ATUALIZADO" };
+  const n = downloadsToday(g);
+  if (n) return { cls: "badge-hot", text: "+" + n + " hoje" };
+  return null;
+}
+function badgeHtml(g) {
+  const b = getCardBadge(g);
+  return b ? `<div class="card-badge ${b.cls}">${b.text}</div>` : "";
+}
+function recSeedGames() {
+  const seeds = [];
+  const used = new Set();
+  const add = (id, verb) => {
+    if (id && allGames[id] && !used.has(id)) {
+      used.add(id);
+      seeds.push({ id, verb });
+    }
+  };
+  (userDownloadedIds || []).slice().reverse().slice(0, 3).forEach((id) => add(id, "baixou"));
+  Object.keys(userLikes || {}).slice(-2).reverse().forEach((id) => add(id, "curtiu"));
+  Object.keys(userFavorites || {}).slice(-2).reverse().forEach((id) => add(id, "favoritou"));
+  return seeds.slice(0, 3);
+}
+function buildDiscoveryRows(list, recScores) {
+  const rows = {};
+  if (!list || list.length < 24) return { list, rows };
+  const plural = { aplicativos: "Aplicativos", jogos: "Jogos", tutoriais: "Tutoriais", pc: "PC", outros: "Outros" };
+  const isSeen = (g) => !!(recScores && (recScores[g.id] || {}).seen);
+  const pool = list.filter((g) => !isSeen(g));
+  const used = new Set();
+  const free = (arr) => arr.filter((g) => !used.has(g.id));
+  const makers = [];
+  const seeds = recSeedGames();
+  const seedMaker = (seed) => () => {
+    const model = recBuildModel();
+    const sv = model.vecs[seed.id];
+    if (!sv) return null;
+    const scored = free(pool).map((g) => {
+      const v = model.vecs[g.id] || {};
+      let dot = 0;
+      for (const t in v) if (sv[t]) dot += v[t] * sv[t];
+      return { g, dot };
+    }).filter((x) => x.dot > 0.08).sort((a, b) => b.dot - a.dot).slice(0, 8);
+    let name = String(allGames[seed.id].titulo || "");
+    if (name.length > 28) name = name.slice(0, 27) + "\u2026";
+    return { title: "Porque voc\xEA " + seed.verb + " " + name, items: scored.map((x) => x.g) };
+  };
+  if (seeds[0]) makers.push(seedMaker(seeds[0]));
+  const cutoff = Date.now() - 30 * 864e5;
+  const recentByType = {};
+  pool.forEach((g) => {
+    if (pdToMs(g.createdAt) > cutoff) (recentByType[g.type] = recentByType[g.type] || []).push(g);
+  });
+  Object.keys(recentByType).sort((a, b) => recentByType[b].length - recentByType[a].length).slice(0, 2).forEach((t) => {
+    makers.push(() => ({
+      title: "Novos em " + (plural[t] || t),
+      items: free(recentByType[t]).sort((a, b) => pdToMs(b.createdAt) - pdToMs(a.createdAt)).slice(0, 8)
+    }));
+  });
+  makers.push(() => {
+    const rated = free(pool).filter((g) => (g.ratingCount || 0) >= 3 && (g.ratingSum || 0) / g.ratingCount >= 4).map((g) => ({
+      g,
+      b: ((g.ratingSum || 0) + 12) / ((g.ratingCount || 0) + 3)
+    })).sort((a, b) => b.b - a.b).slice(0, 8);
+    return { title: "Mais bem avaliados", items: rated.map((x) => x.g) };
+  });
+  if (seeds[1]) makers.push(seedMaker(seeds[1]));
+  if (seeds[2]) makers.push(seedMaker(seeds[2]));
+  let pos = 12;
+  let k = 0;
+  let removed = 0;
+  for (const make of makers) {
+    if (k >= 6 || removed > list.length * 0.35) break;
+    if (pos + 4 > list.length - removed - 8) break;
+    const spec = make();
+    if (!spec || spec.items.length < 4) continue;
+    spec.items.forEach((g) => used.add(g.id));
+    removed += spec.items.length;
+    rows[pos] = spec;
+    pos += k % 2 === 0 ? 24 : 12;
+    k++;
+  }
+  return { list: list.filter((g) => !used.has(g.id)), rows };
+}
+function buildDiscoveryCard(game, typeLabels, position) {
+  const card = document.createElement("div");
+  trackCard(card, game.id, "discovery", position || 0);
+  card.className = "card trending-card";
+  card.addEventListener("click", () => openGameDetail(game.id));
+  card.innerHTML = `
+          <div class="card-img-container">
+            <img src="${escapeHtml(game.poster || "logo.png")}" alt="${escapeHtml(game.titulo || "")}" loading="lazy" onload="this.classList.add('loaded')" onerror="this.onerror=null;this.classList.add('loaded','img-error');this.src='logo.png'">
             <div class="card-type type-${game.type}">${typeLabels[game.type] || game.type}</div>
+            ${badgeHtml(game)}
           </div>
-          <div class="blog-card-info">
-            ${_bgTok ? `<span class="blog-card-genre"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/></svg>${escapeHtml(_bgTok)}</span>` : ""}
-            <div class="blog-card-title">${escapeHtml(game.titulo)}</div>
-            <div class="blog-card-desc">${description}</div>
-            <div class="blog-card-stats">
-              <span class="blog-card-stat" title="Tamanho"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 20h20v-4H2v4zm2-3h2v2H4v-2zM2 4v4h20V4H2zm4 3H4V5h2v2zm-4 7h20v-4H2v4zm2-3h2v2H4v-2z"/></svg>${escapeHtml(String(game.size || "N/A"))}</span>
-              <span class="blog-card-stat" title="Downloads"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>${game.downloads || 0}</span>
-              <span class="blog-card-stat star" title="${ratingCount} avalia\xE7\xF5es"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${RATING_STAR_PATH}"/></svg>${avgRating.toFixed(1)}</span>
-              <span class="blog-card-go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg></span>
-            </div>
+          <div class="card-info">
+            <div class="card-title">${escapeHtml(game.titulo || "")}</div>
           </div>
         `;
-    } else {
-      card.className = "card";
-      card.innerHTML = `
+  return card;
+}
+function buildDiscoveryRowEl(row, typeLabels) {
+  const el = document.createElement("div");
+  el.className = "discovery-row";
+  const title = document.createElement("div");
+  title.className = "trending-title";
+  title.textContent = row.title;
+  const scroll = document.createElement("div");
+  scroll.className = "trending-scroll";
+  row.items.forEach((g, gi) => scroll.appendChild(buildDiscoveryCard(g, typeLabels, gi)));
+  el.appendChild(title);
+  el.appendChild(scroll);
+  return el;
+}
+function buildNewBanner(count, onlyNew) {
+  if (!count && !onlyNew) return null;
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "new-since-banner";
+  const label = onlyNew
+    ? "Mostrando s\xF3 os novos"
+    : pdFirstVisit
+      ? `${count} ${count === 1 ? "novo" : "novos"} nos \xFAltimos dias`
+      : `${count} ${count === 1 ? "novo" : "novos"} desde sua \xFAltima visita`;
+  b.innerHTML = `<span class="nsb-dot"></span><span class="nsb-text">${label}</span><span class="nsb-action">${onlyNew ? "Ver todos" : "Ver"}</span>`;
+  b.addEventListener("click", () => {
+    showOnlyNew = !showOnlyNew;
+    currentPage = 0;
+    renderGrid();
+    const w = document.querySelector(".content-wrapper");
+    if (w) w.scrollTo({ top: 0, behavior: "smooth" });
+  });
+  return b;
+}
+var MMR_WINDOW = 15;
+var MMR_PENALTY_GENRE = 0.3;
+var MMR_PENALTY_TYPE = 0.15;
+function diversifyGames(list) {
+  if (!list || list.length < 3) return list;
+  const genreOf = (g) => normalizeText(getPrimaryGenre(g)) || "outros";
+  const remaining = list.slice();
+  const out = [];
+  while (remaining.length) {
+    const w = Math.min(MMR_WINDOW, remaining.length);
+    const prev = out.slice(-2);
+    let bestIdx = 0;
+    let bestVal = -Infinity;
+    for (let i = 0; i < w; i++) {
+      const g = remaining[i];
+      const gen = genreOf(g);
+      let penalty = 0;
+      prev.forEach((p) => {
+        if (genreOf(p) === gen) penalty += MMR_PENALTY_GENRE;
+        if (p.type === g.type) penalty += MMR_PENALTY_TYPE;
+      });
+      const val = (1 - i / w) - penalty;
+      if (val > bestVal) {
+        bestVal = val;
+        bestIdx = i;
+      }
+    }
+    out.push(remaining.splice(bestIdx, 1)[0]);
+  }
+  return out;
+}
+function buildGridCard(game, index, typeLabels, position) {
+  const card = document.createElement("div");
+  trackCard(card, game.id, "grid", position == null ? index : position);
+  card.style.animationDelay = `${Math.min(index, 12) * 0.05}s`;
+  card.addEventListener("click", function() {
+    openGameDetail(game.id);
+  });
+  card.className = "card";
+  card.innerHTML = `
           <div class="card-img-container">
             <img src="${game.poster}" alt="${game.titulo}" loading="lazy" onload="this.classList.add('loaded')" onerror="this.classList.add('loaded','img-error');this.src='logo.png'">
             <div class="card-type type-${game.type}">${typeLabels[game.type] || game.type}</div>
+            ${badgeHtml(game)}
           </div>
           <div class="card-info">
             <div class="card-title">${game.titulo}</div>
@@ -11397,15 +12267,112 @@ function renderGrid() {
               <span>${game.size || "N/A"}</span>
               <span>\u2022</span>
               <span><svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/></svg>${game.downloads || 0}</span>
-              <span>\u2022</span>
-              <span title="${game.ratingCount || 0} avalia\xE7\xF5es"><svg viewBox="0 0 24 24"><path d="${RATING_STAR_PATH}"/></svg>${game.ratingCount || 0}</span>
+              ${pdRatingMeta(game)}
             </div>
           </div>
         `;
-    }
-    grid.appendChild(card);
+  return card;
+}
+function appendGridCards(upTo) {
+  const grid = document.getElementById("contentGrid");
+  const st = gridInfinite;
+  const slice = st.list.slice(st.shown, upTo);
+  const base = st.shown;
+  slice.forEach((game, i) => {
+    grid.appendChild(buildGridCard(game, i, st.typeLabels, base + i));
+    const row = st.rows && st.rows[base + i + 1];
+    if (row) grid.appendChild(buildDiscoveryRowEl(row, st.typeLabels));
   });
-  setupPaginationVisibility();
+  st.shown += slice.length;
+  currentPage = Math.max(0, Math.ceil(st.shown / gamesPerPage) - 1);
+}
+function preloadGridImages(games) {
+  return Promise.all(games.map((g) => new Promise((resolve) => {
+    if (!g.poster) return resolve();
+    const img = new Image();
+    img.onload = resolve;
+    img.onerror = resolve;
+    img.src = g.poster;
+  })));
+}
+function buildGridSkeleton(i) {
+  const sk = document.createElement("div");
+  sk.className = "skeleton-card";
+  sk.style.animationDelay = `${(i % 6) * 0.08}s`;
+  sk.innerHTML = `
+          <div class="skeleton-poster"></div>
+          <div class="skeleton-info">
+            <div class="skeleton-title"></div>
+            <div class="skeleton-genre"></div>
+            <div class="skeleton-stats">
+              <div class="skeleton-stat"></div>
+              <div class="skeleton-stat"></div>
+            </div>
+          </div>
+        `;
+  return sk;
+}
+function loadMoreGrid() {
+  const st = gridInfinite;
+  if (gridLoadingMore || gridViewMode === "blog" || st.shown >= st.list.length) return;
+  gridLoadingMore = true;
+  const token = gridLoadToken;
+  if (window._gridMoreObserver) {
+    window._gridMoreObserver.disconnect();
+    window._gridMoreObserver = null;
+  }
+  const grid = document.getElementById("contentGrid");
+  const batch = st.list.slice(st.shown, st.shown + gamesPerPage);
+  const preloadList = batch.slice();
+  for (let n = st.shown + 1; n <= st.shown + batch.length; n++) {
+    const row = st.rows && st.rows[n];
+    if (row) row.items.slice(0, 4).forEach((g) => preloadList.push(g));
+  }
+  const skeletons = batch.map((_, i) => buildGridSkeleton(i));
+  skeletons.forEach((sk) => grid.appendChild(sk));
+  const minWait = new Promise((r) => setTimeout(r, GRID_LOAD_MIN_MS));
+  const maxWait = new Promise((r) => setTimeout(r, GRID_LOAD_MAX_MS));
+  Promise.all([minWait, Promise.race([preloadGridImages(preloadList), maxWait])]).then(() => {
+    skeletons.forEach((sk) => sk.remove());
+    if (token !== gridLoadToken) return;
+    gridLoadingMore = false;
+    appendGridCards(Math.min(st.shown + gamesPerPage, st.list.length));
+    setupGridInfiniteScroll();
+  });
+}
+function getGridSentinel() {
+  let sentinel = document.getElementById("gridSentinel");
+  if (!sentinel) {
+    sentinel = document.createElement("div");
+    sentinel.id = "gridSentinel";
+    sentinel.style.cssText = "height:1px;width:100%;";
+    document.getElementById("contentGrid").insertAdjacentElement("afterend", sentinel);
+  }
+  return sentinel;
+}
+function setupGridInfiniteScroll() {
+  if (window._gridMoreObserver) {
+    window._gridMoreObserver.disconnect();
+    window._gridMoreObserver = null;
+  }
+  const sentinel = getGridSentinel();
+  const st = gridInfinite;
+  const hasMore = gridViewMode !== "blog" && st.shown < st.list.length;
+  sentinel.style.display = hasMore ? "block" : "none";
+  if (!hasMore) return;
+  if (typeof IntersectionObserver === "undefined") {
+    appendGridCards(st.list.length);
+    sentinel.style.display = "none";
+    return;
+  }
+  const observer = new IntersectionObserver((entries) => {
+    if (entries.some((e) => e.isIntersecting)) loadMoreGrid();
+  }, {
+    root: document.querySelector(".content-wrapper"),
+    rootMargin: "0px 0px 600px 0px"
+  });
+  observer.observe(sentinel);
+  window._gridMoreObserver = observer;
 }
 function setupPaginationVisibility() {
   const grid = document.getElementById("contentGrid");
@@ -11431,23 +12398,9 @@ function setupPaginationVisibility() {
   observer.observe(triggerCard);
   window._paginationObserver = observer;
 }
-function updatePaginationUI(startIndex, endIndex, totalGames, totalPages) {
+function updatePaginationUI() {
   const paginationControls = document.getElementById("paginationControls");
-  const paginationText = document.getElementById("paginationText");
-  const prevBtn = document.getElementById("prevPageBtn");
-  const nextBtn = document.getElementById("nextPageBtn");
-  if (gridViewMode === "blog") {
-    paginationControls.style.display = "none";
-    return;
-  }
-  if (totalGames > gamesPerPage) {
-    paginationControls.style.display = "flex";
-    paginationText.textContent = `${startIndex + 1} - ${endIndex} de ${totalGames}`;
-    prevBtn.disabled = currentPage === 0;
-    nextBtn.disabled = currentPage >= totalPages - 1;
-  } else {
-    paginationControls.style.display = "none";
-  }
+  if (paginationControls) paginationControls.style.display = "none";
 }
 function goToPrevPage() {
   if (currentPage > 0) {
@@ -11466,6 +12419,7 @@ document.querySelectorAll(".filter-btn").forEach((btn) => {
     document.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
     btn.classList.add("active");
     currentFilter = btn.dataset.filter;
+    showOnlyNew = false;
     currentPage = 0;
     renderGrid();
   });
@@ -11482,6 +12436,8 @@ function goHome() {
   if (notificationsOverlay) notificationsOverlay.classList.remove("active");
   const favoritesOverlay = document.getElementById("favoritesOverlay");
   if (favoritesOverlay) favoritesOverlay.classList.remove("active");
+  const requestsOverlayEl = document.getElementById("requestsOverlay");
+  if (requestsOverlayEl && requestsOverlayEl.classList.contains("active")) closeRequestsOverlay();
   const profileOverlayEl = document.getElementById("profileOverlay");
   if (profileOverlayEl) profileOverlayEl.classList.remove("active");
   const communityOverlay = document.getElementById("communityOverlay");
@@ -11497,6 +12453,7 @@ function goHome() {
   if (allBtn) allBtn.classList.add("active");
   currentFilter = "all";
   currentGenreView = null;
+  showOnlyNew = false;
   currentPage = 0;
   renderGrid();
   const wrapper = document.querySelector(".content-wrapper");
@@ -11735,7 +12692,7 @@ async function openGameDetail(id, skipPushState) {
   const aindaAberto = () => currentGameData && currentGameData.id === id;
   const pCurtidas = loadGameLikes(id).then(() => { if (aindaAberto()) updateLikeButton(); });
   const pAvaliacoes = loadGameRatings(id);
-  try { await Promise.all([pCurtidas, pAvaliacoes]); } catch (e) {  }
+  try { await Promise.all([pCurtidas, pAvaliacoes]); } catch (e) {}
   if (aindaAberto()) overlayEl.classList.remove("is-loading");
 }
 function extractYoutubeId(url) {
@@ -11989,13 +12946,11 @@ async function downloadGame(gameId, appType, url, cost) {
       const downloadSnap = await fsGetDoc(downloadDocRef);
       const currentDownloads = downloadSnap.exists() ? downloadSnap.data().count || 0 : 0;
       await setDoc(downloadDocRef, { count: currentDownloads + 1 }, { merge: true });
-      console.log("Download count incrementado para:", gameId, "- Novo valor:", currentDownloads + 1);
 
       if (allGames[gameId]) {
         allGames[gameId].downloads = currentDownloads + 1;
       }
     } catch (error) {
-      console.error("Erro ao incrementar downloads:", error.message || error);
     }
     await esperaLink;
     removerLinkOculto();
@@ -12004,7 +12959,6 @@ async function downloadGame(gameId, appType, url, cost) {
   } catch (error) {
     removerLinkOculto();
     esconderPreparandoLink();
-    console.error("[SEGURAN\xC7A] Erro na transa\xE7\xE3o de download:", error);
     showCustomAlert("Erro ao processar download. Tente novamente.");
   } finally {
     window._downloadEmCurso = false;
@@ -12148,6 +13102,7 @@ function renderComments(comments) {
   const currentUserId = currentUser ? currentUser.uid : null;
   commentsList.innerHTML = commentsArray.map((comment) => {
     const authorDisplayName = comment.authorName || comment.authorEmail.split("@")[0];
+    ppSetHint(comment.authorId, authorDisplayName, comment.authorAvatar);
     const isAuthor = currentUserId && comment.authorId === currentUserId;
     const ownCommentClass = isAuthor ? " own-comment" : "";
     const ownWrapperClass = isAuthor ? " own-comment-wrapper" : "";
@@ -12157,12 +13112,12 @@ function renderComments(comments) {
     const avatarHtml = comment.authorAvatar ? `<img src="${comment.authorAvatar}" alt="${authorDisplayName}">` : `<svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>`;
     return `
           <div class="comment-wrapper${ownWrapperClass}">
-            <div class="comment-avatar">
+            <div class="comment-avatar" style="cursor:pointer" onclick="openPublicProfile('${comment.authorId}')">
               ${avatarHtml}
             </div>
             <div class="comment-item${ownCommentClass}">
               <div class="comment-header">
-                <div class="comment-author">${authorDisplayName}</div>
+                <div class="comment-author" style="cursor:pointer" onclick="openPublicProfile('${comment.authorId}')">${authorDisplayName}</div>
                 ${deleteBtn}
               </div>
               <div class="comment-text">${comment.text}</div>
@@ -12345,6 +13300,7 @@ async function handlePublish(e) {
       const existingGame = allGames[editId];
       gameData.downloads = existingGame.downloads || 0;
       if (existingGame.createdAt) gameData.createdAt = existingGame.createdAt;
+      gameData.updatedAt = Date.now();
       await setDoc(doc(firestore, "games", editId), gameData);
       showCustomAlert("Jogo atualizado com sucesso!");
     } else {
@@ -12355,7 +13311,6 @@ async function handlePublish(e) {
     document.getElementById("publishForm").reset();
     document.getElementById("editGameId").value = "";
   } catch (error) {
-    console.error("Erro completo:", error);
     showCustomAlert("Erro ao publicar: " + error.message);
   }
 }
@@ -12491,9 +13446,87 @@ async function generateCode() {
   await set(newCodeRef, codeData);
   const codeId = newCodeRef.key;
   document.getElementById("codeDisplay").textContent = codeId;
+    window._lastGenCode = { id: codeId, points: points };
   document.getElementById("generatedCodeResult").classList.add("active");
 }
-async function redeemCode() {
+
+function ppCodeActions(n) {
+  const id = String(n.id).replace(/'/g, "");
+  return `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+    <button onclick="event.stopPropagation();redeemNotifCode('${id}')" style="padding:8px 12px;border-radius:8px;border:none;cursor:pointer;background:#16a34a;color:#fff;font-weight:600">Resgatar os pontos</button>
+    <button onclick="event.stopPropagation();copyNotifCode('${id}')" style="padding:8px 12px;border-radius:8px;border:none;cursor:pointer;background:#374151;color:#fff;font-weight:600">Copiar o código de resgate</button>
+  </div>`;
+}
+async function redeemNotifCode(id) {
+  const n = userNotifications.find(x => String(x.id) === String(id));
+  if (!n || !n.codigo) return;
+  await redeemCode(n.codigo, id);
+}
+function copyNotifCode(id) {
+  const n = userNotifications.find(x => String(x.id) === String(id));
+  if (!n || !n.codigo) return;
+  copiarTextoSimples(n.codigo);
+  showCustomAlert("Código copiado!");
+}
+async function openSendCodeModal() {
+  const g = window._lastGenCode;
+  if (!g) { showCustomAlert("Gere um código primeiro."); return; }
+  document.getElementById("sendCodePts").textContent = g.points;
+  const sel = document.getElementById("sendCodeUser");
+  sel.innerHTML = '<option value="">Carregando...</option>';
+  document.getElementById("sendCodeModal").classList.add("active");
+  try {
+    const { ref, get } = window.firebaseModules;
+    const snap = await get(ref(window.firebaseDatabase, "users"));
+    const list = [];
+    snap.forEach(c => {
+      const u = c.val() || {};
+      if (isVerifiedAccount(u)) list.push({ uid: c.key, name: u.name || u.userName || u.email.split("@")[0], email: u.email });
+    });
+    list.sort((a, b) => String(a.name).localeCompare(String(b.name)));
+    sel.innerHTML = '<option value="">Selecione um usuário</option>';
+    list.forEach(u => {
+      const o = document.createElement("option");
+      o.value = u.uid; o.dataset.name = u.name; o.textContent = u.name + " (" + u.email + ")";
+      sel.appendChild(o);
+    });
+  } catch (e) {
+    sel.innerHTML = '<option value="">Erro ao carregar</option>';
+  }
+}
+function closeSendCodeModal() {
+  document.getElementById("sendCodeModal").classList.remove("active");
+}
+async function sendCodeToUser() {
+  const g = window._lastGenCode;
+  const sel = document.getElementById("sendCodeUser");
+  const uid = sel.value;
+  if (!g || !uid) { showCustomAlert("Selecione um usuário."); return; }
+  const btn = document.getElementById("sendCodeBtn");
+  btn.disabled = true;
+  try {
+    const { ref, push, set } = window.firebaseModules;
+    const nref = push(ref(window.firebaseDatabase, "notifications"));
+    await set(nref, {
+      type: "codigo",
+      title: `🎁 Você recebeu ${g.points} pontos!`,
+      message: `Você recebeu ${g.points} pontos!`,
+      codigo: g.id,
+      points: g.points,
+      targetUserId: uid,
+      targetUserName: sel.options[sel.selectedIndex].dataset.name || sel.options[sel.selectedIndex].textContent,
+      createdBy: currentUser ? currentUser.email : null,
+      createdAt: Date.now()
+    });
+    closeSendCodeModal();
+    showCustomAlert("Pontos enviados para " + sel.options[sel.selectedIndex].textContent + "!");
+  } catch (e) {
+    showCustomAlert("Erro ao enviar: " + e.message);
+  }
+  btn.disabled = false;
+}
+
+async function redeemCode(codeArg, notifId) {
   if (!currentUser || currentUser.isAnonymous) {
     showSignupPrompt("resgatar códigos");
     return;
@@ -12502,7 +13535,7 @@ async function redeemCode() {
     showCustomAlert("Sua conta ainda est\xE1 aguardando aprova\xE7\xE3o do administrador. Por favor, aguarde.");
     return;
   }
-  const code = document.getElementById("redeemCodeInput").value.trim();
+  const code = (typeof codeArg === "string" ? codeArg : document.getElementById("redeemCodeInput").value).trim();
   if (!code) {
     showCustomAlert("Digite um c\xF3digo.");
     return;
@@ -12543,14 +13576,15 @@ async function redeemCode() {
     updates[`codes/${code}/used`] = true;
     updates[`codes/${code}/usedBy`] = currentUser.uid;
     updates[`codes/${code}/usedAt`] = serverTime;
+    updates[`users/${currentUser.uid}/lastRedeemedCode`] = code;
     updates[`users/${currentUser.uid}/points`] = newPointsTotal;
     await update(ref(database), updates);
     _syncPointsDisplay(newPointsTotal);
     document.getElementById("redeemCodeInput").value = "";
     showCustomAlert(`C\xF3digo resgatado! Voc\xEA ganhou ${codePoints} pontos.`);
+    if (notifId) { try { dismissNotification(notifId); } catch (e) {} }
     closeRedeemCodeModal();
   } catch (error) {
-    console.error("[SEGURAN\xC7A] Erro na transa\xE7\xE3o de resgate de c\xF3digo:", error);
     showCustomAlert("Erro ao resgatar c\xF3digo. Tente novamente.");
   }
 }
@@ -12593,7 +13627,6 @@ function dismissSocialAdForever() {
   try {
     window["localStorage"].setItem(SOCIAL_AD_DISMISS_KEY, "true");
   } catch (e) {
-    console.error("Erro ao salvar prefer\xEAncia do an\xFAncio social:", e);
   }
   closeSocialAdModal();
 }
@@ -12762,8 +13795,7 @@ function renderSearchOverlayResults() {
               <span>${game.size || "N/A"}</span>
               <span>\u2022</span>
               <span><svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/></svg>${game.downloads || 0}</span>
-              <span>\u2022</span>
-              <span title="${game.ratingCount || 0} avalia\xE7\xF5es"><svg viewBox="0 0 24 24"><path d="${RATING_STAR_PATH}"/></svg>${game.ratingCount || 0}</span>
+              ${pdRatingMeta(game)}
             </div>
           </div>
         `;
@@ -12855,7 +13887,6 @@ async function enterAsVisitor() {
     closeAuthOverlay();
   } catch (error) {
     hideAuthLoading();
-    console.error("Erro no login an\xF4nimo:", error);
     showCustomAlert("Erro ao conectar. Tente novamente.");
   }
 }
@@ -12942,7 +13973,6 @@ async function sendVerificationLink() {
     await sendEmailVerification(user);
     showVerificationLinkSent(user.email);
   } catch (error) {
-    console.error("Erro ao enviar email:", error);
     let errorMsg = "Erro ao enviar email de verifica\uFFFD\uFFFD\xE3o.";
     if (error.code === "auth/too-many-requests") {
       errorMsg = "Muitas tentativas. Aguarde alguns minutos e tente novamente.";
@@ -13026,7 +14056,6 @@ async function resendVerificationLink() {
       }, 3e4);
     }
   } catch (error) {
-    console.error("Erro ao reenviar email:", error);
     if (error.code === "auth/too-many-requests") {
       showCustomAlert("Muitas tentativas. Aguarde alguns minutos.");
     } else {
@@ -13062,7 +14091,6 @@ async function checkEmailVerification() {
       }
     }
   } catch (error) {
-    console.error("Erro ao verificar:", error);
     showCustomAlert("Erro ao verificar. Tente novamente.");
     if (btn) {
       btn.disabled = false;
@@ -13103,7 +14131,6 @@ async function approveAccountAfterEmailVerification() {
         await update(ref(database), updates);
         bonusPoints = 10;
       } catch (bonusError) {
-        console.log("[SEGURAN\xC7A] Bonus j\xE1 foi reivindicado ou valida\xE7\xE3o falhou:", bonusError);
         await update(ref(database, `users/${user.uid}`), {
           status: "approved",
           emailVerified: true,
@@ -13143,7 +14170,6 @@ async function approveAccountAfterEmailVerification() {
           </div>
         `;
   } catch (error) {
-    console.error("Erro ao aprovar conta:", error);
     showCustomAlert("Email verificado, mas houve um erro ao ativar sua conta. Entre em contato com o suporte.");
   }
 }
@@ -13236,6 +14262,7 @@ async function updateProfileAvatar() {
         avatar: imageUrl
       });
       userAvatar = imageUrl;
+      ppSchedulePublish();
       updateSidebarProfileAvatar();
       if (avatarElement) {
         const statusClass = avatarElement.className.split(" ").find((c) => c.startsWith("status-")) || "status-pending";
@@ -13244,7 +14271,6 @@ async function updateProfileAvatar() {
       }
       showCustomAlert("Foto de perfil atualizada com sucesso!");
     } catch (error) {
-      console.error("Erro ao atualizar avatar:", error);
       showCustomAlert("Erro ao atualizar foto de perfil. Tente novamente.");
       if (avatarElement) {
         const statusClass = avatarElement.className.split(" ").find((c) => c.startsWith("status-")) || "status-pending";
@@ -13290,7 +14316,6 @@ async function handleRegister(e) {
       try {
         avatarUrl = await uploadImageToImgBB(selectedAvatarFile);
       } catch (uploadError) {
-        console.error("Erro ao fazer upload do avatar:", uploadError);
       }
     }
     await set(ref(database, `users/${user.uid}`), {
@@ -13553,7 +14578,6 @@ async function loadCommunityCommentsCount() {
     });
     renderCommunityList();
   } catch (error) {
-    console.log("Erro ao carregar contagem de coment\xE1rios:", error);
     renderCommunityList();
   }
 }
@@ -13958,7 +14982,6 @@ async function claimAdPoints() {
 
 Voc\xEA pode assistir mais ${remaining} an\xFAncio(s) hoje.`);
   } catch (error) {
-    console.error("[SEGURAN\xC7A] Erro na transa\xE7\xE3o de pontos de an\xFAncio:", error);
     closeAdInterstitial();
     showCustomAlert("Erro ao processar pontos. Tente novamente.");
   }
@@ -14559,7 +15582,6 @@ function checkUnreadNotifications() {
         Android.showNotification();
       }
     } catch (e) {
-      console.log("Android bridge not available");
     }
   }
 }
@@ -14656,19 +15678,16 @@ async function loadUsersForNotification() {
     if (snapshot.exists()) {
       const users = snapshot.val();
       const select = document.getElementById("notificationTargetUser");
-      const userList = Object.entries(users).filter(([id, user]) => user.status === "approved" || user.status === "pending").map(([id, user]) => ({
+      const userList = Object.entries(users).filter(([id, user]) => isVerifiedAccount(user)).map(([id, user]) => ({
         id,
         name: user.name || "Sem nome",
-        email: user.email || "",
-        status: user.status
+        email: user.email
       })).sort((a, b) => a.name.localeCompare(b.name));
       select.innerHTML = '<option value="">Selecione um usu\xE1rio...</option>' + userList.map((user) => {
-        const statusLabel = user.status === "approved" ? "\u2713" : "\u23F3";
-        return `<option value="${user.id}">${user.name} (${user.email}) ${statusLabel}</option>`;
+        return `<option value="${user.id}">${user.name} (${user.email}) \u2713</option>`;
       }).join("");
     }
   } catch (error) {
-    console.error("Erro ao carregar usu\xE1rios:", error);
   }
 }
 async function handleSendNotification(e) {
@@ -14919,6 +15938,8 @@ async function pdEnhanceProfile(container, user, createdAtMs, pre) {
     });
     const conq = pdpConquistas(stats);
     const feitas = conq.filter((c) => c.ok).length;
+    window.__ppSnap = { nivelNum: nv.num, nivelNome: nv.nome, pct: nv.pct, conq: conq.filter((c) => c.ok).map((c) => c.nm) };
+    ppSchedulePublish();
 
 
     const cardNivel = '<div class="pdp-card" data-pdp="1"><div class="pdp-idbox" id="pdpIdBox"><div class="pdp-username" id="pdpUserShow"></div><div class="pdp-bio" id="pdpBioShow"></div></div><h3>Nível <small>' + xp + ' XP</small></h3>' +
@@ -14944,7 +15965,8 @@ async function pdEnhanceProfile(container, user, createdAtMs, pre) {
     const recHtml = rec.length ? '<div class="pdp-rec">' + rec.map((r) => '<div class="pdp-rec-item" data-gid="' + escapeHtml(r.id) + '"><img src="' + escapeHtml(r.g.poster || "") + '" alt="" loading="lazy"><span>' + escapeHtml(r.g.titulo || "") + "</span></div>").join("") + "</div>" : '<div class="pdp-vazio">Ainda não baixou nada.</div>';
     const cardRec = '<div class="pdp-card" data-pdp="1"><h3>Últimos downloads</h3>' + recHtml + "</div>";
 
-    card.insertAdjacentHTML("afterend", cardNivel + cardStats + cardPers + cardConq + cardRec);
+    const cardNudge = (!cfg0.user || !cfg0.bio) ? '<div class="pdp-card pp-nudge" data-pdp="1"><div class="pp-nudge-t">Complete o seu perfil</div><div class="pp-nudge-d">Adicione um nome de usuário e uma bio para o seu perfil ficar mais interessante.</div><button type="button" class="custom-modal-btn primary" onclick="ppOpenSetup()">Completar agora</button></div>' : "";
+    card.insertAdjacentHTML("afterend", cardNudge + cardNivel + cardStats + cardPers + cardConq + cardRec);
     const fill = container.querySelector("#pdpXpFill");
     if (fill) setTimeout(() => { fill.style.width = nv.pct + "%"; }, 60);
 
@@ -14958,7 +15980,7 @@ async function pdEnhanceProfile(container, user, createdAtMs, pre) {
     marcar(".pdp-cover-op", "data-capa", cfg.capa || "orig");
     marcar(".pdp-frame-op", "data-mold", cfg.moldura || "padrao");
     pdpAplicar(container, uid, nv.num);
-    const salvar = (patch) => { const c = Object.assign(pdpCfg(uid), patch); pdpSalvarCfg(uid, c); pdpAplicar(raiz(), uid, nv.num); };
+    const salvar = (patch) => { const c = Object.assign(pdpCfg(uid), patch); pdpSalvarCfg(uid, c); pdpAplicar(raiz(), uid, nv.num); ppSchedulePublish(); };
     inUser.addEventListener("input", () => { inUser.value = inUser.value.replace(/[^a-zA-Z0-9_.]/g, "").slice(0, 20); salvar({ user: inUser.value }); });
     inBio.addEventListener("input", () => { cont2.textContent = inBio.value.length + "/100"; salvar({ bio: inBio.value.slice(0, 100) }); });
     container.querySelectorAll(".pdp-cover-op").forEach((b) => b.addEventListener("click", () => { salvar({ capa: b.getAttribute("data-capa") }); marcar(".pdp-cover-op", "data-capa", b.getAttribute("data-capa")); }));
@@ -14969,7 +15991,7 @@ async function pdEnhanceProfile(container, user, createdAtMs, pre) {
       marcar(".pdp-frame-op", "data-mold", m.id);
     }));
     container.querySelectorAll(".pdp-rec-item").forEach((el) => el.addEventListener("click", () => { closeProfileOverlay(); openGameDetail(el.getAttribute("data-gid")); }));
-  } catch (e) { console.log("Perfil+ indisponível:", e); }
+  } catch (e) {}
 }
 function getDefaultAvatarSVG() {
   return `<svg viewBox="0 0 212 212" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -15049,7 +16071,6 @@ async function loadProfileData(user, container) {
         window.__pdCreatedAtMs = snapshot.val();
       }
     } catch (e) {
-      console.log("N\xE3o foi poss\xEDvel buscar data de cria\xE7\xE3o");
     }
     let statusBadgeClass = "pending";
     let statusBadgeText = " Pendente";
@@ -15122,7 +16143,6 @@ async function loadProfileData(user, container) {
     if (tok !== window.__pdLoadTok) return;
     container.replaceChildren(...stage.childNodes);
   } catch (error) {
-    console.error("Error loading profile:", error);
     const displayName = userName || user.displayName || user.email?.split("@")[0] || "Usu\xE1rio";
     const email = user.email || "";
     document.getElementById("profileHeaderPointsValue").textContent = userPoints || 0;
@@ -15244,7 +16264,6 @@ async function handleReportProblem(event) {
     closeReportProblemOverlay();
     showCustomAlert(" Report enviado com sucesso! Os administradores ir\xE3o analisar o problema.");
   } catch (error) {
-    console.error("Error submitting report:", error);
     showCustomAlert("Erro ao enviar report. Tente novamente.");
   } finally {
     submitBtn.disabled = false;
@@ -15286,7 +16305,6 @@ async function updateReportsBadge() {
       badge.style.display = "none";
     }
   } catch (error) {
-    console.error("Error updating reports badge:", error);
     badge.style.display = "none";
   }
 }
@@ -15320,7 +16338,6 @@ async function loadReports() {
     allReports.sort((a, b) => b.createdAt - a.createdAt);
     renderReports();
   } catch (error) {
-    console.error("Error loading reports:", error);
     reportsList.innerHTML = `
           <div class="reports-empty">
             <svg viewBox="0 0 24 24" style="fill: #f44336;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
@@ -15435,7 +16452,6 @@ async function markReportResolved(reportId) {
     updateReportsBadge();
     showCustomAlert(" Report marcado como resolvido!");
   } catch (error) {
-    console.error("Error resolving report:", error);
     showCustomAlert("Erro ao atualizar report.");
   }
 }
@@ -15455,7 +16471,6 @@ async function deleteReport(reportId) {
     updateReportsBadge();
     showCustomAlert("Report exclu\xEDdo com sucesso!");
   } catch (error) {
-    console.error("Error deleting report:", error);
     showCustomAlert("Erro ao excluir report.");
   }
 }
@@ -15678,7 +16693,6 @@ async function confirmRating() {
     showCustomAlert(successMsg);
     renderRatingOverlay();
   } catch (e) {
-    console.error("Erro ao enviar avalia\xE7\xE3o:", e);
     showCustomAlert("Erro ao enviar avalia\xE7\xE3o. Tente novamente.");
   }
 }
@@ -15798,7 +16812,7 @@ function renderNotifications() {
                 <div class="notification-time">${timeAgo}</div>
               </div>
             </div>
-            <div class="notification-message">${convertUrlsToLinks(notif.message)}</div>
+            <div class="notification-message">${convertUrlsToLinks(notif.message)}</div>${notif.type === "codigo" && notif.codigo ? ppCodeActions(notif) : ""}
             <div class="notification-actions">
               ${markReadBtn}
               <button class="notification-action-btn delete" onclick="dismissNotification('${notif.id}')">
@@ -15899,7 +16913,6 @@ async function loadUserRatings() {
       userRatings = {};
     }
   } catch (e) {
-    console.error("Erro ao carregar avalia\xE7\xF5es do usu\xE1rio:", e);
     userRatings = {};
   }
 }
@@ -15942,7 +16955,6 @@ async function loadGameRatings(gameId) {
       count = data.count || 0;
     }
   } catch (e) {
-    console.error("Erro ao carregar m\xE9dia de avalia\xE7\xF5es:", e);
   }
   if (!currentGameData || currentGameData.id !== gameId) return;
   const average = count > 0 ? sum / count : 0;
@@ -15981,7 +16993,6 @@ async function loadGameRatings(gameId) {
     items.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
     renderRatingList(items.slice(0, 20));
   } catch (e) {
-    console.error("Erro ao carregar avalia\xE7\xF5es:", e);
     ratingList.innerHTML = "";
   }
 }
@@ -16065,7 +17076,6 @@ async function submitRating() {
     showCustomAlert(previousRating ? "Avalia\xE7\xE3o atualizada!" : "Avalia\xE7\xE3o enviada!");
     await loadGameRatings(gameId);
   } catch (e) {
-    console.error("Erro ao enviar avalia\xE7\xE3o:", e);
     showCustomAlert("Erro ao enviar avalia\xE7\xE3o.");
   } finally {
     setRatingSubmitLoading(false);
@@ -16091,7 +17101,6 @@ async function loadUserFavorites() {
       userFavorites = {};
     }
   } catch (e) {
-    console.error("Erro ao carregar favoritos:", e);
     userFavorites = {};
   }
   refreshRecommendations();
@@ -16108,7 +17117,6 @@ async function loadUserLikes() {
       userLikes = {};
     }
   } catch (e) {
-    console.error("Erro ao carregar likes:", e);
     userLikes = {};
   }
   refreshRecommendations();
@@ -16143,7 +17151,6 @@ async function toggleFavorite() {
       showCustomAlert("Adicionado aos favoritos!");
     }
   } catch (e) {
-    console.error("Erro ao atualizar favorito:", e);
     showCustomAlert("Erro ao atualizar favorito.");
   }
 }
@@ -16203,7 +17210,6 @@ async function toggleLike() {
     releaseLike();
     updateLikeButton();
   } catch (e) {
-    console.error("Erro ao atualizar like:", e);
     releaseLike();
     showCustomAlert("Erro ao curtir.");
   }
@@ -16339,10 +17345,12 @@ async function removeFavorite(gameId) {
     renderFavoritesList();
     updateFavoriteButton();
   } catch (e) {
-    console.error("Erro ao remover favorito:", e);
   }
 }
 let allUsersForTransfer = [];
+function isVerifiedAccount(u) {
+  return !!(u && u.email && (u.emailVerified === true || u.status === "approved"));
+}
 function toggleTransferType() {
   const transferType = document.querySelector('input[name="transferType"]:checked').value;
   const emailGroup = document.getElementById("transferEmailGroup");
@@ -16374,7 +17382,7 @@ async function updateTransferUsersCount() {
       allUsersForTransfer = [];
       usersSnapshot.forEach((child) => {
         const userData = child.val();
-        if (child.key !== currentUser.uid) {
+        if (child.key !== currentUser.uid && isVerifiedAccount(userData)) {
           allUsersForTransfer.push({
             uid: child.key,
             email: userData.email || "",
@@ -16383,10 +17391,19 @@ async function updateTransferUsersCount() {
           });
         }
       });
-      document.getElementById("totalUsersCount").textContent = `${allUsersForTransfer.length} usu\xE1rios`;
+      document.getElementById("totalUsersCount").textContent = `${allUsersForTransfer.length} usu\xE1rios verificados`;
+      const dl = document.getElementById("transferEmailList");
+      if (dl) {
+        dl.innerHTML = "";
+        allUsersForTransfer.slice().sort((a, b) => a.name.localeCompare(b.name)).forEach((u) => {
+          const opt = document.createElement("option");
+          opt.value = u.email;
+          opt.label = u.name;
+          dl.appendChild(opt);
+        });
+      }
     }
   } catch (e) {
-    console.error("Erro ao contar usu\xE1rios:", e);
   }
 }
 function openTransferModal() {
@@ -16403,6 +17420,7 @@ function openTransferModal() {
   document.getElementById("transferEmail").value = "";
   document.getElementById("transferAmount").value = "";
   selectTransferType("individual");
+  updateTransferUsersCount();
   document.getElementById("transferOverlay").classList.add("active");
 }
 function closeTransferModal() {
@@ -16479,6 +17497,10 @@ async function handleTransferToIndividual(amount) {
       showCustomAlert("Usu\xE1rio com esse email n\xE3o encontrado no sistema.");
       return;
     }
+    if (!isVerifiedAccount(recipientData)) {
+      showCustomAlert("Esta conta ainda n\xE3o est\xE1 verificada. S\xF3 \xE9 poss\xEDvel transferir pontos para contas verificadas.");
+      return;
+    }
     const recipientCurrentPoints = recipientData.points || 0;
     const recipientNewPoints = recipientCurrentPoints + amount;
     const serverTime = await getServerTimestamp();
@@ -16504,7 +17526,6 @@ ${amount} pontos enviados para ${recipientEmail}.
 Novo saldo do destinat\xE1rio: ${recipientNewPoints} pontos.`);
     closeTransferModal();
   } catch (error) {
-    console.error("[SEGURAN\xC7A] Erro na transfer\xEAncia:", error);
     showCustomAlert("Erro ao realizar transfer\xEAncia: " + error.message);
   }
 }
@@ -16559,7 +17580,6 @@ async function executeMassTransfer(amount) {
         successCount++;
         submitBtn.textContent = `Transferindo... (${successCount}/${allUsersForTransfer.length})`;
       } catch (err) {
-        console.error(`Erro ao transferir para ${user.email}:`, err);
         errorCount++;
       }
     }
@@ -16577,7 +17597,6 @@ Erros: ${errorCount} usu\xE1rios`);
     }
     closeTransferModal();
   } catch (error) {
-    console.error("[SEGURAN\xC7A] Erro na transfer\xEAncia em massa:", error);
     showCustomAlert("Erro ao realizar transfer\xEAncia: " + error.message);
   } finally {
     submitBtn.disabled = false;
@@ -16615,7 +17634,6 @@ async function checkDailyReward() {
       showDailyRewardModal();
     }
   } catch (e) {
-    console.error("Erro ao verificar recompensa di\xE1ria:", e);
   }
 }
 async function getServerTimestamp() {
@@ -16627,7 +17645,6 @@ async function getServerTimestamp() {
     const offset = snapshot.val() || 0;
     return Date.now() + offset;
   } catch (e) {
-    console.error("Erro ao obter timestamp do servidor:", e);
     return Date.now();
   }
 }
@@ -16755,7 +17772,6 @@ Volte em ${formatTimeRemaining(nextRewardTime - serverTime)} `);
     try {
       await update(ref(database), updates);
     } catch (claimError) {
-      console.log("[SEGURAN\xC7A] Recompensa bloqueada pelo servidor:", claimError);
       const freshSnapshot = await get(claimRef);
       if (freshSnapshot.exists()) {
         const freshData = freshSnapshot.val();
@@ -16771,11 +17787,9 @@ Volte em ${formatTimeRemaining(nextRewardTime - serverTime)} `);
 
 Volte em ${formatTimeRemaining(nextRewardTime - freshServerTime)}`);
         } else {
-          console.error("[DEBUG] 24h passou mas update falhou. Erro:", claimError.code, claimError.message);
           showCustomAlert("Erro ao resgatar recompensa. Tente recarregar a p\xE1gina e tentar novamente.");
         }
       } else {
-        console.error("[DEBUG] Primeiro resgate falhou. Erro:", claimError.code, claimError.message);
         showCustomAlert("Erro ao resgatar recompensa. Verifique sua conex\xE3o e tente novamente.");
       }
       return;
@@ -16788,7 +17802,6 @@ Volte em ${formatTimeRemaining(nextRewardTime - freshServerTime)}`);
     startRewardCountdown();
     showCustomAlert("\u{1F381} Recompensa di\xE1ria resgatada!\n\n+20 pontos adicionados \xE0 sua conta!");
   } catch (e) {
-    console.error("[SEGURAN\xC7A] Erro ao resgatar recompensa:", e);
     showCustomAlert("Erro ao resgatar recompensa. Tente novamente.");
   }
 }
@@ -16808,7 +17821,6 @@ function saveDailyRecommendationState(state) {
   try {
     localStorage.setItem(DAILY_REC_STORAGE_KEY, JSON.stringify(state));
   } catch (e) {
-    console.error("Erro ao salvar recomenda\xE7\xE3o di\xE1ria:", e);
   }
 }
 function isAnyModalOpen() {
@@ -16914,7 +17926,6 @@ function clearDailyRecommendationState() {
   try {
     localStorage.removeItem(DAILY_REC_STORAGE_KEY);
   } catch (e) {
-    console.error("Erro ao limpar recomenda\xE7\xE3o di\xE1ria:", e);
   }
 }
 function closeDailyRecommendationModal() {
@@ -17010,6 +18021,11 @@ document.addEventListener("keydown", (e) => {
     const publishOverlay = document.getElementById("publishOverlay");
     const manageOverlay = document.getElementById("manageOverlay");
     const searchOverlay = document.getElementById("searchOverlay");
+    const ppOv = document.getElementById("publicProfileOverlay");
+    if (ppOv && ppOv.classList.contains("active")) {
+      closePublicProfile();
+      return;
+    }
     if (searchOverlay && searchOverlay.classList.contains("active")) {
       closeSearchOverlay();
       return;
@@ -17037,6 +18053,8 @@ document.addEventListener("keydown", (e) => {
       closeReportProblemOverlay();
     } else if (notificationsOverlay && notificationsOverlay.classList.contains("active")) {
       closeNotificationsOverlay();
+    } else if (document.getElementById("requestsOverlay") && document.getElementById("requestsOverlay").classList.contains("active")) {
+      closeRequestsOverlay();
     } else if (favoritesOverlay && favoritesOverlay.classList.contains("active")) {
       closeFavoritesOverlay();
     } else if (document.getElementById("generateCodeOverlay") && document.getElementById("generateCodeOverlay").classList.contains("active")) {
@@ -17167,7 +18185,7 @@ document.addEventListener("keydown", (e) => {
         const dados = d.data();
         if (dados.videoId && dados.link) ANUNCIOS_ATIVOS.push({ id: d.id, videoId: dados.videoId, link: dados.link, logoUrl: dados.logoUrl || '', tituloExibido: dados.tituloExibido || '', subtitulo: dados.subtitulo || '', textoBotao: dados.textoBotao || '', exibicoes: Number(dados.exibicoes) || 0, cliques: Number(dados.cliques) || 0 });
       });
-    } catch (e) {  }
+    } catch (e) {}
     sortearAnuncio();
     atualizarPorta();
   }
@@ -17195,7 +18213,7 @@ document.addEventListener("keydown", (e) => {
         [campo]: increment(1)
       }, { merge: true }).catch(() => {});
       updateDoc(doc(firestore, 'anuncios', anuncio.id), { [campo]: increment(1) }).catch(() => {});
-    } catch (e) {  }
+    } catch (e) {}
   }
 
   function toast(msg, ms) {
@@ -17395,7 +18413,7 @@ document.addEventListener("keydown", (e) => {
       ytPlayer.setVolume(100);
       if (ytPlayer.getCurrentTime() > 0.5) ytPlayer.seekTo(0, true);
       ytPlayer.playVideo();
-    } catch (e) {  }
+    } catch (e) {}
 
     let ticks = 0;
     clearInterval(timerRetry);
@@ -17866,7 +18884,7 @@ async function openAdStatsModal(id) {
         ultimaHora: u.ultimaHora || ""
       };
     });
-  } catch (e) {  }
+  } catch (e) {}
   try {
     const snapAntigo = await getDocs(query(collection(firestore, "anuncio_eventos"), where("anuncioId", "==", id)));
     snapAntigo.forEach((d) => {
@@ -17881,7 +18899,7 @@ async function openAdStatsModal(id) {
         u.ultimaHora = ev.hora || "";
       }
     });
-  } catch (e) {  }
+  } catch (e) {}
   allAdStatsUsers = Object.values(porUsuario);
   renderAdStats();
 }
@@ -18053,7 +19071,6 @@ function renderAdStats() {
       aplicarEstado(snap.exists() ? snap.val() : {});
       estadoCarregado = true;
     } catch (e) {
-      console.error('[ANÚNCIOS] Erro ao carregar pontos:', e);
       estadoCarregado = false;
     }
     carregandoEstado = false;
@@ -18119,7 +19136,6 @@ function renderAdStats() {
       _syncPointsDisplay(novoSaldo);
       return { status: 'ganhou', premio: premio };
     } catch (e) {
-      console.error('[SEGURANÇA] Pontos do anúncio bloqueados ou falharam:', e);
       return { status: 'erro' };
     }
   }
@@ -19004,9 +20020,13 @@ function renderAdStats() {
     notificationsOverlay: "closeNotificationsOverlay",
     ratingOverlay: "closeRatingOverlay",
     favoritesOverlay: "closeFavoritesOverlay",
+    requestsOverlay: "closeRequestsOverlay",
+    publicProfileOverlay: "closePublicProfile",
     reportProblemOverlay: "closeReportProblemOverlay",
     reportsOverlay: "closeViewReportsModal",
-    transferOverlay: "closeTransferModal"
+    transferOverlay: "closeTransferModal",
+    surveyOverlay: "closeSurveyOverlay",
+    surveyAdminOverlay: "closeSurveyAdmin"
   };
 
   var lastState = history.state;
@@ -19080,27 +20100,966 @@ function renderAdStats() {
   }, true);
 })();
 </script>
+<script>
+const PQ_CACHE_KEY = "pdPesquisaCfg";
+const PQ_CACHE_TTL = 6 * 36e5;
+const PQ_DEFAULT_CFG = {
+  ativa: true,
+  pontos: 300,
+  atualizadoEm: 0,
+  perguntas: [
+    { id: "q1", bloco: "Primeira impressão e uso", texto: "Com que frequência usas o Portal Digital?", tipo: "unica", opcoes: ["Todos os dias", "Algumas vezes por semana", "Algumas vezes por mês", "É a primeira vez"], obrigatoria: true, ativa: true },
+    { id: "q2", bloco: "Primeira impressão e uso", texto: "O que costumas procurar aqui?", tipo: "multipla", opcoes: ["Jogos", "Aplicativos", "Tutoriais", "Conteúdo para PC", "Outros"], obrigatoria: true, ativa: true },
+    { id: "q3", bloco: "Primeira impressão e uso", texto: "Como avalias o design e a facilidade de navegar no app?", tipo: "escala", opcoes: [], obrigatoria: true, ativa: true },
+    { id: "q4", bloco: "Encontrar e baixar conteúdo", texto: "Com que facilidade encontras o que procuras? (pesquisa, filtros, \"Para você\")", tipo: "escala", opcoes: [], obrigatoria: true, ativa: true },
+    { id: "q5", bloco: "Encontrar e baixar conteúdo", texto: "Quando baixas algo, o que acontece normalmente?", tipo: "unica", opcoes: ["O link abre à primeira", "Demora, mas funciona", "Tive de tentar mais de uma vez", "Não consegui baixar"], obrigatoria: true, ativa: true },
+    { id: "q6", bloco: "Pontos e anúncios", texto: "Os pontos são fáceis de ganhar e de perceber?", tipo: "unica", opcoes: ["Muito fáceis", "Fáceis, mas confusos", "Difíceis de ganhar", "Não percebo como funcionam"], obrigatoria: true, ativa: true },
+    { id: "q7", bloco: "Pontos e anúncios", texto: "O que achas dos anúncios para ganhar pontos?", tipo: "unica", opcoes: ["Gosto, é justo", "Aceitável", "Demasiados", "Não funcionam bem"], obrigatoria: true, ativa: true },
+    { id: "q8", bloco: "O que melhorar", texto: "O que mais queres que melhoremos?", tipo: "multipla", opcoes: ["Velocidade", "Mais conteúdo", "Conteúdo mais recente", "Mais formas de ganhar pontos", "Aprovação de conta mais rápida", "Notificações", "Design", "Suporte"], max: 3, obrigatoria: true, ativa: true },
+    { id: "q9", bloco: "O que melhorar", texto: "Que jogo, aplicativo ou tutorial gostavas de ver no Portal Digital?", tipo: "texto", opcoes: [], minChars: 15, obrigatoria: true, ativa: true },
+    { id: "q10", bloco: "O que melhorar", texto: "Se pudesses mudar uma coisa no app, o que seria?", tipo: "texto", opcoes: [], minChars: 15, obrigatoria: true, ativa: true }
+  ]
+};
+const PQ_TIPOS = { unica: "Escolha única", multipla: "Múltipla escolha", escala: "Escala 1-5", texto: "Texto livre" };
+
+let userSurveyDone = false;
+let pqConfig = null;
+
+function pqClone(o) { return JSON.parse(JSON.stringify(o)); }
+
+function pqNormalizeCfg(d) {
+  const src = d && Array.isArray(d.perguntas) ? d.perguntas : PQ_DEFAULT_CFG.perguntas;
+  return {
+    ativa: d && typeof d.ativa === "boolean" ? d.ativa : true,
+    pontos: d && Number.isFinite(d.pontos) ? d.pontos : PQ_DEFAULT_CFG.pontos,
+    atualizadoEm: d && d.atualizadoEm ? d.atualizadoEm : 0,
+    perguntas: src.map((q, i) => ({
+      id: String(q.id || ("q" + (i + 1))),
+      bloco: String(q.bloco || ""),
+      texto: String(q.texto || ""),
+      tipo: PQ_TIPOS[q.tipo] ? q.tipo : "texto",
+      opcoes: Array.isArray(q.opcoes) ? q.opcoes.map(String) : [],
+      max: Number(q.max) || 0,
+      minChars: Number(q.minChars) || 0,
+      obrigatoria: q.obrigatoria !== false,
+      ativa: q.ativa !== false
+    }))
+  };
+}
+
+async function pqLoadConfig(force) {
+  if (pqConfig && !force) return pqConfig;
+  if (!force) {
+    try {
+      const c = JSON.parse(localStorage.getItem(PQ_CACHE_KEY) || "null");
+      if (c && c.cfg && Date.now() - c.t < PQ_CACHE_TTL) {
+        pqConfig = pqNormalizeCfg(c.cfg);
+        return pqConfig;
+      }
+    } catch (e) {}
+  }
+  let data = null, ok = false;
+  try {
+    const { doc, getDoc } = window.firebaseModules;
+    const snap = await getDoc(doc(window.firebaseFirestore, "pesquisa_config", "atual"));
+    if (snap.exists()) data = snap.data();
+    ok = true;
+  } catch (e) {
+  }
+  pqConfig = pqNormalizeCfg(data);
+  if (ok) pqCacheSave(pqConfig);
+  return pqConfig;
+}
+
+function pqCacheSave(cfg) {
+  try { localStorage.setItem(PQ_CACHE_KEY, JSON.stringify({ t: Date.now(), cfg: cfg })); } catch (e) {}
+}
+
+function pqCachedActive() {
+  try {
+    const c = JSON.parse(localStorage.getItem(PQ_CACHE_KEY) || "null");
+    if (c && c.cfg && typeof c.cfg.ativa === "boolean") return c.cfg.ativa;
+  } catch (e) {}
+  return null;
+}
+
+let pqInviteTimer = null;
+let pqInviteShown = false;
+
+function updateSurveyUI() {
+  const userBtn = document.getElementById("surveyBtn");
+  const adminBtn = document.getElementById("surveyAdminBtn");
+  const logged = !!(currentUser && !currentUser.isAnonymous);
+  if (adminBtn) adminBtn.style.display = logged && isPublisher ? "flex" : "none";
+  const eligible = logged && !isPublisher && userStatus === "approved" && !userSurveyDone && pqCachedActive() !== false;
+  if (userBtn) userBtn.style.display = eligible ? "flex" : "none";
+  if (eligible) pqScheduleInvite();
+}
+
+function pqScheduleInvite() {
+  if (pqInviteShown || pqInviteTimer) return;
+  try {
+    if (localStorage.getItem("pdPqNever") === "1") return;
+    if (Date.now() < (Number(localStorage.getItem("pdPqRemind")) || 0)) return;
+  } catch (e) {}
+  pqInviteTimer = setTimeout(async () => {
+    pqInviteTimer = null;
+    if (userSurveyDone || !currentUser || currentUser.isAnonymous || userStatus !== "approved") return;
+    if (document.querySelector(".custom-modal.active, .manage-users-overlay.active")) return;
+    const cfg = await pqLoadConfig();
+    if (!cfg.ativa || !cfg.perguntas.some(q => q.ativa)) return;
+    pqInviteShown = true;
+    document.getElementById("pqInvitePts").textContent = "+" + cfg.pontos + " pontos";
+    document.getElementById("surveyInviteModal").classList.add("active");
+  }, 9000);
+}
+
+function closeSurveyInvite() {
+  const m = document.getElementById("surveyInviteModal");
+  if (m) m.classList.remove("active");
+}
+function pqInviteLater() {
+  try { localStorage.setItem("pdPqRemind", String(Date.now() + 2 * 864e5)); } catch (e) {}
+  closeSurveyInvite();
+}
+function pqInviteNever() {
+  try { localStorage.setItem("pdPqNever", "1"); } catch (e) {}
+  closeSurveyInvite();
+}
+
+let pqActive = [];
+let pqIdx = 0;
+let pqAns = {};
+let pqPoints = 300;
+let pqPreview = false;
+let pqSending = false;
+let pqStep = "";
+
+async function openSurvey(previewCfg) {
+  if (!currentUser || currentUser.isAnonymous) {
+    showCustomAlert("Entra na tua conta para responder ao inquérito.");
+    return;
+  }
+  pqPreview = !!previewCfg;
+  let cfg;
+  if (pqPreview) {
+    cfg = previewCfg;
+  } else {
+    if (userStatus !== "approved") {
+      showCustomAlert("A tua conta ainda está pendente de aprovação.");
+      return;
+    }
+    if (userSurveyDone) {
+      showCustomAlert("Já respondeste a este inquérito. Obrigado!");
+      return;
+    }
+    cfg = await pqLoadConfig();
+    if (!cfg.ativa) {
+      showCustomAlert("O inquérito não está disponível neste momento.");
+      updateSurveyUI();
+      return;
+    }
+  }
+  pqActive = cfg.perguntas.filter(q => q.ativa);
+  if (!pqActive.length) {
+    showCustomAlert("Não há perguntas ativas no inquérito.");
+    return;
+  }
+  pqPoints = cfg.pontos;
+  pqIdx = 0;
+  pqAns = {};
+  pqSending = false;
+  closeSidebar();
+  closeSurveyInvite();
+  document.getElementById("surveyOverlay").classList.add("active");
+  pqRender();
+}
+
+function closeSurveyOverlay() {
+  document.getElementById("surveyOverlay").classList.remove("active");
+}
+
+function pqRender() {
+  const q = pqActive[pqIdx];
+  const total = pqActive.length;
+  const v = pqAns[q.id];
+  document.getElementById("pqProgressBar").style.width = Math.round(pqIdx / total * 100) + "%";
+  let hint = q.obrigatoria ? "" : "Opcional";
+  if (q.tipo === "multipla") {
+    const h = q.max > 0 ? "Escolhe até " + q.max : "Podes escolher várias";
+    hint = hint ? hint + " · " + h : h;
+  }
+  let html = '<div class="pq-count">Pergunta ' + (pqIdx + 1) + " de " + total + "</div>";
+  if (q.bloco) html += '<div class="pq-bloco">' + escapeHtml(q.bloco) + "</div>";
+  html += '<div class="pq-title">' + escapeHtml(q.texto) + "</div>";
+  html += '<div class="pq-hint">' + escapeHtml(hint) + "</div>";
+  if (q.tipo === "unica") {
+    q.opcoes.forEach((o, i) => {
+      html += '<button type="button" class="pq-opt' + (v === o ? " sel" : "") + '" onclick="pqPickOne(' + i + ')"><span class="pq-mark radio">●</span>' + escapeHtml(o) + "</button>";
+    });
+  } else if (q.tipo === "multipla") {
+    const sel = Array.isArray(v) ? v : [];
+    const full = q.max > 0 && sel.length >= q.max;
+    q.opcoes.forEach((o, i) => {
+      const on = sel.indexOf(o) !== -1;
+      html += '<button type="button" class="pq-opt' + (on ? " sel" : "") + '"' + (full && !on ? " disabled" : "") + ' onclick="pqPickMulti(' + i + ')"><span class="pq-mark check">✓</span>' + escapeHtml(o) + "</button>";
+    });
+  } else if (q.tipo === "escala") {
+    html += '<div class="pq-scale">';
+    for (let n = 1; n <= 5; n++) html += '<button type="button" class="' + (v === n ? "sel" : "") + '" onclick="pqPickScale(' + n + ')">' + n + "</button>";
+    html += '</div><div class="pq-scale-legend"><span>Muito mau</span><span>Excelente</span></div>';
+  } else {
+    html += '<textarea class="pq-textarea" id="pqText" maxlength="1000" placeholder="Escreve aqui..." oninput="pqTextInput(this.value)">' + escapeHtml(v || "") + "</textarea>";
+    html += '<div class="pq-chars" id="pqChars"></div>';
+  }
+  html += '<div class="pq-error" id="pqError"></div>';
+  const stage = document.getElementById("pqStage");
+  stage.innerHTML = html;
+  stage.scrollTop = 0;
+  if (q.tipo === "texto") pqUpdateChars();
+  const last = pqIdx === total - 1;
+  const nb = document.getElementById("pqNextBtn");
+  nb.disabled = pqSending;
+  nb.textContent = last ? (pqPreview ? "Concluir pré-visualização" : "Enviar e ganhar +" + pqPoints + " pts") : "Seguinte";
+  document.getElementById("pqBackBtn").style.visibility = pqIdx === 0 ? "hidden" : "visible";
+}
+
+function pqPickOne(i) {
+  const q = pqActive[pqIdx];
+  pqAns[q.id] = q.opcoes[i];
+  pqRender();
+}
+function pqPickMulti(i) {
+  const q = pqActive[pqIdx];
+  const o = q.opcoes[i];
+  const sel = Array.isArray(pqAns[q.id]) ? pqAns[q.id].slice() : [];
+  const at = sel.indexOf(o);
+  if (at !== -1) sel.splice(at, 1);
+  else if (!(q.max > 0 && sel.length >= q.max)) sel.push(o);
+  pqAns[q.id] = sel;
+  pqRender();
+}
+function pqPickScale(n) {
+  pqAns[pqActive[pqIdx].id] = n;
+  pqRender();
+}
+function pqTextInput(val) {
+  pqAns[pqActive[pqIdx].id] = val;
+  pqUpdateChars();
+}
+function pqUpdateChars() {
+  const q = pqActive[pqIdx];
+  const el = document.getElementById("pqChars");
+  if (!el) return;
+  const len = (pqAns[q.id] || "").trim().length;
+  el.textContent = q.minChars > 0 ? len + " / mínimo " + q.minChars : len + " caracteres";
+}
+
+function pqValidate(q) {
+  const v = pqAns[q.id];
+  if (q.tipo === "texto") {
+    const t = (v || "").trim();
+    if (!t) return q.obrigatoria ? "Escreve a tua resposta para continuar." : null;
+    if (q.minChars > 0 && t.length < q.minChars) return "Escreve pelo menos " + q.minChars + " caracteres (faltam " + (q.minChars - t.length) + ").";
+    return null;
+  }
+  if (q.tipo === "multipla") {
+    if (q.obrigatoria && !(Array.isArray(v) && v.length)) return "Escolhe pelo menos uma opção.";
+    return null;
+  }
+  if (q.obrigatoria && (v === undefined || v === null || v === "")) return "Escolhe uma opção para continuar.";
+  return null;
+}
+
+function pqPrev() {
+  if (pqSending || pqIdx === 0) return;
+  pqIdx--;
+  pqRender();
+}
+
+async function pqNext() {
+  if (pqSending) return;
+  const q = pqActive[pqIdx];
+  const err = pqValidate(q);
+  if (err) {
+    document.getElementById("pqError").textContent = err;
+    return;
+  }
+  if (pqIdx < pqActive.length - 1) {
+    pqIdx++;
+    pqRender();
+    return;
+  }
+  if (pqPreview) {
+    closeSurveyOverlay();
+    showCustomAlert("Pré-visualização concluída. Nada foi guardado.");
+    return;
+  }
+  await pqSubmit();
+}
+
+async function pqSubmit() {
+  if (!currentUser || currentUser.isAnonymous || userStatus !== "approved" || userSurveyDone) return;
+  pqSending = true;
+  const nb = document.getElementById("pqNextBtn");
+  nb.disabled = true;
+  nb.textContent = "A enviar...";
+  try {
+    const { doc, setDoc, ref, get, update } = window.firebaseModules;
+    const database = window.firebaseDatabase;
+    const uid = currentUser.uid;
+    const userRef = ref(database, "users/" + uid);
+    pqStep = "ler a conta (Realtime Database)";
+    const userSnap = await get(userRef);
+    const userData = userSnap.val() || {};
+    if (userData.surveyReward) {
+      userSurveyDone = true;
+      closeSurveyOverlay();
+      updateSurveyUI();
+      showCustomAlert("Já respondeste a este inquérito. Obrigado!");
+      return;
+    }
+    const serverTime = await getServerTimestamp();
+    const respostas = {};
+    pqActive.forEach(q => {
+      const v = pqAns[q.id];
+      if (v === undefined || v === null) return;
+      if (q.tipo === "texto") {
+        const t = String(v).trim().slice(0, 1000);
+        if (t) respostas[q.id] = t;
+      } else if (q.tipo === "multipla") {
+        if (Array.isArray(v) && v.length) respostas[q.id] = v;
+      } else if (v !== "") {
+        respostas[q.id] = v;
+      }
+    });
+    pqStep = "guardar a resposta (Firestore)";
+    try {
+      await setDoc(doc(window.firebaseFirestore, "pesquisa_respostas", uid), {
+        uid: uid,
+        nome: userName || currentUser.displayName || "",
+        email: currentUser.email || "",
+        respostas: respostas,
+        versaoPerguntas: (pqConfig && pqConfig.atualizadoEm) || 0,
+        criadoEm: serverTime
+      });
+    } catch (e) {
+      if (!e || e.code !== "permission-denied") throw e;
+    }
+    pqStep = "creditar os pontos (Realtime Database)";
+    const newTotal = (userData.points || 0) + pqPoints;
+    const updates = {};
+    updates["users/" + uid + "/points"] = newTotal;
+    updates["users/" + uid + "/surveyReward"] = { at: serverTime, points: pqPoints };
+    await update(ref(database), updates);
+    userSurveyDone = true;
+    _syncPointsDisplay(newTotal);
+    closeSurveyOverlay();
+    updateSurveyUI();
+    showCustomAlert("Obrigado pela tua opinião! Ganhaste +" + pqPoints + " pontos. Total: " + newTotal + " pontos.");
+  } catch (e) {
+    showCustomAlert("Não foi possível enviar o inquérito.<br><small>Falhou ao: " + pqStep + "<br>Erro: " + String((e && (e.code || e.message)) || e).slice(0, 120).replace(/</g, "&lt;") + "</small>");
+  } finally {
+    pqSending = false;
+    if (document.getElementById("surveyOverlay").classList.contains("active")) pqRender();
+  }
+}
+
+let pqDraft = null;
+let pqDirty = false;
+let pqAdminTab = "resultados";
+let pqRespostas = null;
+let pqEditIdx = -1;
+
+async function openSurveyAdmin() {
+  if (!isPublisher) {
+    showCustomAlert("Apenas administradores podem ver o inquérito.");
+    return;
+  }
+  closeSidebar();
+  document.getElementById("surveyAdminOverlay").classList.add("active");
+  document.getElementById("pqAdminBody").innerHTML = '<div class="manage-users-empty"><p>Carregando...</p></div>';
+  document.getElementById("pqSaveBar").style.display = "none";
+  pqRespostas = null;
+  pqDirty = false;
+  const cfg = await pqLoadConfig(true);
+  pqDraft = pqClone(cfg);
+  pqAdminSetTab("resultados");
+}
+
+function closeSurveyAdmin() {
+  if (pqDirty) {
+    showCustomConfirm("Tens alterações por guardar. Sair mesmo assim?", () => {
+      pqDirty = false;
+      document.getElementById("surveyAdminOverlay").classList.remove("active");
+    });
+    return;
+  }
+  document.getElementById("surveyAdminOverlay").classList.remove("active");
+}
+
+function pqAdminSetTab(tab) {
+  pqAdminTab = tab;
+  document.getElementById("pqTabResultados").classList.toggle("active", tab === "resultados");
+  document.getElementById("pqTabPerguntas").classList.toggle("active", tab === "perguntas");
+  document.getElementById("pqSaveBar").style.display = tab === "perguntas" ? "flex" : "none";
+  if (tab === "perguntas") {
+    pqRenderPerguntas();
+  } else if (pqRespostas) {
+    pqRenderResultados();
+  } else {
+    pqLoadRespostas();
+  }
+}
+
+async function pqLoadRespostas() {
+  const body = document.getElementById("pqAdminBody");
+  body.innerHTML = '<div class="manage-users-empty"><p>Carregando respostas...</p></div>';
+  try {
+    const { collection, getDocs, query, orderBy, limit } = window.firebaseModules;
+    const snap = await getDocs(query(collection(window.firebaseFirestore, "pesquisa_respostas"), orderBy("criadoEm", "desc"), limit(300)));
+    pqRespostas = snap.docs.map(d => Object.assign({ id: d.id }, d.data()));
+    if (pqAdminTab === "resultados") pqRenderResultados();
+  } catch (e) {
+    body.innerHTML = '<div class="manage-users-empty"><p>Não foi possível carregar as respostas. Verifica as regras do Firestore para a coleção pesquisa_respostas.</p></div>';
+  }
+}
+
+function pqBars(items, total) {
+  return items.map(it => {
+    const pct = total ? Math.round(it.n / total * 100) : 0;
+    return '<div class="pq-bar-line"><div class="pq-bar-label"><span>' + escapeHtml(it.label) + "</span><span>" + it.n + " · " + pct + '%</span></div><div class="pq-bar"><div style="width:' + pct + '%"></div></div></div>';
+  }).join("");
+}
+
+function pqRenderResultados() {
+  const body = document.getElementById("pqAdminBody");
+  const rs = pqRespostas || [];
+  let html = '<div class="pq-row" style="margin-bottom:12px;"><div><div style="font-size:22px;font-weight:700;color:var(--text-primary);">' + rs.length + '</div><div class="pq-meta" style="margin:0;">respostas' + (rs.length >= 300 ? " (últimas 300)" : "") + '</div></div><button class="pq-mini" onclick="pqRespostas=null;pqLoadRespostas()">Atualizar</button></div>';
+  if (!rs.length) {
+    html += '<div class="manage-users-empty"><p>Ainda não há respostas.</p></div>';
+    body.innerHTML = html;
+    return;
+  }
+  pqDraft.perguntas.forEach((q, qi) => {
+    const vals = rs.map(r => r.respostas && r.respostas[q.id]).filter(v => v !== undefined && v !== null);
+    if (!vals.length && !q.ativa) return;
+    html += '<div class="pq-card"><h4>' + (qi + 1) + ". " + escapeHtml(q.texto) + '</h4><div class="pq-meta">' + PQ_TIPOS[q.tipo] + " · " + vals.length + " respostas</div>";
+    if (q.tipo === "escala") {
+      const nums = vals.map(Number).filter(n => n >= 1 && n <= 5);
+      const avg = nums.length ? (nums.reduce((a, b) => a + b, 0) / nums.length).toFixed(1) : "-";
+      html += '<div class="pq-avg">' + avg + " <small>/ 5</small></div>";
+      html += pqBars([5, 4, 3, 2, 1].map(n => ({ label: n + " ★", n: nums.filter(x => x === n).length })), nums.length);
+    } else if (q.tipo === "unica" || q.tipo === "multipla") {
+      const counts = {};
+      q.opcoes.forEach(o => { counts[o] = 0; });
+      vals.forEach(v => { (Array.isArray(v) ? v : [v]).forEach(o => { counts[o] = (counts[o] || 0) + 1; }); });
+      const items = Object.keys(counts).map(k => ({ label: k, n: counts[k] })).sort((a, b) => b.n - a.n);
+      html += pqBars(items, vals.length);
+    } else {
+      const withText = rs.filter(r => r.respostas && r.respostas[q.id]).slice(0, 60);
+      html += withText.map(r => '<div class="pq-text-item">' + escapeHtml(r.respostas[q.id]) + "<small>" + escapeHtml(r.nome || r.email || "Anónimo") + (r.criadoEm ? " · " + new Date(r.criadoEm).toLocaleDateString("pt-PT") : "") + "</small></div>").join("");
+    }
+    html += "</div>";
+  });
+  body.innerHTML = html;
+}
+
+function pqMarkDirty() {
+  pqDirty = true;
+}
+
+function pqRenderPerguntas() {
+  const body = document.getElementById("pqAdminBody");
+  const d = pqDraft;
+  let html = '<div class="pq-card"><div class="pq-row" style="margin-bottom:12px;"><label for="pqAtivaChk">Inquérito ativo</label><input type="checkbox" id="pqAtivaChk" ' + (d.ativa ? "checked" : "") + ' onchange="pqDraft.ativa=this.checked;pqMarkDirty()"></div>';
+  html += '<div class="pq-row"><label for="pqPontosInp">Pontos de recompensa</label><input type="number" class="pq-num" id="pqPontosInp" min="1" max="5000" value="' + d.pontos + '" onchange="pqDraft.pontos=Math.round(Number(this.value))||0;pqMarkDirty()"></div></div>';
+  if (pqDirty) html += '<div class="pq-dirty">Alterações por guardar</div>';
+  d.perguntas.forEach((q, i) => {
+    html += '<div class="pq-aq' + (q.ativa ? "" : " off") + '"><div class="pq-aq-top"><span class="pq-aq-n">' + (i + 1) + '</span><span class="pq-badge">' + PQ_TIPOS[q.tipo] + "</span>" + (q.obrigatoria ? '<span class="pq-badge">Obrigatória</span>' : "") + (q.ativa ? "" : '<span class="pq-badge">Inativa</span>') + "</div>";
+    html += '<div class="pq-aq-text">' + escapeHtml(q.texto) + '</div><div class="pq-aq-actions">';
+    html += '<button class="pq-mini" onclick="pqMove(' + i + ',-1)"' + (i === 0 ? " disabled" : "") + '>↑</button>';
+    html += '<button class="pq-mini" onclick="pqMove(' + i + ',1)"' + (i === d.perguntas.length - 1 ? " disabled" : "") + '>↓</button>';
+    html += '<button class="pq-mini" onclick="pqOpenQForm(' + i + ')">Editar</button>';
+    html += '<button class="pq-mini" onclick="pqToggleAtiva(' + i + ')">' + (q.ativa ? "Desativar" : "Ativar") + "</button></div></div>";
+  });
+  html += '<button class="pq-mini danger" style="margin:6px 0 16px;" onclick="pqRestoreDefaults()">Restaurar perguntas padrão</button>';
+  body.innerHTML = html;
+}
+
+function pqMove(i, dir) {
+  const arr = pqDraft.perguntas;
+  const j = i + dir;
+  if (j < 0 || j >= arr.length) return;
+  const t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+  pqMarkDirty();
+  pqRenderPerguntas();
+}
+function pqToggleAtiva(i) {
+  pqDraft.perguntas[i].ativa = !pqDraft.perguntas[i].ativa;
+  pqMarkDirty();
+  pqRenderPerguntas();
+}
+function pqRestoreDefaults() {
+  showCustomConfirm("Substituir as perguntas atuais pelas 10 perguntas padrão? (Só fica guardado quando carregares em Guardar alterações.)", () => {
+    pqDraft.perguntas = pqClone(PQ_DEFAULT_CFG.perguntas);
+    pqMarkDirty();
+    pqRenderPerguntas();
+  });
+}
+
+function pqOpenQForm(i) {
+  if (!isPublisher || !pqDraft) return;
+  pqEditIdx = i;
+  const q = i >= 0 ? pqDraft.perguntas[i] : { bloco: "", texto: "", tipo: "unica", opcoes: [], max: 0, minChars: 0, obrigatoria: true, ativa: true };
+  document.getElementById("pqQFormTitle").textContent = i >= 0 ? "Editar pergunta" : "Nova pergunta";
+  document.getElementById("pqQBloco").value = q.bloco;
+  document.getElementById("pqQTexto").value = q.texto;
+  document.getElementById("pqQTipo").value = q.tipo;
+  document.getElementById("pqQOpcoes").value = q.opcoes.join("\n");
+  document.getElementById("pqQMax").value = q.max || 0;
+  document.getElementById("pqQMin").value = q.minChars || 0;
+  document.getElementById("pqQObrig").checked = q.obrigatoria;
+  document.getElementById("pqQAtiva").checked = q.ativa;
+  document.getElementById("pqQDeleteBtn").style.display = i >= 0 ? "" : "none";
+  pqQFormTypeChange();
+  document.getElementById("pqQuestionModal").classList.add("active");
+}
+function pqCloseQForm() {
+  document.getElementById("pqQuestionModal").classList.remove("active");
+}
+function pqQFormTypeChange() {
+  const t = document.getElementById("pqQTipo").value;
+  document.getElementById("pqQOpcoesWrap").style.display = t === "unica" || t === "multipla" ? "" : "none";
+  document.getElementById("pqQMaxWrap").style.display = t === "multipla" ? "" : "none";
+  document.getElementById("pqQMinWrap").style.display = t === "texto" ? "" : "none";
+}
+function pqSaveQForm() {
+  const tipo = document.getElementById("pqQTipo").value;
+  const texto = document.getElementById("pqQTexto").value.trim();
+  const opcoes = document.getElementById("pqQOpcoes").value.split("\n").map(s => s.trim()).filter(Boolean);
+  if (!texto) { showCustomAlert("Escreve o texto da pergunta."); return; }
+  if ((tipo === "unica" || tipo === "multipla") && opcoes.length < 2) { showCustomAlert("Indica pelo menos 2 opções."); return; }
+  const q = {
+    id: pqEditIdx >= 0 ? pqDraft.perguntas[pqEditIdx].id : "q" + Date.now().toString(36),
+    bloco: document.getElementById("pqQBloco").value.trim(),
+    texto: texto,
+    tipo: tipo,
+    opcoes: tipo === "unica" || tipo === "multipla" ? opcoes : [],
+    max: tipo === "multipla" ? Math.max(0, Math.round(Number(document.getElementById("pqQMax").value)) || 0) : 0,
+    minChars: tipo === "texto" ? Math.max(0, Math.round(Number(document.getElementById("pqQMin").value)) || 0) : 0,
+    obrigatoria: document.getElementById("pqQObrig").checked,
+    ativa: document.getElementById("pqQAtiva").checked
+  };
+  if (pqEditIdx >= 0) pqDraft.perguntas[pqEditIdx] = q;
+  else pqDraft.perguntas.push(q);
+  pqMarkDirty();
+  pqCloseQForm();
+  if (pqAdminTab !== "perguntas") pqAdminSetTab("perguntas");
+  else pqRenderPerguntas();
+}
+function pqDeleteQ() {
+  if (pqEditIdx < 0) return;
+  showCustomConfirm("Eliminar esta pergunta? As respostas já enviadas continuam guardadas, mas deixam de aparecer nos resultados.", () => {
+    pqDraft.perguntas.splice(pqEditIdx, 1);
+    pqMarkDirty();
+    pqCloseQForm();
+    pqRenderPerguntas();
+  });
+}
+
+function pqPreviewDraft() {
+  if (!pqDraft) return;
+  openSurvey(pqClone(pqDraft));
+}
+
+async function pqAdminSave() {
+  if (!isPublisher || !pqDraft) return;
+  if (!(pqDraft.pontos >= 1 && pqDraft.pontos <= 5000)) {
+    showCustomAlert("Os pontos de recompensa têm de estar entre 1 e 5000.");
+    return;
+  }
+  if (pqDraft.ativa && !pqDraft.perguntas.some(q => q.ativa)) {
+    showCustomAlert("Ativa pelo menos uma pergunta ou desativa o inquérito.");
+    return;
+  }
+  const btn = document.getElementById("pqSaveBtn");
+  btn.disabled = true;
+  btn.textContent = "A guardar...";
+  try {
+    const { doc, setDoc } = window.firebaseModules;
+    pqDraft.atualizadoEm = Date.now();
+    await setDoc(doc(window.firebaseFirestore, "pesquisa_config", "atual"), pqDraft);
+    pqConfig = pqNormalizeCfg(pqDraft);
+    pqCacheSave(pqConfig);
+    pqDirty = false;
+    pqRenderPerguntas();
+    showCustomAlert("Inquérito guardado.");
+  } catch (e) {
+    showCustomAlert("Não foi possível guardar. Verifica as regras do Firestore para pesquisa_config.");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Guardar alterações";
+  }
+}
+</script>
+<script>
+let reqUnsub = null;
+let reqData = {};
+let reqFilter = "todos";
+let reqTipo = "Jogo";
+let reqLastSent = 0;
+const REQ_MAX = 300;
+const REQ_MIN = 8;
+const REQ_LIMIT = 100;
+const REQ_COOLDOWN = 20000;
+
+function reqEsc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+function reqSafeUrl(u) {
+  return /^(https:\/\/|data:image\/)/i.test(u || "") ? u : "";
+}
+function reqIsVerified() {
+  return !!currentUser && !currentUser.isAnonymous && (userStatus === "approved" || isPublisher);
+}
+function navOpenRequests() {
+  if (!currentUser || currentUser.isAnonymous) {
+    showSignupPrompt("ver e fazer pedidos");
+    return;
+  }
+  if (!reqIsVerified()) {
+    showCustomAlert("Sua conta precisa estar verificada para ver e fazer pedidos.");
+    return;
+  }
+  setActiveNavItem("navRequestsBtn");
+  openRequestsOverlay();
+}
+function openRequestsOverlay() {
+  closeSidebar();
+  document.getElementById("requestsOverlay").classList.add("active");
+  document.body.style.overflow = "hidden";
+  reqSubscribe();
+  setTimeout(ppMaybePromptSetup, 700);
+}
+function closeRequestsOverlay() {
+  document.getElementById("requestsOverlay").classList.remove("active");
+  document.body.style.overflow = "";
+  reqUnsubscribe();
+  setActiveNavItem("navHomeBtn");
+}
+function reqUnsubscribe() {
+  if (typeof reqUnsub === "function") { try { reqUnsub(); } catch (e) {} }
+  reqUnsub = null;
+}
+function reqSubscribe() {
+  reqUnsubscribe();
+  const { ref, onValue, rtdbQuery, limitToLast } = window.firebaseModules;
+  const list = document.getElementById("requestsList");
+  list.innerHTML = '<div class="overlay-empty-state"><p>A carregar pedidos...</p></div>';
+  const q = rtdbQuery(ref(window.firebaseDatabase, "pedidos"), limitToLast(REQ_LIMIT));
+  reqUnsub = onValue(q, (snap) => {
+    reqData = snap.val() || {};
+    renderRequests();
+  }, () => {
+    list.innerHTML = '<div class="overlay-empty-state"><h3>Não foi possível carregar</h3><p>Verifique a sua ligação e tente novamente.</p></div>';
+  });
+}
+function setRequestsFilter(f) {
+  reqFilter = f;
+  document.querySelectorAll("#reqTabs .req-tab").forEach((b) => b.classList.toggle("active", b.dataset.f === f));
+  renderRequests();
+}
+function setRequestType(t) {
+  reqTipo = t;
+  document.querySelectorAll("#reqTypes .req-tab").forEach((b) => b.classList.toggle("active", b.dataset.t === t));
+}
+function reqUpdateCounter() {
+  const el = document.getElementById("reqInput");
+  document.getElementById("reqCounter").textContent = el.value.length + "/" + REQ_MAX;
+}
+function renderRequests() {
+  const list = document.getElementById("requestsList");
+  if (!list) return;
+  const uid = currentUser ? currentUser.uid : null;
+  let items = Object.entries(reqData).map(([id, r]) => ({ id, ...r })).filter((r) => r && r.text);
+  items.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+  if (reqFilter === "abertos") items = items.filter((r) => r.status !== "atendido");
+  else if (reqFilter === "atendidos") items = items.filter((r) => r.status === "atendido");
+  else if (reqFilter === "meus") items = items.filter((r) => r.authorId === uid);
+  if (!items.length) {
+    const msg = reqFilter === "meus" ? "Você ainda não fez nenhum pedido." : "Seja o primeiro a pedir algo!";
+    list.innerHTML = '<div class="overlay-empty-state"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 14h-3v3h-2v-3H8v-2h3v-3h2v3h3v2zm-3-7V3.5L18.5 9H13z"/></svg><h3>Nenhum pedido</h3><p>' + msg + '</p></div>';
+    return;
+  }
+  list.innerHTML = items.map((r) => {
+    const done = r.status === "atendido";
+    ppSetHint(r.authorId, r.authorName, r.authorAvatar);
+    const name = reqEsc(r.authorName || "Usuário");
+    const av = reqSafeUrl(r.authorAvatar);
+    const avatar = av
+      ? '<img src="' + reqEsc(av) + '" alt="">'
+      : '<svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
+    const id = reqEsc(r.id);
+    const canDelete = isPublisher || (uid && r.authorId === uid);
+    let actions = "";
+    if (isPublisher) actions += '<button class="req-action-btn" onclick="toggleRequestStatus(\'' + id + '\')">' + (done ? "Reabrir" : "Marcar atendido") + '</button>';
+    if (canDelete) actions += '<button class="req-action-btn danger" onclick="deleteRequest(\'' + id + '\')">Apagar</button>';
+    return '<div class="req-card' + (done ? " done" : "") + '">' +
+      '<div class="req-card-top">' +
+        '<div class="req-avatar req-click" onclick="openPublicProfile(\'' + reqEsc(r.authorId) + '\')">' + avatar + '</div>' +
+        '<div class="req-meta req-click" onclick="openPublicProfile(\'' + reqEsc(r.authorId) + '\')"><div class="req-author">' + name + '</div><div class="req-time">' + formatTimeAgo(r.timestamp || Date.now()) + '</div></div>' +
+        '<span class="req-tipo">' + reqEsc(r.tipo || "Outro") + '</span>' +
+      '</div>' +
+      '<div class="req-text">' + reqEsc(r.text) + '</div>' +
+      '<div class="req-footer">' +
+        '<span class="req-status' + (done ? " done" : "") + '">' + (done ? "✓ Atendido" : "Em aberto") + '</span>' +
+        '<div class="req-actions">' + actions + '</div>' +
+      '</div>' +
+    '</div>';
+  }).join("");
+}
+async function submitRequest() {
+  if (!currentUser || currentUser.isAnonymous) { showSignupPrompt("fazer pedidos"); return; }
+  if (!reqIsVerified()) { showCustomAlert("Sua conta precisa estar verificada para fazer pedidos."); return; }
+  const input = document.getElementById("reqInput");
+  const text = input.value.trim();
+  if (text.length < REQ_MIN) { showCustomAlert("Descreva melhor o seu pedido (mínimo " + REQ_MIN + " caracteres)."); return; }
+  if (text.length > REQ_MAX) { showCustomAlert("O pedido é muito longo (máximo " + REQ_MAX + " caracteres)."); return; }
+  const wait = REQ_COOLDOWN - (Date.now() - reqLastSent);
+  if (wait > 0) { showCustomAlert("Aguarde " + Math.ceil(wait / 1000) + "s para enviar outro pedido."); return; }
+  const btn = document.getElementById("reqSendBtn");
+  btn.disabled = true;
+  try {
+    const { ref, push, set } = window.firebaseModules;
+    const newRef = push(ref(window.firebaseDatabase, "pedidos"));
+    await set(newRef, {
+      text,
+      tipo: reqTipo,
+      status: "aberto",
+      authorId: currentUser.uid,
+      authorName: userName || (currentUser.email ? currentUser.email.split("@")[0] : "Usuário"),
+      authorAvatar: userAvatar || "",
+      timestamp: Date.now()
+    });
+    reqLastSent = Date.now();
+    input.value = "";
+    reqUpdateCounter();
+    const list = document.getElementById("requestsList");
+    if (list) list.scrollTop = 0;
+    showCustomAlert("Pedido enviado!");
+  } catch (e) {
+    showCustomAlert("Erro ao enviar pedido: " + e.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+function deleteRequest(id) {
+  showCustomConfirm("Deseja apagar este pedido?", async () => {
+    try {
+      const { ref, remove } = window.firebaseModules;
+      await remove(ref(window.firebaseDatabase, "pedidos/" + id));
+    } catch (e) {
+      showCustomAlert("Erro ao apagar pedido: " + e.message);
+    }
+  });
+}
+async function toggleRequestStatus(id) {
+  if (!isPublisher) return;
+  const r = reqData[id];
+  if (!r) return;
+  const done = r.status === "atendido";
+  try {
+    const { ref, update } = window.firebaseModules;
+    await update(ref(window.firebaseDatabase, "pedidos/" + id), { status: done ? "aberto" : "atendido", atendidoEm: done ? null : Date.now() });
+  } catch (e) {
+    showCustomAlert("Erro ao atualizar pedido: " + e.message);
+  }
+}
+</script>
+<script>
+const ppHint = {};
+let ppTok = 0;
+let ppTimer = null;
+function ppSetHint(uid, name, avatar) { if (uid) ppHint[uid] = { name: name || "", avatar: avatar || "" }; }
+function ppSchedulePublish() { clearTimeout(ppTimer); ppTimer = setTimeout(ppPublish, 1200); }
+async function ppPublish() {
+  try {
+    const user = window.firebaseAuth && window.firebaseAuth.currentUser;
+    if (!user || user.isAnonymous || !reqIsVerified()) return;
+    const { ref, get, set, update } = window.firebaseModules;
+    const db = window.firebaseDatabase;
+    let createdAt = window.__pdCreatedAtMs;
+    if (!createdAt) {
+      const s = await get(ref(db, "users/" + user.uid + "/createdAt"));
+      if (s.exists()) createdAt = s.val();
+    }
+    const base = {
+      name: String(userName || user.displayName || (user.email || "").split("@")[0] || "Usuário").slice(0, 100),
+      avatar: userAvatar || "",
+      selo: isPublisher ? "admin" : "verificado",
+      updatedAt: Date.now()
+    };
+    if (createdAt && !isNaN(Number(createdAt))) base.createdAt = Number(createdAt);
+    const snap = window.__ppSnap;
+    const cfg = pdpCfg(user.uid);
+    Object.assign(base, {
+      username: cfg.user || "",
+      bio: cfg.bio || "",
+      capa: cfg.capa || "orig",
+      moldura: cfg.moldura || "padrao"
+    });
+    if (!snap) { await update(ref(db, "publicProfiles/" + user.uid), base); return; }
+    await set(ref(db, "publicProfiles/" + user.uid), Object.assign(base, {
+      nivelNum: snap.nivelNum,
+      nivelNome: snap.nivelNome,
+      pct: snap.pct,
+      conq: snap.conq
+    }));
+  } catch (e) {}
+}
+async function ppLoadRequests(uid) {
+  const { ref, get, rtdbQuery, orderByChild, equalTo, limitToLast } = window.firebaseModules;
+  const q = rtdbQuery(ref(window.firebaseDatabase, "pedidos"), orderByChild("authorId"), equalTo(uid), limitToLast(50));
+  const s = await get(q);
+  const v = s.val() || {};
+  return Object.entries(v).map(([id, r]) => ({ id, ...r })).filter((r) => r && r.text).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+}
+function closePublicProfile() {
+  ppTok++;
+  const ov = document.getElementById("publicProfileOverlay");
+  if (ov) ov.classList.remove("active");
+}
+async function openPublicProfile(uid) {
+  if (!uid) return;
+  if (!currentUser || currentUser.isAnonymous) { showSignupPrompt("ver perfis"); return; }
+  if (!reqIsVerified()) { showCustomAlert("Sua conta precisa estar verificada para ver perfis."); return; }
+  const body = document.getElementById("publicProfileBody");
+  body.innerHTML = '<div class="overlay-empty-state"><p>A carregar perfil...</p></div>';
+  document.getElementById("publicProfileOverlay").classList.add("active");
+  const tok = ++ppTok;
+  const { ref, get } = window.firebaseModules;
+  let prof = null, reqs = null;
+  try { const s = await get(ref(window.firebaseDatabase, "publicProfiles/" + uid)); if (s.exists()) prof = s.val(); } catch (e) {}
+  try { reqs = await ppLoadRequests(uid); } catch (e) { reqs = null; }
+  if (tok !== ppTok) return;
+  body.innerHTML = ppRender(uid, prof, reqs);
+  setTimeout(() => { body.querySelectorAll(".pdp-xp-fill[data-w]").forEach((el) => { el.style.width = el.getAttribute("data-w") + "%"; }); }, 60);
+  body.scrollTop = 0;
+}
+function ppRender(uid, prof, reqs) {
+  const p = prof || {};
+  const hint = ppHint[uid] || {};
+  const name = reqEsc(p.name || hint.name || "Utilizador");
+  const av = reqSafeUrl(p.avatar || hint.avatar);
+  const avatar = av
+    ? '<img src="' + reqEsc(av) + '" alt="">'
+    : '<svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
+  const capa = PDP_CAPAS.find((c) => c.id === p.capa);
+  const capaStyle = capa && capa.css ? ' style="background:' + capa.css + '"' : "";
+  const nivelNum = Number(p.nivelNum) || 0;
+  const mold = PDP_MOLDURAS.find((m) => m.id === p.moldura);
+  const frameCls = mold && mold.id !== "padrao" && mold.nivel <= nivelNum ? " pdp-frame-" + mold.id : "";
+  const isAdmin = p.selo === "admin";
+  const stCls = isAdmin ? "status-admin" : (p.selo === "verificado" ? "status-verified" : "status-pending");
+  const badge = isAdmin
+    ? '<span class="profile-status-badge admin">Administrador</span>'
+    : (p.selo === "verificado" ? '<span class="profile-status-badge verified">✓ Verificado</span>' : "");
+  const desde = p.createdAt && !isNaN(Number(p.createdAt))
+    ? new Date(Number(p.createdAt)).toLocaleDateString("pt-BR", { month: "long", year: "numeric" }) : "";
+  let html = '<div class="profile-header-card"' + capaStyle + '>' +
+    '<div class="profile-avatar-svg ' + stCls + frameCls + '">' + avatar + '</div>' +
+    '<h2 class="profile-name">' + name + '</h2>' +
+    (p.username ? '<div class="pp-username">@' + reqEsc(p.username) + '</div>' : "") +
+    (p.bio ? '<div class="pp-bio">' + reqEsc(p.bio) + '</div>' : "") +
+    (nivelNum ? '<span class="pdp-nivel-pill pp-pill">Nível ' + nivelNum + ' · ' + reqEsc(p.nivelNome || "") + '</span>' : "") +
+    (desde ? '<div class="pp-since">Membro desde ' + reqEsc(desde) + '</div>' : "") +
+    badge +
+  '</div>';
+  if (nivelNum) {
+    const pct = Math.max(0, Math.min(100, Number(p.pct) || 0));
+    const max = nivelNum >= PDP_NIVEIS.length;
+    html += '<div class="pdp-card"><h3>Nível <small>Nível ' + nivelNum + '</small></h3>' +
+      '<div class="pdp-xp-top"><span class="pdp-xp-nome">' + reqEsc(p.nivelNome || "") + '</span><span class="pdp-xp-num">' + (max ? "Nível máximo!" : pct + "% para o próximo nível") + '</span></div>' +
+      '<div class="pdp-xp-barra"><div class="pdp-xp-fill" data-w="' + (max ? 100 : pct) + '"></div></div></div>';
+    const defs = pdpConquistas({ down: Infinity, fav: Infinity, melhor: Infinity, dias: Infinity, verificado: true, estilo: true });
+    const have = new Set(Array.isArray(p.conq) ? p.conq : Object.values(p.conq || {}));
+    const got = defs.filter((d) => have.has(d.nm));
+    html += '<div class="pdp-card"><h3>Conquistas <small>' + got.length + '</small></h3>' +
+      (got.length
+        ? '<div class="pdp-ach">' + got.map((c) => '<div class="pdp-ach-item"><div class="ic">' + pdpIc(c.ic, 26, c.cor) + '</div><div class="nm">' + c.nm + '</div><div class="ds">' + c.ds + '</div></div>').join("") + '</div>'
+        : '<div class="pdp-vazio">Ainda sem conquistas.</div>') + '</div>';
+  }
+  if (reqs === null) {
+    html += '<div class="pdp-card"><h3>Pedidos</h3><div class="pdp-vazio">Não foi possível carregar os pedidos.</div></div>';
+  } else {
+    const done = reqs.filter((r) => r.status === "atendido").length;
+    const total = reqs.length >= 50 ? "50+" : String(reqs.length);
+    html += '<div class="pdp-card"><h3>Pedidos <small>' + total + (reqs.length === 1 ? " pedido" : " pedidos") + ' · ' + done + (done === 1 ? " atendido" : " atendidos") + '</small></h3>' +
+      (reqs.length
+        ? reqs.slice(0, 20).map((r, i) =>
+            '<div class="pp-req' + (i === 0 ? " first" : "") + '"><div class="pp-req-top"><span class="req-tipo">' + reqEsc(r.tipo || "Outro") + '</span>' +
+            '<span class="req-status' + (r.status === "atendido" ? " done" : "") + '">' + (r.status === "atendido" ? "✓ Atendido" : "Em aberto") + '</span></div>' +
+            '<div class="pp-req-text">' + reqEsc(r.text) + '</div></div>').join("")
+        : '<div class="pdp-vazio">Ainda não fez pedidos.</div>') + '</div>';
+  }
+  return html;
+}
+</script>
+<script>
+function ppSetupState(uid) { try { return JSON.parse(localStorage.getItem("pd_setup_" + uid) || "{}") || {}; } catch (e) { return {}; } }
+function ppSetupSave_(uid, st) { try { localStorage.setItem("pd_setup_" + uid, JSON.stringify(st)); } catch (e) {} }
+function ppProfileIncomplete(uid) { const c = pdpCfg(uid); return !c.user || !c.bio; }
+function ppMaybePromptSetup() {
+  const u = currentUser;
+  if (!u || u.isAnonymous || !reqIsVerified()) return;
+  const ov = document.getElementById("requestsOverlay");
+  if (!ov || !ov.classList.contains("active")) return;
+  if (!ppProfileIncomplete(u.uid)) return;
+  const st = ppSetupState(u.uid);
+  if ((st.n || 0) >= 3 || Date.now() - (st.t || 0) < 864e5) return;
+  ppOpenSetup();
+}
+function ppSetupCount() {
+  document.getElementById("ppSetupCount").textContent = document.getElementById("ppSetupBio").value.length + "/100";
+}
+function ppOpenSetup() {
+  const u = currentUser;
+  if (!u || u.isAnonymous) return;
+  const c = pdpCfg(u.uid);
+  document.getElementById("ppSetupUser").value = c.user || "";
+  document.getElementById("ppSetupBio").value = c.bio || "";
+  ppSetupCount();
+  document.getElementById("profileSetupModal").classList.add("active");
+}
+function ppSetupClose() {
+  document.getElementById("profileSetupModal").classList.remove("active");
+}
+function ppSetupLater() {
+  const u = currentUser;
+  if (u) { const st = ppSetupState(u.uid); ppSetupSave_(u.uid, { n: (st.n || 0) + 1, t: Date.now() }); }
+  ppSetupClose();
+}
+function ppSetupSave() {
+  const u = currentUser;
+  if (!u || u.isAnonymous) return;
+  const user = document.getElementById("ppSetupUser").value.trim().replace(/^@/, "");
+  const bio = document.getElementById("ppSetupBio").value.trim().slice(0, 100);
+  if (!user && !bio) { showCustomAlert("Preencha o nome de usuário ou a bio."); return; }
+  if (user && !/^[a-zA-Z0-9_.]{3,20}$/.test(user)) {
+    showCustomAlert("O nome de usuário deve ter de 3 a 20 caracteres: letras, números, ponto ou underscore.");
+    return;
+  }
+  const c = Object.assign(pdpCfg(u.uid), { user: user || pdpCfg(u.uid).user || "", bio: bio || pdpCfg(u.uid).bio || "" });
+  pdpSalvarCfg(u.uid, c);
+  ppSchedulePublish();
+  ppSetupClose();
+  showCustomAlert("Perfil atualizado!");
+  const po = document.getElementById("profileOverlay");
+  if (po && po.classList.contains("active")) openProfileOverlay();
+}
+</script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
