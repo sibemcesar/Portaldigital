@@ -67,29 +67,6 @@
       increment
     };
   </script>
-  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-  <script>
-    window.OneSignalDeferred = window.OneSignalDeferred || [];
-    OneSignalDeferred.push(async function(OneSignal) {
-      await OneSignal.init({
-        appId: "8e32cbe1-ece5-49fc-9b60-41e1e69c99b0",
-        promptOptions: {
-          slidedown: {
-            prompts: [{
-              type: "push",
-              autoPrompt: false,
-              text: {
-                actionMessage: "Quer receber notificações de novos jogos e resultados?",
-                acceptButton: "Permitir",
-                cancelButton: "Agora não"
-              },
-              delay: { pageViews: 1, timeDelay: 3 }
-            }]
-          }
-        }
-      });
-    });
-  </script>
   <style>
     :root {
       --bg-primary: #ffffff;
@@ -5600,41 +5577,102 @@
     applyTheme();
     setInterval(applyTheme, 60000);
     const PUBLISHER_EMAILS = ['sibemcesar@gmail.com', 'portaldigitalao@gmail.com'];
-    const ONESIGNAL_APP_ID = '8e32cbe1-ece5-49fc-9b60-41e1e69c99b0';
-    const ONESIGNAL_REST_API_KEY = 'os_v2_app_gn5pyi5d5vdelm4sxmhrmzgulhiudh7kcgcioyqwudqonpsimvxe3vc4fprp5xjww357xvn54wrmgqfwmjyzmmx4wdrvpklwffaouby';
+    const PUSH_SERVER = 'https://portal-push.onrender.com';
+    const PUSH_VAPID_KEY = 'BJ6UVRv08KRrRt73n8BgNANvBxN-9X12OhBUCVkn3wFfjGnGJsZZI4_fC5eiA2oNBokDuLUQZOoTGyFtL8CCn8M';
+    let pushOnMessageAtivo = false;
+    let pushEsperaToque = false;
 
-    async function sendOneSignalPush(title, message, targetUserId) {
-      const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': 'Key ' + ONESIGNAL_REST_API_KEY
-      };
-      const payload = {
-        app_id: ONESIGNAL_APP_ID,
-        headings: { en: title },
-        contents: { en: message }
-      };
-      if (targetUserId) {
-        payload.include_aliases = { external_id: [targetUserId] };
-        payload.target_channel = 'push';
-      } else {
-        payload.included_segments = ['All'];
-      }
+    async function sendPush(title, message, targetUserId, link) {
       try {
-        const response = await fetch('https://api.onesignal.com/notifications', {
+        if (!currentUser) return null;
+        const idToken = await currentUser.getIdToken();
+        const response = await fetch(PUSH_SERVER + '/notificar', {
           method: 'POST',
-          headers: headers,
-          body: JSON.stringify(payload)
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + idToken
+          },
+          body: JSON.stringify({
+            titulo: title,
+            corpo: message,
+            alvoUid: targetUserId || null,
+            link: link || ''
+          })
         });
-        const data = await response.json();
-        if (!response.ok) {
-          console.log('OneSignal push error: ' + JSON.stringify(data));
-        } else {
-          console.log('OneSignal push sent: ' + JSON.stringify(data));
-        }
+        const data = await response.json().catch(() => null);
+        console.log('Push: ' + response.status + ' ' + JSON.stringify(data));
         return data;
       } catch (error) {
-        console.log('OneSignal push fetch error: ' + (error && error.message ? error.message : error));
+        console.log('Push fetch error: ' + (error && error.message ? error.message : error));
         return null;
+      }
+    }
+
+    async function registarPush(user) {
+      try {
+        if (!('serviceWorker' in navigator) || !('Notification' in window)) return;
+        const m = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js');
+        if (!(await m.isSupported())) return;
+        if (Notification.permission !== 'granted') {
+          const p = await Notification.requestPermission();
+          if (p !== 'granted') return;
+        }
+        const reg = await navigator.serviceWorker.register('firebase-messaging-sw.js', {
+          scope: '/firebase-cloud-messaging-push-scope'
+        });
+        const messaging = m.getMessaging(window.firebaseApp);
+        const token = await m.getToken(messaging, {
+          vapidKey: PUSH_VAPID_KEY,
+          serviceWorkerRegistration: reg
+        });
+        if (!token) return;
+
+        const { ref, get, set } = window.firebaseModules;
+        const tokenRef = ref(window.firebaseDatabase, 'fcmTokens/' + user.uid);
+        const atual = await get(tokenRef);
+        const agora = Date.now();
+        const v = atual.exists() ? atual.val() : null;
+        if (!(v && v.token === token && (agora - (v.lastUpdated || 0)) < 7 * 24 * 3600 * 1000)) {
+          await set(tokenRef, {
+            token: token,
+            userId: user.uid,
+            userEmail: user.email || '',
+            createdAt: (v && v.createdAt) || agora,
+            lastUpdated: agora
+          });
+        }
+
+        if (!pushOnMessageAtivo) {
+          pushOnMessageAtivo = true;
+          m.onMessage(messaging, (payload) => {
+            const n = payload.notification || {};
+            reg.showNotification(n.title || 'Portal Digital', {
+              body: n.body || '',
+              icon: 'logo.png'
+            });
+          });
+        }
+      } catch (e) {
+        console.log('Push register error: ' + (e && e.message ? e.message : e));
+      }
+    }
+
+    function iniciarPush(user) {
+      try {
+        if (!('Notification' in window)) return;
+        if (Notification.permission === 'denied') return;
+        if (Notification.permission === 'granted') {
+          registarPush(user);
+          return;
+        }
+        if (pushEsperaToque) return;
+        pushEsperaToque = true;
+        document.addEventListener('click', () => {
+          pushEsperaToque = false;
+          registarPush(user);
+        }, { once: true });
+      } catch (e) {
+        console.log('Push init error: ' + (e && e.message ? e.message : e));
       }
     }
     let currentUser = null;
@@ -5660,32 +5698,13 @@
           isPublisher = PUBLISHER_EMAILS.includes(user.email);
           if (!user.isAnonymous) {
             await loadUserData();
-            window.OneSignalDeferred = window.OneSignalDeferred || [];
-            OneSignalDeferred.push(async function(OneSignal) {
-              try {
-                await OneSignal.login(user.uid);
-                const permission = await OneSignal.Notifications.permission;
-                if (!permission) {
-                  await OneSignal.Slidedown.promptPush();
-                }
-              } catch (e) {
-                console.log('OneSignal login/prompt error: ' + (e && e.message ? e.message : e));
-              }
-            });
+            iniciarPush(user);
           }
           updateUIForUser();
           loadGames();
           loadHistory();
           closeAuthOverlay();
         } else {
-          window.OneSignalDeferred = window.OneSignalDeferred || [];
-          OneSignalDeferred.push(async function(OneSignal) {
-            try {
-              await OneSignal.logout();
-            } catch (e) {
-              console.log('OneSignal logout error: ' + (e && e.message ? e.message : e));
-            }
-          });
           showAuthOverlay();
           loadGames();
         }
@@ -6777,6 +6796,7 @@
           showCustomAlert('Jogo atualizado com sucesso!');
         } else {
           await addDoc(collection(firestore, 'games'), gameData);
+          sendPush('Novo no Portal Digital', gameData.titulo);
           showCustomAlert('Jogo publicado com sucesso!');
         }
         closePublishModal();
@@ -8381,7 +8401,7 @@
         await set(newNotificationRef, notificationData);
 
         const pushTargetUserId = (targetType === 'individual') ? targetUserId : null;
-        const pushResult = await sendOneSignalPush(title, message, pushTargetUserId);
+        sendPush(title, message, pushTargetUserId);
 
         closeSendNotificationModal();
         if (targetType === 'individual') {
