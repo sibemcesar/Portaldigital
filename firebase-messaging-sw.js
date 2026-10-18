@@ -41,49 +41,77 @@ messaging.onBackgroundMessage(function (payload) {
   if (payload.notification) return;
   const d = payload.data || {};
 
-  // Validade: se o aparelho estava desligado e a mensagem chegou tarde, não mostra.
-  const expira = Number(d.expira) || 0;
-  if (expira && Date.now() > expira) {
-    // O navegador exige mostrar algo a cada push; mostramos em silêncio e fechamos logo.
-    return self.registration.showNotification('Portal Digital', {
-      tag: 'expirada',
-      silent: true,
-      icon: ICONE
-    }).then(function () {
-      return self.registration.getNotifications({ tag: 'expirada' });
-    }).then(function (lista) {
-      lista.forEach(function (n) { n.close(); });
-    });
-  }
+  // A validade é aplicada pelo FCM (cabeçalho TTL); não comparamos com o relógio do aparelho,
+  // porque um relógio errado fazia o aviso desaparecer em silêncio.
 
   const n = montarNotificacao(d);
   return self.registration.showNotification(n.titulo, n.opcoes);
 });
 
+// DEBUG TEMPORÁRIO: mostra uma notificação "🔧 Teste de clique" com o que aconteceu (remover depois de testar).
+function dbg(msg) {
+  return self.registration.showNotification('🔧 Teste de clique', {
+    body: msg,
+    tag: 'debug-clique',
+    icon: ICONE
+  });
+}
+
 self.addEventListener('notificationclick', function (event) {
   const notif = event.notification;
   const dados = notif.data || {};
+  const acao = event.action || 'corpo';
   notif.close();
 
-  if (event.action === 'depois') return;
+  if (event.action === 'depois') {
+    event.waitUntil(dbg('recebi o clique: ação=depois (só fecha)')); // DEBUG
+    return;
+  }
 
   const destino = dados.link || (self.location.origin + '/');
 
   event.waitUntil((async function () {
-    const lista = await clients.matchAll({ type: 'window', includeUncontrolled: true });
-    let mesmaOrigem = false;
-    try { mesmaOrigem = new URL(destino).origin === self.location.origin; } catch (e) {}
+    let via = '';
+    let resultado = '';
+    let janelas = 0;
+    try {
+      const lista = await clients.matchAll({ type: 'window', includeUncontrolled: true });
+      janelas = lista.length;
+      let mesmaOrigem = false;
+      try { mesmaOrigem = new URL(destino).origin === self.location.origin; } catch (e) {}
 
-    if (mesmaOrigem) {
-      for (const c of lista) {
-        if (new URL(c.url).origin === self.location.origin) {
-          // Página já aberta: pede à página para abrir o conteúdo, sem recarregar.
-          try { await c.focus(); } catch (e) {}
-          c.postMessage({ tipo: 'pd-abrir', url: destino });
-          return;
+      if (mesmaOrigem) {
+        for (const c of lista) {
+          if (new URL(c.url).origin === self.location.origin) {
+            // Página já aberta: pede à página para abrir o conteúdo, sem recarregar.
+            try { await c.focus(); } catch (e) {}
+            const confirmou = await new Promise(function (resolve) {
+              const canal = new MessageChannel();
+              const espera = setTimeout(function () { resolve(false); }, 700);
+              canal.port1.onmessage = function () { clearTimeout(espera); resolve(true); };
+              try {
+                c.postMessage({ tipo: 'pd-abrir', url: destino }, [canal.port2]);
+              } catch (e) {
+                clearTimeout(espera);
+                resolve(false);
+              }
+            });
+            if (confirmou) { via = 'pagina respondeu'; return await dbg('ação=' + acao + ' | janelas=' + janelas + ' | via=' + via); } // DEBUG
+            via = 'pagina nao respondeu -> janela nova';
+            break;
+          }
         }
       }
+      if (!via) via = 'sem pagina aberta -> janela nova';
+      if (clients.openWindow) {
+        const w = await clients.openWindow(destino);
+        resultado = w ? 'openWindow ok' : 'openWindow devolveu null';
+      } else {
+        resultado = 'openWindow indisponivel';
+      }
+    } catch (e) {
+      resultado = 'ERRO: ' + (e && e.message ? e.message : e);
     }
-    if (clients.openWindow) return clients.openWindow(destino);
+    await dbg('ação=' + acao + ' | janelas=' + janelas + ' | via=' + via + ' | ' + resultado); // DEBUG
   })());
 });
