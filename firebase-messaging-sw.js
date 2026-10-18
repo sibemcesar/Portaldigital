@@ -12,8 +12,6 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-const SW_VERSAO = 'v5'; // sobe a cada alteração, para sabermos qual versão está a correr
-
 // Aplica as versões novas logo, sem esperar que todas as janelas fechem.
 self.addEventListener('install', function () { self.skipWaiting(); });
 self.addEventListener('activate', function (event) { event.waitUntil(self.clients.claim()); });
@@ -67,35 +65,17 @@ function normalizarLink(l) {
   }
 }
 
-// DEBUG TEMPORÁRIO: mostra uma notificação "🔧 Teste de clique" com o que aconteceu (remover depois de testar).
-function dbg(msg) {
-  return self.registration.showNotification('🔧 Teste de clique', {
-    body: 'SW ' + SW_VERSAO + ' | ' + msg,
-    tag: 'debug-clique',
-    icon: ICONE
-  });
-}
-
 self.addEventListener('notificationclick', function (event) {
   const notif = event.notification;
   const dados = notif.data || {};
-  const acao = event.action || 'corpo';
   notif.close();
-
-  if (event.action === 'depois') {
-    event.waitUntil(dbg('recebi o clique: ação=depois (só fecha)')); // DEBUG
-    return;
-  }
+  if (event.action === 'depois') return;
 
   const destino = normalizarLink(dados.link || (self.location.origin + '/'));
 
   event.waitUntil((async function () {
-    let via = '';
-    let resultado = '';
-    let janelas = 0;
     try {
       const lista = await clients.matchAll({ type: 'window', includeUncontrolled: true });
-      janelas = lista.length;
       let mesmaOrigem = false;
       try { mesmaOrigem = new URL(destino).origin === self.location.origin; } catch (e) {}
 
@@ -115,22 +95,12 @@ self.addEventListener('notificationclick', function (event) {
                 resolve(false);
               }
             });
-            if (confirmou) { via = 'pagina respondeu'; return await dbg('ação=' + acao + ' | janelas=' + janelas + ' | via=' + via); } // DEBUG
-            via = 'pagina nao respondeu -> janela nova';
-            break;
+            if (confirmou) return;
+            break; // a página não respondeu: abre uma janela nova (abaixo)
           }
         }
       }
-      if (!via) via = 'sem pagina aberta -> janela nova';
-      if (clients.openWindow) {
-        const w = await clients.openWindow(destino);
-        resultado = w ? 'openWindow ok' : 'openWindow devolveu null';
-      } else {
-        resultado = 'openWindow indisponivel';
-      }
-    } catch (e) {
-      resultado = 'ERRO: ' + (e && e.message ? e.message : e);
-    }
-    await dbg('ação=' + acao + ' | janelas=' + janelas + ' | via=' + via + ' | ' + resultado + ' | destino=' + destino); // DEBUG
+      if (clients.openWindow) await clients.openWindow(destino);
+    } catch (e) {}
   })());
 });

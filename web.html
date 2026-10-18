@@ -6615,16 +6615,10 @@
     function checkUrlForGameId() {
       renderFromLocation(true);
     }
-    const PD_URL_INICIAL = window.location.href; // DEBUG
-    let pdDebugMostrado = false; // DEBUG
     async function renderFromLocation(isInitial) {
       const urlParams = new URLSearchParams(window.location.search);
       const gameId = urlParams.get('id');
       const view = urlParams.get('view');
-      if (isInitial && !pdDebugMostrado && /[?&]id=/.test(PD_URL_INICIAL)) { // DEBUG
-        pdDebugMostrado = true;
-        showCustomAlert('🔧 Teste de abertura<br><span style="font-size:12px;word-break:break-all;">URL inicial: ' + escapeHtml(PD_URL_INICIAL) + '<br>URL agora: ' + escapeHtml(window.location.href) + '<br>Conteúdo encontrado: ' + (allGames[gameId] ? 'sim' : 'NÃO') + ' (de ' + Object.keys(allGames).length + ')</span>');
-      }
       if (!gameId || !allGames[gameId]) {
         if (!isInitial) closeOverlay(true);
         return;
@@ -7005,7 +6999,7 @@
           await setDoc(doc(firestore, 'games', editId), gameData);
           if (document.getElementById('notifyUpdate').checked) {
             sendPush('🔄 Conteúdo atualizado', gameData.titulo + ' foi atualizado', null, {
-              link: SITE_URL + '/?id=' + editId,
+              link: SITE_URL + '/web.html?id=' + editId,
               imagem: /^https:\/\//.test(gameData.poster || '') ? gameData.poster : '',
               tipo: gameData.type,
               tag: 'atualizado-' + editId,
@@ -7016,7 +7010,7 @@
         } else {
           const novoDoc = await addDoc(collection(firestore, 'games'), gameData);
           sendPush(NOTIF_TITULOS[gameData.type] || '🎮 Novo no Portal Digital', gameData.titulo, null, {
-            link: SITE_URL + '/?id=' + novoDoc.id,
+            link: SITE_URL + '/web.html?id=' + novoDoc.id,
             imagem: /^https:\/\//.test(gameData.poster || '') ? gameData.poster : '',
             tipo: gameData.type,
             tag: 'novo-conteudo',
