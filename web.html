@@ -4566,6 +4566,10 @@
       <svg viewBox="0 0 24 24"><path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 00-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"/></svg>
       Resgatar Código
     </button>
+    <button class="btn" id="notifPrefsBtn" onclick="openNotifPrefsModal()">
+      <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+      Avisos que quero receber
+    </button>
 
     <button class="btn" id="rewardedAdsBtn" onclick="RewardedAds.abrirPagina()">
       <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
@@ -5069,6 +5073,17 @@
       </div>
     </div>
   </div>
+  <div id="notifPrefsModal" class="custom-modal">
+    <div class="custom-modal-content" style="max-width: 420px;">
+      <h2>Avisos que quero receber</h2>
+      <p style="font-size:14px;">Escolhe os tipos de conteúdo novo sobre os quais queres ser avisado. Os avisos de pontos recebidos chegam sempre.</p>
+      <div id="notifPrefsList"></div>
+      <div class="custom-modal-buttons" style="margin-top: 16px;">
+        <button class="custom-modal-btn primary" onclick="closeNotifPrefsModal()">Concluir</button>
+      </div>
+    </div>
+  </div>
+
   <div id="historyModal" class="custom-modal">
     <div class="custom-modal-content">
       <h2>Histórico de Jogos Visualizados</h2>
@@ -5582,9 +5597,40 @@
     let pushOnMessageAtivo = false;
     let pushEsperaToque = false;
 
-    async function sendPush(title, message, targetUserId, link) {
+    const SITE_URL = 'https://portaldigital.vercel.app';
+    const NOTIF_TIPOS = [
+      { id: 'jogos', nome: 'Jogos', icone: '🎮' },
+      { id: 'aplicativos', nome: 'Aplicativos', icone: '📱' },
+      { id: 'tutoriais', nome: 'Tutoriais', icone: '📘' },
+      { id: 'pc', nome: 'PC', icone: '💻' },
+      { id: 'outros', nome: 'Outros', icone: '✨' }
+    ];
+    const NOTIF_TITULOS = {
+      jogos: '🎮 Novo jogo',
+      aplicativos: '📱 Novo aplicativo',
+      tutoriais: '📘 Novo tutorial',
+      pc: '💻 Novo para PC',
+      outros: '✨ Novo conteúdo'
+    };
+
+    function lerPrefsNotif() {
+      let guardado = {};
+      try { guardado = JSON.parse(window['localStorage'].getItem('pdNotifPrefs') || '{}') || {}; } catch (e) {}
+      const prefs = {};
+      NOTIF_TIPOS.forEach((t) => { prefs[t.id] = guardado[t.id] !== false; });
+      return prefs;
+    }
+
+    function guardarPrefsNotif(prefs) {
+      try { window['localStorage'].setItem('pdNotifPrefs', JSON.stringify(prefs)); } catch (e) {}
+    }
+
+    // extra: texto (link) ou objeto { link, imagem, tipo, tag, validadeHoras }
+    async function sendPush(title, message, targetUserId, extra) {
       try {
         if (!currentUser) return null;
+        if (typeof extra === 'string') extra = { link: extra };
+        extra = extra || {};
         const idToken = await currentUser.getIdToken();
         const response = await fetch(PUSH_SERVER + '/notificar', {
           method: 'POST',
@@ -5596,7 +5642,11 @@
             titulo: title,
             corpo: message,
             alvoUid: targetUserId || null,
-            link: link || ''
+            link: extra.link || '',
+            imagem: extra.imagem || '',
+            tipo: extra.tipo || '',
+            tag: extra.tag || '',
+            validadeHoras: extra.validadeHoras || 0
           })
         });
         const data = await response.json().catch(() => null);
@@ -5606,6 +5656,16 @@
         console.log('Push fetch error: ' + (error && error.message ? error.message : error));
         return null;
       }
+    }
+
+    // Aviso de pontos recebidos (enviado pelo administrador ao usuário que recebeu).
+    function avisarPontosRecebidos(uidDestino, pontos, motivo) {
+      if (!uidDestino || !pontos) return;
+      sendPush('🎁 Pontos recebidos', '+' + pontos + ' pontos ' + motivo, uidDestino, {
+        tag: 'pontos',
+        link: SITE_URL + '/',
+        validadeHoras: 48
+      });
     }
 
     async function registarPush(user) {
@@ -5627,34 +5687,118 @@
         });
         if (!token) return;
 
-        const { ref, get, set } = window.firebaseModules;
+        const { ref, get, update } = window.firebaseModules;
         const tokenRef = ref(window.firebaseDatabase, 'fcmTokens/' + user.uid);
         const atual = await get(tokenRef);
         const agora = Date.now();
         const v = atual.exists() ? atual.val() : null;
-        if (!(v && v.token === token && (agora - (v.lastUpdated || 0)) < 7 * 24 * 3600 * 1000)) {
-          await set(tokenRef, {
+        const prefs = lerPrefsNotif();
+        const prefsIguais = !!(v && v.prefs) && NOTIF_TIPOS.every((t) => (v.prefs[t.id] !== false) === prefs[t.id]);
+        if (!(v && v.token === token && prefsIguais && (agora - (v.lastUpdated || 0)) < 7 * 24 * 3600 * 1000)) {
+          await update(tokenRef, {
             token: token,
             userId: user.uid,
             userEmail: user.email || '',
             createdAt: (v && v.createdAt) || agora,
-            lastUpdated: agora
+            lastUpdated: agora,
+            prefs: prefs
           });
         }
 
         if (!pushOnMessageAtivo) {
           pushOnMessageAtivo = true;
           m.onMessage(messaging, (payload) => {
-            const n = payload.notification || {};
-            reg.showNotification(n.title || 'Portal Digital', {
-              body: n.body || '',
-              icon: 'logo.png'
-            });
+            if (payload.notification) {
+              const n = payload.notification;
+              reg.showNotification(n.title || 'Portal Digital', { body: n.body || '', icon: '/logo.png', badge: '/badge.png' });
+              return;
+            }
+            const d = payload.data || {};
+            const expira = Number(d.expira) || 0;
+            if (expira && Date.now() > expira) return;
+            const opcoes = {
+              body: d.corpo || '',
+              icon: '/logo.png',
+              badge: '/badge.png',
+              tag: d.tag || 'geral',
+              renotify: true,
+              data: { link: d.link || '', tipo: d.tipo || '' }
+            };
+            if (d.imagem) opcoes.image = d.imagem;
+            if (d.acoes === '1') {
+              opcoes.actions = [
+                { action: 'ver', title: 'Ver agora' },
+                { action: 'depois', title: 'Mais tarde' }
+              ];
+            }
+            reg.showNotification(d.titulo || 'Portal Digital', opcoes);
           });
         }
       } catch (e) {
         console.log('Push register error: ' + (e && e.message ? e.message : e));
       }
+    }
+
+    // ---- Preferências de avisos por tipo ----
+    function openNotifPrefsModal() {
+      closeSidebar();
+      if (!currentUser || currentUser.isAnonymous) {
+        showCustomAlert('Entra com a tua conta para escolher os avisos que queres receber.');
+        return;
+      }
+      const prefs = lerPrefsNotif();
+      document.getElementById('notifPrefsList').innerHTML = NOTIF_TIPOS.map((t) => `
+        <label style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;margin-bottom:8px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;cursor:pointer;">
+          <span style="font-size:15px;color:var(--text-primary);">${t.icone} ${t.nome}</span>
+          <input type="checkbox" data-tipo="${t.id}" ${prefs[t.id] ? 'checked' : ''} onchange="mudarPrefNotif(this)" style="width:20px;height:20px;">
+        </label>
+      `).join('');
+      document.getElementById('notifPrefsModal').classList.add('active');
+    }
+    function closeNotifPrefsModal() {
+      document.getElementById('notifPrefsModal').classList.remove('active');
+    }
+    async function mudarPrefNotif(el) {
+      const prefs = lerPrefsNotif();
+      prefs[el.dataset.tipo] = el.checked;
+      guardarPrefsNotif(prefs);
+      try {
+        if (currentUser && !currentUser.isAnonymous) {
+          const { ref, update } = window.firebaseModules;
+          await update(ref(window.firebaseDatabase, 'fcmTokens/' + currentUser.uid), { prefs: prefs });
+        }
+      } catch (e) {
+        console.log('Erro ao guardar preferências: ' + (e && e.message ? e.message : e));
+      }
+    }
+
+    // Pergunta em português antes do pedido do navegador (que vem no idioma do aparelho).
+    function mostrarPedidoNotificacoes(user) {
+      if (document.getElementById('notifPedidoModal')) return;
+      const modal = document.createElement('div');
+      modal.className = 'custom-modal active';
+      modal.id = 'notifPedidoModal';
+      modal.innerHTML = `
+        <div class="custom-modal-content" style="max-width: 380px; text-align: center;">
+          <div style="font-size: 44px; margin-bottom: 8px;">🔔</div>
+          <h2>Ativar notificações?</h2>
+          <p style="font-size: 14px;">Recebe um aviso quando sair um jogo, app ou tutorial novo, e quando receberes pontos. Podes escolher o que queres receber no menu, em "Avisos que quero receber".</p>
+          <div class="custom-modal-buttons" style="flex-direction: column; gap: 10px;">
+            <button class="custom-modal-btn primary" id="notifPedidoSim" style="width: 100%; padding: 13px;">Ativar notificações</button>
+            <button class="custom-modal-btn secondary" id="notifPedidoNao" style="width: 100%; padding: 13px; border-color: transparent;">Agora não</button>
+          </div>
+          <p style="font-size: 12px; color: var(--text-muted); margin: 12px 0 0;">Depois, o navegador vai pedir a tua confirmação. Escolhe "Permitir".</p>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      document.getElementById('notifPedidoSim').addEventListener('click', () => {
+        modal.remove();
+        registarPush(user);
+      });
+      document.getElementById('notifPedidoNao').addEventListener('click', () => {
+        try { window['localStorage'].setItem('pdNotifPedidoEm', String(Date.now())); } catch (e) {}
+        modal.remove();
+      });
     }
 
     function iniciarPush(user) {
@@ -5666,11 +5810,21 @@
           return;
         }
         if (pushEsperaToque) return;
+        // Não insiste: se o usuário disse "Agora não", só volta a perguntar passados 3 dias.
+        let ultimo = 0;
+        try { ultimo = Number(window['localStorage'].getItem('pdNotifPedidoEm')) || 0; } catch (e) {}
+        if (Date.now() - ultimo < 3 * 24 * 3600 * 1000) return;
         pushEsperaToque = true;
-        document.addEventListener('click', () => {
-          pushEsperaToque = false;
-          registarPush(user);
-        }, { once: true });
+        const aoToque = () => {
+          // Se o toque abriu outra janela, espera pelo próximo toque.
+          setTimeout(() => {
+            if (typeof isAnyModalOpen === 'function' && isAnyModalOpen()) return;
+            document.removeEventListener('click', aoToque);
+            pushEsperaToque = false;
+            mostrarPedidoNotificacoes(user);
+          }, 400);
+        };
+        document.addEventListener('click', aoToque);
       } catch (e) {
         console.log('Push init error: ' + (e && e.message ? e.message : e));
       }
@@ -6795,8 +6949,14 @@
           await setDoc(doc(firestore, 'games', editId), gameData);
           showCustomAlert('Jogo atualizado com sucesso!');
         } else {
-          await addDoc(collection(firestore, 'games'), gameData);
-          sendPush('Novo no Portal Digital', gameData.titulo);
+          const novoDoc = await addDoc(collection(firestore, 'games'), gameData);
+          sendPush(NOTIF_TITULOS[gameData.type] || '🎮 Novo no Portal Digital', gameData.titulo, null, {
+            link: SITE_URL + '/?id=' + novoDoc.id,
+            imagem: /^https:\/\//.test(gameData.poster || '') ? gameData.poster : '',
+            tipo: gameData.type,
+            tag: 'novo-conteudo',
+            validadeHoras: 12
+          });
           showCustomAlert('Jogo publicado com sucesso!');
         }
         closePublishModal();
@@ -8180,6 +8340,7 @@
           });
           allUsers[userId].status = 'approved';
           allUsers[userId].points = currentPoints + 100;
+          avisarPontosRecebidos(userId, 100, 'de bónus: a tua conta foi aprovada');
           renderUsersList();
           showCustomAlert('Usuário aprovado com sucesso! +100 pontos de bônus concedidos.');
         } catch (error) {
@@ -9507,6 +9668,7 @@
         const notificationsRef = ref(database, 'notifications');
         const newNotificationRef = push(notificationsRef);
         await set(newNotificationRef, notificationData);
+        avisarPontosRecebidos(recipientUid, amount, 'recebidos por transferência');
         updateUserInfoDisplay();
         showCustomAlert(`Transferência realizada com sucesso!\n${amount} pontos enviados para ${recipientEmail}.\nNovo saldo do destinatário: ${recipientNewPoints} pontos.`);
         closeTransferModal();
@@ -10117,6 +10279,21 @@
         document.getElementById('saveAvatarBtn').style.display = 'inline-block';
         showCustomAlert('Erro ao atualizar foto: ' + error.message);
       }
+    }
+
+    // Tocar numa notificação com a página já aberta: abre o conteúdo sem recarregar.
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        const d = event.data || {};
+        if (d.tipo !== 'pd-abrir' || !d.url) return;
+        try {
+          const u = new URL(d.url);
+          if (u.origin !== window.location.origin) return;
+          window.history.pushState({}, '', u.pathname + u.search);
+          renderFromLocation(false);
+        } catch (e) {}
+      });
+      if (navigator.serviceWorker.startMessages) navigator.serviceWorker.startMessages();
     }
 
     if ('serviceWorker' in navigator) {
