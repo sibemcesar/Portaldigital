@@ -5732,8 +5732,7 @@
               return;
             }
             const d = payload.data || {};
-            const expira = Number(d.expira) || 0;
-            if (expira && Date.now() > expira) return;
+            // A validade é aplicada pelo FCM (cabeçalho TTL); não comparamos com o relógio do aparelho.
             const opcoes = {
               body: d.corpo || '',
               icon: '/logo.png',
@@ -6968,10 +6967,10 @@
           if (document.getElementById('notifyUpdate').checked) {
             mostrarResultadoPush(sendPush('🔄 Conteúdo atualizado', gameData.titulo + ' foi atualizado', null, {
               link: SITE_URL + '/?id=' + editId,
-              imagem: '', // TESTE: sem capa
+              imagem: /^https:\/\//.test(gameData.poster || '') ? gameData.poster : '',
               tipo: gameData.type,
               tag: 'atualizado-' + editId,
-              validadeHoras: 48 // TESTE
+              validadeHoras: 12
             }));
           }
           showCustomAlert('Jogo atualizado com sucesso!');
@@ -6979,10 +6978,10 @@
           const novoDoc = await addDoc(collection(firestore, 'games'), gameData);
           mostrarResultadoPush(sendPush(NOTIF_TITULOS[gameData.type] || '🎮 Novo no Portal Digital', gameData.titulo, null, {
             link: SITE_URL + '/?id=' + novoDoc.id,
-            imagem: '', // TESTE: sem capa
+            imagem: /^https:\/\//.test(gameData.poster || '') ? gameData.poster : '',
             tipo: gameData.type,
             tag: 'novo-conteudo',
-            validadeHoras: 48 // TESTE
+            validadeHoras: 12
           }));
           showCustomAlert('Jogo publicado com sucesso!');
         }
@@ -10323,6 +10322,8 @@
           if (u.origin !== window.location.origin) return;
           window.history.pushState({}, '', u.pathname + u.search);
           renderFromLocation(false);
+          // Confirma ao service worker que a página tratou o pedido (senão ele abre uma janela nova).
+          if (event.ports && event.ports[0]) event.ports[0].postMessage('ok');
         } catch (e) {}
       });
       if (navigator.serviceWorker.startMessages) navigator.serviceWorker.startMessages();
