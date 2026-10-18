@@ -5280,6 +5280,43 @@ window.firebaseModules = {
       word-break: break-all;
     }
 
+    .manage-user-email-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .manage-user-copy-btn {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .manage-user-copy-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    .manage-user-copy-btn:active {
+      background: var(--bg-card);
+    }
+
+    .manage-user-copy-btn.copied {
+      color: #4CAF50;
+    }
+
     .manage-user-status-badge {
       padding: 6px 12px;
       border-radius: 20px;
@@ -9938,6 +9975,13 @@ window.firebaseModules = {
             <label class="form-label">Custo em Pontos</label>
             <input type="number" class="form-input" id="gameCost" min="0" required>
           </div>
+
+          <div class="form-group" id="notifyUpdateGroup" style="display: none;">
+            <label for="notifyUpdate" style="display: flex; align-items: center; gap: 10px; cursor: pointer; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+              <input type="checkbox" id="notifyUpdate" style="width: 20px; height: 20px; flex-shrink: 0;">
+              <span style="font-size: 14px; line-height: 1.4;">&#x1F514; Notificar usuários que este conteúdo foi atualizado</span>
+            </label>
+          </div>
         </div>
 
         <div class="publish-footer">
@@ -13349,6 +13393,40 @@ function shareContent() {
     copyToClipboard(shareUrl);
   }
 }
+const COPY_EMAIL_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>';
+const COPIED_EMAIL_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>';
+function escapeEmailAttr(value) {
+  return String(value).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+function copyUserEmail(btn) {
+  const email = btn.getAttribute("data-email") || "";
+  if (!email) return;
+  const feito = () => {
+    btn.classList.add("copied");
+    btn.innerHTML = COPIED_EMAIL_SVG;
+    setTimeout(() => {
+      btn.classList.remove("copied");
+      btn.innerHTML = COPY_EMAIL_SVG;
+    }, 1500);
+  };
+  const fallback = () => {
+    const textArea = document.createElement("textarea");
+    textArea.value = email;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-9999px";
+    document.body.appendChild(textArea);
+    textArea.select();
+    let ok = false;
+    try { ok = document.execCommand("copy"); } catch (err) {}
+    document.body.removeChild(textArea);
+    if (ok) feito(); else showCustomAlert("Erro ao copiar o email.");
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(email).then(feito).catch(fallback);
+  } else {
+    fallback();
+  }
+}
 function copyToClipboard(text) {
   if (navigator.clipboard) {
     navigator.clipboard.writeText(text).then(() => {
@@ -13612,6 +13690,46 @@ async function logout() {
     }
   });
 }
+const PUSH_SERVER = "https://portal-push.onrender.com";
+const SITE_URL = "https://portaldigital.vercel.app";
+const NOTIF_TITULOS = {
+  jogos: "\uD83C\uDFAE Novo jogo",
+  aplicativos: "\uD83D\uDCF1 Novo aplicativo",
+  tutoriais: "\uD83D\uDCD8 Novo tutorial",
+  pc: "\uD83D\uDCBB Novo para PC",
+  outros: "\u2728 Novo conte\u00FAdo"
+};
+async function sendPush(title, message, targetUserId, extra) {
+  try {
+    if (!currentUser) return null;
+    if (typeof extra === "string") extra = { link: extra };
+    extra = extra || {};
+    const idToken = await currentUser.getIdToken();
+    const response = await fetch(PUSH_SERVER + "/notificar", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + idToken
+      },
+      body: JSON.stringify({
+        titulo: title,
+        corpo: message,
+        alvoUid: targetUserId || null,
+        link: extra.link || "",
+        imagem: extra.imagem || "",
+        tipo: extra.tipo || "",
+        tag: extra.tag || "",
+        validadeHoras: extra.validadeHoras || 0
+      })
+    });
+    const data = await response.json().catch(() => null);
+    console.log("Push: " + response.status + " " + JSON.stringify(data));
+    return data;
+  } catch (error) {
+    console.log("Push fetch error: " + (error && error.message ? error.message : error));
+    return null;
+  }
+}
 async function handlePublish(e) {
   e.preventDefault();
   if (!isPublisher) {
@@ -13650,9 +13768,25 @@ async function handlePublish(e) {
       if (existingGame.createdAt) gameData.createdAt = existingGame.createdAt;
       gameData.updatedAt = Date.now();
       await setDoc(doc(firestore, "games", editId), gameData);
+      if (document.getElementById("notifyUpdate").checked) {
+        sendPush("\uD83D\uDD04 Conte\u00FAdo atualizado", gameData.titulo + " foi atualizado", null, {
+          link: SITE_URL + "/web.html?id=" + editId,
+          imagem: /^https:\/\//.test(gameData.poster || "") ? gameData.poster : "",
+          tipo: gameData.type,
+          tag: "atualizado-" + editId,
+          validadeHoras: 12
+        });
+      }
       showCustomAlert("Jogo atualizado com sucesso!");
     } else {
-      await addDoc(collection(firestore, "games"), gameData);
+      const novoDoc = await addDoc(collection(firestore, "games"), gameData);
+      sendPush(NOTIF_TITULOS[gameData.type] || "\uD83C\uDFAE Novo no Portal Digital", gameData.titulo, null, {
+        link: SITE_URL + "/web.html?id=" + novoDoc.id,
+        imagem: /^https:\/\//.test(gameData.poster || "") ? gameData.poster : "",
+        tipo: gameData.type,
+        tag: "novo-conteudo",
+        validadeHoras: 12
+      });
       showCustomAlert("Jogo publicado com sucesso!");
     }
     closePublishModal();
@@ -13740,6 +13874,8 @@ function editGame(id) {
   closeManageModal();
   document.getElementById("publishModalTitle").textContent = "Editar Jogo";
   document.getElementById("editGameId").value = id;
+  document.getElementById("notifyUpdate").checked = false;
+  document.getElementById("notifyUpdateGroup").style.display = "block";
   document.getElementById("gameType").value = game.type;
   document.getElementById("gameTitle").value = game.titulo;
   document.getElementById("gameGenre").value = game.genero;
@@ -15180,6 +15316,8 @@ function openPublishModal() {
   }
   document.getElementById("publishModalTitle").textContent = "Publicar Jogo";
   document.getElementById("editGameId").value = "";
+  document.getElementById("notifyUpdate").checked = false;
+  document.getElementById("notifyUpdateGroup").style.display = "none";
   resetDownloadLinks();
   document.getElementById("publishOverlay").classList.add("active");
 }
@@ -15187,6 +15325,7 @@ function closePublishModal() {
   document.getElementById("publishOverlay").classList.remove("active");
   document.getElementById("publishForm").reset();
   document.getElementById("editGameId").value = "";
+  document.getElementById("notifyUpdateGroup").style.display = "none";
   resetDownloadLinks();
 }
 function resetDownloadLinks() {
@@ -16006,7 +16145,10 @@ function renderUsersList() {
             <div class="manage-user-header">
               <div class="manage-user-info">
                 <span class="manage-user-name">${user.name || "Sem nome"}</span>
-                <span class="manage-user-email">${user.email || "Email n\xE3o dispon\xEDvel"}</span>
+                <span class="manage-user-email-row">
+                  <span class="manage-user-email">${user.email || "Email n\xE3o dispon\xEDvel"}</span>
+                  ${user.email ? `<button type="button" class="manage-user-copy-btn" data-email="${escapeEmailAttr(user.email)}" onclick="copyUserEmail(this)" aria-label="Copiar email" title="Copiar email">${COPY_EMAIL_SVG}</button>` : ""}
+                </span>
               </div>
               <span class="manage-user-status-badge ${status}">${statusLabels[status]}</span>
             </div>
