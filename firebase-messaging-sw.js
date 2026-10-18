@@ -48,6 +48,19 @@ messaging.onBackgroundMessage(function (payload) {
   return self.registration.showNotification(n.titulo, n.opcoes);
 });
 
+// Links de conteúdo (?id=...) têm de apontar para /web.html; se vier só "/", corrige (também serve para avisos antigos).
+function normalizarLink(l) {
+  try {
+    const u = new URL(l);
+    if (u.origin === self.location.origin && (u.pathname === '/' || u.pathname === '') && u.searchParams.get('id')) {
+      u.pathname = '/web.html';
+    }
+    return u.href;
+  } catch (e) {
+    return l;
+  }
+}
+
 // DEBUG TEMPORÁRIO: mostra uma notificação "🔧 Teste de clique" com o que aconteceu (remover depois de testar).
 function dbg(msg) {
   return self.registration.showNotification('🔧 Teste de clique', {
@@ -68,7 +81,7 @@ self.addEventListener('notificationclick', function (event) {
     return;
   }
 
-  const destino = dados.link || (self.location.origin + '/');
+  const destino = normalizarLink(dados.link || (self.location.origin + '/'));
 
   event.waitUntil((async function () {
     let via = '';
