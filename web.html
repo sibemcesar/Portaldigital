@@ -5634,7 +5634,7 @@
     // extra: texto (link) ou objeto { link, imagem, tipo, tag, validadeHoras }
     async function sendPush(title, message, targetUserId, extra) {
       try {
-        if (!currentUser) { window.__pushUltimo = { status: 0, erro: 'sem utilizador autenticado' }; return null; }
+        if (!currentUser) return null;
         if (typeof extra === 'string') extra = { link: extra };
         extra = extra || {};
         const idToken = await currentUser.getIdToken();
@@ -5657,23 +5657,11 @@
         });
         const data = await response.json().catch(() => null);
         console.log('Push: ' + response.status + ' ' + JSON.stringify(data));
-        window.__pushUltimo = { status: response.status, data: data };
         return data;
       } catch (error) {
-        window.__pushUltimo = { status: 0, erro: (error && error.message ? error.message : String(error)) };
         console.log('Push fetch error: ' + (error && error.message ? error.message : error));
         return null;
       }
-    }
-
-    // DIAGNÓSTICO TEMPORÁRIO: mostra ao publicador a resposta do servidor de push (remover depois de testar).
-    async function mostrarResultadoPush(promessa) {
-      try { await promessa; } catch (e) {}
-      const r = window.__pushUltimo || { status: 0, erro: 'sem resposta' };
-      let txt = r.erro ? ('erro: ' + r.erro) : JSON.stringify(r.data);
-      if (txt && txt.length > 300) txt = txt.slice(0, 300) + '…';
-      const txtSeguro = String(txt || '').replace(/</g, '&lt;');
-      showCustomAlert('📣 Push (diagnóstico)<br>Estado: ' + r.status + '<br><span style="font-size:12px;word-break:break-all;">' + txtSeguro + '</span>');
     }
 
     // Aviso de pontos recebidos (enviado pelo administrador ao usuário que recebeu).
@@ -6965,24 +6953,24 @@
           gameData.downloads = existingGame.downloads || 0;
           await setDoc(doc(firestore, 'games', editId), gameData);
           if (document.getElementById('notifyUpdate').checked) {
-            mostrarResultadoPush(sendPush('🔄 Conteúdo atualizado', gameData.titulo + ' foi atualizado', null, {
+            sendPush('🔄 Conteúdo atualizado', gameData.titulo + ' foi atualizado', null, {
               link: SITE_URL + '/?id=' + editId,
               imagem: /^https:\/\//.test(gameData.poster || '') ? gameData.poster : '',
               tipo: gameData.type,
               tag: 'atualizado-' + editId,
               validadeHoras: 12
-            }));
+            });
           }
           showCustomAlert('Jogo atualizado com sucesso!');
         } else {
           const novoDoc = await addDoc(collection(firestore, 'games'), gameData);
-          mostrarResultadoPush(sendPush(NOTIF_TITULOS[gameData.type] || '🎮 Novo no Portal Digital', gameData.titulo, null, {
+          sendPush(NOTIF_TITULOS[gameData.type] || '🎮 Novo no Portal Digital', gameData.titulo, null, {
             link: SITE_URL + '/?id=' + novoDoc.id,
             imagem: /^https:\/\//.test(gameData.poster || '') ? gameData.poster : '',
             tipo: gameData.type,
             tag: 'novo-conteudo',
             validadeHoras: 12
-          }));
+          });
           showCustomAlert('Jogo publicado com sucesso!');
         }
         closePublishModal();
@@ -10317,14 +10305,26 @@
       navigator.serviceWorker.addEventListener('message', (event) => {
         const d = event.data || {};
         if (d.tipo !== 'pd-abrir' || !d.url) return;
+        let u;
         try {
-          const u = new URL(d.url);
-          if (u.origin !== window.location.origin) return;
-          window.history.pushState({}, '', u.pathname + u.search);
-          renderFromLocation(false);
-          // Confirma ao service worker que a página tratou o pedido (senão ele abre uma janela nova).
-          if (event.ports && event.ports[0]) event.ports[0].postMessage('ok');
-        } catch (e) {}
+          u = new URL(d.url);
+        } catch (e) { return; }
+        if (u.origin !== window.location.origin) return;
+        // Confirma logo ao service worker que a página recebeu o pedido (senão ele abre uma janela nova).
+        try { if (event.ports && event.ports[0]) event.ports[0].postMessage('ok'); } catch (e) {}
+        (async () => {
+          try {
+            const gid = u.searchParams.get('id');
+            if (gid && allGames[gid]) {
+              window.history.pushState({}, '', u.pathname + u.search);
+              await renderFromLocation(false);
+              const ov = document.getElementById('overlay');
+              if (ov && ov.classList.contains('active')) return;
+            }
+          } catch (e) {}
+          // Não abriu por aqui: carrega o link normalmente (o mesmo caminho de um link partilhado).
+          window.location.href = d.url;
+        })();
       });
       if (navigator.serviceWorker.startMessages) navigator.serviceWorker.startMessages();
     }
