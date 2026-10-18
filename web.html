@@ -2585,6 +2585,7 @@
     .favorites-item-remove:hover {
       opacity: 1;
     }
+
     
     .auth-overlay {
       position: fixed;
@@ -4378,6 +4379,7 @@
 </head>
 <body>
 
+  
   <div class="auth-overlay" id="auth-overlay">
     <div class="auth-overlay-content">
       <div class="auth-overlay-header">
@@ -5623,6 +5625,7 @@
       try { window['localStorage'].setItem('pdNotifPrefs', JSON.stringify(prefs)); } catch (e) {}
     }
 
+    // extra: texto (link) ou objeto { link, imagem, tipo, tag, validadeHoras }
     async function sendPush(title, message, targetUserId, extra) {
       try {
         if (!currentUser) return null;
@@ -5655,6 +5658,7 @@
       }
     }
 
+    // Aviso de pontos recebidos (enviado pelo administrador ao usuário que recebeu).
     function avisarPontosRecebidos(uidDestino, pontos, motivo) {
       if (!uidDestino || !pontos) return;
       sendPush('🎁 Pontos recebidos', '+' + pontos + ' pontos ' + motivo, uidDestino, {
@@ -5735,6 +5739,7 @@
       }
     }
 
+    // ---- Preferências de avisos por tipo ----
     function openNotifPrefsModal() {
       closeSidebar();
       if (!currentUser || currentUser.isAnonymous) {
@@ -5767,6 +5772,7 @@
       }
     }
 
+    // Pergunta em português antes do pedido do navegador (que vem no idioma do aparelho).
     function mostrarPedidoNotificacoes(user) {
       if (document.getElementById('notifPedidoModal')) return;
       const modal = document.createElement('div');
@@ -5804,11 +5810,13 @@
           return;
         }
         if (pushEsperaToque) return;
+        // Não insiste: se o usuário disse "Agora não", só volta a perguntar passados 3 dias.
         let ultimo = 0;
         try { ultimo = Number(window['localStorage'].getItem('pdNotifPedidoEm')) || 0; } catch (e) {}
         if (Date.now() - ultimo < 3 * 24 * 3600 * 1000) return;
         pushEsperaToque = true;
         const aoToque = () => {
+          // Se o toque abriu outra janela, espera pelo próximo toque.
           setTimeout(() => {
             if (typeof isAnyModalOpen === 'function' && isAnyModalOpen()) return;
             document.removeEventListener('click', aoToque);
@@ -10273,6 +10281,7 @@
       }
     }
 
+    // Tocar numa notificação com a página já aberta: abre o conteúdo sem recarregar.
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.addEventListener('message', (event) => {
         const d = event.data || {};
@@ -11730,6 +11739,7 @@
 </div>
 
 <script>
+  // Banner do app: "Instalar" = nunca mais aparece; "✕" = some durante 24h
   (function () {
     var K_INST = 'pdBannerAppInstalou';
     var K_FECHOU = 'pdBannerAppFechouEm';
@@ -11773,4 +11783,6 @@
 </script>
 </body>
 </html>
+
+
 
