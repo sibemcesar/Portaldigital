@@ -6968,10 +6968,10 @@
           if (document.getElementById('notifyUpdate').checked) {
             mostrarResultadoPush(sendPush('🔄 Conteúdo atualizado', gameData.titulo + ' foi atualizado', null, {
               link: SITE_URL + '/?id=' + editId,
-              imagem: /^https:\/\//.test(gameData.poster || '') ? gameData.poster : '',
+              imagem: '', // TESTE: sem capa
               tipo: gameData.type,
               tag: 'atualizado-' + editId,
-              validadeHoras: 12
+              validadeHoras: 48 // TESTE
             }));
           }
           showCustomAlert('Jogo atualizado com sucesso!');
@@ -6979,10 +6979,10 @@
           const novoDoc = await addDoc(collection(firestore, 'games'), gameData);
           mostrarResultadoPush(sendPush(NOTIF_TITULOS[gameData.type] || '🎮 Novo no Portal Digital', gameData.titulo, null, {
             link: SITE_URL + '/?id=' + novoDoc.id,
-            imagem: /^https:\/\//.test(gameData.poster || '') ? gameData.poster : '',
+            imagem: '', // TESTE: sem capa
             tipo: gameData.type,
             tag: 'novo-conteudo',
-            validadeHoras: 12
+            validadeHoras: 48 // TESTE
           }));
           showCustomAlert('Jogo publicado com sucesso!');
         }
