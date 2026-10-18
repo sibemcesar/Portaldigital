@@ -112,6 +112,6 @@ self.addEventListener('notificationclick', function (event) {
     } catch (e) {
       resultado = 'ERRO: ' + (e && e.message ? e.message : e);
     }
-    await dbg('ação=' + acao + ' | janelas=' + janelas + ' | via=' + via + ' | ' + resultado); // DEBUG
+    await dbg('ação=' + acao + ' | janelas=' + janelas + ' | via=' + via + ' | ' + resultado + ' | destino=' + destino); // DEBUG
   })());
 });
