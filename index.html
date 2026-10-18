@@ -5280,6 +5280,43 @@ window.firebaseModules = {
       word-break: break-all;
     }
 
+    .manage-user-email-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .manage-user-copy-btn {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .manage-user-copy-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    .manage-user-copy-btn:active {
+      background: var(--bg-card);
+    }
+
+    .manage-user-copy-btn.copied {
+      color: #4CAF50;
+    }
+
     .manage-user-status-badge {
       padding: 6px 12px;
       border-radius: 20px;
@@ -5562,6 +5599,22 @@ window.firebaseModules = {
       border-bottom: none;
     }
 
+    .vup-dl { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 16px; padding: 16px 14px; }
+    .vup-dl-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+    .vup-dl-head h4 { margin: 0; font-size: 15px; font-weight: 700; color: var(--text-primary); }
+    .vup-dl-stats { display: flex; gap: 10px; margin-bottom: 14px; }
+    .vup-dl-stat { flex: 1; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px 8px; text-align: center; }
+    .vup-dl-stat b { display: block; font-size: 20px; color: var(--text-primary); line-height: 1.2; }
+    .vup-dl-stat span { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .4px; }
+    .vup-dl-msg { font-size: 13px; line-height: 1.45; color: var(--text-muted); text-align: center; padding: 10px 4px; }
+    .vup-dl-msg.erro { color: #DC2626; }
+    .vup-dl-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--border-color); }
+    .vup-dl-item img { width: 48px; height: 48px; flex-shrink: 0; object-fit: cover; border-radius: 10px; background: var(--bg-card); }
+    .vup-dl-info { flex: 1; min-width: 0; }
+    .vup-dl-title { font-size: 14px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .vup-dl-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .vup-dl-cost { flex-shrink: 0; font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+    .vup-dl-more { display: block; width: 100%; margin-top: 10px; padding: 11px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; cursor: pointer; }
     .view-user-profile-info-icon {
       width: 42px;
       height: 42px;
@@ -9938,6 +9991,13 @@ window.firebaseModules = {
             <label class="form-label">Custo em Pontos</label>
             <input type="number" class="form-input" id="gameCost" min="0" required>
           </div>
+
+          <div class="form-group" id="notifyUpdateGroup" style="display: none;">
+            <label for="notifyUpdate" style="display: flex; align-items: center; gap: 10px; cursor: pointer; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+              <input type="checkbox" id="notifyUpdate" style="width: 20px; height: 20px; flex-shrink: 0;">
+              <span style="font-size: 14px; line-height: 1.4;">&#x1F514; Notificar usuários que este conteúdo foi atualizado</span>
+            </label>
+          </div>
         </div>
 
         <div class="publish-footer">
@@ -13137,7 +13197,7 @@ function mostrarLinkPronto(url, cost, pontosRestantes) {
           </div>
           <h2 class="pdlink-title" id="pdLinkTitulo">O seu link est\xE1 pronto</h2>
           <p class="pdlink-sub">Escolha como quer continuar</p>
-          <div class="pdlink-pontos">${cost} pontos deduzidos &middot; Restam ${pontosRestantes}</div>
+          <div class="pdlink-pontos">${cost > 0 ? `${cost} pontos deduzidos &middot; Restam ${pontosRestantes}` : "Download gratuito &middot; nenhum ponto deduzido"}</div>
           <button type="button" class="pdlink-btn pdlink-btn-main" data-acao="chrome">
             <span class="pdlink-btn-icon">
               <svg viewBox="0 0 48 48" width="28" height="28" aria-hidden="true">
@@ -13267,9 +13327,10 @@ async function downloadGame(gameId, appType, url, cost) {
     const newPointsTotal = currentPoints - cost;
     const serverTime = await getServerTimestamp();
     const downloadId = `${gameId}_${Date.now()}`;
-    const updates = {};
-    updates[`users/${currentUser.uid}/points`] = newPointsTotal;
-    updates[`downloadClaims/${currentUser.uid}/${downloadId}`] = {
+    if (cost > 0) {
+      const updates = {};
+      updates[`users/${currentUser.uid}/points`] = newPointsTotal;
+      updates[`downloadClaims/${currentUser.uid}/${downloadId}`] = {
       gameId,
       appType,
       cost,
@@ -13277,9 +13338,26 @@ async function downloadGame(gameId, appType, url, cost) {
       newPoints: newPointsTotal,
       downloadedAt: serverTime
     };
-    await update(ref(database), updates);
-    if (!userDownloadedIds.includes(gameId)) userDownloadedIds.push(gameId);
-    _syncPointsDisplay(newPointsTotal);
+      await update(ref(database), updates);
+      if (!userDownloadedIds.includes(gameId)) userDownloadedIds.push(gameId);
+      _syncPointsDisplay(newPointsTotal);
+    } else {
+      if (!userDownloadedIds.includes(gameId)) userDownloadedIds.push(gameId);
+      try {
+        await update(ref(database), {
+          [`downloadClaims/${currentUser.uid}/${downloadId}`]: {
+      gameId,
+      appType,
+      cost,
+      previousPoints: currentPoints,
+      newPoints: newPointsTotal,
+      downloadedAt: serverTime
+    }
+        });
+      } catch (claimErr) {
+        console.warn('Registro de download grátis não gravado:', claimErr && (claimErr.message || claimErr));
+      }
+    }
     mostrarPreparandoLink();
     precarregarLinkOculto(url);
     const esperaLink = new Promise((resolve) => setTimeout(resolve, LINK_PREP_MS));
@@ -13347,6 +13425,40 @@ function shareContent() {
     });
   } else {
     copyToClipboard(shareUrl);
+  }
+}
+const COPY_EMAIL_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>';
+const COPIED_EMAIL_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>';
+function escapeEmailAttr(value) {
+  return String(value).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+function copyUserEmail(btn) {
+  const email = btn.getAttribute("data-email") || "";
+  if (!email) return;
+  const feito = () => {
+    btn.classList.add("copied");
+    btn.innerHTML = COPIED_EMAIL_SVG;
+    setTimeout(() => {
+      btn.classList.remove("copied");
+      btn.innerHTML = COPY_EMAIL_SVG;
+    }, 1500);
+  };
+  const fallback = () => {
+    const textArea = document.createElement("textarea");
+    textArea.value = email;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-9999px";
+    document.body.appendChild(textArea);
+    textArea.select();
+    let ok = false;
+    try { ok = document.execCommand("copy"); } catch (err) {}
+    document.body.removeChild(textArea);
+    if (ok) feito(); else showCustomAlert("Erro ao copiar o email.");
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(email).then(feito).catch(fallback);
+  } else {
+    fallback();
   }
 }
 function copyToClipboard(text) {
@@ -13612,6 +13724,46 @@ async function logout() {
     }
   });
 }
+const PUSH_SERVER = "https://portal-push.onrender.com";
+const SITE_URL = "https://portaldigital.vercel.app";
+const NOTIF_TITULOS = {
+  jogos: "\uD83C\uDFAE Novo jogo",
+  aplicativos: "\uD83D\uDCF1 Novo aplicativo",
+  tutoriais: "\uD83D\uDCD8 Novo tutorial",
+  pc: "\uD83D\uDCBB Novo para PC",
+  outros: "\u2728 Novo conte\u00FAdo"
+};
+async function sendPush(title, message, targetUserId, extra) {
+  try {
+    if (!currentUser) return null;
+    if (typeof extra === "string") extra = { link: extra };
+    extra = extra || {};
+    const idToken = await currentUser.getIdToken();
+    const response = await fetch(PUSH_SERVER + "/notificar", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + idToken
+      },
+      body: JSON.stringify({
+        titulo: title,
+        corpo: message,
+        alvoUid: targetUserId || null,
+        link: extra.link || "",
+        imagem: extra.imagem || "",
+        tipo: extra.tipo || "",
+        tag: extra.tag || "",
+        validadeHoras: extra.validadeHoras || 0
+      })
+    });
+    const data = await response.json().catch(() => null);
+    console.log("Push: " + response.status + " " + JSON.stringify(data));
+    return data;
+  } catch (error) {
+    console.log("Push fetch error: " + (error && error.message ? error.message : error));
+    return null;
+  }
+}
 async function handlePublish(e) {
   e.preventDefault();
   if (!isPublisher) {
@@ -13650,9 +13802,25 @@ async function handlePublish(e) {
       if (existingGame.createdAt) gameData.createdAt = existingGame.createdAt;
       gameData.updatedAt = Date.now();
       await setDoc(doc(firestore, "games", editId), gameData);
+      if (document.getElementById("notifyUpdate").checked) {
+        sendPush("\uD83D\uDD04 Conte\u00FAdo atualizado", gameData.titulo + " foi atualizado", null, {
+          link: SITE_URL + "/web.html?id=" + editId,
+          imagem: /^https:\/\//.test(gameData.poster || "") ? gameData.poster : "",
+          tipo: gameData.type,
+          tag: "atualizado-" + editId,
+          validadeHoras: 12
+        });
+      }
       showCustomAlert("Jogo atualizado com sucesso!");
     } else {
-      await addDoc(collection(firestore, "games"), gameData);
+      const novoDoc = await addDoc(collection(firestore, "games"), gameData);
+      sendPush(NOTIF_TITULOS[gameData.type] || "\uD83C\uDFAE Novo no Portal Digital", gameData.titulo, null, {
+        link: SITE_URL + "/web.html?id=" + novoDoc.id,
+        imagem: /^https:\/\//.test(gameData.poster || "") ? gameData.poster : "",
+        tipo: gameData.type,
+        tag: "novo-conteudo",
+        validadeHoras: 12
+      });
       showCustomAlert("Jogo publicado com sucesso!");
     }
     closePublishModal();
@@ -13740,6 +13908,8 @@ function editGame(id) {
   closeManageModal();
   document.getElementById("publishModalTitle").textContent = "Editar Jogo";
   document.getElementById("editGameId").value = id;
+  document.getElementById("notifyUpdate").checked = false;
+  document.getElementById("notifyUpdateGroup").style.display = "block";
   document.getElementById("gameType").value = game.type;
   document.getElementById("gameTitle").value = game.titulo;
   document.getElementById("gameGenre").value = game.genero;
@@ -15180,6 +15350,8 @@ function openPublishModal() {
   }
   document.getElementById("publishModalTitle").textContent = "Publicar Jogo";
   document.getElementById("editGameId").value = "";
+  document.getElementById("notifyUpdate").checked = false;
+  document.getElementById("notifyUpdateGroup").style.display = "none";
   resetDownloadLinks();
   document.getElementById("publishOverlay").classList.add("active");
 }
@@ -15187,6 +15359,7 @@ function closePublishModal() {
   document.getElementById("publishOverlay").classList.remove("active");
   document.getElementById("publishForm").reset();
   document.getElementById("editGameId").value = "";
+  document.getElementById("notifyUpdateGroup").style.display = "none";
   resetDownloadLinks();
 }
 function resetDownloadLinks() {
@@ -16006,7 +16179,10 @@ function renderUsersList() {
             <div class="manage-user-header">
               <div class="manage-user-info">
                 <span class="manage-user-name">${user.name || "Sem nome"}</span>
-                <span class="manage-user-email">${user.email || "Email n\xE3o dispon\xEDvel"}</span>
+                <span class="manage-user-email-row">
+                  <span class="manage-user-email">${user.email || "Email n\xE3o dispon\xEDvel"}</span>
+                  ${user.email ? `<button type="button" class="manage-user-copy-btn" data-email="${escapeEmailAttr(user.email)}" onclick="copyUserEmail(this)" aria-label="Copiar email" title="Copiar email">${COPY_EMAIL_SVG}</button>` : ""}
+                </span>
               </div>
               <span class="manage-user-status-badge ${status}">${statusLabels[status]}</span>
             </div>
@@ -16208,9 +16384,72 @@ function viewUserProfile(userId) {
           </div>
         </div>
       `;
+  const vupMyToken = ++vupToken;
+  if (isPublisher) {
+    container.insertAdjacentHTML("beforeend", '<div class="vup-dl" id="vupDownloads"><div class="vup-dl-head"><h4>Downloads</h4></div><div class="vup-dl-msg">Carregando downloads...</div></div>');
+    vupLoadDownloads(userId, vupMyToken);
+  }
   document.getElementById("viewUserProfileOverlay").classList.add("active");
 }
+let vupToken = 0;
+const VUP_PAGE = 15;
+function vupFmtDate(ts) {
+  const n = Number(ts);
+  if (!n || isNaN(n)) return "—";
+  const d = new Date(n);
+  if (isNaN(d.getTime())) return "—";
+  return d.toLocaleDateString("pt-BR") + " " + d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+}
+async function vupLoadDownloads(userId, token) {
+  if (!isPublisher) return;
+  const box = document.getElementById("vupDownloads");
+  if (!box) return;
+  try {
+    const { ref, get } = window.firebaseModules;
+    const snap = await get(ref(window.firebaseDatabase, "downloadClaims/" + userId));
+    if (token !== vupToken) return;
+    const claims = snap.exists() ? Object.values(snap.val()).filter((c) => c && c.gameId) : [];
+    if (!claims.length) {
+      box.innerHTML = '<div class="vup-dl-head"><h4>Downloads</h4></div><div class="vup-dl-msg">Este usuário ainda não baixou nenhum conteúdo.</div>';
+      return;
+    }
+    const porJogo = {};
+    claims.forEach((c) => {
+      const t = Number(c.downloadedAt) || 0;
+      const g = porJogo[c.gameId] || (porJogo[c.gameId] = { id: c.gameId, n: 0, ultimo: 0, cost: 0 });
+      g.n++;
+      if (t >= g.ultimo) { g.ultimo = t; g.cost = Number(c.cost) || 0; }
+    });
+    const grupos = Object.values(porJogo).sort((a, b) => b.ultimo - a.ultimo);
+    let mostrados = 0;
+    const linha = (g) => {
+      const jogo = typeof allGames !== "undefined" && allGames ? allGames[g.id] : null;
+      const titulo = jogo ? (jogo.titulo || "Sem título") : "Conteúdo removido";
+      const poster = jogo && jogo.poster ? jogo.poster : "";
+      const sub = (g.n > 1 ? g.n + " downloads" : "1 download") + " · último: " + vupFmtDate(g.ultimo) + (jogo ? "" : " · " + g.id);
+      return '<div class="vup-dl-item"><img src="' + escapeHtml(poster) + '" alt="" loading="lazy"><div class="vup-dl-info"><div class="vup-dl-title">' + escapeHtml(titulo) + '</div><div class="vup-dl-sub">' + escapeHtml(sub) + '</div></div><span class="vup-dl-cost">' + (g.cost > 0 ? g.cost + " pts" : "Grátis") + "</span></div>";
+    };
+    const desenhar = () => {
+      mostrados = Math.min(grupos.length, mostrados + VUP_PAGE);
+      box.innerHTML = '<div class="vup-dl-head"><h4>Downloads</h4></div>' +
+        '<div class="vup-dl-stats"><div class="vup-dl-stat"><b>' + claims.length + '</b><span>Downloads</span></div><div class="vup-dl-stat"><b>' + grupos.length + '</b><span>Conteúdos</span></div></div>' +
+        grupos.slice(0, mostrados).map(linha).join("") +
+        (mostrados < grupos.length ? '<button type="button" class="vup-dl-more" id="vupDlMore">Ver mais (' + (grupos.length - mostrados) + ")</button>" : "");
+      const mais = box.querySelector("#vupDlMore");
+      if (mais) mais.addEventListener("click", desenhar);
+    };
+    desenhar();
+  } catch (e) {
+    if (token !== vupToken) return;
+    const negado = /permission[_ -]?denied/i.test(String((e && (e.code || e.message)) || e));
+    box.innerHTML = '<div class="vup-dl-head"><h4>Downloads</h4></div><div class="vup-dl-msg erro">' + (negado
+      ? "Sem permissão para ler os downloads deste usuário. A regra de leitura de downloadClaims precisa permitir publicadores."
+      : "Não foi possível carregar os downloads.") + "</div>";
+    console.error("[Admin] Erro ao ler downloads do usuário:", e);
+  }
+}
 function closeViewUserProfile() {
+  vupToken++;
   document.getElementById("viewUserProfileOverlay").classList.remove("active");
 }
 function openResetPasswordModal() {
@@ -16547,6 +16786,7 @@ async function handleSendNotification(e) {
       notificationData.targetUserName = targetUserName.split(" (")[0];
     }
     await set(newNotificationRef, notificationData);
+    sendPush(title, message, targetType === "individual" ? targetUserId : null);
     closeSendNotificationModal();
     if (targetType === "individual") {
       showCustomAlert("Notifica\xE7\xE3o enviada com sucesso para o usu\xE1rio selecionado!");
@@ -16646,7 +16886,6 @@ function pdpIc(nome, tam, cor) {
 }
 function pdpCfg(uid) { try { return JSON.parse(localStorage.getItem("pdp_cfg_" + uid) || "{}") || {}; } catch (e) { return {}; } }
 function pdpSalvarCfg(uid, c) { try { localStorage.setItem("pdp_cfg_" + uid, JSON.stringify(c)); } catch (e) {} }
-// O localStorage é só cache: a fonte da verdade é publicProfiles/<uid> no Firebase.
 const __pdpSync = {};
 function pdpSyncFromDb(uid) {
   if (!uid) return Promise.resolve(false);
@@ -16665,7 +16904,7 @@ function pdpSyncFromDb(uid) {
       if (Object.keys(patch).length) pdpSalvarCfg(uid, Object.assign(pdpCfg(uid), patch));
       return true;
     } catch (e) {
-      delete __pdpSync[uid]; // tenta de novo mais tarde (ex.: conta ainda não verificada)
+      delete __pdpSync[uid];
       return false;
     }
   })();
