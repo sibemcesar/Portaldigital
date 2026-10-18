@@ -5003,6 +5003,12 @@
           <label class="form-label">Custo em Pontos</label>
           <input type="number" class="form-input" id="gameCost" min="0" required>
         </div>
+        <div class="form-group" id="notifyUpdateGroup" style="display: none;">
+          <label for="notifyUpdate" style="display: flex; align-items: center; gap: 10px; cursor: pointer; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+            <input type="checkbox" id="notifyUpdate" style="width: 20px; height: 20px; flex-shrink: 0;">
+            <span style="font-size: 14px; line-height: 1.4;">🔔 Notificar usuários que este conteúdo foi atualizado</span>
+          </label>
+        </div>
         <div class="custom-modal-buttons">
           <button type="button" class="custom-modal-btn secondary" onclick="closePublishModal()">Cancelar</button>
           <button type="submit" class="custom-modal-btn primary">Publicar</button>
@@ -6947,6 +6953,15 @@
           const existingGame = allGames[editId];
           gameData.downloads = existingGame.downloads || 0;
           await setDoc(doc(firestore, 'games', editId), gameData);
+          if (document.getElementById('notifyUpdate').checked) {
+            sendPush('🔄 Conteúdo atualizado', gameData.titulo + ' foi atualizado', null, {
+              link: SITE_URL + '/?id=' + editId,
+              imagem: /^https:\/\//.test(gameData.poster || '') ? gameData.poster : '',
+              tipo: gameData.type,
+              tag: 'atualizado-' + editId,
+              validadeHoras: 12
+            });
+          }
           showCustomAlert('Jogo atualizado com sucesso!');
         } else {
           const novoDoc = await addDoc(collection(firestore, 'games'), gameData);
@@ -6999,6 +7014,8 @@
       closeManageModal();
       document.getElementById('publishModalTitle').textContent = 'Editar Jogo';
       document.getElementById('editGameId').value = id;
+      document.getElementById('notifyUpdate').checked = false;
+      document.getElementById('notifyUpdateGroup').style.display = 'block';
       document.getElementById('gameType').value = game.type;
       document.getElementById('gameTitle').value = game.titulo;
       document.getElementById('gameGenre').value = game.genero;
@@ -7632,6 +7649,8 @@
       }
       document.getElementById('publishModalTitle').textContent = 'Publicar Jogo';
       document.getElementById('editGameId').value = '';
+      document.getElementById('notifyUpdate').checked = false;
+      document.getElementById('notifyUpdateGroup').style.display = 'none';
       resetDownloadLinks();
       document.getElementById('publishModal').classList.add('active');
     }
@@ -7639,6 +7658,7 @@
       document.getElementById('publishModal').classList.remove('active');
       document.getElementById('publishForm').reset();
       document.getElementById('editGameId').value = '';
+      document.getElementById('notifyUpdateGroup').style.display = 'none';
       resetDownloadLinks();
     }
     function resetDownloadLinks() {
