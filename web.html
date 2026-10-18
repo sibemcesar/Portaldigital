@@ -5083,7 +5083,6 @@
     <div class="custom-modal-content" style="max-width: 420px;">
       <h2>Avisos que quero receber</h2>
       <p style="font-size:14px;">Escolhe os tipos de conteúdo novo sobre os quais queres ser avisado. Os avisos de pontos recebidos chegam sempre.</p>
-      <div class="notif-perm-banner"></div>
       <div id="notifPrefsList"></div>
       <div class="custom-modal-buttons" style="margin-top: 16px;">
         <button class="custom-modal-btn primary" onclick="closeNotifPrefsModal()">Concluir</button>
@@ -5162,7 +5161,6 @@
   <div id="notificationsModal" class="custom-modal">
     <div class="custom-modal-content" style="max-width: 500px;">
       <h2> Minhas Notificações</h2>
-      <div class="notif-perm-banner"></div>
       <div id="notificationsList" style="max-height: 60vh; overflow-y: auto; padding: 8px 0;">Carregando...</div>
       <div class="custom-modal-buttons" style="margin-top: 16px; justify-content: space-between;">
         <button class="custom-modal-btn primary" onclick="markAllNotificationsAsRead()" id="markAllReadBtn">✓ Marcar todas como lidas</button>
@@ -5633,6 +5631,7 @@
       try { window['localStorage'].setItem('pdNotifPrefs', JSON.stringify(prefs)); } catch (e) {}
     }
 
+    // extra: texto (link) ou objeto { link, imagem, tipo, tag, validadeHoras }
     async function sendPush(title, message, targetUserId, extra) {
       try {
         if (!currentUser) return null;
@@ -5665,6 +5664,7 @@
       }
     }
 
+    // Aviso de pontos recebidos (enviado pelo administrador ao usuário que recebeu).
     function avisarPontosRecebidos(uidDestino, pontos, motivo) {
       if (!uidDestino || !pontos) return;
       sendPush('🎁 Pontos recebidos', '+' + pontos + ' pontos ' + motivo, uidDestino, {
@@ -5674,28 +5674,15 @@
       });
     }
 
-    let pdMsgModulo = null;
-    function carregarMessaging() {
-      if (!pdMsgModulo) {
-        pdMsgModulo = import('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js').catch((e) => {
-          pdMsgModulo = null;
-          throw e;
-        });
-      }
-      return pdMsgModulo;
-    }
-
     async function registarPush(user) {
       try {
-        if (!('serviceWorker' in navigator) || !('Notification' in window) || !('PushManager' in window)) return;
-        const moduloP = carregarMessaging();
-        moduloP.catch(() => {});
+        if (!('serviceWorker' in navigator) || !('Notification' in window)) return;
+        const m = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js');
+        if (!(await m.isSupported())) return;
         if (Notification.permission !== 'granted') {
           const p = await Notification.requestPermission();
-          if (p !== 'granted') { atualizarBannerNotif(); return; }
+          if (p !== 'granted') return;
         }
-        const m = await moduloP;
-        if (!(await m.isSupported())) return;
         const reg = await navigator.serviceWorker.register('firebase-messaging-sw.js', {
           scope: '/firebase-cloud-messaging-push-scope'
         });
@@ -5733,6 +5720,7 @@
               return;
             }
             const d = payload.data || {};
+            // A validade é aplicada pelo FCM (cabeçalho TTL); não comparamos com o relógio do aparelho.
             const opcoes = {
               body: d.corpo || '',
               icon: '/logo.png',
@@ -5754,32 +5742,9 @@
       } catch (e) {
         console.log('Push register error: ' + (e && e.message ? e.message : e));
       }
-      atualizarBannerNotif();
     }
 
-    function atualizarBannerNotif() {
-      let html = '';
-      if ('Notification' in window) {
-        if (Notification.permission === 'default') {
-          html = '<div style="padding:12px 14px;margin-bottom:12px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;font-size:14px;">'
-            + '🔔 As notificações do navegador estão desligadas, por isso não recebes avisos fora do site.'
-            + '<button type="button" class="custom-modal-btn primary" style="width:100%;margin-top:10px;padding:12px;" onclick="ativarNotificacoesAgora(this)">Ativar notificações</button></div>';
-        } else if (Notification.permission === 'denied') {
-          html = '<div style="padding:12px 14px;margin-bottom:12px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;font-size:14px;">'
-            + '🔕 As notificações estão bloqueadas neste navegador. Para ativar: toca no ícone à esquerda do endereço → <b>Definições do site</b> → <b>Notificações</b> → Permitir.</div>';
-        }
-      }
-      document.querySelectorAll('.notif-perm-banner').forEach((el) => { el.innerHTML = html; });
-    }
-    function ativarNotificacoesAgora(btn) {
-      if (!currentUser || currentUser.isAnonymous) {
-        showCustomAlert('Entra com a tua conta para ativar as notificações.');
-        return;
-      }
-      if (btn) { btn.disabled = true; btn.textContent = 'A ativar...'; }
-      registarPush(currentUser);
-    }
-
+    // ---- Preferências de avisos por tipo ----
     function openNotifPrefsModal() {
       closeSidebar();
       if (!currentUser || currentUser.isAnonymous) {
@@ -5793,7 +5758,6 @@
           <input type="checkbox" data-tipo="${t.id}" ${prefs[t.id] ? 'checked' : ''} onchange="mudarPrefNotif(this)" style="width:20px;height:20px;">
         </label>
       `).join('');
-      atualizarBannerNotif();
       document.getElementById('notifPrefsModal').classList.add('active');
     }
     function closeNotifPrefsModal() {
@@ -5813,6 +5777,7 @@
       }
     }
 
+    // Pergunta em português antes do pedido do navegador (que vem no idioma do aparelho).
     function mostrarPedidoNotificacoes(user) {
       if (document.getElementById('notifPedidoModal')) return;
       const modal = document.createElement('div');
@@ -5841,57 +5806,22 @@
       });
     }
 
-    function mostrarAvisoBloqueio() {
-      if (document.getElementById('notifBloqueioModal')) return;
-      try { window['localStorage'].setItem('pdNotifBloqEm', String(Date.now())); } catch (e) {}
-      const modal = document.createElement('div');
-      modal.className = 'custom-modal active';
-      modal.id = 'notifBloqueioModal';
-      modal.innerHTML = `
-        <div class="custom-modal-content" style="max-width: 380px; text-align: center;">
-          <div style="font-size: 44px; margin-bottom: 8px;">🔕</div>
-          <h2>Notificações bloqueadas</h2>
-          <p style="font-size: 14px;">Para receber avisos de conteúdo novo, permite as notificações deste site:</p>
-          <p style="font-size: 14px; text-align: left; margin: 8px 0 0;">1. Toca no ícone à esquerda do endereço<br>2. <b>Definições do site</b> → <b>Notificações</b><br>3. Escolhe <b>Permitir</b> e volta ao site</p>
-          <div class="custom-modal-buttons" style="margin-top: 16px;">
-            <button class="custom-modal-btn primary" style="width: 100%; padding: 13px;" onclick="document.getElementById('notifBloqueioModal').remove()">Entendi</button>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(modal);
-    }
-
     function iniciarPush(user) {
       try {
         if (!('Notification' in window)) return;
-        if (Notification.permission === 'denied') {
-          if (pushEsperaToque) return;
-          let ultimoBloq = 0;
-          try { ultimoBloq = Number(window['localStorage'].getItem('pdNotifBloqEm')) || 0; } catch (e) {}
-          if (Date.now() - ultimoBloq < 3 * 24 * 3600 * 1000) return;
-          pushEsperaToque = true;
-          const aoToqueBloq = () => {
-            setTimeout(() => {
-              if (typeof isAnyModalOpen === 'function' && isAnyModalOpen()) return;
-              document.removeEventListener('click', aoToqueBloq);
-              pushEsperaToque = false;
-              mostrarAvisoBloqueio();
-            }, 400);
-          };
-          document.addEventListener('click', aoToqueBloq);
-          return;
-        }
-        carregarMessaging().catch(() => {});
+        if (Notification.permission === 'denied') return;
         if (Notification.permission === 'granted') {
           registarPush(user);
           return;
         }
         if (pushEsperaToque) return;
+        // Não insiste: se o usuário disse "Agora não", só volta a perguntar passados 3 dias.
         let ultimo = 0;
         try { ultimo = Number(window['localStorage'].getItem('pdNotifPedidoEm')) || 0; } catch (e) {}
         if (Date.now() - ultimo < 3 * 24 * 3600 * 1000) return;
         pushEsperaToque = true;
         const aoToque = () => {
+          // Se o toque abriu outra janela, espera pelo próximo toque.
           setTimeout(() => {
             if (typeof isAnyModalOpen === 'function' && isAnyModalOpen()) return;
             document.removeEventListener('click', aoToque);
@@ -7024,7 +6954,7 @@
           await setDoc(doc(firestore, 'games', editId), gameData);
           if (document.getElementById('notifyUpdate').checked) {
             sendPush('🔄 Conteúdo atualizado', gameData.titulo + ' foi atualizado', null, {
-              link: SITE_URL + '/web.html?id=' + editId,
+              link: SITE_URL + '/?id=' + editId,
               imagem: /^https:\/\//.test(gameData.poster || '') ? gameData.poster : '',
               tipo: gameData.type,
               tag: 'atualizado-' + editId,
@@ -7035,7 +6965,7 @@
         } else {
           const novoDoc = await addDoc(collection(firestore, 'games'), gameData);
           sendPush(NOTIF_TITULOS[gameData.type] || '🎮 Novo no Portal Digital', gameData.titulo, null, {
-            link: SITE_URL + '/web.html?id=' + novoDoc.id,
+            link: SITE_URL + '/?id=' + novoDoc.id,
             imagem: /^https:\/\//.test(gameData.poster || '') ? gameData.poster : '',
             tipo: gameData.type,
             tag: 'novo-conteudo',
@@ -8664,7 +8594,6 @@
       }
     }
     function openNotificationsModal() {
-      atualizarBannerNotif();
       document.getElementById('notificationsModal').classList.add('active');
       renderNotifications();
     }
@@ -10371,6 +10300,7 @@
       }
     }
 
+    // Tocar numa notificação com a página já aberta: abre o conteúdo sem recarregar.
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.addEventListener('message', (event) => {
         const d = event.data || {};
@@ -10380,6 +10310,7 @@
           u = new URL(d.url);
         } catch (e) { return; }
         if (u.origin !== window.location.origin) return;
+        // Confirma logo ao service worker que a página recebeu o pedido (senão ele abre uma janela nova).
         try { if (event.ports && event.ports[0]) event.ports[0].postMessage('ok'); } catch (e) {}
         (async () => {
           try {
@@ -10391,6 +10322,7 @@
               if (ov && ov.classList.contains('active')) return;
             }
           } catch (e) {}
+          // Não abriu por aqui: carrega o link normalmente (o mesmo caminho de um link partilhado).
           window.location.href = d.url;
         })();
       });
@@ -11840,6 +11772,7 @@
 </div>
 
 <script>
+  // Banner do app: "Instalar" = nunca mais aparece; "✕" = some durante 24h
   (function () {
     var K_INST = 'pdBannerAppInstalou';
     var K_FECHOU = 'pdBannerAppFechouEm';
