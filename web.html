@@ -5633,7 +5633,6 @@
       try { window['localStorage'].setItem('pdNotifPrefs', JSON.stringify(prefs)); } catch (e) {}
     }
 
-    // extra: texto (link) ou objeto { link, imagem, tipo, tag, validadeHoras }
     async function sendPush(title, message, targetUserId, extra) {
       try {
         if (!currentUser) return null;
@@ -5666,7 +5665,6 @@
       }
     }
 
-    // Aviso de pontos recebidos (enviado pelo administrador ao usuário que recebeu).
     function avisarPontosRecebidos(uidDestino, pontos, motivo) {
       if (!uidDestino || !pontos) return;
       sendPush('🎁 Pontos recebidos', '+' + pontos + ' pontos ' + motivo, uidDestino, {
@@ -5676,7 +5674,6 @@
       });
     }
 
-    // O módulo do Firebase Messaging é carregado uma só vez e pode ser aquecido antes de o usuário tocar.
     let pdMsgModulo = null;
     function carregarMessaging() {
       if (!pdMsgModulo) {
@@ -5691,8 +5688,6 @@
     async function registarPush(user) {
       try {
         if (!('serviceWorker' in navigator) || !('Notification' in window) || !('PushManager' in window)) return;
-        // Começa a carregar o módulo já, mas NÃO espera por ele antes de pedir a permissão:
-        // o pedido tem de sair logo, enquanto o toque do usuário ainda conta.
         const moduloP = carregarMessaging();
         moduloP.catch(() => {});
         if (Notification.permission !== 'granted') {
@@ -5738,7 +5733,6 @@
               return;
             }
             const d = payload.data || {};
-            // A validade é aplicada pelo FCM (cabeçalho TTL); não comparamos com o relógio do aparelho.
             const opcoes = {
               body: d.corpo || '',
               icon: '/logo.png',
@@ -5763,7 +5757,6 @@
       atualizarBannerNotif();
     }
 
-    // ---- Aviso nas janelas de notificações quando o navegador ainda não permitiu ----
     function atualizarBannerNotif() {
       let html = '';
       if ('Notification' in window) {
@@ -5787,7 +5780,6 @@
       registarPush(currentUser);
     }
 
-    // ---- Preferências de avisos por tipo ----
     function openNotifPrefsModal() {
       closeSidebar();
       if (!currentUser || currentUser.isAnonymous) {
@@ -5821,7 +5813,6 @@
       }
     }
 
-    // Pergunta em português antes do pedido do navegador (que vem no idioma do aparelho).
     function mostrarPedidoNotificacoes(user) {
       if (document.getElementById('notifPedidoModal')) return;
       const modal = document.createElement('div');
@@ -5850,23 +5841,57 @@
       });
     }
 
+    function mostrarAvisoBloqueio() {
+      if (document.getElementById('notifBloqueioModal')) return;
+      try { window['localStorage'].setItem('pdNotifBloqEm', String(Date.now())); } catch (e) {}
+      const modal = document.createElement('div');
+      modal.className = 'custom-modal active';
+      modal.id = 'notifBloqueioModal';
+      modal.innerHTML = `
+        <div class="custom-modal-content" style="max-width: 380px; text-align: center;">
+          <div style="font-size: 44px; margin-bottom: 8px;">🔕</div>
+          <h2>Notificações bloqueadas</h2>
+          <p style="font-size: 14px;">Para receber avisos de conteúdo novo, permite as notificações deste site:</p>
+          <p style="font-size: 14px; text-align: left; margin: 8px 0 0;">1. Toca no ícone à esquerda do endereço<br>2. <b>Definições do site</b> → <b>Notificações</b><br>3. Escolhe <b>Permitir</b> e volta ao site</p>
+          <div class="custom-modal-buttons" style="margin-top: 16px;">
+            <button class="custom-modal-btn primary" style="width: 100%; padding: 13px;" onclick="document.getElementById('notifBloqueioModal').remove()">Entendi</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+
     function iniciarPush(user) {
       try {
         if (!('Notification' in window)) return;
-        if (Notification.permission === 'denied') return;
-        carregarMessaging().catch(() => {}); // aquece o módulo para o pedido sair rápido
+        if (Notification.permission === 'denied') {
+          if (pushEsperaToque) return;
+          let ultimoBloq = 0;
+          try { ultimoBloq = Number(window['localStorage'].getItem('pdNotifBloqEm')) || 0; } catch (e) {}
+          if (Date.now() - ultimoBloq < 3 * 24 * 3600 * 1000) return;
+          pushEsperaToque = true;
+          const aoToqueBloq = () => {
+            setTimeout(() => {
+              if (typeof isAnyModalOpen === 'function' && isAnyModalOpen()) return;
+              document.removeEventListener('click', aoToqueBloq);
+              pushEsperaToque = false;
+              mostrarAvisoBloqueio();
+            }, 400);
+          };
+          document.addEventListener('click', aoToqueBloq);
+          return;
+        }
+        carregarMessaging().catch(() => {});
         if (Notification.permission === 'granted') {
           registarPush(user);
           return;
         }
         if (pushEsperaToque) return;
-        // Não insiste: se o usuário disse "Agora não", só volta a perguntar passados 3 dias.
         let ultimo = 0;
         try { ultimo = Number(window['localStorage'].getItem('pdNotifPedidoEm')) || 0; } catch (e) {}
         if (Date.now() - ultimo < 3 * 24 * 3600 * 1000) return;
         pushEsperaToque = true;
         const aoToque = () => {
-          // Se o toque abriu outra janela, espera pelo próximo toque.
           setTimeout(() => {
             if (typeof isAnyModalOpen === 'function' && isAnyModalOpen()) return;
             document.removeEventListener('click', aoToque);
@@ -10346,7 +10371,6 @@
       }
     }
 
-    // Tocar numa notificação com a página já aberta: abre o conteúdo sem recarregar.
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.addEventListener('message', (event) => {
         const d = event.data || {};
@@ -10356,7 +10380,6 @@
           u = new URL(d.url);
         } catch (e) { return; }
         if (u.origin !== window.location.origin) return;
-        // Confirma logo ao service worker que a página recebeu o pedido (senão ele abre uma janela nova).
         try { if (event.ports && event.ports[0]) event.ports[0].postMessage('ok'); } catch (e) {}
         (async () => {
           try {
@@ -10368,7 +10391,6 @@
               if (ov && ov.classList.contains('active')) return;
             }
           } catch (e) {}
-          // Não abriu por aqui: carrega o link normalmente (o mesmo caminho de um link partilhado).
           window.location.href = d.url;
         })();
       });
@@ -11818,7 +11840,6 @@
 </div>
 
 <script>
-  // Banner do app: "Instalar" = nunca mais aparece; "✕" = some durante 24h
   (function () {
     var K_INST = 'pdBannerAppInstalou';
     var K_FECHOU = 'pdBannerAppFechouEm';
