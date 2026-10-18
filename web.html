@@ -2585,7 +2585,6 @@
     .favorites-item-remove:hover {
       opacity: 1;
     }
-
     
     .auth-overlay {
       position: fixed;
@@ -4379,7 +4378,6 @@
 </head>
 <body>
 
-  
   <div class="auth-overlay" id="auth-overlay">
     <div class="auth-overlay-content">
       <div class="auth-overlay-header">
@@ -4431,7 +4429,7 @@
         </div>
       </div>
       <div class="buttons-container">
-        <a href="https://www.mediafire.com/file/nj4zgph4ekr85lr/Portal+Digital+1.0.apk/file" target="_blank" class="btn btn-primary" id="install-btn1">
+        <a href="https://portaldigital.vercel.app/portal-digital.apk" target="_blank" class="btn btn-primary" id="install-btn1">
           <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
           </svg>
@@ -5625,7 +5623,6 @@
       try { window['localStorage'].setItem('pdNotifPrefs', JSON.stringify(prefs)); } catch (e) {}
     }
 
-    // extra: texto (link) ou objeto { link, imagem, tipo, tag, validadeHoras }
     async function sendPush(title, message, targetUserId, extra) {
       try {
         if (!currentUser) return null;
@@ -5658,7 +5655,6 @@
       }
     }
 
-    // Aviso de pontos recebidos (enviado pelo administrador ao usuário que recebeu).
     function avisarPontosRecebidos(uidDestino, pontos, motivo) {
       if (!uidDestino || !pontos) return;
       sendPush('🎁 Pontos recebidos', '+' + pontos + ' pontos ' + motivo, uidDestino, {
@@ -5739,7 +5735,6 @@
       }
     }
 
-    // ---- Preferências de avisos por tipo ----
     function openNotifPrefsModal() {
       closeSidebar();
       if (!currentUser || currentUser.isAnonymous) {
@@ -5772,7 +5767,6 @@
       }
     }
 
-    // Pergunta em português antes do pedido do navegador (que vem no idioma do aparelho).
     function mostrarPedidoNotificacoes(user) {
       if (document.getElementById('notifPedidoModal')) return;
       const modal = document.createElement('div');
@@ -5810,13 +5804,11 @@
           return;
         }
         if (pushEsperaToque) return;
-        // Não insiste: se o usuário disse "Agora não", só volta a perguntar passados 3 dias.
         let ultimo = 0;
         try { ultimo = Number(window['localStorage'].getItem('pdNotifPedidoEm')) || 0; } catch (e) {}
         if (Date.now() - ultimo < 3 * 24 * 3600 * 1000) return;
         pushEsperaToque = true;
         const aoToque = () => {
-          // Se o toque abriu outra janela, espera pelo próximo toque.
           setTimeout(() => {
             if (typeof isAnyModalOpen === 'function' && isAnyModalOpen()) return;
             document.removeEventListener('click', aoToque);
@@ -10281,7 +10273,6 @@
       }
     }
 
-    // Tocar numa notificação com a página já aberta: abre o conteúdo sem recarregar.
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.addEventListener('message', (event) => {
         const d = event.data || {};
@@ -11733,10 +11724,33 @@
     </div>
   </div>
   <div class="bfa-acoes">
-    <button class="bfa-instalar" onclick="window.open('https://www.mediafire.com/file/nj4zgph4ekr85lr/Portal+Digital+1.0.apk/file', '_blank')">Instalar</button>
-    <button class="bfa-close" onclick="document.getElementById('bannerFixoApp').style.display='none'">✕</button>
+    <button class="bfa-instalar" onclick="bfaInstalar()">Instalar</button>
+    <button class="bfa-close" onclick="bfaFechar()">✕</button>
   </div>
 </div>
+
+<script>
+  (function () {
+    var K_INST = 'pdBannerAppInstalou';
+    var K_FECHOU = 'pdBannerAppFechouEm';
+    var el = document.getElementById('bannerFixoApp');
+    function ler(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+    function gravar(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+    var fechou = parseInt(ler(K_FECHOU) || '0', 10);
+    if (ler(K_INST) === '1' || (fechou && Date.now() - fechou < 24 * 60 * 60 * 1000)) {
+      el.style.display = 'none';
+    }
+    window.bfaInstalar = function () {
+      gravar(K_INST, '1');
+      el.style.display = 'none';
+      window.open('https://portaldigital.vercel.app/portal-digital.apk', '_blank');
+    };
+    window.bfaFechar = function () {
+      gravar(K_FECHOU, String(Date.now()));
+      el.style.display = 'none';
+    };
+  })();
+</script>
 
 <script>
   const bfaVantagens = [
@@ -11759,6 +11773,4 @@
 </script>
 </body>
 </html>
-
-
 
