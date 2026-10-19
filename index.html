@@ -14065,6 +14065,13 @@ async function cvLoadList() {
     });
     cvItems.sort((a, b) => (a.points || 0) - (b.points || 0) || (a.value || 0) - (b.value || 0) || (a.createdAt || 0) - (b.createdAt || 0));
     if (isPublisher && cvItems.length) await cvSweepUsed();
+    cvHidden = {};
+    if (isPublisher && currentUser) {
+      try {
+        const hs = await get(ref(window.firebaseDatabase, "cartoesOcultos/" + currentUser.uid));
+        if (hs.exists()) cvHidden = hs.val() || {};
+      } catch (e) {}
+    }
   } catch (e) {
     box.innerHTML = '<div class="cv-empty">N\u00e3o foi poss\u00edvel carregar os cart\u00f5es.</div>';
     return;
@@ -14088,6 +14095,7 @@ async function cvSweepUsed() {
           if (!v.used) livre = true;
         }
       });
+      c.estado = achou ? (livre ? "livre" : "usado") : "nd";
       if (achou && !livre) gone.push(c.id);
     } catch (e) {}
   }));
@@ -14100,9 +14108,11 @@ async function cvSweepUsed() {
 function cvRender() {
   const box = document.getElementById("cvList");
   if (!box) return;
-  const items = cvItems.filter(cvPass);
+  const nOcultos = isPublisher ? cvItems.filter((c) => cvHidden[c.id]).length : 0;
+  const items = cvItems.filter(cvPass).filter((c) => !isPublisher || cvShowHidden || !cvHidden[c.id]);
+  const bar = nOcultos ? `<div class="pn-pts-foot" style="margin-bottom:10px"><button class="pn-chip" onclick="cvToggleHidden()">${cvShowHidden ? "Esconder ocultos" : "Mostrar ocultos (" + nOcultos + ")"}</button></div>` : "";
   if (!items.length) {
-    box.innerHTML = '<div class="cv-empty">' + (cvItems.length ? "Nenhum cart\u00e3o com esse filtro." : "Nenhum cart\u00e3o dispon\u00edvel no momento.") + '</div>';
+    box.innerHTML = bar + '<div class="cv-empty">' + (cvItems.length ? "Nenhum cart\u00e3o para mostrar." : "Nenhum cart\u00e3o dispon\u00edvel no momento.") + '</div>';
     return;
   }
   const chat = '<svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>';
@@ -14110,12 +14120,15 @@ function cvRender() {
     const id = String(c.id).replace(/[^A-Za-z0-9_-]/g, "");
     const last3 = String(c.last3 || "").replace(/\D/g, "").slice(-3);
     const pts = Number(c.points) || 0;
-    const admin = isPublisher ? `<div class="pn-pts-foot"><button class="pn-chip" onclick="cvReleaseAsk('${id}')">${PN_ICONS.check}Liberar</button><button class="pn-chip pn-del" onclick="cvRemove('${id}')">${PN_ICONS.trash}Remover</button></div>` : "";
+    const hid = isPublisher && !!cvHidden[c.id];
+    const admin = isPublisher ? `<div class="pn-pts-foot"><button class="pn-chip" onclick="cvReleaseAsk('${id}')">${PN_ICONS.check}Liberar</button><button class="pn-chip" onclick="cvHideListing('${id}', ${hid ? "false" : "true"})">${hid ? "Mostrar" : "Ocultar"}</button><button class="pn-chip pn-del" onclick="cvRemove('${id}')">${PN_ICONS.trash}Remover</button></div>` : "";
+    const estado = isPublisher ? '<div class="cv-badge">' + (c.estado === "livre" ? "N\u00e3o usado" : "N\u00e3o verificado") + '</div>' + (hid ? '<div class="cv-badge">Oculto s\u00f3 para si</div>' : "") : "";
     return `<div class="pn-card pn-points cv-card" style="--i:${i}">
       <div class="pn-pts-in">
         <div class="pn-pts-head"><span>${PN_ICONS.gift}Cart\u00e3o de pontos</span><span class="pn-time">${formatTimeAgo(c.createdAt || Date.now())}</span></div>
         <div class="pn-pts-amount"><b>+${pts.toLocaleString("pt-PT")}</b><small>pontos</small></div>
         <div class="cv-val">Valor <strong>${cvKz(c.value)}</strong></div>
+        ${estado}
         <div class="cv-sep"></div>
         <div class="pn-code"><em>C\u00f3digo</em><code>${cvMask(last3)}</code></div>
         <div class="cv-actions"><button class="pn-btn pn-main" onclick="cvBuy('${id}')">${chat}Comprar</button></div>
@@ -14123,6 +14136,21 @@ function cvRender() {
       </div>
     </div>`;
   }).join("");
+  box.innerHTML = bar + box.innerHTML;
+}
+let cvHidden = {}, cvShowHidden = false;
+function cvToggleHidden() { cvShowHidden = !cvShowHidden; cvRender(); }
+async function cvHideListing(id, ocultar) {
+  if (!isPublisher || !currentUser) return;
+  try {
+    const { ref, set, remove } = window.firebaseModules;
+    const r = ref(window.firebaseDatabase, "cartoesOcultos/" + currentUser.uid + "/" + id);
+    if (ocultar) { await set(r, true); cvHidden[id] = true; }
+    else { await remove(r); delete cvHidden[id]; }
+    cvRender();
+  } catch (e) {
+    showCustomAlert("Erro: " + (e && (e.code || e.message) || "tente novamente"));
+  }
 }
 function cvBuy(id) {
   if (!currentUser || currentUser.isAnonymous) { showSignupPrompt("comprar pontos"); return; }
