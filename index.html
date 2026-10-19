@@ -625,7 +625,6 @@ window.firebaseModules = {
     .req-stat b { display: block; font-size: 19px; font-weight: 800; line-height: 1.1; }
     .req-stat small { font-size: 10.5px; font-weight: 600; opacity: 0.92; }
 
-    /* Pedidos: cabeçalho compacto e lista com scroll */
     .requests-overlay .req-hero { margin: 8px 16px 0; padding: 9px 12px; border-radius: 14px; gap: 10px; box-shadow: 0 4px 12px rgba(29, 78, 216, 0.2); }
     .requests-overlay .req-hero::after { display: none; }
     .requests-overlay .req-hero-txt strong { font-size: 14px; margin-bottom: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -646,6 +645,15 @@ window.firebaseModules = {
     .req-sort { flex-shrink: 0; height: 36px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-secondary); font: 600 12.5px 'Inter', sans-serif; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
     .req-sort.on { color: var(--accent-primary); border-color: var(--accent-primary); }
     .req-sort svg { width: 15px; height: 15px; fill: currentColor; }
+    .req-back { display: none; flex-shrink: 0; width: 36px; height: 36px; align-items: center; justify-content: center; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    .req-back svg { width: 20px; height: 20px; fill: currentColor; }
+    .req-back:active { transform: scale(0.94); }
+    .requests-overlay.req-searching .content-header,
+    .requests-overlay.req-searching .req-hero,
+    .requests-overlay.req-searching .req-tabs,
+    .requests-overlay.req-searching .req-compose { display: none; }
+    .requests-overlay.req-searching .req-back { display: inline-flex; }
+    .requests-overlay.req-searching .req-tools { margin-top: calc(10px + env(safe-area-inset-top, 0px)); }
     .req-chips { flex-shrink: 0; display: flex; gap: 6px; overflow-x: auto; margin: 6px 16px 0; padding-bottom: 2px; -webkit-overflow-scrolling: touch; }
     .req-chips::-webkit-scrollbar { display: none; }
     .req-chip { flex-shrink: 0; border: 1px solid var(--border-color); background: transparent; color: var(--text-secondary); border-radius: 999px; padding: 4px 12px; font: 600 12px 'Inter', sans-serif; cursor: pointer; white-space: nowrap; -webkit-tap-highlight-color: transparent; }
@@ -10923,9 +10931,10 @@ window.firebaseModules = {
         <button class="req-tab" data-f="meus" onclick="setRequestsFilter('meus')">Meus <i class="req-count" data-c="meus">0</i></button>
       </div>
       <div class="req-tools">
+        <button type="button" class="req-back" id="reqSearchBack" onclick="reqExitSearch()" aria-label="Voltar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
         <div class="req-search">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-          <input id="reqSearch" type="search" placeholder="Procurar pedidos..." autocomplete="off" oninput="reqSetQuery(this.value)">
+          <input id="reqSearch" type="search" placeholder="Procurar pedidos..." autocomplete="off" onfocus="reqEnterSearch()" oninput="reqSetQuery(this.value)">
         </div>
         <button type="button" class="req-sort" id="reqSortBtn" onclick="reqToggleSort()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18h6v-2H3v2zM3 6v2h18V6H3zm0 7h12v-2H3v2z"/></svg><span id="reqSortLbl">Recentes</span></button>
       </div>
@@ -22273,6 +22282,7 @@ function openRequestsOverlay() {
   setTimeout(ppMaybePromptSetup, 700);
 }
 function closeRequestsOverlay() {
+  try { reqExitSearch(); } catch (e) {}
   document.getElementById("requestsOverlay").classList.remove("active");
   document.body.style.overflow = "";
   reqUnsubscribe();
@@ -22341,6 +22351,18 @@ function reqVoteCount(id) { const v = reqVotes[id]; return v ? Object.keys(v).le
 function reqHasVoted(id) { const v = reqVotes[id]; return !!(v && currentUser && v[currentUser.uid]); }
 function reqCanVote(id, r) { return !!currentUser && !currentUser.isAnonymous && reqIsVerified() && reqIsOpen(r) && r.authorId !== currentUser.uid; }
 const REQ_ICON_UP = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg>';
+function reqEnterSearch() {
+  const o = document.getElementById("requestsOverlay");
+  if (o) o.classList.add("req-searching");
+}
+function reqExitSearch() {
+  const o = document.getElementById("requestsOverlay");
+  if (o) o.classList.remove("req-searching");
+  const i = document.getElementById("reqSearch");
+  if (i) { i.value = ""; i.blur(); }
+  reqQuery = "";
+  renderRequests();
+}
 function reqSetQuery(v) { reqQuery = v || ""; renderRequests(); }
 function reqSetTypeF(t) {
   reqTypeF = t;
@@ -22466,7 +22488,7 @@ function renderRequests() {
     const hasGame = r.gameId && allGames && allGames[r.gameId];
     const content = hasGame ? '<button class="req-action-btn ok" onclick="reqOpenContent(\'' + reqEsc(r.gameId) + '\')">Ver conteúdo</button>' : "";
     let reply = "";
-    if (r.resposta) reply = '<div class="req-reply"><b>Resposta do ADM</b><span>' + reqEsc(r.resposta) + '</span></div>';
+    if (r.resposta) reply = '<div class="req-reply"><b>' + (r.respondidoPor ? "Resposta de " + reqEsc(r.respondidoPor) : "Resposta do ADM") + '</b><span>' + reqEsc(r.resposta) + '</span></div>';
     else if (r.gameTitulo) reply = '<div class="req-reply"><b>Disponível em</b><span>' + reqEsc(r.gameTitulo) + '</span></div>';
     const chip = stKey === "atendido"
       ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>' + st.l
@@ -22595,6 +22617,8 @@ function reqOpenReply(id) {
         gameId: gid || null,
         gameTitulo: g ? (g.titulo || null) : null,
         respondidoEm: status === "aberto" ? null : agora,
+        respondidoPor: status === "aberto" ? null : String(userName || (currentUser && currentUser.displayName) || ((currentUser && currentUser.email) || "").split("@")[0] || "Administrador").slice(0, 100),
+        respondidoPorId: status === "aberto" ? null : (currentUser ? currentUser.uid : null),
         atendidoEm: status === "atendido" ? agora : null
       });
       modal.remove();
