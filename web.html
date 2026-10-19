@@ -5776,6 +5776,14 @@
           <div id="cvMine" class="cv-list"></div>
         </div>
 
+        <div class="cv-section" id="cvHistSection" style="display:none">
+          <div class="cv-head">
+            <h4>Cartões usados</h4>
+            <p>Histórico dos cartões que já resgatou. Toque em Ocultar para tirar da lista.</p>
+          </div>
+          <div id="cvHist" class="cv-list"></div>
+        </div>
+
         <div class="cv-section">
           <div class="cv-head">
             <h4>Cartões disponíveis</h4>
@@ -10437,12 +10445,38 @@ async function cvLoadList() {
       if (v && v.points > 0) cvItems.push({ id: c.key, ...v });
     });
     cvItems.sort((a, b) => (a.points || 0) - (b.points || 0) || (a.value || 0) - (b.value || 0) || (a.createdAt || 0) - (b.createdAt || 0));
+    if (isPublisher && cvItems.length) await cvSweepUsed();
   } catch (e) {
     box.innerHTML = '<div class="cv-empty">N\u00e3o foi poss\u00edvel carregar os cart\u00f5es.</div>';
     return;
   }
   cvRender();
   cvLoadMine();
+}
+async function cvSweepUsed() {
+  const { ref, get, update, rtdbQuery, orderByChild, equalTo } = window.firebaseModules;
+  const db = window.firebaseDatabase;
+  const gone = [];
+  await Promise.all(cvItems.map(async (c) => {
+    try {
+      const last3 = String(c.last3 || "");
+      const q = await get(rtdbQuery(ref(db, "codes"), orderByChild("createdAt"), equalTo(c.createdAt)));
+      let achou = false, livre = false;
+      q.forEach((x) => {
+        const v = x.val();
+        if (v && String(x.key).slice(-3) === last3 && v.points === c.points && v.value === c.value) {
+          achou = true;
+          if (!v.used) livre = true;
+        }
+      });
+      if (achou && !livre) gone.push(c.id);
+    } catch (e) {}
+  }));
+  if (!gone.length) return;
+  const updates = {};
+  gone.forEach((id) => { updates["cartoesVenda/" + id] = null; });
+  try { await update(ref(db), updates); } catch (e) {}
+  cvItems = cvItems.filter((c) => gone.indexOf(c.id) < 0);
 }
 function cvRender() {
   const box = document.getElementById("cvList");
@@ -10538,12 +10572,80 @@ async function cvLoadMine() {
       }));
     }
     list.sort((a, b) => (a.usado - b.usado) || (a.points || 0) - (b.points || 0) || (a.liberadoEm || 0) - (b.liberadoEm || 0));
-    cvMineItems = list;
+    cvMineItems = list.filter((x) => !x.usado);
   } catch (e) {
     sec.style.display = "none";
     return;
   }
   cvRenderMine();
+  cvLoadHist();
+}
+let cvHistItems = [];
+async function cvLoadHist() {
+  const sec = document.getElementById("cvHistSection");
+  if (!sec) return;
+  if (!currentUser || currentUser.isAnonymous) { sec.style.display = "none"; return; }
+  try {
+    const { ref, get } = window.firebaseModules;
+    const db = window.firebaseDatabase;
+    const uid = currentUser.uid;
+    const rs = await Promise.all([
+      get(ref(db, "codeRedemptions/" + uid)).catch(() => null),
+      get(ref(db, "cartoesLiberados/" + uid)).catch(() => null),
+      get(ref(db, "cartoesOcultos/" + uid)).catch(() => null)
+    ]);
+    const red = rs[0], lib = rs[1], oc = rs[2];
+    const ocultos = oc && oc.exists() ? (oc.val() || {}) : {};
+    const info = {};
+    if (lib && lib.exists()) lib.forEach((c) => { const v = c.val(); if (v && v.code) info[v.code] = v; });
+    const out = [];
+    if (red && red.exists()) red.forEach((r) => {
+      if (ocultos[r.key]) return;
+      const v = r.val() || {};
+      const l = info[r.key] || {};
+      out.push({ code: r.key, points: Number(v.pointsAwarded) || Number(l.points) || 0, value: l.value, at: Number(v.redeemedAt) || 0 });
+    });
+    out.sort((a, b) => b.at - a.at);
+    cvHistItems = out;
+  } catch (e) {
+    cvHistItems = [];
+  }
+  cvRenderHist();
+}
+function cvRenderHist() {
+  const sec = document.getElementById("cvHistSection");
+  const box = document.getElementById("cvHist");
+  if (!sec || !box) return;
+  if (!cvHistItems.length) { sec.style.display = "none"; box.innerHTML = ""; return; }
+  sec.style.display = "";
+  box.innerHTML = cvHistItems.map((h, i) => {
+    const code = pnEsc(String(h.code).replace(/[^0-9A-Za-z_-]/g, ""));
+    const quando = h.at ? new Date(h.at).toLocaleDateString("pt-PT") : "";
+    return `<div class="pn-card pn-points cv-card cv-used" style="--i:${i}">
+      <div class="pn-pts-in">
+        <div class="pn-pts-head"><span>${PN_ICONS.gift}Cartão de pontos</span><span class="pn-time">${quando}</span></div>
+        <div class="pn-pts-amount"><b>+${h.points.toLocaleString("pt-PT")}</b><small>pontos</small></div>
+        ${h.value ? '<div class="cv-val">Valor <strong>' + cvKz(h.value) + '</strong></div>' : ""}
+        <div class="cv-badge used">${PN_ICONS.check}Usado</div>
+        <div class="cv-sep"></div>
+        <div class="pn-code"><em>Código</em><code>${cvMask(code.slice(-3))}</code></div>
+        <div class="pn-pts-foot"><button class="pn-chip pn-del" onclick="cvHideHist('${code}', this)">${PN_ICONS.trash}Ocultar</button></div>
+      </div>
+    </div>`;
+  }).join("");
+}
+async function cvHideHist(code, btn) {
+  if (!currentUser || currentUser.isAnonymous) return;
+  if (btn) btn.disabled = true;
+  try {
+    const { ref, set } = window.firebaseModules;
+    await set(ref(window.firebaseDatabase, "cartoesOcultos/" + currentUser.uid + "/" + code), true);
+    cvHistItems = cvHistItems.filter((h) => String(h.code) !== code);
+    cvRenderHist();
+  } catch (e) {
+    if (btn) btn.disabled = false;
+    showCustomAlert("N\u00e3o foi poss\u00edvel ocultar: " + (e && (e.code || e.message) || "tente novamente"));
+  }
 }
 function cvRenderMine() {
   const sec = document.getElementById("cvMineSection");
@@ -10551,7 +10653,7 @@ function cvRenderMine() {
   if (!sec || !box) return;
   document.getElementById("cvMineTitle").textContent = isPublisher ? "Cartões liberados" : "Meus cartões";
   document.getElementById("cvMineDesc").textContent = isPublisher
-    ? "Cartões liberados para utilizadores. Use Retirar para ocultá-los."
+    ? "Cartões liberados para utilizadores. Quando o utilizador resgata, o cartão sai daqui. Use Retirar para o devolver à lista de venda."
     : "Cartões liberados para a sua conta depois do pagamento. Toque em Resgatar para receber os pontos.";
   if (!cvMineItems.length) { sec.style.display = "none"; return; }
   sec.style.display = "";

@@ -6713,6 +6713,12 @@ window.firebaseModules = {
     .pdp-rec-item { flex: 0 0 84px; cursor: pointer; text-align: center; }
     .pdp-rec-item img { width: 84px; height: 84px; object-fit: cover; border-radius: 14px; background: var(--bg-secondary); display: block; }
     .pdp-rec-item span { display: block; font-size: 11px; color: var(--text-secondary); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pdp-cartao { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 0; border-top: 1px solid var(--border-color); }
+    .pdp-cartao:first-child { border-top: 0; padding-top: 0; }
+    .pdp-cartao-info { min-width: 0; }
+    .pdp-cartao-info b { display: block; font-size: 14px; color: var(--text-primary); }
+    .pdp-cartao-info span { display: block; font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .pdp-cartao-ocultar { flex-shrink: 0; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-secondary); border-radius: 10px; padding: 7px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
     .pdp-vazio { font-size: 13px; color: var(--text-muted); text-align: center; padding: 6px 0; }
     .profile-avatar-svg.pdp-frame-azul { border-color: #3b82f6 !important; box-shadow: 0 0 14px rgba(59,130,246,.65) !important; }
     .profile-avatar-svg.pdp-frame-esmeralda { border-color: #10b981 !important; box-shadow: 0 0 14px rgba(16,185,129,.65) !important; }
@@ -14058,12 +14064,38 @@ async function cvLoadList() {
       if (v && v.points > 0) cvItems.push({ id: c.key, ...v });
     });
     cvItems.sort((a, b) => (a.points || 0) - (b.points || 0) || (a.value || 0) - (b.value || 0) || (a.createdAt || 0) - (b.createdAt || 0));
+    if (isPublisher && cvItems.length) await cvSweepUsed();
   } catch (e) {
     box.innerHTML = '<div class="cv-empty">N\u00e3o foi poss\u00edvel carregar os cart\u00f5es.</div>';
     return;
   }
   cvRender();
   cvLoadMine();
+}
+async function cvSweepUsed() {
+  const { ref, get, update, rtdbQuery, orderByChild, equalTo } = window.firebaseModules;
+  const db = window.firebaseDatabase;
+  const gone = [];
+  await Promise.all(cvItems.map(async (c) => {
+    try {
+      const last3 = String(c.last3 || "");
+      const q = await get(rtdbQuery(ref(db, "codes"), orderByChild("createdAt"), equalTo(c.createdAt)));
+      let achou = false, livre = false;
+      q.forEach((x) => {
+        const v = x.val();
+        if (v && String(x.key).slice(-3) === last3 && v.points === c.points && v.value === c.value) {
+          achou = true;
+          if (!v.used) livre = true;
+        }
+      });
+      if (achou && !livre) gone.push(c.id);
+    } catch (e) {}
+  }));
+  if (!gone.length) return;
+  const updates = {};
+  gone.forEach((id) => { updates["cartoesVenda/" + id] = null; });
+  try { await update(ref(db), updates); } catch (e) {}
+  cvItems = cvItems.filter((c) => gone.indexOf(c.id) < 0);
 }
 function cvRender() {
   const box = document.getElementById("cvList");
@@ -14159,7 +14191,7 @@ async function cvLoadMine() {
       }));
     }
     list.sort((a, b) => (a.usado - b.usado) || (a.points || 0) - (b.points || 0) || (a.liberadoEm || 0) - (b.liberadoEm || 0));
-    cvMineItems = list;
+    cvMineItems = list.filter((x) => !x.usado);
   } catch (e) {
     sec.style.display = "none";
     return;
@@ -14172,7 +14204,7 @@ function cvRenderMine() {
   if (!sec || !box) return;
   document.getElementById("cvMineTitle").textContent = isPublisher ? "Cartões liberados" : "Meus cartões";
   document.getElementById("cvMineDesc").textContent = isPublisher
-    ? "Cartões liberados para utilizadores. Use Retirar para ocultá-los."
+    ? "Cartões liberados para utilizadores. Quando o utilizador resgata, o cartão sai daqui. Use Retirar para o devolver à lista de venda."
     : "Cartões liberados para a sua conta depois do pagamento. Toque em Resgatar para receber os pontos.";
   if (!cvMineItems.length) { sec.style.display = "none"; return; }
   sec.style.display = "";
@@ -16986,6 +17018,28 @@ function pdpAplicar(container, uid, nivelNum) {
   const box = container.querySelector("#pdpIdBox");
   if (box) box.style.display = (cfg.user || cfg.bio) ? "flex" : "none";
 }
+async function pdCartoesHist(uid) {
+  const { ref, get } = window.firebaseModules;
+  const db = window.firebaseDatabase;
+  const rs = await Promise.all([
+    get(ref(db, "codeRedemptions/" + uid)).catch(() => null),
+    get(ref(db, "cartoesLiberados/" + uid)).catch(() => null),
+    get(ref(db, "cartoesOcultos/" + uid)).catch(() => null)
+  ]);
+  const red = rs[0], lib = rs[1], oc = rs[2];
+  const ocultos = oc && oc.exists() ? (oc.val() || {}) : {};
+  const info = {};
+  if (lib && lib.exists()) lib.forEach((c) => { const v = c.val(); if (v && v.code) info[v.code] = v; });
+  const out = [];
+  if (red && red.exists()) red.forEach((r) => {
+    if (ocultos[r.key]) return;
+    const v = r.val() || {};
+    const l = info[r.key] || {};
+    out.push({ code: r.key, points: Number(v.pointsAwarded) || Number(l.points) || 0, value: l.value, at: Number(v.redeemedAt) || 0 });
+  });
+  out.sort((a, b) => b.at - a.at);
+  return out;
+}
 function pdPrefetch(user) {
   const { ref, get } = window.firebaseModules;
   const db = window.firebaseDatabase;
@@ -17001,6 +17055,7 @@ async function pdEnhanceProfile(container, user, createdAtMs, pre) {
     const dados = await (pre || pdPrefetch(user));
     if (dados.last) pdpRegistrarDia(dados.last, uid);
     const claims = dados.claims || [];
+    const histCart = await pdCartoesHist(uid).catch(() => []);
     const card = container.querySelector(".profile-header-card");
     if (!card || container.querySelector("[data-pdp]")) return;
     const unicos = Array.from(new Set(claims.map((c) => c.gameId)));
@@ -17054,9 +17109,11 @@ async function pdEnhanceProfile(container, user, createdAtMs, pre) {
     const cardConq = '<div class="pdp-card" data-pdp="1"><h3>Conquistas <small>' + feitas + "/" + conq.length + '</small></h3><div class="pdp-ach">' + achHtml + "</div></div>";
     const recHtml = rec.length ? '<div class="pdp-rec">' + rec.map((r) => '<div class="pdp-rec-item" data-gid="' + escapeHtml(r.id) + '"><img src="' + escapeHtml(r.g.poster || "") + '" alt="" loading="lazy"><span>' + escapeHtml(r.g.titulo || "") + "</span></div>").join("") + "</div>" : '<div class="pdp-vazio">Ainda não baixou nada.</div>';
     const cardRec = '<div class="pdp-card" data-pdp="1"><h3>Últimos downloads</h3>' + recHtml + "</div>";
+    const cartHtml = histCart.map((h) => '<div class="pdp-cartao" data-code="' + escapeHtml(h.code) + '"><div class="pdp-cartao-info"><b>+' + h.points.toLocaleString("pt-PT") + ' pontos</b><span>' + (h.value ? cvKz(h.value) + " · " : "") + cvMask(String(h.code).slice(-3)) + (h.at ? " · " + new Date(h.at).toLocaleDateString("pt-PT") : "") + '</span></div><button type="button" class="pdp-cartao-ocultar">Ocultar</button></div>').join("");
+    const cardCart = histCart.length ? '<div class="pdp-card" data-pdp="1" id="pdpCartCard"><h3>Cartões usados <small>' + histCart.length + '</small></h3><div>' + cartHtml + '</div><div class="pdp-xp-dica">Ocultar só tira o cartão desta lista.</div></div>' : "";
 
     const cardNudge = ppProfileIncomplete(uid) ? '<div class="pdp-card pp-nudge" data-pdp="1"><div class="pp-nudge-t">Complete o seu perfil</div><div class="pp-nudge-d">' + ppNudgeText(uid) + '</div><button type="button" class="custom-modal-btn primary" onclick="ppNudgeAction()">Completar agora</button></div>' : "";
-    card.insertAdjacentHTML("afterend", cardNudge + cardNivel + cardStats + cardPers + cardConq + cardRec);
+    card.insertAdjacentHTML("afterend", cardNudge + cardNivel + cardStats + cardPers + cardConq + cardRec + cardCart);
     const fill = container.querySelector("#pdpXpFill");
     if (fill) setTimeout(() => { fill.style.width = nv.pct + "%"; }, 60);
 
@@ -17081,6 +17138,25 @@ async function pdEnhanceProfile(container, user, createdAtMs, pre) {
       marcar(".pdp-frame-op", "data-mold", m.id);
     }));
     container.querySelectorAll(".pdp-rec-item").forEach((el) => el.addEventListener("click", () => { closeProfileOverlay(); openGameDetail(el.getAttribute("data-gid")); }));
+    container.querySelectorAll(".pdp-cartao-ocultar").forEach((b) => b.addEventListener("click", async () => {
+      const item = b.closest(".pdp-cartao");
+      const code = item.getAttribute("data-code");
+      b.disabled = true;
+      try {
+        const { ref, set } = window.firebaseModules;
+        await set(ref(window.firebaseDatabase, "cartoesOcultos/" + uid + "/" + code), true);
+        item.remove();
+        const left = container.querySelectorAll(".pdp-cartao").length;
+        const cc = container.querySelector("#pdpCartCard");
+        if (cc) {
+          if (!left) cc.remove();
+          else { const sm = cc.querySelector("h3 small"); if (sm) sm.textContent = left; }
+        }
+      } catch (e) {
+        b.disabled = false;
+        showCustomAlert("N\u00e3o foi poss\u00edvel ocultar: " + (e && (e.code || e.message) || "tente novamente"));
+      }
+    }));
   } catch (e) {}
 }
 function getDefaultAvatarSVG() {
