@@ -14360,6 +14360,7 @@ async function cvRelease(id, email) {
   };
   updates["cartoesVenda/" + id] = null;
   await update(ref(db), updates);
+  sendPush("\uD83C\uDF81 Cart\u00E3o liberado", "Um cart\u00E3o de " + c.points + " pontos foi liberado para si. Veja em Resgatar Pontos.", uid, { tag: "cartao-liberado", validadeHoras: 72 });
   return "Cartão liberado para " + pnEsc(email) + ". Ele já aparece em Resgatar Pontos > Meus cartões.";
 }
 function cvDeleteMine(id, uid) {
@@ -14533,6 +14534,7 @@ async function sendCodeToUser() {
       createdBy: currentUser ? currentUser.email : null,
       createdAt: Date.now()
     });
+    sendPush("\uD83C\uDF81 Voc\u00EA recebeu " + g.points + " pontos!", "Abra o Portal Digital para resgatar o seu c\u00F3digo.", uid, { tag: "codigo-pontos", validadeHoras: 72 });
     if (g.listingId) {
       try { await window.firebaseModules.remove(ref(window.firebaseDatabase, "cartoesVenda/" + g.listingId)); } catch (e) {}
     }
@@ -16352,6 +16354,7 @@ async function approveUser(userId) {
       allUsers[userId].status = "approved";
       allUsers[userId].points = currentPoints + 100;
       renderUsersList();
+      sendPush("\u2705 Conta aprovada", "A sua conta foi verificada e recebeu 100 pontos de b\u00F3nus.", userId, { tag: "conta-aprovada", validadeHoras: 72 });
       showCustomAlert("Usu\xE1rio aprovado com sucesso! +100 pontos de b\xF4nus concedidos.");
     } catch (error) {
       showCustomAlert("Erro ao aprovar usu\xE1rio: " + error.message);
@@ -17083,10 +17086,9 @@ async function pdCartoesHist(uid) {
   if (lib && lib.exists()) lib.forEach((c) => { const v = c.val(); if (v && v.code) info[v.code] = v; });
   const out = [];
   if (red && red.exists()) red.forEach((r) => {
-    if (ocultos[r.key]) return;
     const v = r.val() || {};
     const l = info[r.key] || {};
-    out.push({ code: r.key, points: Number(v.pointsAwarded) || Number(l.points) || 0, value: l.value, at: Number(v.redeemedAt) || 0 });
+    out.push({ code: r.key, points: Number(v.pointsAwarded) || Number(l.points) || 0, value: l.value, at: Number(v.redeemedAt) || 0, hid: !!ocultos[r.key] });
   });
   out.sort((a, b) => b.at - a.at);
   return out;
@@ -17098,6 +17100,37 @@ function pdPrefetch(user) {
   const last = get(ref(db, "dailyRewardClaims/" + uid + "/lastClaimedAt")).then((s) => (s.exists() ? s.val() : null)).catch(() => null);
   const claims = get(ref(db, "downloadClaims/" + uid)).then((s) => (s.exists() ? Object.values(s.val()).filter((c) => c && c.gameId) : [])).catch(() => (userDownloadedIds || []).map((id) => ({ gameId: id })));
   return Promise.all([last, claims]).then((r) => ({ last: r[0], claims: r[1] }));
+}
+let pdpShowHidCart = false;
+function pdRenderCart(container, uid, list) {
+  const cc = container.querySelector("#pdpCartCard");
+  if (!cc) return;
+  const nHid = list.filter((h) => h.hid).length;
+  const vis = list.filter((h) => pdpShowHidCart || !h.hid);
+  const nVis = list.length - nHid;
+  const itens = vis.map((h) => '<div class="pdp-cartao" data-code="' + escapeHtml(h.code) + '"' + (h.hid ? ' style="opacity:.6"' : "") + '><div class="pdp-cartao-info"><b>+' + h.points.toLocaleString("pt-PT") + ' pontos</b><span>' + (h.value ? cvKz(h.value) + " \u00b7 " : "") + cvMask(String(h.code).slice(-3)) + (h.at ? " \u00b7 " + new Date(h.at).toLocaleDateString("pt-PT") : "") + (h.hid ? " \u00b7 Oculto" : "") + '</span></div><button type="button" class="pdp-cartao-ocultar" data-act="' + (h.hid ? "mostrar" : "ocultar") + '">' + (h.hid ? "Mostrar" : "Ocultar") + '</button></div>').join("");
+  const vazio = !vis.length ? '<div class="pdp-vazio">Nenhum cart\u00e3o vis\u00edvel.</div>' : "";
+  const barra = nHid ? '<div style="margin-top:10px"><button type="button" class="pdp-cartao-ocultar" id="pdpCartToggle">' + (pdpShowHidCart ? "Esconder ocultos" : "Ver ocultos (" + nHid + ")") + '</button></div>' : "";
+  cc.innerHTML = '<h3>Cart\u00f5es usados <small>' + nVis + '</small></h3><div>' + itens + vazio + '</div>' + barra + '<div class="pdp-xp-dica">Ocultar s\u00f3 tira o cart\u00e3o desta lista. Pode v\u00ea-lo de novo em "Ver ocultos".</div>';
+  const tg = cc.querySelector("#pdpCartToggle");
+  if (tg) tg.addEventListener("click", () => { pdpShowHidCart = !pdpShowHidCart; pdRenderCart(container, uid, list); });
+  cc.querySelectorAll(".pdp-cartao .pdp-cartao-ocultar").forEach((b) => b.addEventListener("click", async () => {
+    const item = b.closest(".pdp-cartao");
+    const code = item.getAttribute("data-code");
+    const ocultar = b.getAttribute("data-act") === "ocultar";
+    b.disabled = true;
+    try {
+      const { ref, set, remove } = window.firebaseModules;
+      const r = ref(window.firebaseDatabase, "cartoesOcultos/" + uid + "/" + code);
+      if (ocultar) await set(r, true); else await remove(r);
+      const h = list.find((x) => x.code === code);
+      if (h) h.hid = ocultar;
+      pdRenderCart(container, uid, list);
+    } catch (e) {
+      b.disabled = false;
+      showCustomAlert("N\u00e3o foi poss\u00edvel atualizar: " + (e && (e.code || e.message) || "tente novamente"));
+    }
+  }));
 }
 async function pdEnhanceProfile(container, user, createdAtMs, pre) {
   try {
@@ -17160,8 +17193,7 @@ async function pdEnhanceProfile(container, user, createdAtMs, pre) {
     const cardConq = '<div class="pdp-card" data-pdp="1"><h3>Conquistas <small>' + feitas + "/" + conq.length + '</small></h3><div class="pdp-ach">' + achHtml + "</div></div>";
     const recHtml = rec.length ? '<div class="pdp-rec">' + rec.map((r) => '<div class="pdp-rec-item" data-gid="' + escapeHtml(r.id) + '"><img src="' + escapeHtml(r.g.poster || "") + '" alt="" loading="lazy"><span>' + escapeHtml(r.g.titulo || "") + "</span></div>").join("") + "</div>" : '<div class="pdp-vazio">Ainda não baixou nada.</div>';
     const cardRec = '<div class="pdp-card" data-pdp="1"><h3>Últimos downloads</h3>' + recHtml + "</div>";
-    const cartHtml = histCart.map((h) => '<div class="pdp-cartao" data-code="' + escapeHtml(h.code) + '"><div class="pdp-cartao-info"><b>+' + h.points.toLocaleString("pt-PT") + ' pontos</b><span>' + (h.value ? cvKz(h.value) + " · " : "") + cvMask(String(h.code).slice(-3)) + (h.at ? " · " + new Date(h.at).toLocaleDateString("pt-PT") : "") + '</span></div><button type="button" class="pdp-cartao-ocultar">Ocultar</button></div>').join("");
-    const cardCart = histCart.length ? '<div class="pdp-card" data-pdp="1" id="pdpCartCard"><h3>Cartões usados <small>' + histCart.length + '</small></h3><div>' + cartHtml + '</div><div class="pdp-xp-dica">Ocultar só tira o cartão desta lista.</div></div>' : "";
+    const cardCart = histCart.length ? '<div class="pdp-card" data-pdp="1" id="pdpCartCard"></div>' : "";
 
     const cardNudge = ppProfileIncomplete(uid) ? '<div class="pdp-card pp-nudge" data-pdp="1"><div class="pp-nudge-t">Complete o seu perfil</div><div class="pp-nudge-d">' + ppNudgeText(uid) + '</div><button type="button" class="custom-modal-btn primary" onclick="ppNudgeAction()">Completar agora</button></div>' : "";
     card.insertAdjacentHTML("afterend", cardNudge + cardNivel + cardStats + cardPers + cardConq + cardRec + cardCart);
@@ -17189,25 +17221,7 @@ async function pdEnhanceProfile(container, user, createdAtMs, pre) {
       marcar(".pdp-frame-op", "data-mold", m.id);
     }));
     container.querySelectorAll(".pdp-rec-item").forEach((el) => el.addEventListener("click", () => { closeProfileOverlay(); openGameDetail(el.getAttribute("data-gid")); }));
-    container.querySelectorAll(".pdp-cartao-ocultar").forEach((b) => b.addEventListener("click", async () => {
-      const item = b.closest(".pdp-cartao");
-      const code = item.getAttribute("data-code");
-      b.disabled = true;
-      try {
-        const { ref, set } = window.firebaseModules;
-        await set(ref(window.firebaseDatabase, "cartoesOcultos/" + uid + "/" + code), true);
-        item.remove();
-        const left = container.querySelectorAll(".pdp-cartao").length;
-        const cc = container.querySelector("#pdpCartCard");
-        if (cc) {
-          if (!left) cc.remove();
-          else { const sm = cc.querySelector("h3 small"); if (sm) sm.textContent = left; }
-        }
-      } catch (e) {
-        b.disabled = false;
-        showCustomAlert("N\u00e3o foi poss\u00edvel ocultar: " + (e && (e.code || e.message) || "tente novamente"));
-      }
-    }));
+    pdRenderCart(container, uid, histCart);
   } catch (e) {}
 }
 function getDefaultAvatarSVG() {
@@ -18937,6 +18951,7 @@ async function handleTransferToIndividual(amount) {
     const notificationsRef = ref(database, "notifications");
     const newNotificationRef = push(notificationsRef);
     await set(newNotificationRef, notificationData);
+    sendPush("\uD83C\uDF81 Voc\u00EA recebeu pontos!", amount + " pontos foram transferidos para si. Novo saldo: " + recipientNewPoints + " pontos.", recipientUid, { tag: "transferencia", validadeHoras: 72 });
     updateUserInfoDisplay();
     showCustomAlert(`Transfer\xEAncia realizada com sucesso!
 ${amount} pontos enviados para ${recipientEmail}.
@@ -18977,6 +18992,7 @@ async function executeMassTransfer(amount) {
     const senderName = currentUser.displayName || currentUser.email.split("@")[0];
     let successCount = 0;
     let errorCount = 0;
+    const pushUids = [];
     for (const user of allUsersForTransfer) {
       try {
         const newPoints = user.points + amount;
@@ -18996,12 +19012,18 @@ async function executeMassTransfer(amount) {
         const newNotificationRef = push(notificationsRef);
         await set(newNotificationRef, notificationData);
         successCount++;
+        pushUids.push(user.uid);
         submitBtn.textContent = `Transferindo... (${successCount}/${allUsersForTransfer.length})`;
       } catch (err) {
         console.error(`Erro ao transferir para ${user.email}:`, err);
         errorCount++;
       }
     }
+    (async () => {
+      for (let i = 0; i < pushUids.length; i += 5) {
+        await Promise.all(pushUids.slice(i, i + 5).map((u) => sendPush("\uD83C\uDF81 Voc\u00EA recebeu " + amount + " pontos!", "O Portal Digital distribuiu pontos aos usu\u00E1rios verificados.", u, { tag: "transferencia", validadeHoras: 72 })));
+      }
+    })();
     updateUserInfoDisplay();
     if (errorCount === 0) {
       showCustomAlert(`Transfer\xEAncia em massa conclu\xEDda com sucesso!
