@@ -14139,7 +14139,7 @@ function cvRender() {
   box.innerHTML = bar + box.innerHTML;
 }
 let cvHidden = {}, cvShowHidden = false;
-function cvToggleHidden() { cvShowHidden = !cvShowHidden; cvRender(); }
+function cvToggleHidden() { cvShowHidden = !cvShowHidden; cvRender(); cvRenderMine(); }
 async function cvHideListing(id, ocultar) {
   if (!isPublisher || !currentUser) return;
   try {
@@ -14148,6 +14148,7 @@ async function cvHideListing(id, ocultar) {
     if (ocultar) { await set(r, true); cvHidden[id] = true; }
     else { await remove(r); delete cvHidden[id]; }
     cvRender();
+    cvRenderMine();
   } catch (e) {
     showCustomAlert("Erro: " + (e && (e.code || e.message) || "tente novamente"));
   }
@@ -14209,7 +14210,7 @@ async function cvLoadMine() {
       const snap = await get(ref(db, "cartoesLiberados"));
       snap.forEach((u) => { u.forEach((c) => { const v = c.val(); if (v && v.code) list.push({ id: c.key, uid: u.key, ...v }); }); });
       await Promise.all(list.map(async (x) => {
-        try { x.usado = !!(await get(ref(db, "codeRedemptions/" + x.uid + "/" + x.code))).exists() || !!(await get(ref(db, "codes/" + x.code + "/used"))).val(); } catch (e) { x.usado = false; }
+        try { x.usado = !!(await get(ref(db, "codes/" + x.code + "/used"))).val(); } catch (e) { x.usado = false; }
       }));
     } else {
       const snap = await get(ref(db, "cartoesLiberados/" + currentUser.uid));
@@ -14236,19 +14237,22 @@ function cvRenderMine() {
     : "Cartões liberados para a sua conta depois do pagamento. Toque em Resgatar para receber os pontos.";
   if (!cvMineItems.length) { sec.style.display = "none"; return; }
   sec.style.display = "";
-  const mine = cvMineItems.filter(cvPass);
-  if (!mine.length) { box.innerHTML = '<div class="cv-empty">Nenhum cart\u00e3o com esse filtro.</div>'; return; }
+  const nOcM = isPublisher ? cvMineItems.filter((c) => cvHidden[c.id]).length : 0;
+  const mine = cvMineItems.filter(cvPass).filter((c) => !isPublisher || cvShowHidden || !cvHidden[c.id]);
+  const barM = nOcM ? `<div class="pn-pts-foot" style="margin-bottom:10px"><button class="pn-chip" onclick="cvToggleHidden()">${cvShowHidden ? "Esconder ocultos" : "Mostrar ocultos (" + nOcM + ")"}</button></div>` : "";
+  if (!mine.length) { box.innerHTML = barM + '<div class="cv-empty">Nenhum cart\u00e3o para mostrar.</div>'; return; }
   box.innerHTML = mine.map((c, i) => {
     const id = pnEsc(String(c.id).replace(/[^A-Za-z0-9_-]/g, ""));
     const code = String(c.code).replace(/\D/g, "");
     const pts = Number(c.points) || 0;
     const usado = !!c.usado;
+    const hid = isPublisher && !!cvHidden[c.id];
     const badge = usado ? '<div class="cv-badge used">' + PN_ICONS.check + 'Usado</div>' : "";
-    const who = isPublisher ? '<div class="cv-badge">' + pnEsc(c.email || c.uid) + '</div>' : "";
+    const who = isPublisher ? '<div class="cv-badge">' + pnEsc(c.email || c.uid) + '</div><div class="cv-badge">N\u00e3o usado</div>' + (hid ? '<div class="cv-badge">Oculto s\u00f3 para si</div>' : "") : "";
     const act = usado || isPublisher
       ? ""
       : `<div class="cv-actions"><button class="pn-btn pn-main" onclick="cvRedeemMine('${id}', this)">${PN_ICONS.star}Resgatar</button><button class="pn-btn pn-ghost" onclick="cvCopyMine('${id}', this)">${PN_ICONS.copy}Copiar código</button></div>`;
-    const adm = isPublisher ? `<div class="pn-pts-foot"><button class="pn-chip pn-del" onclick="cvRetire('${id}', '${pnEsc(c.uid)}')">${PN_ICONS.trash}Retirar</button></div>` : "";
+    const adm = isPublisher ? `<div class="pn-pts-foot"><button class="pn-chip" onclick="cvRetire('${id}', '${pnEsc(c.uid)}')">Retirar</button><button class="pn-chip" onclick="cvHideListing('${id}', ${hid ? "false" : "true"})">${hid ? "Mostrar" : "Ocultar"}</button><button class="pn-chip pn-del" onclick="cvDeleteMine('${id}', '${pnEsc(c.uid)}')">${PN_ICONS.trash}Apagar</button></div>` : "";
     return `<div class="pn-card pn-points cv-card ${usado ? "cv-used" : ""}" style="--i:${i}">
       <div class="pn-pts-in">
         <div class="pn-pts-head"><span>${PN_ICONS.gift}Cartão de pontos</span><span class="pn-time">${formatTimeAgo(c.liberadoEm || Date.now())}</span></div>
@@ -14261,6 +14265,7 @@ function cvRenderMine() {
       </div>
     </div>`;
   }).join("");
+  box.innerHTML = barM + box.innerHTML;
 }
 function cvMineFind(id) {
   return cvMineItems.find((x) => String(x.id).replace(/[^A-Za-z0-9_-]/g, "") === id);
@@ -14356,6 +14361,24 @@ async function cvRelease(id, email) {
   updates["cartoesVenda/" + id] = null;
   await update(ref(db), updates);
   return "Cartão liberado para " + pnEsc(email) + ". Ele já aparece em Resgatar Pontos > Meus cartões.";
+}
+function cvDeleteMine(id, uid) {
+  if (!isPublisher) return;
+  const c = cvMineItems.find((x) => String(x.id).replace(/[^A-Za-z0-9_-]/g, "") === id && x.uid === uid);
+  if (!c) return;
+  showCustomConfirm("Apagar este cart\u00e3o? O cart\u00e3o e o c\u00f3digo s\u00e3o eliminados e n\u00e3o poder\u00e3o mais ser resgatados.", async () => {
+    try {
+      const { ref, update } = window.firebaseModules;
+      const updates = {};
+      updates["cartoesLiberados/" + uid + "/" + c.id] = null;
+      updates["codes/" + c.code] = null;
+      updates["cartoesVenda/" + c.id] = null;
+      await update(ref(window.firebaseDatabase), updates);
+      cvLoadList();
+    } catch (e) {
+      showCustomAlert("Erro ao apagar: " + (e && (e.code || e.message) || "tente novamente"));
+    }
+  });
 }
 function cvRetire(id, uid) {
   if (!isPublisher) return;
