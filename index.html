@@ -625,6 +625,58 @@ window.firebaseModules = {
     .req-stat b { display: block; font-size: 19px; font-weight: 800; line-height: 1.1; }
     .req-stat small { font-size: 10.5px; font-weight: 600; opacity: 0.92; }
 
+    /* Pedidos: cabeçalho compacto e lista com scroll */
+    .requests-overlay .req-hero { margin: 8px 16px 0; padding: 9px 12px; border-radius: 14px; gap: 10px; box-shadow: 0 4px 12px rgba(29, 78, 216, 0.2); }
+    .requests-overlay .req-hero::after { display: none; }
+    .requests-overlay .req-hero-txt strong { font-size: 14px; margin-bottom: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .requests-overlay .req-hero-txt span { display: block; font-size: 11px; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .requests-overlay .req-hero-stats { gap: 6px; }
+    .requests-overlay .req-stat { min-width: 48px; padding: 4px 8px; border-radius: 10px; }
+    .requests-overlay .req-stat b { font-size: 15px; }
+    .requests-overlay .req-stat small { font-size: 9.5px; }
+    .requests-overlay .req-tabs { margin-top: 8px; }
+    .requests-overlay .favorites-list-container { min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: 12px 16px; }
+    .requests-overlay .favorites-list-container > * { flex-shrink: 0; }
+    .requests-overlay .req-compose { gap: 8px; padding-top: 8px; }
+
+    .req-tools { flex-shrink: 0; display: flex; gap: 8px; margin: 8px 16px 0; }
+    .req-search { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; padding: 0 10px; height: 36px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; }
+    .req-search svg { width: 17px; height: 17px; fill: var(--text-muted); flex-shrink: 0; }
+    .req-search input { flex: 1; min-width: 0; border: none; outline: none; background: transparent; color: var(--text-primary); font: 13.5px 'Inter', sans-serif; }
+    .req-sort { flex-shrink: 0; height: 36px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-secondary); font: 600 12.5px 'Inter', sans-serif; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    .req-sort.on { color: var(--accent-primary); border-color: var(--accent-primary); }
+    .req-sort svg { width: 15px; height: 15px; fill: currentColor; }
+    .req-chips { flex-shrink: 0; display: flex; gap: 6px; overflow-x: auto; margin: 6px 16px 0; padding-bottom: 2px; -webkit-overflow-scrolling: touch; }
+    .req-chips::-webkit-scrollbar { display: none; }
+    .req-chip { flex-shrink: 0; border: 1px solid var(--border-color); background: transparent; color: var(--text-secondary); border-radius: 999px; padding: 4px 12px; font: 600 12px 'Inter', sans-serif; cursor: pointer; white-space: nowrap; -webkit-tap-highlight-color: transparent; }
+    .req-chip.active { background: var(--accent-primary); border-color: var(--accent-primary); color: var(--bg-primary); }
+    .req-foot-l { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; min-width: 0; }
+    .req-vote { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-secondary); border-radius: 999px; padding: 5px 11px; font: 600 12px 'Inter', sans-serif; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    .req-vote svg { width: 14px; height: 14px; fill: currentColor; }
+    .req-vote:active { transform: scale(0.96); }
+    .req-vote.on { background: var(--accent-primary); border-color: var(--accent-primary); color: var(--bg-primary); }
+    .req-vote.static { cursor: default; background: transparent; }
+    .req-reply { padding: 8px 12px; border-radius: 12px; background: rgba(29, 78, 216, 0.08); border-left: 3px solid var(--accent-primary); display: flex; flex-direction: column; gap: 2px; font-size: 13px; line-height: 1.4; color: var(--text-primary); word-break: break-word; }
+    .req-reply b { font-size: 10.5px; color: var(--accent-primary); text-transform: uppercase; letter-spacing: .04em; }
+    .req-status.st-analise { background: rgba(59, 130, 246, 0.16); color: #1d4ed8; }
+    .req-status.st-existe { background: rgba(139, 92, 246, 0.16); color: #6d28d9; }
+    .req-status.st-recusado { background: rgba(239, 68, 68, 0.14); color: #b91c1c; }
+    .dark .req-status.st-analise { color: #93c5fd; }
+    .dark .req-status.st-existe { color: #c4b5fd; }
+    .dark .req-status.st-recusado { color: #fca5a5; }
+    #reqSimilar { display: none; max-height: 132px; overflow-y: auto; padding: 8px 10px; border-radius: 12px; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.35); }
+    .req-sim-t { font-size: 11.5px; font-weight: 700; color: #b45309; margin-bottom: 4px; }
+    .dark .req-sim-t { color: #fbbf24; }
+    .req-sim-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 4px 0; font-size: 12.5px; color: var(--text-primary); }
+    .req-sim-item span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .req-m-lbl { display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin: 0 0 4px; text-align: left; }
+    .req-m-field { width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1.5px solid var(--border-color); border-radius: 12px; background: var(--bg-secondary); color: var(--text-primary); font: 14px 'Inter', sans-serif; margin-bottom: 10px; }
+    .req-m-quote { font-size: 13px; color: var(--text-secondary); background: var(--bg-secondary); padding: 8px 10px; border-radius: 10px; margin: 0 0 10px; word-break: break-word; text-align: left; }
+
+    .cv-hid-bar { display: flex; }
+    .cv-hid-toggle { border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); border-radius: 999px; padding: 7px 14px; font-size: 12.5px; font-weight: 600; font-family: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    .cv-hid-toggle:active { transform: scale(.96); }
+
     .req-tabs, .req-types { display: flex; overflow-x: auto; flex-shrink: 0; -webkit-overflow-scrolling: touch; }
     .req-tabs::-webkit-scrollbar, .req-types::-webkit-scrollbar { display: none; }
     .req-tab { border: none; background: none; font-family: 'Inter', sans-serif; cursor: pointer; -webkit-tap-highlight-color: transparent; }
@@ -10870,8 +10922,23 @@ window.firebaseModules = {
         <button class="req-tab" data-f="atendidos" onclick="setRequestsFilter('atendidos')">Atendidos <i class="req-count" data-c="atendidos">0</i></button>
         <button class="req-tab" data-f="meus" onclick="setRequestsFilter('meus')">Meus <i class="req-count" data-c="meus">0</i></button>
       </div>
+      <div class="req-tools">
+        <div class="req-search">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          <input id="reqSearch" type="search" placeholder="Procurar pedidos..." autocomplete="off" oninput="reqSetQuery(this.value)">
+        </div>
+        <button type="button" class="req-sort" id="reqSortBtn" onclick="reqToggleSort()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18h6v-2H3v2zM3 6v2h18V6H3zm0 7h12v-2H3v2z"/></svg><span id="reqSortLbl">Recentes</span></button>
+      </div>
+      <div class="req-chips" id="reqChips">
+        <button type="button" class="req-chip active" data-ty="todos" onclick="reqSetTypeF('todos')">Todos</button>
+        <button type="button" class="req-chip" data-ty="Jogo" onclick="reqSetTypeF('Jogo')">Jogo</button>
+        <button type="button" class="req-chip" data-ty="App" onclick="reqSetTypeF('App')">App</button>
+        <button type="button" class="req-chip" data-ty="Tutorial" onclick="reqSetTypeF('Tutorial')">Tutorial</button>
+        <button type="button" class="req-chip" data-ty="Outro" onclick="reqSetTypeF('Outro')">Outro</button>
+      </div>
       <div id="requestsList" class="favorites-list-container"></div>
       <div class="req-compose">
+        <div id="reqSimilar"></div>
         <div class="req-types" id="reqTypes">
           <button class="req-tab t-jogo active" data-t="Jogo" onclick="setRequestType('Jogo')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>Jogo</button>
           <button class="req-tab t-app" data-t="App" onclick="setRequestType('App')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>App</button>
@@ -14110,7 +14177,7 @@ function cvRender() {
   if (!box) return;
   const nOcultos = isPublisher ? cvItems.filter((c) => cvHidden[c.id]).length : 0;
   const items = cvItems.filter(cvPass).filter((c) => !isPublisher || cvShowHidden || !cvHidden[c.id]);
-  const bar = nOcultos ? `<div class="pn-pts-foot" style="margin-bottom:10px"><button class="pn-chip" onclick="cvToggleHidden()">${cvShowHidden ? "Esconder ocultos" : "Mostrar ocultos (" + nOcultos + ")"}</button></div>` : "";
+  const bar = nOcultos ? `<div class="cv-hid-bar"><button type="button" class="cv-hid-toggle" onclick="cvToggleHidden()">${cvShowHidden ? "Esconder ocultos" : "Mostrar ocultos (" + nOcultos + ")"}</button></div>` : "";
   if (!items.length) {
     box.innerHTML = bar + '<div class="cv-empty">' + (cvItems.length ? "Nenhum cart\u00e3o para mostrar." : "Nenhum cart\u00e3o dispon\u00edvel no momento.") + '</div>';
     return;
@@ -14239,7 +14306,7 @@ function cvRenderMine() {
   sec.style.display = "";
   const nOcM = isPublisher ? cvMineItems.filter((c) => cvHidden[c.id]).length : 0;
   const mine = cvMineItems.filter(cvPass).filter((c) => !isPublisher || cvShowHidden || !cvHidden[c.id]);
-  const barM = nOcM ? `<div class="pn-pts-foot" style="margin-bottom:10px"><button class="pn-chip" onclick="cvToggleHidden()">${cvShowHidden ? "Esconder ocultos" : "Mostrar ocultos (" + nOcM + ")"}</button></div>` : "";
+  const barM = nOcM ? `<div class="cv-hid-bar"><button type="button" class="cv-hid-toggle" onclick="cvToggleHidden()">${cvShowHidden ? "Esconder ocultos" : "Mostrar ocultos (" + nOcM + ")"}</button></div>` : "";
   if (!mine.length) { box.innerHTML = barM + '<div class="cv-empty">Nenhum cart\u00e3o para mostrar.</div>'; return; }
   box.innerHTML = mine.map((c, i) => {
     const id = pnEsc(String(c.id).replace(/[^A-Za-z0-9_-]/g, ""));
@@ -22162,6 +22229,12 @@ async function pqAdminSave() {
 </script>
 <script>
 let reqUnsub = null;
+let reqUnsubV = null;
+let reqVotes = {};
+let reqQuery = "";
+let reqTypeF = "todos";
+let reqSort = "recentes";
+const reqVoteBusy = {};
 let reqData = {};
 let reqFilter = "todos";
 let reqTipo = "Jogo";
@@ -22208,6 +22281,8 @@ function closeRequestsOverlay() {
 function reqUnsubscribe() {
   if (typeof reqUnsub === "function") { try { reqUnsub(); } catch (e) {} }
   reqUnsub = null;
+  if (typeof reqUnsubV === "function") { try { reqUnsubV(); } catch (e) {} }
+  reqUnsubV = null;
 }
 function reqSubscribe() {
   reqUnsubscribe();
@@ -22215,6 +22290,10 @@ function reqSubscribe() {
   const list = document.getElementById("requestsList");
   list.innerHTML = '<div class="overlay-empty-state"><p>A carregar pedidos...</p></div>';
   const q = rtdbQuery(ref(window.firebaseDatabase, "pedidos"), limitToLast(REQ_LIMIT));
+  reqUnsubV = onValue(ref(window.firebaseDatabase, "pedidosVotos"), (snap) => {
+    reqVotes = snap.val() || {};
+    renderRequests();
+  }, () => { reqVotes = {}; });
   reqUnsub = onValue(q, (snap) => {
     reqData = snap.val() || {};
     renderRequests();
@@ -22234,6 +22313,7 @@ function setRequestType(t) {
 function reqUpdateCounter() {
   const el = document.getElementById("reqInput");
   document.getElementById("reqCounter").textContent = el.value.length + "/" + REQ_MAX;
+  reqRenderSimilar();
 }
 const REQ_TIPOS = {
   Jogo: { c: "t-jogo", i: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>' },
@@ -22242,16 +22322,103 @@ const REQ_TIPOS = {
   Outro: { c: "t-outro", i: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg>' }
 };
 const reqSeen = new Set();
+const REQ_ST = {
+  aberto: { l: "Em aberto", c: "" },
+  analise: { l: "Em análise", c: "st-analise" },
+  atendido: { l: "Atendido", c: "done" },
+  existe: { l: "Já existe", c: "st-existe" },
+  recusado: { l: "Recusado", c: "st-recusado" }
+};
+const REQ_STOP = new Set(["quero","queria","gostaria","pode","podem","por","favor","para","que","uma","uns","umas","com","sem","dos","das","nos","nas","mais","novo","nova","jogo","app","aplicativo","tutorial","ver","ter","tem","tenha","coloquem","colocar","adicionar","adicionem","como","aqui","portal","digital","pls","the","por favor","gostava","preciso","procuro","isso","esse","essa","num","numa","pro","pra"]);
+function reqSt(r) { return r && REQ_ST[r.status] ? r.status : "aberto"; }
+function reqIsOpen(r) { const x = reqSt(r); return x === "aberto" || x === "analise"; }
+function reqIsDone(r) { const x = reqSt(r); return x === "atendido" || x === "existe"; }
+function reqNorm(t) { return String(t || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim(); }
+function reqWords(t) {
+  return reqNorm(t).split(" ").map((w) => (w.length > 3 && w.endsWith("s") ? w.slice(0, -1) : w)).filter((w) => w.length >= 3 && !REQ_STOP.has(w));
+}
+function reqVoteCount(id) { const v = reqVotes[id]; return v ? Object.keys(v).length : 0; }
+function reqHasVoted(id) { const v = reqVotes[id]; return !!(v && currentUser && v[currentUser.uid]); }
+function reqCanVote(id, r) { return !!currentUser && !currentUser.isAnonymous && reqIsVerified() && reqIsOpen(r) && r.authorId !== currentUser.uid; }
+const REQ_ICON_UP = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg>';
+function reqSetQuery(v) { reqQuery = v || ""; renderRequests(); }
+function reqSetTypeF(t) {
+  reqTypeF = t;
+  document.querySelectorAll("#reqChips .req-chip").forEach((b) => b.classList.toggle("active", b.dataset.ty === t));
+  renderRequests();
+}
+function reqToggleSort() {
+  reqSort = reqSort === "recentes" ? "votos" : "recentes";
+  const l = document.getElementById("reqSortLbl"), b = document.getElementById("reqSortBtn");
+  if (l) l.textContent = reqSort === "votos" ? "Mais pedidos" : "Recentes";
+  if (b) b.classList.toggle("on", reqSort === "votos");
+  renderRequests();
+}
+function reqOpenContent(gid) {
+  if (!gid || !allGames || !allGames[gid]) { showCustomAlert("Este conteúdo não está disponível."); return; }
+  closeRequestsOverlay();
+  openGameDetail(gid);
+}
+async function reqVote(id) {
+  if (!currentUser || currentUser.isAnonymous) { showSignupPrompt("apoiar pedidos"); return; }
+  if (!reqIsVerified()) { showCustomAlert("Sua conta precisa estar verificada para apoiar pedidos."); return; }
+  const r = reqData[id];
+  if (!r || r.authorId === currentUser.uid || reqVoteBusy[id]) return;
+  reqVoteBusy[id] = 1;
+  try {
+    const { ref, set, remove } = window.firebaseModules;
+    const rf = ref(window.firebaseDatabase, "pedidosVotos/" + id + "/" + currentUser.uid);
+    if (reqHasVoted(id)) await remove(rf); else await set(rf, true);
+  } catch (e) {
+    showCustomAlert("Não foi possível apoiar o pedido: " + (e && (e.code || e.message) || "tente novamente"));
+  } finally {
+    delete reqVoteBusy[id];
+  }
+}
+function reqSimilar(text) {
+  const w = new Set(reqWords(text));
+  if (!w.size || String(text).trim().length < 6) return [];
+  const out = [];
+  Object.entries(reqData).forEach(([id, r]) => {
+    if (!r || !r.text || reqSt(r) === "recusado") return;
+    const rw = Array.from(new Set(reqWords(r.text)));
+    if (!rw.length) return;
+    let common = 0;
+    rw.forEach((x) => { if (w.has(x)) common++; });
+    const base = Math.min(w.size, rw.length);
+    const need = base <= 2 ? 1 : 2;
+    const ratio = common / base;
+    if (common >= need && ratio >= 0.5) out.push({ id, r, score: common + ratio });
+  });
+  out.sort((a, b) => b.score - a.score);
+  return out.slice(0, 3);
+}
+function reqRenderSimilar() {
+  const box = document.getElementById("reqSimilar");
+  if (!box) return;
+  const el = document.getElementById("reqInput");
+  const list = el ? reqSimilar(el.value) : [];
+  if (!list.length) { box.style.display = "none"; box.innerHTML = ""; return; }
+  box.style.display = "block";
+  box.innerHTML = '<div class="req-sim-t">Pedidos parecidos. Apoie em vez de repetir:</div>' + list.map((x) => {
+    const r = x.r, id = x.id;
+    let btn = "";
+    if (r.gameId && allGames && allGames[r.gameId]) btn = '<button type="button" class="req-action-btn ok" onclick="reqOpenContent(\'' + reqEsc(r.gameId) + '\')">Ver conteúdo</button>';
+    else if (reqCanVote(id, r)) btn = '<button type="button" class="req-action-btn ok" onclick="reqVote(\'' + reqEsc(id) + '\')">' + (reqHasVoted(id) ? "Apoiado" : "Eu também quero") + '</button>';
+    return '<div class="req-sim-item"><span>' + reqEsc(String(r.text).slice(0, 90)) + '</span>' + btn + '</div>';
+  }).join("");
+}
 function renderRequests() {
   const list = document.getElementById("requestsList");
   if (!list) return;
+  const keepTop = list.scrollTop;
   const uid = currentUser ? currentUser.uid : null;
   const all = Object.entries(reqData).map(([id, r]) => ({ id, ...r })).filter((r) => r && r.text);
   all.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
   const cnt = {
     todos: all.length,
-    abertos: all.filter((r) => r.status !== "atendido").length,
-    atendidos: all.filter((r) => r.status === "atendido").length,
+    abertos: all.filter(reqIsOpen).length,
+    atendidos: all.filter(reqIsDone).length,
     meus: all.filter((r) => uid && r.authorId === uid).length
   };
   document.querySelectorAll("#reqTabs .req-count").forEach((el) => { el.textContent = cnt[el.dataset.c]; });
@@ -22260,16 +22427,24 @@ function renderRequests() {
   if (stOpen) stOpen.textContent = cnt.abertos;
   if (stDone) stDone.textContent = cnt.atendidos;
   let items = all.slice();
-  if (reqFilter === "abertos") items = items.filter((r) => r.status !== "atendido");
-  else if (reqFilter === "atendidos") items = items.filter((r) => r.status === "atendido");
+  if (reqFilter === "abertos") items = items.filter(reqIsOpen);
+  else if (reqFilter === "atendidos") items = items.filter(reqIsDone);
   else if (reqFilter === "meus") items = items.filter((r) => r.authorId === uid);
+  if (reqTypeF !== "todos") items = items.filter((r) => (REQ_TIPOS[r.tipo] ? r.tipo : "Outro") === reqTypeF);
+  const toks = reqNorm(reqQuery).split(" ").filter(Boolean);
+  if (toks.length) items = items.filter((r) => { const hay = reqNorm((r.text || "") + " " + (r.authorName || "") + " " + (r.gameTitulo || "")); return toks.every((t) => hay.indexOf(t) >= 0); });
+  if (reqSort === "votos") items.sort((a, b) => (reqIsOpen(b) - reqIsOpen(a)) || (reqVoteCount(b.id) - reqVoteCount(a.id)) || ((b.timestamp || 0) - (a.timestamp || 0)));
   if (!items.length) {
-    const msg = reqFilter === "meus" ? "Você ainda não fez nenhum pedido." : reqFilter === "atendidos" ? "Ainda não há pedidos atendidos." : "Seja o primeiro a pedir algo!";
+    const filtrado = toks.length || reqTypeF !== "todos";
+    const msg = filtrado ? "Nenhum pedido encontrado com esse filtro." : reqFilter === "meus" ? "Você ainda não fez nenhum pedido." : reqFilter === "atendidos" ? "Ainda não há pedidos atendidos." : "Seja o primeiro a pedir algo!";
     list.innerHTML = '<div class="req-empty"><div class="req-empty-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3H4.99c-1.11 0-1.98.89-1.98 2L3 19c0 1.1.88 2 1.99 2H19c1.1 0 2-.9 2-2V5c0-1.11-.9-2-2-2zm0 12h-4c0 1.66-1.35 3-3 3s-3-1.34-3-3H4.99V5H19v10z"/></svg></div><h3>Nenhum pedido</h3><p>' + msg + '</p></div>';
+    reqRenderSimilar();
     return;
   }
   list.innerHTML = items.map((r) => {
-    const done = r.status === "atendido";
+    const stKey = reqSt(r);
+    const st = REQ_ST[stKey];
+    const closed = !reqIsOpen(r);
     ppSetHint(r.authorId, r.authorName, r.authorAvatar);
     const name = reqEsc(r.authorName || "Usuário");
     const av = reqSafeUrl(r.authorAvatar);
@@ -22279,24 +22454,39 @@ function renderRequests() {
     const id = reqEsc(r.id);
     const canDelete = isPublisher || (uid && r.authorId === uid);
     let actions = "";
-    if (isPublisher) actions += '<button class="req-action-btn' + (done ? "" : " ok") + '" onclick="toggleRequestStatus(\'' + id + '\')">' + (done ? "Reabrir" : "Marcar atendido") + '</button>';
+    if (isPublisher) actions += '<button class="req-action-btn ok" onclick="reqOpenReply(\'' + id + '\')">Responder</button>';
     if (canDelete) actions += '<button class="req-action-btn danger" onclick="deleteRequest(\'' + id + '\')">Apagar</button>';
     const tp = REQ_TIPOS[r.tipo] || REQ_TIPOS.Outro;
     const isNew = !reqSeen.has(r.id);
     reqSeen.add(r.id);
-    return '<div class="req-card ' + tp.c + (done ? " done" : "") + (isNew ? " req-new" : "") + '">' +
+    const n = reqVoteCount(r.id);
+    let vote = "";
+    if (reqCanVote(r.id, r)) vote = '<button class="req-vote' + (reqHasVoted(r.id) ? " on" : "") + '" onclick="reqVote(\'' + id + '\')">' + REQ_ICON_UP + (reqHasVoted(r.id) ? "Apoiado" : "Eu também quero") + (n ? " · " + n : "") + '</button>';
+    else if (n > 0) vote = '<span class="req-vote static">' + REQ_ICON_UP + n + (n === 1 ? " apoio" : " apoios") + '</span>';
+    const hasGame = r.gameId && allGames && allGames[r.gameId];
+    const content = hasGame ? '<button class="req-action-btn ok" onclick="reqOpenContent(\'' + reqEsc(r.gameId) + '\')">Ver conteúdo</button>' : "";
+    let reply = "";
+    if (r.resposta) reply = '<div class="req-reply"><b>Resposta do ADM</b><span>' + reqEsc(r.resposta) + '</span></div>';
+    else if (r.gameTitulo) reply = '<div class="req-reply"><b>Disponível em</b><span>' + reqEsc(r.gameTitulo) + '</span></div>';
+    const chip = stKey === "atendido"
+      ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>' + st.l
+      : st.l;
+    return '<div class="req-card ' + tp.c + (closed ? " done" : "") + (isNew ? " req-new" : "") + '">' +
       '<div class="req-card-top">' +
         '<div class="req-avatar req-click" onclick="openPublicProfile(\'' + reqEsc(r.authorId) + '\')">' + avatar + '</div>' +
         '<div class="req-meta req-click" onclick="openPublicProfile(\'' + reqEsc(r.authorId) + '\')"><div class="req-author">' + name + '</div><div class="req-time">' + formatTimeAgo(r.timestamp || Date.now()) + '</div></div>' +
-        '<span class="req-status' + (done ? " done" : "") + '">' + (done ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Atendido' : "Em aberto") + '</span>' +
+        '<span class="req-status ' + st.c + '">' + chip + '</span>' +
       '</div>' +
       '<div class="req-text">' + reqEsc(r.text) + '</div>' +
+      reply +
       '<div class="req-footer">' +
-        '<span class="req-tipo">' + tp.i + reqEsc(r.tipo || "Outro") + '</span>' +
+        '<div class="req-foot-l"><span class="req-tipo">' + tp.i + reqEsc(r.tipo || "Outro") + '</span>' + vote + content + '</div>' +
         '<div class="req-actions">' + actions + '</div>' +
       '</div>' +
     '</div>';
   }).join("");
+  list.scrollTop = keepTop;
+  reqRenderSimilar();
 }
 async function submitRequest() {
   if (!currentUser || currentUser.isAnonymous) { showSignupPrompt("fazer pedidos"); return; }
@@ -22338,21 +22528,110 @@ function deleteRequest(id) {
     try {
       const { ref, remove } = window.firebaseModules;
       await remove(ref(window.firebaseDatabase, "pedidos/" + id));
+      try { await remove(ref(window.firebaseDatabase, "pedidosVotos/" + id)); } catch (e2) {}
     } catch (e) {
       showCustomAlert("Erro ao apagar pedido: " + e.message);
     }
   });
 }
-async function toggleRequestStatus(id) {
+function reqOpenReply(id) {
   if (!isPublisher) return;
   const r = reqData[id];
   if (!r) return;
-  const done = r.status === "atendido";
-  try {
-    const { ref, update } = window.firebaseModules;
-    await update(ref(window.firebaseDatabase, "pedidos/" + id), { status: done ? "aberto" : "atendido", atendidoEm: done ? null : Date.now() });
-  } catch (e) {
-    showCustomAlert("Erro ao atualizar pedido: " + e.message);
+  const old = document.getElementById("reqReplyModal");
+  if (old) old.remove();
+  const games = Object.entries(allGames || {}).map(([gid, g]) => ({ gid, t: (g && g.titulo) || "", ty: (g && g.type) || "" })).filter((x) => x.t).sort((a, b) => a.t.localeCompare(b.t));
+  let selGame = r.gameId || "";
+  const opts = [["aberto", "Em aberto (reabrir)"], ["analise", "Em análise"], ["atendido", "Atendido"], ["existe", "Já existe"], ["recusado", "Recusado"]];
+  const cur = reqSt(r);
+  const modal = document.createElement("div");
+  modal.className = "custom-modal active";
+  modal.id = "reqReplyModal";
+  modal.innerHTML = '<div class="custom-modal-content" style="max-height:88vh;overflow-y:auto;">' +
+    '<h3 style="margin:0 0 10px;text-align:left">Responder pedido</h3>' +
+    '<p class="req-m-quote">' + reqEsc(String(r.text).slice(0, 160)) + '</p>' +
+    '<label class="req-m-lbl" for="reqRpStatus">Estado</label>' +
+    '<select class="req-m-field" id="reqRpStatus">' + opts.map((o) => '<option value="' + o[0] + '"' + (o[0] === cur ? " selected" : "") + '>' + o[1] + '</option>').join("") + '</select>' +
+    '<div id="reqRpGameBox">' +
+      '<label class="req-m-lbl" for="reqRpFind">Conteúdo publicado (opcional)</label>' +
+      '<input type="search" class="req-m-field" id="reqRpFind" placeholder="Procurar jogo, app ou tutorial..." autocomplete="off" style="margin-bottom:6px">' +
+      '<select class="req-m-field" id="reqRpGame"></select>' +
+    '</div>' +
+    '<label class="req-m-lbl" for="reqRpMsg">Resposta (opcional)</label>' +
+    '<textarea class="req-m-field" id="reqRpMsg" rows="2" maxlength="140" placeholder="Ex.: já está na categoria Jogos"></textarea>' +
+    '<div class="custom-modal-buttons">' +
+      '<button type="button" class="custom-modal-btn secondary" id="reqRpCancel">Cancelar</button>' +
+      '<button type="button" class="custom-modal-btn primary" id="reqRpSave">Guardar</button>' +
+    '</div></div>';
+  document.body.appendChild(modal);
+  const sel = modal.querySelector("#reqRpStatus"), box = modal.querySelector("#reqRpGameBox");
+  const find = modal.querySelector("#reqRpFind"), gsel = modal.querySelector("#reqRpGame"), msg = modal.querySelector("#reqRpMsg");
+  msg.value = r.resposta || "";
+  const fill = () => {
+    const q = reqNorm(find.value);
+    const arr = games.filter((x) => !q || reqNorm(x.t).indexOf(q) >= 0).slice(0, 80);
+    if (selGame && !arr.some((x) => x.gid === selGame)) { const c = games.find((x) => x.gid === selGame); if (c) arr.unshift(c); }
+    gsel.innerHTML = '<option value="">Sem conteúdo ligado</option>' + arr.map((x) => '<option value="' + reqEsc(x.gid) + '"' + (x.gid === selGame ? " selected" : "") + '>' + reqEsc(x.t + (x.ty ? " · " + x.ty : "")) + '</option>').join("");
+  };
+  const toggleBox = () => { box.style.display = (sel.value === "atendido" || sel.value === "existe") ? "" : "none"; };
+  fill(); toggleBox();
+  find.addEventListener("input", fill);
+  gsel.addEventListener("change", () => { selGame = gsel.value; });
+  sel.addEventListener("change", toggleBox);
+  modal.querySelector("#reqRpCancel").addEventListener("click", () => modal.remove());
+  modal.querySelector("#reqRpSave").addEventListener("click", async () => {
+    const status = sel.value;
+    const resposta = msg.value.trim().slice(0, 140);
+    const gid = (status === "atendido" || status === "existe") ? selGame : "";
+    const g = gid && allGames ? allGames[gid] : null;
+    const saveBtn = modal.querySelector("#reqRpSave");
+    saveBtn.disabled = true;
+    try {
+      const { ref, update } = window.firebaseModules;
+      const agora = Date.now();
+      await update(ref(window.firebaseDatabase, "pedidos/" + id), {
+        status,
+        resposta: resposta || null,
+        gameId: gid || null,
+        gameTitulo: g ? (g.titulo || null) : null,
+        respondidoEm: status === "aberto" ? null : agora,
+        atendidoEm: status === "atendido" ? agora : null
+      });
+      modal.remove();
+      if (status !== "aberto" && status !== cur) reqNotifyReply(id, r, status, resposta, gid, g ? g.titulo : "");
+    } catch (e) {
+      saveBtn.disabled = false;
+      showCustomAlert("Erro ao responder pedido: " + (e && (e.code || e.message) || "tente novamente"));
+    }
+  });
+}
+async function reqNotifyReply(id, r, status, resposta, gid, gtitulo) {
+  const titulos = { atendido: "✅ Pedido atendido", existe: "📌 Esse conteúdo já existe", analise: "🔎 Pedido em análise", recusado: "Resposta ao seu pedido" };
+  const short = String(r.text || "").replace(/\s+/g, " ").slice(0, 60);
+  const g = gid && allGames ? allGames[gid] : null;
+  const extra = {
+    link: gid ? SITE_URL + "/web.html?id=" + gid : "",
+    imagem: g && /^https:\/\//.test(g.poster || "") ? g.poster : "",
+    tipo: g ? (g.type || "") : "",
+    tag: "pedido-" + id,
+    validadeHoras: 72
+  };
+  let corpo;
+  if (status === "atendido") corpo = gtitulo ? "O seu pedido já está no Portal Digital: " + gtitulo : "O seu pedido “" + short + "” foi atendido.";
+  else if (status === "existe") corpo = gtitulo ? "“" + gtitulo + "” já existe no Portal Digital." : "O que pediu já existe no Portal Digital.";
+  else if (status === "analise") corpo = "Estamos a analisar o seu pedido “" + short + "”.";
+  else corpo = "O seu pedido “" + short + "” foi recusado.";
+  if (resposta && status !== "atendido") corpo += " " + resposta;
+  const meu = currentUser ? currentUser.uid : null;
+  if (r.authorId && r.authorId !== meu) await sendPush(titulos[status], corpo, r.authorId, extra);
+  if (status === "atendido" || status === "existe") {
+    const votantes = Object.keys(reqVotes[id] || {}).filter((u) => u !== r.authorId && u !== meu);
+    const corpoV = status === "atendido"
+      ? (gtitulo ? "O pedido que você apoiou já está no Portal Digital: " + gtitulo : "O pedido que você apoiou foi atendido.")
+      : (gtitulo ? "“" + gtitulo + "” já existe no Portal Digital." : "O que você apoiou já existe no Portal Digital.");
+    for (let i = 0; i < votantes.length; i += 5) {
+      await Promise.all(votantes.slice(i, i + 5).map((u) => sendPush(titulos[status], corpoV, u, extra)));
+    }
   }
 }
 </script>
