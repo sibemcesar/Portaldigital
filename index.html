@@ -12154,6 +12154,34 @@ window.firebaseModules = {
     #changePasswordOverlay .about-container { gap: 14px; }
     #changePasswordOverlay .auth-submit-btn:disabled { opacity: .6; }
   </style>
+<style>
+.dst-section{margin:0;padding-top:12px}
+.dst-section+.trending-section{padding-top:4px}
+.dst-track{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:0 12px;scroll-padding:0 12px}
+.dst-track::-webkit-scrollbar{display:none}
+.dst-card{flex:0 0 100%;scroll-snap-align:center;background:var(--bg-secondary);border-radius:var(--m3-r-card);overflow:hidden;display:flex;flex-direction:column;transition:transform .35s var(--m3-spring)}
+.dst-card:active{transform:scale(.98)}
+.dst-multi .dst-card{flex-basis:92%}
+.dst-img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;background:var(--bg-secondary)}
+.dst-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px}
+.dst-title{font-size:16px;font-weight:700;color:var(--text-primary);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.dst-text{font-size:13px;color:var(--text-secondary);line-height:1.4;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.dst-btn{align-self:flex-start;margin-top:4px;background:var(--accent-primary);color:var(--bg-primary);border:0;border-radius:999px;padding:9px 20px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:transform .35s var(--m3-spring)}
+.dst-btn:active{transform:scale(.94)}
+.dst-dots{display:flex;justify-content:center;gap:6px;margin-top:6px}
+.dst-dot{width:6px;height:6px;border-radius:50%;background:var(--text-muted);opacity:.4;transition:all .3s var(--m3-ease-emph)}
+.dst-dot.on{width:18px;border-radius:3px;background:var(--accent-primary);opacity:1}
+.dst-field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.dst-field label{font-size:12px;font-weight:600;color:var(--text-secondary)}
+.dst-input{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:16px;border:1px solid var(--border-color);background:var(--bg-secondary);color:var(--text-primary);font-size:14px;font-family:'Inter',sans-serif;user-select:text;-webkit-user-select:text}
+.dst-row{display:flex;gap:10px;align-items:center;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:16px;padding:8px;margin-bottom:10px}
+.dst-row img{width:72px;height:41px;object-fit:cover;border-radius:8px;background:var(--bg-secondary);flex:none}
+.dst-row-info{flex:1;min-width:0;font-size:13px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dst-row-info small{display:block;font-weight:400;color:var(--text-muted)}
+.dst-mini{border:1px solid var(--border-color);background:var(--bg-primary);color:var(--text-primary);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer}
+.dst-mini.del{color:#d32f2f}
+@supports (background:color-mix(in srgb,red 10%,blue)){.dst-card{background:color-mix(in srgb,var(--accent-primary) 8%,var(--bg-secondary))}}
+</style>
 </head>
 <body>
   <div class="offline-banner" id="offlineBanner">
@@ -12288,6 +12316,11 @@ window.firebaseModules = {
       Inquérito (ADM)
     </button>
 
+    <button class="btn" id="destaquesAdminBtn" onclick="dstOpenAdmin()" style="display: none;">
+      <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+      Destaques (ADM)
+    </button>
+
     <button class="btn" id="reportProblemBtn" onclick="openReportProblemModal()" style="display: none;">
       <svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
       Reportar Problema
@@ -12385,6 +12418,7 @@ window.firebaseModules = {
   </div>
 
   <div class="content-wrapper">
+    <div class="dst-section" id="destaquesSection" style="display:none;"><div class="dst-track" id="destaquesTrack"></div><div class="dst-dots" id="destaquesDots"></div></div>
     <div class="trending-section" id="trendingSection" style="display: none;">
       <div class="trending-title">
         <svg viewBox="0 0 24 24"><path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"/></svg>
@@ -13552,6 +13586,21 @@ window.firebaseModules = {
         <button class="custom-modal-btn secondary" id="pqBackBtn" onclick="pqPrev()">Voltar</button>
         <button class="custom-modal-btn primary" id="pqNextBtn" onclick="pqNext()">Seguinte</button>
       </div>
+    </div>
+  </div>
+
+  <div id="destaquesAdminOverlay" class="manage-users-overlay">
+    <div class="manage-users-overlay-content">
+      <div class="content-header">
+        <button class="content-header-btn back-btn" onclick="dstBack()">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <h1 class="content-header-title">Destaques</h1>
+        <button class="content-header-btn" onclick="dstForm(null)" title="Novo destaque">
+          <svg viewBox="0 0 24 24" width="22" height="22"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+        </button>
+      </div>
+      <div class="pq-admin-body" id="dstAdminBody"></div>
     </div>
   </div>
 
@@ -25505,6 +25554,8 @@ function updateSurveyUI() {
   const adminBtn = document.getElementById("surveyAdminBtn");
   const logged = !!(currentUser && !currentUser.isAnonymous);
   if (adminBtn) adminBtn.style.display = logged && isPublisher ? "flex" : "none";
+  const dstBtn = document.getElementById("destaquesAdminBtn");
+  if (dstBtn) dstBtn.style.display = logged && isPublisher ? "flex" : "none";
   const eligible = logged && !isPublisher && userStatus === "approved" && !userSurveyDone && pqCachedActive() !== false;
   if (userBtn) userBtn.style.display = eligible ? "flex" : "none";
   if (eligible) pqScheduleInvite();
@@ -26748,6 +26799,123 @@ function ppSetupSave() {
   showCustomAlert("Perfil atualizado!");
   const po = document.getElementById("profileOverlay");
   if (po && po.classList.contains("active")) openProfileOverlay();
+}
+</script>
+<script>
+var dstItems = [], dstAll = [], dstFormId = null, dstInView = "list";
+function dstSafeUrl(u) { u = String(u || "").trim(); return /^https?:\/\/[^\s]+$/i.test(u) ? u : ""; }
+function dstDb() { return window.firebaseFirestore; }
+async function dstFetch() {
+  const { collection, getDocs, query, orderBy } = window.firebaseModules;
+  const snap = await getDocs(query(collection(dstDb(), "destaques"), orderBy("ordem", "asc")));
+  const out = [];
+  snap.forEach((d) => out.push(Object.assign({ id: d.id }, d.data())));
+  return out;
+}
+function dstRender() {
+  const sec = document.getElementById("destaquesSection");
+  const track = document.getElementById("destaquesTrack");
+  const dots = document.getElementById("destaquesDots");
+  if (!sec || !track) return;
+  if (!dstItems.length) { sec.style.display = "none"; return; }
+  sec.style.display = "block";
+  sec.classList.toggle("dst-multi", dstItems.length > 1);
+  track.innerHTML = dstItems.map((d, i) =>
+    '<div class="dst-card"><img class="dst-img" loading="lazy" alt="" src="' + escapeHtml(d.imagem) + '" onerror="this.style.visibility=\'hidden\'">' +
+    '<div class="dst-body"><div class="dst-title">' + escapeHtml(d.titulo) + '</div>' +
+    (d.texto ? '<div class="dst-text">' + escapeHtml(d.texto) + '</div>' : '') +
+    '<button class="dst-btn" onclick="dstOpen(' + i + ')">' + escapeHtml(d.botao || "Saber mais") + '</button></div></div>').join("");
+  dots.innerHTML = dstItems.length > 1 ? dstItems.map((_, i) => '<span class="dst-dot' + (i === 0 ? " on" : "") + '"></span>').join("") : "";
+  track.scrollLeft = 0;
+  track.onscroll = function () {
+    const c = track.firstElementChild; if (!c) return;
+    const idx = Math.round(track.scrollLeft / (c.offsetWidth + 12));
+    dots.querySelectorAll(".dst-dot").forEach((el, i) => el.classList.toggle("on", i === idx));
+  };
+}
+function dstOpen(i) {
+  const u = dstSafeUrl(dstItems[i] && dstItems[i].url);
+  if (u) window.open(u, "_blank");
+}
+async function dstLoadPublic() {
+  try {
+    const all = await dstFetch();
+    dstItems = all.filter((d) => d.ativo !== false && d.imagem && d.titulo && dstSafeUrl(d.url));
+    try { localStorage.setItem("pd_dst", JSON.stringify(dstItems)); } catch (e) {}
+  } catch (e) { return; }
+  dstRender();
+}
+function dstInit() {
+  try { dstItems = JSON.parse(localStorage.getItem("pd_dst") || "[]") || []; dstRender(); } catch (e) {}
+  let n = 0;
+  const t = setInterval(() => {
+    n++;
+    if (dstDb() && window.firebaseModules && window.firebaseModules.getDocs) { clearInterval(t); dstLoadPublic(); }
+    else if (n > 40) clearInterval(t);
+  }, 500);
+}
+window.addEventListener("load", () => setTimeout(dstInit, 300));
+
+function dstOpenAdmin() {
+  if (!isPublisher) { showCustomAlert("Apenas administradores podem gerir os destaques."); return; }
+  closeSidebar();
+  document.getElementById("destaquesAdminOverlay").classList.add("active");
+  dstList();
+}
+function dstBack() {
+  if (dstInView === "form") { dstList(); return; }
+  document.getElementById("destaquesAdminOverlay").classList.remove("active");
+}
+async function dstList() {
+  dstInView = "list";
+  const body = document.getElementById("dstAdminBody");
+  body.innerHTML = '<div class="manage-users-empty"><p>Carregando...</p></div>';
+  try { dstAll = await dstFetch(); }
+  catch (e) { body.innerHTML = '<div class="manage-users-empty"><p>Sem permissão ou sem ligação.</p></div>'; return; }
+  if (!dstAll.length) { body.innerHTML = '<div class="manage-users-empty"><p>Nenhum destaque. Toca em + para criar.</p></div>'; return; }
+  body.innerHTML = dstAll.map((d, i) =>
+    '<div class="dst-row"><img alt="" src="' + escapeHtml(d.imagem) + '" onerror="this.style.visibility=\'hidden\'">' +
+    '<div class="dst-row-info">' + escapeHtml(d.titulo) + '<small>Ordem ' + (Number(d.ordem) || 0) + (d.ativo === false ? ' · Oculto' : ' · Visível') + '</small></div>' +
+    '<button class="dst-mini" onclick="dstForm(' + i + ')">Editar</button>' +
+    '<button class="dst-mini del" onclick="dstDelete(' + i + ')">Apagar</button></div>').join("");
+}
+function dstForm(i) {
+  if (!isPublisher) return;
+  dstInView = "form";
+  const d = i === null ? { ordem: dstAll.length + 1, ativo: true } : dstAll[i];
+  dstFormId = i === null ? null : d.id;
+  const f = (id, label, val, ph, type) => '<div class="dst-field"><label>' + label + '</label><input class="dst-input" id="' + id + '" type="' + (type || "text") + '" value="' + escapeHtml(val == null ? "" : val) + '" placeholder="' + ph + '"></div>';
+  document.getElementById("destaquesAdminOverlay").classList.add("active");
+  document.getElementById("dstAdminBody").innerHTML =
+    f("dstImagem", "Link da imagem (16:9)", d.imagem, "https://...", "url") +
+    f("dstTitulo", "Título", d.titulo, "Título do destaque") +
+    '<div class="dst-field"><label>Texto</label><textarea class="dst-input" id="dstTexto" rows="3" placeholder="Descrição curta">' + escapeHtml(d.texto || "") + '</textarea></div>' +
+    f("dstBotao", "Texto do botão (máx. 24 letras)", d.botao, "Saber mais") +
+    f("dstUrl", "Link do botão", d.url, "https://...", "url") +
+    f("dstOrdem", "Ordem (1 aparece primeiro)", d.ordem, "1", "number") +
+    '<label style="display:flex;gap:8px;align-items:center;font-size:14px;color:var(--text-primary);margin-bottom:16px"><input type="checkbox" id="dstAtivo"' + (d.ativo === false ? "" : " checked") + '> Visível para os usuários</label>' +
+    '<button class="custom-modal-btn primary" id="dstSaveBtn" style="width:100%" onclick="dstSave()">Guardar</button>';
+}
+async function dstSave() {
+  if (!isPublisher) return;
+  const v = (id) => document.getElementById(id).value.trim();
+  const data = { imagem: dstSafeUrl(v("dstImagem")), titulo: v("dstTitulo"), texto: v("dstTexto"), url: dstSafeUrl(v("dstUrl")), botao: v("dstBotao").slice(0, 24) || "Saber mais", ordem: Number(v("dstOrdem")) || 0, ativo: document.getElementById("dstAtivo").checked };
+  if (!data.imagem || !data.titulo || !data.url) { showCustomAlert("Preenche o título e os links da imagem e do botão (começam por https://)."); return; }
+  const btn = document.getElementById("dstSaveBtn"); btn.disabled = true;
+  try {
+    const { collection, doc, addDoc, updateDoc } = window.firebaseModules;
+    if (dstFormId) await updateDoc(doc(dstDb(), "destaques", dstFormId), data);
+    else { data.criadoEm = Date.now(); await addDoc(collection(dstDb(), "destaques"), data); }
+    dstLoadPublic();
+    dstList();
+  } catch (e) { btn.disabled = false; showCustomAlert("Não foi possível guardar. Verifica as regras do Firestore."); }
+}
+function dstDelete(i) {
+  const d = dstAll[i]; if (!d || !isPublisher) return;
+  showCustomConfirm("Apagar este destaque?", async () => {
+    try { const { doc, deleteDoc } = window.firebaseModules; await deleteDoc(doc(dstDb(), "destaques", d.id)); dstLoadPublic(); dstList(); }
+    catch (e) { showCustomAlert("Não foi possível apagar."); }
+  });
 }
 </script>
 </body>
