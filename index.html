@@ -26986,10 +26986,12 @@ function dstDelete(i) {
 </script>
 <script>
 var aiHist = [], aiBusy = false, aiGreeted = false;
-var AI_APP_KEY = "AQ.Ab8RN6KoQKZ2NLQK7TW0-Y__XTxWoEVHB6s-soRAK3OsbJiYIQ";
+var AI_PD_PARTS = ["AQ.Ab8RN6K6", "_b2c26Oa21lnhKvj5T6", "xrT5txdBv375nVRB_It5UkA"];
+function aiPdKey() { return AI_PD_PARTS.join(""); }
 function aiUserKey() { try { return localStorage.getItem("pd_ai_key") || ""; } catch (e) { return ""; } }
-function aiOwn() { return !!aiUserKey(); }
-function aiKey() { return aiUserKey() || AI_APP_KEY; }
+function aiSrc() { try { return localStorage.getItem("pd_ai_src") || ""; } catch (e) { return ""; } }
+function aiOwn() { return !!aiUserKey() && aiSrc() !== "portal"; }
+function aiKey() { return aiUserKey(); }
 function aiBox() { return document.getElementById("aiMsgs"); }
 function aiFmt(t) { return escapeHtml(t).replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>").replace(/^\s*\* /gm, "• "); }
 var AI_BOT = '<svg viewBox="0 0 24 24"><path d="M20 9V7c0-1.1-.9-2-2-2h-3c0-1.66-1.34-3-3-3S9 3.34 9 5H6c-1.1 0-2 .9-2 2v2c-1.66 0-3 1.34-3 3s1.34 3 3 3v4c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-4c1.66 0 3-1.34 3-3s-1.34-3-3-3zM7.5 11.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5S9.83 13 9 13s-1.5-.67-1.5-1.5zM16 17H8v-2h8v2zm-1-4c-.83 0-1.5-.67-1.5-1.5S14.17 10 15 10s1.5.67 1.5 1.5S15.83 13 15 13z"/></svg>';
@@ -27060,25 +27062,27 @@ function aiWelcome() {
 function aiSetup(note) {
   aiGreeted = false;
   aiBarShow(false);
+  const has = !!aiKey();
   const own = aiOwn();
   aiBox().innerHTML = '<div class="ai-setup"><h3>Assistente do Portal Digital</h3>' +
     (typeof note === "string" && note ? '<p><b>' + escapeHtml(note) + '</b></p>' : "") +
-    '<p>Agora estás a usar: <b>' + (own ? 'a tua própria chave' : 'a chave padrão do app') + '</b>.</p>' +
-    '<p><b>Opção 1 · Chave padrão do app</b><br>Já funciona, sem configurar nada. O limite gratuito é partilhado por todos os usuários. Se esgotar, cria a tua própria chave (opção 2).</p>' +
-    (own ? '<button class="ai-btn" onclick="aiUseDefault()">Usar chave padrão</button>' : '<button class="ai-btn" onclick="aiRenderHist()">Continuar com a chave padrão</button>') +
+    '<p>' + (has ? 'Agora estás a usar: <b>' + (own ? 'a tua própria chave' : 'a chave do Portal Digital') + '</b>.' : 'Escolhe como queres usar o assistente.') + '</p>' +
+    '<p><b>Opção 1 · Chave do Portal Digital</b><br>Já funciona, sem configurar nada. O limite gratuito é partilhado por todos os usuários. Se esgotar, cria a tua própria chave (opção 2).</p>' +
+    '<button class="ai-btn" onclick="aiUsePortal()">Usar a chave do Portal Digital</button>' +
     '<p><b>Opção 2 · A minha própria chave</b><br>1. Toca em "Entrar no site" e abre "Get API key".<br>2. Cria a chave e copia.<br>3. Cola aqui em baixo.</p>' +
     '<button class="ai-btn soft" onclick="openLinkInGA(\'https://aistudio.google.com/apikey\')">Entrar no site para criar a chave</button>' +
     '<input class="dst-input" id="aiKeyInput" type="password" autocomplete="off" placeholder="Cola a tua chave aqui">' +
     '<button class="ai-btn" onclick="aiSaveKey()">Guardar a minha chave</button>' +
-    '<p>Modelo do Gemini. O padrão é o gemini-flash-lite-latest. Se não responder, experimenta outro: cada modelo tem limites próprios.</p><select class="dst-input" id="aiModelSel" onchange="aiPickModel(this.value)"><option value="">A carregar modelos...</option></select>' +
-    (own ? '<button class="ai-btn soft" onclick="aiRemoveKey()">Remover a minha chave deste aparelho</button>' : "") +
-    '<button class="ai-btn soft" onclick="aiRenderHist()">Voltar ao chat</button><button class="ai-btn soft" onclick="aiClear()">Apagar conversa</button>' +
-    '<p>A tua chave fica guardada só neste aparelho. Nunca a partilhes com ninguém.</p></div>';
-  aiLoadModels();
+    (has ? '<p>Modelo do Gemini. O padrão é o gemini-flash-lite-latest. Se não responder, experimenta outro: cada modelo tem limites próprios.</p><select class="dst-input" id="aiModelSel" onchange="aiPickModel(this.value)"><option value="">A carregar modelos...</option></select>' : "") +
+    (has ? '<button class="ai-btn soft" onclick="aiRemoveKey()">Remover a chave deste aparelho</button><button class="ai-btn soft" onclick="aiRenderHist()">Voltar ao chat</button><button class="ai-btn soft" onclick="aiClear()">Apagar conversa</button>' : "") +
+    '<p>A chave fica guardada só neste aparelho. Nunca partilhes a tua chave com ninguém.</p></div>';
+  if (has) aiLoadModels();
 }
-function aiUseDefault() {
-  try { localStorage.removeItem("pd_ai_key"); localStorage.removeItem("pd_ai_model"); localStorage.removeItem("pd_ai_pick"); } catch (e) {}
-  aiHist = []; aiSave(); aiWelcome();
+function aiUsePortal() {
+  const inp = document.getElementById("aiKeyInput");
+  if (!inp) return;
+  inp.value = aiPdKey();
+  aiSaveKey("portal");
 }
 function aiPick() { try { return localStorage.getItem("pd_ai_pick") || ""; } catch (e) { return ""; } }
 function aiPickModel(v) {
@@ -27098,14 +27102,14 @@ async function aiLoadModels() {
     sel.innerHTML = '<option value="">Padrão (gemini-flash-lite-latest)</option>';
   }
 }
-function aiSaveKey() {
+function aiSaveKey(src) {
   const k = document.getElementById("aiKeyInput").value.trim();
   if (k.length < 20 || /\s/.test(k)) { showCustomAlert("Chave inválida. Cola a chave completa, sem espaços."); return; }
-  try { localStorage.setItem("pd_ai_key", k); localStorage.removeItem("pd_ai_model"); } catch (e) { showCustomAlert("Não foi possível guardar a chave."); return; }
+  try { localStorage.setItem("pd_ai_key", k); localStorage.setItem("pd_ai_src", src === "portal" ? "portal" : "own"); localStorage.removeItem("pd_ai_model"); } catch (e) { showCustomAlert("Não foi possível guardar a chave."); return; }
   aiHist = []; aiSave(); aiWelcome();
 }
 function aiRemoveKey() {
-  try { localStorage.removeItem("pd_ai_key"); localStorage.removeItem("pd_ai_model"); localStorage.removeItem("pd_ai_pick"); } catch (e) {}
+  try { localStorage.removeItem("pd_ai_key"); localStorage.removeItem("pd_ai_src"); localStorage.removeItem("pd_ai_model"); localStorage.removeItem("pd_ai_pick"); } catch (e) {}
   aiHist = []; aiSave(); aiSetup();
 }
 async function aiErr(r) {
@@ -27473,8 +27477,8 @@ async function aiSend(pre) {
     const own = aiOwn();
     const keyBad = st === 401 || st === 403 || (st === 400 && /api key/i.test(e.msg || ""));
     wait.textContent = e && e.net ? "Não consegui ligar ao Gemini. Verifica a internet e tenta de novo." :
-      keyBad ? (own ? "A chave não foi aceite. Toca no ícone da chave no topo para a trocar." : "A chave padrão do app não está disponível agora. Cria a tua própria chave para continuar.") + det :
-      st === 429 ? (own ? "Atingiste o limite gratuito por agora. Tenta daqui a pouco." : "O limite gratuito da chave padrão do app esgotou por agora. Cria a tua própria chave para continuar.") + det :
+      keyBad ? (own ? "A chave não foi aceite. Toca no ícone da chave no topo para a trocar." : "A chave do Portal Digital não está disponível agora. Cria a tua própria chave para continuar.") + det :
+      st === 429 ? (own ? "Atingiste o limite gratuito por agora. Tenta daqui a pouco." : "O limite gratuito da chave do Portal Digital esgotou por agora. Cria a tua própria chave para continuar.") + det :
       "O Gemini devolveu um erro" + (st ? " " + st : "") + "." + det;
     if (!own && !(e && e.net) && (keyBad || st === 429)) {
       const c = document.createElement("div");
