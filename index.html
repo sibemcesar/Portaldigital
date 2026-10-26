@@ -12182,6 +12182,41 @@ window.firebaseModules = {
 .dst-mini.del{color:#d32f2f}
 @supports (background:color-mix(in srgb,red 10%,blue)){.dst-card{background:color-mix(in srgb,var(--accent-primary) 8%,var(--bg-secondary))}}
 </style>
+<style>
+.ai-msgs{position:relative;flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch}
+.ai-msg{min-width:0;padding:10px 14px;font-size:14px;line-height:1.5;white-space:pre-wrap;word-wrap:break-word;user-select:text;-webkit-user-select:text;animation:m3Rise .3s var(--m3-ease-emph)}
+.ai-msg.user{background:var(--accent-primary);color:var(--bg-primary);border-radius:20px 20px 6px 20px}
+.ai-msg.bot{background:var(--bg-secondary);color:var(--text-primary);border-radius:20px 20px 20px 6px}
+.ai-row{display:flex;gap:8px;align-items:flex-end;max-width:94%}
+.ai-row.user{align-self:flex-end;flex-direction:row-reverse}
+.ai-row.bot{align-self:flex-start}
+.ai-av{width:32px;height:32px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.ai-av svg{width:20px;height:20px;fill:currentColor}
+.ai-av img{width:100%;height:100%;object-fit:cover}
+.ai-av.bot{background:var(--accent-primary);color:var(--bg-primary)}
+.ai-av.user{background:var(--bg-secondary);color:var(--text-secondary)}
+.ai-fab{position:fixed;right:16px;bottom:calc(88px + env(safe-area-inset-bottom,0px));z-index:8;width:56px;height:56px;border:0;border-radius:18px;background:var(--accent-primary);color:var(--bg-primary);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.25);transition:transform .35s var(--m3-spring)}
+.ai-fab:active{transform:scale(.9)}
+.ai-fab svg{width:26px;height:26px;fill:currentColor}
+.ai-chips{display:flex;flex-wrap:wrap;gap:8px}
+.ai-chip{border:1px solid var(--border-color);background:var(--bg-primary);color:var(--text-primary);border-radius:999px;padding:8px 14px;font-size:13px;font-family:'Inter',sans-serif;cursor:pointer;transition:transform .35s var(--m3-spring)}
+.ai-chip:active{transform:scale(.94)}
+.ai-setup{background:var(--bg-secondary);border-radius:var(--m3-r-card);padding:18px;display:flex;flex-direction:column;gap:10px}
+.ai-setup h3{font-size:17px;color:var(--text-primary)}
+.ai-setup p{font-size:13px;line-height:1.5;color:var(--text-secondary)}
+.ai-btn{border:0;border-radius:999px;padding:11px 20px;font-size:14px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;background:var(--accent-primary);color:var(--bg-primary);transition:transform .35s var(--m3-spring)}
+.ai-btn:active{transform:scale(.95)}
+.ai-btn.soft{background:var(--bg-primary);color:var(--text-primary);border:1px solid var(--border-color)}
+.ai-bar{display:flex;gap:8px;align-items:flex-end;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border-color);background:var(--bg-primary);flex-shrink:0}
+.ai-input{flex:1;resize:none;max-height:110px;box-sizing:border-box;border-radius:24px;padding:11px 16px;border:1px solid var(--border-color);background:var(--bg-secondary);color:var(--text-primary);font-size:14px;font-family:'Inter',sans-serif;line-height:1.4;user-select:text;-webkit-user-select:text}
+.ai-send{width:44px;height:44px;flex:none;border-radius:50%;border:0;background:var(--accent-primary);color:var(--bg-primary);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .35s var(--m3-spring)}
+.ai-send:active{transform:scale(.9)}
+.ai-send:disabled{opacity:.5}
+.ai-dots span{display:inline-block;width:6px;height:6px;margin:0 2px;border-radius:50%;background:var(--text-muted);animation:aiDot 1s infinite}
+.ai-dots span:nth-child(2){animation-delay:.2s}
+.ai-dots span:nth-child(3){animation-delay:.4s}
+@keyframes aiDot{0%,80%,100%{opacity:.25}40%{opacity:1}}
+</style>
 </head>
 <body>
   <div class="offline-banner" id="offlineBanner">
@@ -12314,6 +12349,11 @@ window.firebaseModules = {
     <button class="btn" id="surveyAdminBtn" onclick="openSurveyAdmin()" style="display: none;">
       <svg viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
       Inquérito (ADM)
+    </button>
+
+    <button class="btn" id="aiBtn" onclick="aiOpen()">
+      <svg viewBox="0 0 24 24"><path d="M20 9V7c0-1.1-.9-2-2-2h-3c0-1.66-1.34-3-3-3S9 3.34 9 5H6c-1.1 0-2 .9-2 2v2c-1.66 0-3 1.34-3 3s1.34 3 3 3v4c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-4c1.66 0 3-1.34 3-3s-1.34-3-3-3zM7.5 11.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5S9.83 13 9 13s-1.5-.67-1.5-1.5zM16 17H8v-2h8v2zm-1-4c-.83 0-1.5-.67-1.5-1.5S14.17 10 15 10s1.5.67 1.5 1.5S15.83 13 15 13z"/></svg>
+      Assistente
     </button>
 
     <button class="btn" id="destaquesAdminBtn" onclick="dstOpenAdmin()" style="display: none;">
@@ -12500,6 +12540,10 @@ window.firebaseModules = {
       Nenhum resultado encontrado
     </div>
   </div>
+
+  <button class="ai-fab" id="aiFab" onclick="aiOpen()" aria-label="Assistente">
+    <svg viewBox="0 0 24 24"><path d="M20 9V7c0-1.1-.9-2-2-2h-3c0-1.66-1.34-3-3-3S9 3.34 9 5H6c-1.1 0-2 .9-2 2v2c-1.66 0-3 1.34-3 3s1.34 3 3 3v4c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-4c1.66 0 3-1.34 3-3s-1.34-3-3-3zM7.5 11.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5S9.83 13 9 13s-1.5-.67-1.5-1.5zM16 17H8v-2h8v2zm-1-4c-.83 0-1.5-.67-1.5-1.5S14.17 10 15 10s1.5.67 1.5 1.5S15.83 13 15 13z"/></svg>
+  </button>
 
   <nav class="bottom-nav" id="bottomNav">
     <button class="bottom-nav-item active" id="navHomeBtn" onclick="goHome()">
@@ -13585,6 +13629,27 @@ window.firebaseModules = {
       <div class="pq-footer">
         <button class="custom-modal-btn secondary" id="pqBackBtn" onclick="pqPrev()">Voltar</button>
         <button class="custom-modal-btn primary" id="pqNextBtn" onclick="pqNext()">Seguinte</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="aiOverlay" class="manage-users-overlay">
+    <div class="manage-users-overlay-content">
+      <div class="content-header">
+        <button class="content-header-btn back-btn" onclick="aiBack()">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <h1 class="content-header-title">Assistente</h1>
+        <button class="content-header-btn" onclick="aiSetup()" title="Configurar assistente">
+          <svg viewBox="0 0 24 24" width="22" height="22"><path d="M12.65 10A5.99 5.99 0 0 0 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6a5.99 5.99 0 0 0 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
+        </button>
+      </div>
+      <div class="ai-msgs" id="aiMsgs"></div>
+      <div class="ai-bar" id="aiBar">
+        <textarea class="ai-input" id="aiInput" rows="1" maxlength="600" placeholder="Pergunta qualquer coisa..." oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,110)+'px'"></textarea>
+        <button class="ai-send" id="aiSendBtn" onclick="aiSend()" aria-label="Enviar">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
       </div>
     </div>
   </div>
@@ -20369,9 +20434,10 @@ function showInsufficientPointsAlert() {
   modal.innerHTML = `
         <div class="custom-modal-content">
           <p style="margin: 0 0 16px 0;">Voc\xEA n\xE3o tem pontos suficientes! Resgate um c\xF3digo ou ganhe mais pontos para obter este conte\xFAdo.</p>
-          <div class="custom-modal-buttons">
+          <div class="custom-modal-buttons" style="flex-wrap: wrap;">
             <button class="custom-modal-btn secondary" onclick="this.closest('.custom-modal').remove(); RewardedAds.abrirPagina();">Ganhar + Pontos</button>
-            <button class="custom-modal-btn primary" onclick="this.closest('.custom-modal').remove()">OK</button>
+            <button class="custom-modal-btn primary" onclick="this.closest('.custom-modal').remove(); openRedeemCodeModal();">Comprar pontos</button>
+            <button class="custom-modal-btn secondary" onclick="this.closest('.custom-modal').remove()">OK</button>
           </div>
         </div>
       `;
@@ -26917,6 +26983,525 @@ function dstDelete(i) {
     catch (e) { showCustomAlert("Não foi possível apagar."); }
   });
 }
+</script>
+<script>
+var aiHist = [], aiBusy = false, aiGreeted = false;
+var AI_APP_KEY = "AQ.Ab8RN6KoQKZ2NLQK7TW0-Y__XTxWoEVHB6s-soRAK3OsbJiYIQ";
+function aiUserKey() { try { return localStorage.getItem("pd_ai_key") || ""; } catch (e) { return ""; } }
+function aiOwn() { return !!aiUserKey(); }
+function aiKey() { return aiUserKey() || AI_APP_KEY; }
+function aiBox() { return document.getElementById("aiMsgs"); }
+function aiFmt(t) { return escapeHtml(t).replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>").replace(/^\s*\* /gm, "• "); }
+var AI_BOT = '<svg viewBox="0 0 24 24"><path d="M20 9V7c0-1.1-.9-2-2-2h-3c0-1.66-1.34-3-3-3S9 3.34 9 5H6c-1.1 0-2 .9-2 2v2c-1.66 0-3 1.34-3 3s1.34 3 3 3v4c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-4c1.66 0 3-1.34 3-3s-1.34-3-3-3zM7.5 11.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5S9.83 13 9 13s-1.5-.67-1.5-1.5zM16 17H8v-2h8v2zm-1-4c-.83 0-1.5-.67-1.5-1.5S14.17 10 15 10s1.5.67 1.5 1.5S15.83 13 15 13z"/></svg>';
+var AI_USER = '<svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
+function aiAdd(role, text) {
+  const row = document.createElement("div");
+  row.className = "ai-row " + role;
+  const av = document.createElement("div");
+  av.className = "ai-av " + role;
+  if (role === "bot") av.innerHTML = AI_BOT;
+  else if (userAvatar && currentUser && !currentUser.isAnonymous) {
+    const im = document.createElement("img");
+    im.alt = "";
+    im.onerror = () => { av.innerHTML = AI_USER; };
+    im.src = userAvatar;
+    av.appendChild(im);
+  } else av.innerHTML = AI_USER;
+  const d = document.createElement("div");
+  d.className = "ai-msg " + role;
+  if (role === "bot") d.innerHTML = aiFmt(text); else d.textContent = text;
+  row.appendChild(av);
+  row.appendChild(d);
+  aiBox().appendChild(row);
+  aiBox().scrollTop = aiBox().scrollHeight;
+  return d;
+}
+function aiBarShow(on) { document.getElementById("aiBar").style.display = on ? "flex" : "none"; }
+function aiOpen() {
+  closeSidebar();
+  document.getElementById("aiOverlay").classList.add("active");
+  if (!aiKey()) aiSetup(); else if (!aiGreeted) aiRenderHist();
+  requestAnimationFrame(() => { aiFit(); aiScrollEnd(null); });
+}
+function aiBack() {
+  const o = document.getElementById("aiOverlay");
+  o.classList.remove("active");
+  o.style.height = ""; o.style.top = ""; o.style.bottom = "";
+}
+function aiScrollEnd(row) {
+  const b = aiBox();
+  const bottom = b.scrollHeight - b.clientHeight;
+  b.scrollTop = row && row.offsetHeight > b.clientHeight - 24 ? Math.min(bottom, row.offsetTop - 8) : bottom;
+}
+function aiFit() {
+  const o = document.getElementById("aiOverlay");
+  const vv = window.visualViewport;
+  if (!vv || !o.classList.contains("active")) return;
+  o.style.height = vv.height + "px";
+  o.style.top = vv.offsetTop + "px";
+  o.style.bottom = "auto";
+  aiScrollEnd(null);
+}
+function aiWelcome() {
+  aiGreeted = true;
+  aiBarShow(true);
+  aiBox().innerHTML = "";
+  aiAdd("bot", "Olá" + (aiFirstName() ? ", " + aiFirstName() : "") + "! Sou o assistente do Portal Digital. Pergunta-me o que quiseres e eu ajudo-te a encontrar o melhor do app. 😉");
+  const c = document.createElement("div");
+  c.className = "ai-chips";
+  ["Que jogos me recomendas?", "Como ganho pontos?", "Como compro pontos?", "Ajuda-me com uma dúvida"].forEach((q) => {
+    const b = document.createElement("button");
+    b.className = "ai-chip"; b.textContent = q;
+    b.onclick = () => { c.remove(); aiSend(q); };
+    c.appendChild(b);
+  });
+  aiBox().appendChild(c);
+}
+function aiSetup(note) {
+  aiGreeted = false;
+  aiBarShow(false);
+  const own = aiOwn();
+  aiBox().innerHTML = '<div class="ai-setup"><h3>Assistente do Portal Digital</h3>' +
+    (typeof note === "string" && note ? '<p><b>' + escapeHtml(note) + '</b></p>' : "") +
+    '<p>Agora estás a usar: <b>' + (own ? 'a tua própria chave' : 'a chave padrão do app') + '</b>.</p>' +
+    '<p><b>Opção 1 · Chave padrão do app</b><br>Já funciona, sem configurar nada. O limite gratuito é partilhado por todos os usuários. Se esgotar, cria a tua própria chave (opção 2).</p>' +
+    (own ? '<button class="ai-btn" onclick="aiUseDefault()">Usar chave padrão</button>' : '<button class="ai-btn" onclick="aiRenderHist()">Continuar com a chave padrão</button>') +
+    '<p><b>Opção 2 · A minha própria chave</b><br>1. Toca em "Entrar no site" e abre "Get API key".<br>2. Cria a chave e copia.<br>3. Cola aqui em baixo.</p>' +
+    '<button class="ai-btn soft" onclick="openLinkInGA(\'https://aistudio.google.com/apikey\')">Entrar no site para criar a chave</button>' +
+    '<input class="dst-input" id="aiKeyInput" type="password" autocomplete="off" placeholder="Cola a tua chave aqui">' +
+    '<button class="ai-btn" onclick="aiSaveKey()">Guardar a minha chave</button>' +
+    '<p>Modelo do Gemini. O padrão é o gemini-flash-lite-latest. Se não responder, experimenta outro: cada modelo tem limites próprios.</p><select class="dst-input" id="aiModelSel" onchange="aiPickModel(this.value)"><option value="">A carregar modelos...</option></select>' +
+    (own ? '<button class="ai-btn soft" onclick="aiRemoveKey()">Remover a minha chave deste aparelho</button>' : "") +
+    '<button class="ai-btn soft" onclick="aiRenderHist()">Voltar ao chat</button><button class="ai-btn soft" onclick="aiClear()">Apagar conversa</button>' +
+    '<p>A tua chave fica guardada só neste aparelho. Nunca a partilhes com ninguém.</p></div>';
+  aiLoadModels();
+}
+function aiUseDefault() {
+  try { localStorage.removeItem("pd_ai_key"); localStorage.removeItem("pd_ai_model"); localStorage.removeItem("pd_ai_pick"); } catch (e) {}
+  aiHist = []; aiSave(); aiWelcome();
+}
+function aiPick() { try { return localStorage.getItem("pd_ai_pick") || ""; } catch (e) { return ""; } }
+function aiPickModel(v) {
+  try { if (v) localStorage.setItem("pd_ai_pick", v); else localStorage.removeItem("pd_ai_pick"); } catch (e) {}
+}
+async function aiLoadModels() {
+  const sel = document.getElementById("aiModelSel");
+  if (!sel) return;
+  const cur = aiPick();
+  try {
+    const r = await fetch("https://generativelanguage.googleapis.com/v1beta/models?pageSize=200", { headers: { "x-goog-api-key": aiKey() } });
+    if (!r.ok) throw new Error("x");
+    const j = await r.json();
+    const names = (j.models || []).filter((x) => (x.supportedGenerationMethods || []).includes("generateContent") && /gemini/.test(x.name)).map((x) => x.name.replace("models/", "")).sort();
+    sel.innerHTML = '<option value="">Padrão (gemini-flash-lite-latest)</option>' + names.map((n) => '<option value="' + escapeHtml(n) + '"' + (n === cur ? " selected" : "") + '>' + escapeHtml(n) + '</option>').join("");
+  } catch (e) {
+    sel.innerHTML = '<option value="">Padrão (gemini-flash-lite-latest)</option>';
+  }
+}
+function aiSaveKey() {
+  const k = document.getElementById("aiKeyInput").value.trim();
+  if (k.length < 20 || /\s/.test(k)) { showCustomAlert("Chave inválida. Cola a chave completa, sem espaços."); return; }
+  try { localStorage.setItem("pd_ai_key", k); localStorage.removeItem("pd_ai_model"); } catch (e) { showCustomAlert("Não foi possível guardar a chave."); return; }
+  aiHist = []; aiSave(); aiWelcome();
+}
+function aiRemoveKey() {
+  try { localStorage.removeItem("pd_ai_key"); localStorage.removeItem("pd_ai_model"); localStorage.removeItem("pd_ai_pick"); } catch (e) {}
+  aiHist = []; aiSave(); aiSetup();
+}
+async function aiErr(r) {
+  let m = "";
+  try { const j = await r.json(); m = (j.error && j.error.message) || ""; } catch (e) {}
+  return { status: r.status, msg: m };
+}
+async function aiModels() {
+  let c = [];
+  try { c = JSON.parse(localStorage.getItem("pd_ai_model") || "[]"); } catch (e) {}
+  if (Array.isArray(c) && c.length) return c;
+  let r;
+  try { r = await fetch("https://generativelanguage.googleapis.com/v1beta/models?pageSize=200", { headers: { "x-goog-api-key": aiKey() } }); } catch (e) { throw { net: true }; }
+  if (!r.ok) throw await aiErr(r);
+  const j = await r.json();
+  const ver = (x) => parseFloat((x.name.match(/gemini-(\d+(?:\.\d+)?)/) || [0, 0])[1]);
+  const pre = (x) => /preview/.test(x.name);
+  c = (j.models || []).filter((x) => (x.supportedGenerationMethods || []).includes("generateContent") && /flash/.test(x.name) && !/image|tts|live|audio|embed|thinking|exp/.test(x.name))
+    .sort((x, y) => (pre(x) - pre(y)) || (ver(y) - ver(x))).slice(0, 4).map((x) => x.name.replace("models/", ""));
+  if (!c.length) throw { status: 404, msg: "Nenhum modelo disponível para esta chave." };
+  try { localStorage.setItem("pd_ai_model", JSON.stringify(c)); } catch (e) {}
+  return c;
+}
+var AI_DEFAULT = "gemini-flash-lite-latest";
+function aiFirstName() {
+  if (!currentUser || currentUser.isAnonymous) return "";
+  const n = pdCleanName(userName) || pdFallbackName(currentUser);
+  const f = n.split(" ")[0];
+  return f.length > 1 && f !== "Usuário" ? f : "";
+}
+var AI_STOP = new Set(["que","qual","quais","como","com","sem","para","pra","por","uma","uns","umas","dos","das","nos","nas","num","numa","tem","ter","tens","quero","queria","gostava","gostaria","podes","pode","algo","alguma","algum","isso","esse","essa","este","esta","aqui","recomenda","recomendas","recomendar","sugere","sugerir","mostra","mostrar","abre","abrir","ver","ola","bom","boa","dia","tarde","noite","obrigado","obrigada","favor","mais","muito","muita","bem","melhor","melhores","novo","novos","nova","novas","outro","outra","outros","outras","onde","quando","fazer","faz","ajuda","ajudar","preciso","procuro","encontrar","tipo","coisa","coisas","gosto","gostas","conteudo","conteudos"]);
+function aiNorm(s) { return String(s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, " ").trim(); }
+function aiWordHit(a, b) { return a === b || (a.length >= 4 && b.length >= 4 && (a.indexOf(b) === 0 || b.indexOf(a) === 0)); }
+function aiHistText(m) { return (m && m.parts && m.parts[0] && m.parts[0].text) || ""; }
+function aiQuality(x) {
+  const bayes = ((x.ratingSum || 0) + 12) / ((x.ratingCount || 0) + 3);
+  return (bayes - 3) + Math.log10((Number(x.downloads) || 0) + 1) * 0.5;
+}
+function aiLine(e) {
+  const x = e[1];
+  const cl = (v, n) => String(v || "").replace(/\s+/g, " ").replace(/\|/g, "/").trim().slice(0, n);
+  const r = typeof pdRating === "function" ? pdRating(x) : null;
+  const nv = typeof isNewGame === "function" && isNewGame(x);
+  return [e[0], cl(x.titulo, 60), cl(x.type, 20), cl(x.genero, 40), cl(x.descCurta || x.descricao, 90) || "-", r ? r.avg.toFixed(1) + "/5 (" + r.count + ")" : "sem nota", Number(x.downloads) || 0, nv ? "sim" : "não"].join(" | ");
+}
+function aiPickGames(all) {
+  const MAX = 40;
+  if (all.length <= MAX) return all;
+  const us = aiHist.filter((m) => m.role === "user");
+  const last = aiNorm(aiHistText(us[us.length - 1]));
+  const before = aiNorm(aiHistText(us[us.length - 2]));
+  const q = new Map();
+  [[before, 0.5], [last, 1]].forEach((p) => p[0].split(" ").forEach((w) => { if (w.length >= 3 && !AI_STOP.has(w)) q.set(w, Math.max(q.get(w) || 0, p[1])); }));
+  const FW = [["titulo", 5], ["genero", 4], ["type", 3], ["desc", 1.5]];
+  const rows = all.map((e) => {
+    const x = e[1];
+    const f = { titulo: aiNorm(x.titulo), genero: aiNorm(x.genero), type: aiNorm(x.type), desc: aiNorm(x.descCurta || x.descricao) };
+    const hits = new Map();
+    q.forEach((wq, qw) => {
+      let sum = 0;
+      FW.forEach((p) => { if (f[p[0]].split(" ").some((w) => aiWordHit(w, qw))) sum += p[1]; });
+      if (sum) hits.set(qw, sum);
+    });
+    return { e: e, tn: f.titulo, hits: hits };
+  });
+  const df = new Map();
+  rows.forEach((r) => r.hits.forEach((v, qw) => df.set(qw, (df.get(qw) || 0) + 1)));
+  const scored = rows.map((r) => {
+    let sc = 0;
+    r.hits.forEach((v, qw) => { sc += v * q.get(qw) * Math.log(1 + rows.length / df.get(qw)); });
+    if (r.tn.length >= 3 && last.indexOf(r.tn) >= 0) sc += 10;
+    return { e: r.e, s: sc };
+  }).filter((o) => o.s > 0).sort((a, b) => (b.s - a.s) || (aiQuality(b.e[1]) - aiQuality(a.e[1]))).slice(0, 24).map((o) => o.e);
+  const prevIds = new Set();
+  aiHist.filter((m) => m.role === "model").slice(-2).forEach((m) => { ((m.ac && m.ac.ids) || []).forEach((id) => prevIds.add(id)); aiHistText(m).replace(/\[\[abrir:([^\]\s]+)\]\]/g, (m0, id) => { prevIds.add(id); return ""; }); });
+  const chosen = new Map();
+  const put = (e) => { if (e && chosen.size < MAX && !chosen.has(e[0])) chosen.set(e[0], e); };
+  all.filter((e) => prevIds.has(e[0])).slice(0, 6).forEach(put);
+  scored.forEach(put);
+  all.slice().sort((a, b) => aiQuality(b[1]) - aiQuality(a[1])).slice(0, 8).forEach(put);
+  all.filter((e) => typeof isNewGame === "function" && isNewGame(e[1])).sort((a, b) => pdToMs(b[1].createdAt) - pdToMs(a[1].createdAt)).slice(0, 6).forEach(put);
+  return Array.from(chosen.values());
+}
+function aiGuide() {
+  return "\nGUIA DO APP (regras reais; usa só isto para responder a dúvidas sobre pontos, bónus, códigos e pedidos, e nunca inventes valores, prazos ou regras que não estejam aqui. Se a dúvida não estiver coberta, diz que não sabes e sugere abrir a Ajuda ou Reportar um problema com a ferramenta ir_para):\n" +
+    "CONTA: sem conta (visitante) não dá para baixar, ganhar pontos, resgatar códigos nem fazer pedidos; é preciso criar conta, que é grátis. A conta tem de estar verificada: enquanto estiver à espera de aprovação, o app avisa e bloqueia downloads, recompensas, códigos e pedidos. Verificar o e-mail aprova a conta.\n" +
+    "PONTOS: o saldo aparece no topo do app. Gastam-se a baixar conteúdos: cada conteúdo tem o seu custo, que se vê na página dele, e há conteúdos grátis (custo 0). Se o saldo não chegar, o app avisa e sugere resgatar um código ou ganhar mais pontos. Não sabes o custo de cada conteúdo, por isso manda o usuário ver na página do conteúdo.\n" +
+    "COMO GANHAR PONTOS:\n" +
+    "- Recompensa diária: +20 pontos, e só pode ser resgatada de 24 em 24 horas (botão Recompensa Diária no menu lateral).\n" +
+    "- Ganhar Pontos (anúncios com recompensa, botão no menu lateral, abre com ir_para pontos): cada recompensa pede para ver 2 vídeos seguidos e dá 25 pontos. Dá para receber até 6 vezes e no máximo 150 pontos por ciclo de 24 horas, contados desde a primeira. Há uma pausa curta entre anúncios. Se o usuário saltar o vídeo, sair do app a meio ou tocar no link do anúncio, esse vídeo não conta.\n" +
+    "- Verificar o e-mail: 10 pontos de bónus, uma só vez.\n" +
+    "- Avaliar o app: 4 estrelas dão 5 pontos de bónus e 5 estrelas dão 10. Com 1 a 3 estrelas não há bónus.\n" +
+    "- Inquérito de opinião: dá pontos uma só vez (normalmente 300; o valor certo aparece no próprio inquérito).\n" +
+    "- Códigos de resgate (ver abaixo).\n" +
+    "REMOVER ANÚNCIOS: dá para comprar com pontos 7 dias por 1000 pontos, 15 dias por 1500 ou 30 dias por 2500. Permite baixar conteúdos grátis sem ver o anúncio. Os pontos são descontados logo e não há reembolso. Se já tiver tempo ativo, o novo plano soma ao que resta.\n" +
+    "RESGATAR PONTOS (página): abre-se em Resgatar Código no menu lateral, ou a tocar nos pontos no topo (ir_para resgatar). Nessa página, o ícone de presente no canto superior direito mostra ou esconde o campo para escrever um código. A mesma página serve para comprar pontos (ver COMPRAR PONTOS).\n" +
+    "RESGATAR CÓDIGOS: na página Resgatar Pontos, toca no ícone de presente para mostrar o campo, escreve o código (os espaços são ignorados) e toca em Resgatar Código. Os pontos entram logo. Cada código só pode ser usado uma vez e o valor em pontos depende de cada código. Mensagens possíveis: código inválido (confere os caracteres), já foi usado, já resgataste este código, ou está reservado para outra conta. Há um intervalo de 3 segundos entre tentativas e, depois de 10 tentativas, é preciso esperar cerca de 15 minutos. Os códigos que a equipa envia podem aparecer também nas notificações.\n" +
+    "COMPRAR PONTOS: dá para comprar pontos na página Resgatar Pontos (ir_para resgatar). Em \"Cartões disponíveis\" aparecem cartões de pontos, cada um com a quantidade de pontos, o valor em Kz e só os 3 últimos dígitos do código. Dá para filtrar por pontos (Todos, Acima de, Abaixo de). Ao tocar em Comprar, abre o WhatsApp do Portal Digital com uma mensagem já preenchida com os dados do cartão e da conta do usuário, e a equipa explica como pagar. Depois do pagamento, a equipa liberta o cartão para a conta do usuário e ele aparece em \"Meus cartões\", na mesma página, com os botões Resgatar (os pontos entram logo) e Copiar código. Precisa de conta (visitante é convidado a criar uma). Os cartões e valores mudam e podem não haver cartões no momento (a página mostra \"Nenhum cartão disponível\"), por isso manda o usuário ver na página e nunca inventes preços, valores, formas de pagamento ou prazos de entrega. Se perguntarem como pagar, diz que é combinado com a equipa pelo WhatsApp.\n" +
+    "PEDIDOS: servem para pedir um jogo, app, tutorial ou outro conteúdo (ir_para pedidos) e não custam pontos. Precisa de conta verificada. O texto tem de ter entre 8 e 300 caracteres. Ao enviar, escolhe-se o tipo: Jogo, App, Tutorial ou Outro. Tem de se esperar 20 segundos entre um pedido e o seguinte. O app mostra pedidos parecidos antes de enviar, e o usuário pode apoiar pedidos de outras pessoas (não o próprio) e apagar os seus. O estado do pedido pode ser: Em aberto, Em análise, Atendido, Já existe ou Recusado. Quando é atendido ou já existe, o usuário recebe uma notificação. Não prometas prazos nem que um pedido vai ser atendido.\n";
+}
+function aiSystem() {
+  const g = typeof allGames !== "undefined" && allGames ? allGames : {};
+  const all = Object.entries(g).filter((e) => e[1] && e[1].titulo);
+  const pick = aiPickGames(all);
+  const t = pick.map(aiLine).join("\n");
+  const sel = all.length > pick.length ? "A lista abaixo é só uma seleção de " + pick.length + " dos " + all.length + " conteúdos do app: os que combinam com a pergunta e alguns destaques. Se o usuário procurar algo que não esteja nela, usa a ferramenta pesquisar_conteudos, que pesquisa no catálogo completo, antes de dizer que não encontraste. Nunca digas que um conteúdo não existe só porque não está na lista. " : "";
+  return "És o assistente do Portal Digital, um app angolano de jogos e conteúdos. Responde em português de Angola, com palavras simples e do dia a dia, como numa conversa entre amigos. Sê simpático e positivo, mas sem exagerar: nada de frases pomposas, palavras difíceis ou elogios repetidos. Mostra o que é bom de forma natural e, quando fizer sentido, convida o usuário a experimentar. Respostas curtas, de 2 a 5 linhas, com no máximo um emoji. Sê sempre honesto: não inventes funções do app, nem detalhes ou preços que não estejam na lista. Se não souberes, diz que não sabes e sugere outra opção. " +
+    "" +
+    "Tens ferramentas para agir no app. Usa-as em vez de escrever marcadores no texto (nunca escrevas nada como [[abrir:...]] ou [[ir:...]]). " +
+    "abrir_conteudo: abre a página de um conteúdo; usa o ID exato da lista ou de pesquisar_conteudos (no máximo 3), quando o usuário pedir para abrir, ver ou mostrar, ou quando recomendares conteúdos. " +
+    "ir_para: leva o usuário a uma secção do app (no máximo 2), quando ele quiser ir lá ou quando isso resolver o pedido dele. Para pesquisar no ecrã de pesquisa do app, usa secao pesquisa com consulta. " +
+    "pesquisar_conteudos: procura no catálogo completo por nome, género ou tipo e devolve os resultados com ID, nota e downloads. " +
+    "ler_favoritos: devolve os conteúdos que o usuário guardou nos favoritos; usa quando ele perguntar pelos favoritos ou pedir sugestões parecidas com o que já guardou. " +
+    "Depois de usar as ferramentas, escreve sempre uma resposta curta em texto; os botões aparecem automaticamente por baixo." +
+    aiGuide() +
+    (t ? "\n" + sel + "Cada conteúdo da lista traz descrição curta, nota média de 0 a 5 (com o número de avaliações entre parênteses), downloads e se é novidade. Usa esses dados para recomendar com critério (por exemplo, dar preferência ao que tem nota alta ou muitos downloads, e lembrar o que é novidade). \"sem nota\" quer dizer só que ainda não há avaliações suficientes, não que seja mau. Só diz que é novidade se estiver marcado \"sim\". Não inventes dados que não estejam na lista.\nConteúdos disponíveis (ID | título | tipo | género | descrição | nota (avaliações) | downloads | novidade):\n" + t : "");
+}
+function aiContents() {
+  const c = aiHist.slice(-11).map((m) => ({ role: m.role, parts: m.parts }));
+  while (c.length && c[0].role !== "user") c.shift();
+  return c;
+}
+function aiSave() { try { sessionStorage.setItem("pd_ai_hist", JSON.stringify(aiHist.slice(-30))); } catch (e) {} }
+function aiTools() {
+  return [{ functionDeclarations: [
+    {
+      name: "abrir_conteudo",
+      description: "Abre a página de um conteúdo (jogo, app ou tutorial) do Portal Digital. Usa o ID exato da lista de conteúdos ou devolvido por pesquisar_conteudos.",
+      parameters: { type: "OBJECT", properties: { id: { type: "STRING", description: "ID exato do conteúdo." } }, required: ["id"] }
+    },
+    {
+      name: "ir_para",
+      description: "Leva o usuário a uma secção do app. Chaves: inicio (página inicial), favoritos (conteúdos guardados), notificacoes, pedidos (pedir conteúdos), perfil (conta e perfil), configuracoes (tema, cores, aparência), comunidade, historico (conteúdos vistos), sobre, termos, ajuda (perguntas frequentes), reportar (reportar um problema), senha (alterar senha), resgatar (resgatar códigos e comprar pontos), pontos (ganhar pontos), pesquisa (pesquisar).",
+      parameters: { type: "OBJECT", properties: {
+        secao: { type: "STRING", enum: Object.keys(AI_DEST), description: "Chave da secção." },
+        consulta: { type: "STRING", description: "Só para secao=pesquisa: texto a pesquisar no ecrã de pesquisa." }
+      }, required: ["secao"] }
+    },
+    {
+      name: "pesquisar_conteudos",
+      description: "Pesquisa no catálogo completo do app por nome, género ou tipo. Devolve até 8 resultados com ID, nota e downloads.",
+      parameters: { type: "OBJECT", properties: { consulta: { type: "STRING", description: "Nome, género ou tipo a procurar." } }, required: ["consulta"] }
+    },
+    {
+      name: "ler_favoritos",
+      description: "Devolve os conteúdos que o usuário guardou nos favoritos, do mais recente para o mais antigo."
+    }
+  ] }];
+}
+function aiItem(id, x) {
+  const cl = (v, n) => String(v || "").replace(/\s+/g, " ").trim().slice(0, n);
+  const r = typeof pdRating === "function" ? pdRating(x) : null;
+  return {
+    id: id, titulo: cl(x.titulo, 60), tipo: cl(x.type, 20), genero: cl(x.genero, 40), descricao: cl(x.descCurta || x.descricao, 90),
+    nota: r ? r.avg.toFixed(1) + "/5 (" + r.count + " avaliações)" : "sem nota", downloads: Number(x.downloads) || 0,
+    novidade: typeof isNewGame === "function" && isNewGame(x)
+  };
+}
+function aiRunTool(name, args, acts) {
+  const a = args || {};
+  const g = typeof allGames !== "undefined" && allGames ? allGames : {};
+  if (name === "abrir_conteudo") {
+    const id = String(a.id || "").trim();
+    if (!g[id] || !g[id].titulo) return { erro: "Esse ID não existe. Usa um ID da lista ou de pesquisar_conteudos." };
+    if (acts.ids.indexOf(id) < 0) {
+      if (acts.ids.length >= 3) return { erro: "Já ofereceste o máximo de 3 conteúdos." };
+      acts.ids.push(id);
+    }
+    return { ok: true, titulo: g[id].titulo, nota: "O botão para abrir já aparece ao usuário." };
+  }
+  if (name === "ir_para") {
+    const k = String(a.secao || "").trim();
+    if (!AI_DEST[k]) return { erro: "Secção desconhecida. Chaves válidas: " + Object.keys(AI_DEST).join(", ") };
+    const c = k === "pesquisa" ? String(a.consulta || "").trim().slice(0, 60) : "";
+    if (!acts.dest.some((d) => d.k === k && d.c === c)) {
+      if (acts.dest.length >= 2) return { erro: "Já ofereceste o máximo de 2 secções." };
+      acts.dest.push({ k: k, c: c });
+    }
+    return { ok: true, secao: AI_DEST[k][0], nota: "O botão para abrir já aparece ao usuário." };
+  }
+  if (name === "pesquisar_conteudos") {
+    const q = String(a.consulta || "").trim();
+    if (!q) return { erro: "Consulta vazia." };
+    const arr = Object.entries(g).filter((e) => e[1] && e[1].titulo).map((e) => Object.assign({ id: e[0] }, e[1]));
+    const res = typeof searchGames === "function" ? searchGames(arr, q) : [];
+    if (!res.length) return { total: 0, resultados: [], sugestao: (typeof suggestTitle === "function" && suggestTitle(arr, q)) || undefined };
+    return { total: res.length, resultados: res.slice(0, 8).map((x) => aiItem(x.id, x)) };
+  }
+  if (name === "ler_favoritos") {
+    if (!currentUser || currentUser.isAnonymous) return { erro: "O usuário é visitante e não tem favoritos. Precisa de criar conta." };
+    const f = typeof userFavorites !== "undefined" && userFavorites ? userFavorites : {};
+    const ents = Object.entries(f).sort((p, q) => ((q[1] && q[1].addedAt) || 0) - ((p[1] && p[1].addedAt) || 0));
+    return {
+      total: ents.length,
+      favoritos: ents.slice(0, 30).map((e) => g[e[0]] && g[e[0]].titulo ? aiItem(e[0], g[e[0]]) : { id: e[0], titulo: String((e[1] && e[1].titulo) || e[0]).slice(0, 60), removido: true })
+    };
+  }
+  return { erro: "Ferramenta desconhecida." };
+}
+async function aiPost(model, sys, contents, tools) {
+  const body = { systemInstruction: { parts: [{ text: sys }] }, contents: contents, generationConfig: { maxOutputTokens: 2048, temperature: 0.7 } };
+  if (tools) body.tools = aiTools();
+  try {
+    return await fetch("https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-goog-api-key": aiKey() },
+      body: JSON.stringify(body)
+    });
+  } catch (e) { throw { net: true }; }
+}
+async function aiTry(model, sys) {
+  const contents = aiContents();
+  const acts = { ids: [], dest: [] };
+  let tools = true, text = "", why = "";
+  for (let round = 0; round < 5; round++) {
+    const r = await aiPost(model, sys, contents, tools);
+    if (!r.ok) {
+      const er = await aiErr(r);
+      er.model = model;
+      if (tools && er.status === 400 && /function|tool/i.test(er.msg || "") && !/api key/i.test(er.msg || "")) { tools = false; round--; continue; }
+      return { err: er };
+    }
+    const j = await r.json();
+    const cand = j.candidates && j.candidates[0];
+    const parts = (cand && cand.content && cand.content.parts) || [];
+    const calls = parts.filter((x) => x.functionCall);
+    text = parts.map((x) => x.text || "").join("").trim();
+    why = (j.promptFeedback && j.promptFeedback.blockReason) || (cand && cand.finishReason) || "resposta vazia";
+    if (!calls.length) break;
+    const outs = calls.map((x) => ({ functionResponse: { name: x.functionCall.name, response: aiRunTool(x.functionCall.name, x.functionCall.args, acts) } }));
+    const needsData = calls.some((x) => x.functionCall.name === "pesquisar_conteudos" || x.functionCall.name === "ler_favoritos");
+    if ((text && !needsData) || round === 4) break;
+    contents.push({ role: "model", parts: parts });
+    contents.push({ role: "user", parts: outs });
+  }
+  if (!text && !acts.ids.length && !acts.dest.length) return { err: { status: 0, model: model, msg: why } };
+  return { res: { text: text || "Aqui tens:", ac: acts } };
+}
+async function aiCall() {
+  const sys = aiSystem();
+  const pk = aiPick();
+  const list = pk ? [pk] : [AI_DEFAULT];
+  let last = null, extra = false;
+  for (let i = 0; i < list.length; i++) {
+    const x = await aiTry(list[i], sys);
+    if (x.res) return x.res;
+    last = x.err;
+    if ([0, 404, 429, 500, 503].indexOf(last.status) < 0) throw last;
+    if (i === list.length - 1 && !pk && !extra) {
+      extra = true;
+      try { (await aiModels()).forEach((m) => { if (list.indexOf(m) < 0) list.push(m); }); } catch (e) {}
+    }
+  }
+  throw last || { status: 0, msg: "sem resposta" };
+}
+var aiReturn = null;
+function aiLogged(txt, fn) { if (!currentUser || currentUser.isAnonymous) showSignupPrompt(txt); else fn(); }
+var AI_DEST = {
+  inicio: ["Início", () => goHome(), false],
+  favoritos: ["Favoritos", () => navOpenFavorites(), true],
+  notificacoes: ["Notificações", () => navOpenNotifications(), true],
+  pedidos: ["Pedidos", () => navOpenRequests(), true],
+  perfil: ["Perfil", () => navOpenAccount(), true],
+  configuracoes: ["Configurações", () => openSettings(), true],
+  comunidade: ["Comunidade", () => openCommunityModal(), true],
+  historico: ["Histórico", () => openHistoryModal(), true],
+  sobre: ["Sobre", () => openAboutOverlay(), true],
+  termos: ["Termos", () => openTermsOverlay(), true],
+  ajuda: ["Ajuda (FAQ)", () => openFaqModal(), true],
+  reportar: ["Reportar problema", () => openReportProblemModal(), true],
+  senha: ["Alterar senha", () => aiLogged("alterar a senha", openChangePasswordOverlay), true],
+  resgatar: ["Resgatar código", () => aiLogged("resgatar um código", openRedeemCodeModal), true],
+  pontos: ["Ganhar pontos", () => aiLogged("ganhar pontos", () => RewardedAds.abrirPagina()), true],
+  pesquisa: ["Pesquisar", () => openSearchOverlay(), true]
+};
+function aiParse(a) {
+  const ids = [], dest = [];
+  const clean = a.replace(/\[\[(abrir|ir):([^\]\s]+)\]\]/g, (m, k, v) => {
+    if (k === "abrir" && ids.indexOf(v) < 0) ids.push(v);
+    if (k === "ir" && dest.indexOf(v) < 0) dest.push(v);
+    return "";
+  }).trim();
+  const g = typeof allGames !== "undefined" && allGames ? allGames : {};
+  return { clean: clean, ids: ids.filter((id) => g[id]).slice(0, 3), dest: dest.filter((d) => AI_DEST[d]).slice(0, 2) };
+}
+function aiLeave(fn, ret) {
+  aiBack();
+  if (ret) {
+    if (aiReturn) clearTimeout(aiReturn.t);
+    aiReturn = { seen: false, t: setTimeout(() => { aiReturn = null; }, 6000) };
+  }
+  setTimeout(fn, 60);
+}
+function aiOpenContent(id) { aiLeave(() => openGameDetail(id), true); }
+function aiOpenDest(k, c) {
+  const d = AI_DEST[k];
+  if (!d) return;
+  if (k === "pesquisa" && c) {
+    aiLeave(() => {
+      openSearchOverlay();
+      const i = document.getElementById("searchOverlayInput");
+      if (i) { i.value = c; if (typeof renderSearchOverlayResults === "function") renderSearchOverlayResults(); }
+    }, true);
+    return;
+  }
+  aiLeave(d[1], d[2]);
+}
+function aiAnyOpen() {
+  const o = document.getElementById("overlay");
+  if (o && o.classList.contains("active")) return true;
+  return !!document.querySelector('[id$="Overlay"].active:not(#aiOverlay):not(#authLoadingOverlay), [id$="Modal"].active');
+}
+function aiShowAnswer(el, a, q, ac) {
+  const p = aiParse(a);
+  const g = typeof allGames !== "undefined" && allGames ? allGames : {};
+  const ids = [], dest = [];
+  ((ac && ac.ids) || []).concat(p.ids).forEach((id) => { if (g[id] && ids.indexOf(id) < 0 && ids.length < 3) ids.push(id); });
+  ((ac && ac.dest) || []).concat(p.dest.map((k) => ({ k: k, c: "" }))).forEach((d) => {
+    const c = (d && d.c) || "";
+    if (d && AI_DEST[d.k] && !dest.some((x) => x.k === d.k && x.c === c) && dest.length < 2) dest.push({ k: d.k, c: c });
+  });
+  const n = ids.length + dest.length;
+  el.innerHTML = aiFmt(p.clean || (n ? "Aqui tens:" : a));
+  if (!n) return;
+  const c = document.createElement("div");
+  c.className = "ai-chips";
+  c.style.marginTop = "10px";
+  const add = (label, fn) => { const b = document.createElement("button"); b.className = "ai-chip"; b.textContent = label; b.onclick = fn; c.appendChild(b); };
+  ids.forEach((id) => add("Abrir: " + g[id].titulo, () => aiOpenContent(id)));
+  dest.forEach((d) => add(d.k === "pesquisa" && d.c ? 'Pesquisar: "' + d.c + '"' : "Abrir " + AI_DEST[d.k][0], () => aiOpenDest(d.k, d.c)));
+  el.appendChild(c);
+  if (n === 1 && /\b(abr[ae]|abrir|abre-me|leva-me|vai|mostra|mostra-me|quero ver|quero ir)\b/i.test(q)) setTimeout(() => (ids.length ? aiOpenContent(ids[0]) : aiOpenDest(dest[0].k, dest[0].c)), 700);
+}
+function aiRenderHist() {
+  aiGreeted = true;
+  aiBarShow(true);
+  aiBox().innerHTML = "";
+  if (!aiHist.length) { aiWelcome(); return; }
+  aiHist.forEach((m) => {
+    const t = (m.parts && m.parts[0] && m.parts[0].text) || "";
+    if (m.role === "user") aiAdd("user", t); else aiShowAnswer(aiAdd("bot", ""), t, "", m.ac);
+  });
+}
+function aiClear() { aiHist = []; aiSave(); aiWelcome(); }
+async function aiSend(pre) {
+  if (aiBusy) return;
+  const inp = document.getElementById("aiInput");
+  const q = (typeof pre === "string" ? pre : inp.value).trim();
+  if (!q) return;
+  if (!aiKey()) { aiSetup(); return; }
+  inp.value = ""; inp.style.height = "auto";
+  aiBusy = true; document.getElementById("aiSendBtn").disabled = true;
+  aiAdd("user", q);
+  aiHist.push({ role: "user", parts: [{ text: q }] });
+  const wait = aiAdd("bot", "");
+  wait.innerHTML = '<span class="ai-dots"><span></span><span></span><span></span></span>';
+  try {
+    const a = await aiCall();
+    aiHist.push({ role: "model", parts: [{ text: a.text }], ac: a.ac });
+    aiSave();
+    aiShowAnswer(wait, a.text, q, a.ac);
+  } catch (e) {
+    aiHist.pop();
+    const st = e && e.status, det = e && e.msg ? " (" + (e.model ? e.model + ": " : "") + String(e.msg).slice(0, 140) + ")" : "";
+    const own = aiOwn();
+    const keyBad = st === 401 || st === 403 || (st === 400 && /api key/i.test(e.msg || ""));
+    wait.textContent = e && e.net ? "Não consegui ligar ao Gemini. Verifica a internet e tenta de novo." :
+      keyBad ? (own ? "A chave não foi aceite. Toca no ícone da chave no topo para a trocar." : "A chave padrão do app não está disponível agora. Cria a tua própria chave para continuar.") + det :
+      st === 429 ? (own ? "Atingiste o limite gratuito por agora. Tenta daqui a pouco." : "O limite gratuito da chave padrão do app esgotou por agora. Cria a tua própria chave para continuar.") + det :
+      "O Gemini devolveu um erro" + (st ? " " + st : "") + "." + det;
+    if (!own && !(e && e.net) && (keyBad || st === 429)) {
+      const c = document.createElement("div");
+      c.className = "ai-chips";
+      c.style.marginTop = "10px";
+      const bt = document.createElement("button");
+      bt.className = "ai-chip";
+      bt.textContent = "Criar a minha chave";
+      bt.onclick = () => aiSetup("Cria a tua chave gratuita para continuar a usar o assistente.");
+      c.appendChild(bt);
+      wait.appendChild(c);
+    }
+  }
+  aiScrollEnd(wait.parentNode);
+  aiBusy = false; document.getElementById("aiSendBtn").disabled = false;
+}
+try { aiHist = JSON.parse(sessionStorage.getItem("pd_ai_hist") || "[]") || []; } catch (e) { aiHist = []; }
+if (window.visualViewport) {
+  window.visualViewport.addEventListener("resize", aiFit);
+  window.visualViewport.addEventListener("scroll", aiFit);
+}
+document.getElementById("aiInput").addEventListener("focus", () => { setTimeout(aiFit, 300); });
+new MutationObserver(() => {
+  if (!aiReturn) return;
+  if (aiAnyOpen()) { aiReturn.seen = true; clearTimeout(aiReturn.t); }
+  else if (aiReturn.seen) { aiReturn = null; aiOpen(); }
+}).observe(document.body, { attributes: true, attributeFilter: ["class"], subtree: true });
 </script>
 </body>
 </html>
