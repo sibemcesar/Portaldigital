@@ -12199,6 +12199,11 @@ window.firebaseModules = {
 .ai-fab:active{transform:scale(.9)}
 .ai-fab svg{width:26px;height:26px;fill:currentColor}
 .ai-chips{display:flex;flex-wrap:wrap;gap:8px}
+.ai-cards{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.ai-card{display:flex;align-items:center;gap:10px;width:100%;border:1px solid var(--border-color);background:var(--bg-primary);color:var(--text-primary);border-radius:14px;padding:8px;font-family:'Inter',sans-serif;text-align:left;cursor:pointer}
+.ai-card img{width:56px;height:56px;border-radius:10px;object-fit:cover;flex-shrink:0;background:var(--bg-secondary)}
+.ai-card-t{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:14px;font-weight:600;line-height:1.25}
+.ai-card-s{display:block;margin-top:2px;font-size:12px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ai-chip{border:1px solid var(--border-color);background:var(--bg-primary);color:var(--text-primary);border-radius:999px;padding:8px 14px;font-size:13px;font-family:'Inter',sans-serif;cursor:pointer;transition:transform .35s var(--m3-spring)}
 .ai-chip:active{transform:scale(.94)}
 .ai-setup{background:var(--bg-secondary);border-radius:var(--m3-r-card);padding:18px;display:flex;flex-direction:column;gap:10px}
@@ -12215,6 +12220,8 @@ window.firebaseModules = {
 .ai-dots span{display:inline-block;width:6px;height:6px;margin:0 2px;border-radius:50%;background:var(--text-muted);animation:aiDot 1s infinite}
 .ai-dots span:nth-child(2){animation-delay:.2s}
 .ai-dots span:nth-child(3){animation-delay:.4s}
+.ai-status{margin-left:8px;font-size:13px;color:var(--text-muted);animation:aiPulse 1.6s ease-in-out infinite}
+@keyframes aiPulse{0%,100%{opacity:.55}50%{opacity:1}}
 @keyframes aiDot{0%,80%,100%{opacity:.25}40%{opacity:1}}
 </style>
 </head>
@@ -27218,7 +27225,7 @@ function aiSystem() {
   const sel = all.length > pick.length ? "A lista abaixo é só uma seleção de " + pick.length + " dos " + all.length + " conteúdos do app: os que combinam com a pergunta e alguns destaques. Se o usuário procurar algo que não esteja nela, usa a ferramenta pesquisar_conteudos, que pesquisa no catálogo completo, antes de dizer que não encontraste. Nunca digas que um conteúdo não existe só porque não está na lista. " : "";
   return "És o assistente do Portal Digital, um app angolano de jogos e conteúdos. Responde em português de Angola, com palavras simples e do dia a dia, como numa conversa entre amigos. Sê simpático e positivo, mas sem exagerar: nada de frases pomposas, palavras difíceis ou elogios repetidos. Mostra o que é bom de forma natural e, quando fizer sentido, convida o usuário a experimentar. Respostas curtas, de 2 a 5 linhas, com no máximo um emoji. Sê sempre honesto: não inventes funções do app, nem detalhes ou preços que não estejam na lista. Se não souberes, diz que não sabes e sugere outra opção. " +
     "" +
-    "Tens ferramentas para agir no app. Usa-as em vez de escrever marcadores no texto (nunca escrevas nada como [[abrir:...]] ou [[ir:...]]). " +
+    "Tens ferramentas para agir no app. Usa-as em vez de escrever marcadores no texto (nunca escrevas nada como [[abrir:...]] ou [[ir:...]]). Nunca escrevas IDs de conteúdos no texto: os conteúdos aparecem sozinhos, em cartões com imagem e título. " +
     "abrir_conteudo: abre a página de um conteúdo; usa o ID exato da lista ou de pesquisar_conteudos (no máximo 3), quando o usuário pedir para abrir, ver ou mostrar, ou quando recomendares conteúdos. " +
     "ir_para: leva o usuário a uma secção do app (no máximo 2), quando ele quiser ir lá ou quando isso resolver o pedido dele. Para pesquisar no ecrã de pesquisa do app, usa secao pesquisa com consulta. " +
     "pesquisar_conteudos: procura no catálogo completo por nome, género ou tipo e devolve os resultados com ID, nota e downloads. " +
@@ -27309,11 +27316,83 @@ function aiRunTool(name, args, acts) {
   }
   return { erro: "Ferramenta desconhecida." };
 }
+var aiLive = null;
+function aiSetStatus(t) {
+  if (!aiLive) return;
+  aiLive.last = t;
+  aiLive.el.innerHTML = '<span class="ai-dots"><span></span><span></span><span></span></span><span class="ai-status">' + escapeHtml(t) + '</span>';
+}
+function aiLiveText(t) {
+  if (!aiLive || aiLive.tool) return;
+  const c = aiStripIds(String(t).replace(/\[\[(abrir|ir):[^\]]*\]\]/g, "").replace(/\[\[[^\]]*$/, ""), null).replace(/(?<![A-Za-z0-9_-])(?=[A-Za-z0-9_-]*\d)(?=[A-Za-z0-9_-]*[A-Za-z])[A-Za-z0-9_-]{8,}$/, "").trim();
+  if (!c) return;
+  aiLive.last = "";
+  aiLive.el.innerHTML = aiFmt(c);
+  if (aiLive.el.parentNode) aiScrollEnd(aiLive.el.parentNode);
+}
+function aiToolStatus(c) {
+  if (!aiLive || !c) return;
+  const a = c.args || {};
+  if (c.name === "pesquisar_conteudos") aiSetStatus('A pesquisar "' + String(a.consulta || "").slice(0, 28) + '" no catálogo…');
+  else if (c.name === "ler_favoritos") aiSetStatus("A ver os teus favoritos…");
+  else if (c.name === "abrir_conteudo" || c.name === "ir_para") aiSetStatus("A preparar o atalho…");
+  else return;
+  aiLive.tool = true;
+}
+async function aiReadStream(r) {
+  const parts = [];
+  let fin = "", block = "";
+  const feed = (j) => {
+    if (j.error) throw { status: j.error.code || 0, msg: j.error.message || "" };
+    if (j.promptFeedback && j.promptFeedback.blockReason) block = j.promptFeedback.blockReason;
+    const c = j.candidates && j.candidates[0];
+    if (!c) return;
+    if (c.finishReason) fin = c.finishReason;
+    ((c.content && c.content.parts) || []).forEach((p) => {
+      if (p.functionCall) { parts.push(p); aiToolStatus(p.functionCall); }
+      else if (typeof p.text === "string" && !p.thought) {
+        const l = parts[parts.length - 1];
+        if (l && typeof l.text === "string") l.text += p.text; else parts.push({ text: p.text });
+      }
+    });
+    aiLiveText(parts.map((x) => x.text || "").join(""));
+  };
+  const line = (ln) => {
+    ln = ln.trim();
+    if (ln.indexOf("data:") !== 0) return;
+    const d = ln.slice(5).trim();
+    if (!d || d === "[DONE]") return;
+    let j = null;
+    try { j = JSON.parse(d); } catch (e) { return; }
+    feed(j);
+  };
+  try {
+    if (r.body && r.body.getReader) {
+      const rd = r.body.getReader(), dec = new TextDecoder();
+      let buf = "";
+      for (;;) {
+        const x = await rd.read();
+        if (x.done) break;
+        buf += dec.decode(x.value, { stream: true });
+        let k;
+        while ((k = buf.indexOf("\n")) >= 0) { line(buf.slice(0, k)); buf = buf.slice(k + 1); }
+      }
+      buf += dec.decode();
+      buf.split("\n").forEach(line);
+    } else {
+      (await r.text()).split("\n").forEach(line);
+    }
+  } catch (e) {
+    if (e && e.status !== undefined) throw e;
+    throw { net: true };
+  }
+  return { candidates: [{ content: { parts: parts }, finishReason: fin }], promptFeedback: { blockReason: block } };
+}
 async function aiPost(model, sys, contents, tools) {
   const body = { systemInstruction: { parts: [{ text: sys }] }, contents: contents, generationConfig: { maxOutputTokens: 2048, temperature: 0.7 } };
   if (tools) body.tools = aiTools();
   try {
-    return await fetch("https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent", {
+    return await fetch("https://generativelanguage.googleapis.com/v1beta/models/" + model + ":streamGenerateContent?alt=sse", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-goog-api-key": aiKey() },
       body: JSON.stringify(body)
@@ -27325,6 +27404,7 @@ async function aiTry(model, sys) {
   const acts = { ids: [], dest: [] };
   let tools = true, text = "", why = "";
   for (let round = 0; round < 5; round++) {
+    if (aiLive) aiLive.tool = false;
     const r = await aiPost(model, sys, contents, tools);
     if (!r.ok) {
       const er = await aiErr(r);
@@ -27332,7 +27412,7 @@ async function aiTry(model, sys) {
       if (tools && er.status === 400 && /function|tool/i.test(er.msg || "") && !/api key/i.test(er.msg || "")) { tools = false; round--; continue; }
       return { err: er };
     }
-    const j = await r.json();
+    const j = await aiReadStream(r);
     const cand = j.candidates && j.candidates[0];
     const parts = (cand && cand.content && cand.content.parts) || [];
     const calls = parts.filter((x) => x.functionCall);
@@ -27341,6 +27421,7 @@ async function aiTry(model, sys) {
     if (!calls.length) break;
     const outs = calls.map((x) => ({ functionResponse: { name: x.functionCall.name, response: aiRunTool(x.functionCall.name, x.functionCall.args, acts) } }));
     const needsData = calls.some((x) => x.functionCall.name === "pesquisar_conteudos" || x.functionCall.name === "ler_favoritos");
+    if (needsData) aiSetStatus("A preparar a resposta…");
     if ((text && !needsData) || round === 4) break;
     contents.push({ role: "model", parts: parts });
     contents.push({ role: "user", parts: outs });
@@ -27354,6 +27435,7 @@ async function aiCall() {
   const list = pk ? [pk] : [AI_DEFAULT];
   let last = null, extra = false;
   for (let i = 0; i < list.length; i++) {
+    if (i > 0) aiSetStatus("A tentar outro modelo…");
     const x = await aiTry(list[i], sys);
     if (x.res) return x.res;
     last = x.err;
@@ -27385,14 +27467,43 @@ var AI_DEST = {
   pontos: ["Ganhar pontos", () => aiLogged("ganhar pontos", () => RewardedAds.abrirPagina()), true],
   pesquisa: ["Pesquisar", () => openSearchOverlay(), true]
 };
+function aiStripIds(t, found) {
+  const g = typeof allGames !== "undefined" && allGames ? allGames : {};
+  const out = String(t).replace(/[A-Za-z0-9_-]{4,}/g, (tok) => {
+    if (g[tok]) { if (found) found.push(tok); return ""; }
+    if (tok.length < 20 || tok.length % 20 !== 0) return tok;
+    const ch = tok.match(/.{20}/g);
+    if (ch.every((c) => g[c])) { if (found) ch.forEach((c) => found.push(c)); return ""; }
+    if (ch.every((c) => /\d/.test(c) && /[A-Za-z]/.test(c))) return "";
+    return tok;
+  });
+  return out.replace(/\b(?:ID|id)\s*[:=]\s*(?=[\s.,;:)\]]|$)/g, "").replace(/\(\s*\)/g, "").replace(/`\s*`/g, "").replace(/[ \t]{2,}/g, " ").replace(/[ \t]+([.,;:!?])/g, "$1").replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+}
+function aiMentioned(t, g, have) {
+  const n = " " + aiNorm(t) + " ";
+  const hits = [];
+  Object.keys(g).forEach((id) => {
+    const x = g[id];
+    if (!x || !x.titulo || have.indexOf(id) >= 0) return;
+    const tn = aiNorm(x.titulo);
+    if (tn.length < 4) return;
+    const k = n.indexOf(" " + tn + " ");
+    if (k >= 0) hits.push([k, id]);
+  });
+  return hits.sort((a, b) => a[0] - b[0]).map((h) => h[1]);
+}
 function aiParse(a) {
   const ids = [], dest = [];
-  const clean = a.replace(/\[\[(abrir|ir):([^\]\s]+)\]\]/g, (m, k, v) => {
+  const g = typeof allGames !== "undefined" && allGames ? allGames : {};
+  let clean = a.replace(/\[\[(abrir|ir):([^\]\s]+)\]\]/g, (m, k, v) => {
     if (k === "abrir" && ids.indexOf(v) < 0) ids.push(v);
     if (k === "ir" && dest.indexOf(v) < 0) dest.push(v);
     return "";
   }).trim();
-  const g = typeof allGames !== "undefined" && allGames ? allGames : {};
+  const found = [];
+  clean = aiStripIds(clean, found);
+  found.forEach((id) => { if (ids.indexOf(id) < 0) ids.push(id); });
+  aiMentioned(clean, g, ids).forEach((id) => { if (ids.indexOf(id) < 0) ids.push(id); });
   return { clean: clean, ids: ids.filter((id) => g[id]).slice(0, 3), dest: dest.filter((d) => AI_DEST[d]).slice(0, 2) };
 }
 function aiLeave(fn, ret) {
@@ -27434,13 +27545,49 @@ function aiShowAnswer(el, a, q, ac) {
   const n = ids.length + dest.length;
   el.innerHTML = aiFmt(p.clean || (n ? "Aqui tens:" : a));
   if (!n) return;
-  const c = document.createElement("div");
-  c.className = "ai-chips";
-  c.style.marginTop = "10px";
-  const add = (label, fn) => { const b = document.createElement("button"); b.className = "ai-chip"; b.textContent = label; b.onclick = fn; c.appendChild(b); };
-  ids.forEach((id) => add("Abrir: " + g[id].titulo, () => aiOpenContent(id)));
-  dest.forEach((d) => add(d.k === "pesquisa" && d.c ? 'Pesquisar: "' + d.c + '"' : "Abrir " + AI_DEST[d.k][0], () => aiOpenDest(d.k, d.c)));
-  el.appendChild(c);
+  if (ids.length) {
+    const w = document.createElement("div");
+    w.className = "ai-cards";
+    ids.forEach((id) => {
+      const x = g[id];
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "ai-card";
+      const im = document.createElement("img");
+      im.alt = "";
+      im.loading = "lazy";
+      im.onerror = () => { im.onerror = null; im.src = "logo.png"; };
+      im.src = x.poster || "logo.png";
+      const tx = document.createElement("span");
+      tx.style.minWidth = "0";
+      const t1 = document.createElement("span");
+      t1.className = "ai-card-t";
+      t1.textContent = x.titulo;
+      const t2 = document.createElement("span");
+      t2.className = "ai-card-s";
+      t2.textContent = [x.type, x.genero].filter(Boolean).join(" · ");
+      tx.appendChild(t1);
+      if (t2.textContent) tx.appendChild(t2);
+      b.appendChild(im);
+      b.appendChild(tx);
+      b.onclick = () => aiOpenContent(id);
+      w.appendChild(b);
+    });
+    el.appendChild(w);
+  }
+  if (dest.length) {
+    const c = document.createElement("div");
+    c.className = "ai-chips";
+    c.style.marginTop = "10px";
+    dest.forEach((d) => {
+      const b = document.createElement("button");
+      b.className = "ai-chip";
+      b.textContent = d.k === "pesquisa" && d.c ? 'Pesquisar: "' + d.c + '"' : "Abrir " + AI_DEST[d.k][0];
+      b.onclick = () => aiOpenDest(d.k, d.c);
+      c.appendChild(b);
+    });
+    el.appendChild(c);
+  }
   if (n === 1 && /\b(abr[ae]|abrir|abre-me|leva-me|vai|mostra|mostra-me|quero ver|quero ir)\b/i.test(q)) setTimeout(() => (ids.length ? aiOpenContent(ids[0]) : aiOpenDest(dest[0].k, dest[0].c)), 700);
 }
 function aiRenderHist() {
@@ -27465,7 +27612,9 @@ async function aiSend(pre) {
   aiAdd("user", q);
   aiHist.push({ role: "user", parts: [{ text: q }] });
   const wait = aiAdd("bot", "");
-  wait.innerHTML = '<span class="ai-dots"><span></span><span></span><span></span></span>';
+  aiLive = { el: wait, last: "", tool: false, t: null };
+  aiSetStatus("A pensar…");
+  aiLive.t = setTimeout(() => { if (aiLive && aiLive.last === "A pensar…") aiSetStatus("A demorar um pouco mais do que o normal…"); }, 9000);
   try {
     const a = await aiCall();
     aiHist.push({ role: "model", parts: [{ text: a.text }], ac: a.ac });
@@ -27492,6 +27641,7 @@ async function aiSend(pre) {
       wait.appendChild(c);
     }
   }
+  if (aiLive) { clearTimeout(aiLive.t); aiLive = null; }
   aiScrollEnd(wait.parentNode);
   aiBusy = false; document.getElementById("aiSendBtn").disabled = false;
 }
