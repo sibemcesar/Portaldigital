@@ -12157,12 +12157,14 @@ window.firebaseModules = {
 <style>
 .dst-section{margin:0;padding-top:12px}
 .dst-section+.trending-section{padding-top:4px}
-.dst-track{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:0 12px;scroll-padding:0 12px}
+.dst-track{display:flex;gap:12px;overflow-x:auto;scroll-behavior:smooth;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:0 12px;scroll-padding:0 12px}
 .dst-track::-webkit-scrollbar{display:none}
 .dst-card{flex:0 0 100%;scroll-snap-align:center;background:var(--bg-secondary);border-radius:var(--m3-r-card);overflow:hidden;display:flex;flex-direction:column;transition:transform .35s var(--m3-spring)}
 .dst-card:active{transform:scale(.98)}
 .dst-multi .dst-card{flex-basis:92%}
 .dst-img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;background:var(--bg-secondary)}
+.dst-vid{position:relative;width:100%;aspect-ratio:16/9;background:var(--bg-secondary) center/cover no-repeat;overflow:hidden}
+.dst-vid iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;pointer-events:none}
 .dst-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px}
 .dst-title{font-size:16px;font-weight:700;color:var(--text-primary);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .dst-text{font-size:13px;color:var(--text-secondary);line-height:1.4;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
@@ -13295,6 +13297,7 @@ window.firebaseModules = {
       <section class="settings-group" style="--i:2">
         <h2 class="settings-title">Avisos e dados</h2>
         <div class="settings-card">
+          <button type="button" class="settings-row" role="switch" aria-checked="true" data-sw="autovid" onclick="settingsSwitch(this)"><span class="settings-row-text"><span class="settings-row-title">Vídeos automáticos</span><span class="settings-row-sub">Toca sozinhos, sem som, os vídeos dos destaques. Só funciona com animações Normais. Desligado mostra só a capa do destaque.</span></span><span class="switch"></span></button>
           <button type="button" class="settings-row" onclick="settingsResetReminders()"><span class="settings-row-text"><span class="settings-row-title">Reativar avisos e lembretes</span><span class="settings-row-sub">Volta a mostrar o inquérito e o aviso das redes sociais.</span></span><svg class="chev" viewBox="0 0 24 24"><path d="M9.29 6.71a1 1 0 000 1.41L13.17 12l-3.88 3.88a1 1 0 101.41 1.41l4.59-4.59a1 1 0 000-1.41L10.7 6.7a1 1 0 00-1.41.01z"/></svg></button>
           <button type="button" class="settings-row" onclick="settingsClearCache()"><span class="settings-row-text"><span class="settings-row-title">Limpar cache do app</span><span class="settings-row-sub">Apaga ficheiros guardados neste aparelho. A conta e os pontos não são afetados.</span></span><svg class="chev" viewBox="0 0 24 24"><path d="M9.29 6.71a1 1 0 000 1.41L13.17 12l-3.88 3.88a1 1 0 101.41 1.41l4.59-4.59a1 1 0 000-1.41L10.7 6.7a1 1 0 00-1.41.01z"/></svg></button>
           <button type="button" class="settings-row" onclick="settingsRestoreDefaults()"><span class="settings-row-text"><span class="settings-row-title">Restaurar padrões</span><span class="settings-row-sub">Volta tema, cor, visualização, tamanho, animações e recomendações ao original.</span></span><svg class="chev" viewBox="0 0 24 24"><path d="M9.29 6.71a1 1 0 000 1.41L13.17 12l-3.88 3.88a1 1 0 101.41 1.41l4.59-4.59a1 1 0 000-1.41L10.7 6.7a1 1 0 00-1.41.01z"/></svg></button>
@@ -14547,6 +14550,7 @@ function applyUiSize() {
 }
 const PD_PREF_FORYOU = "pd_pref_foryou";
 const PD_PREF_DAILY = "pd_pref_daily";
+const PD_PREF_AUTOVID = "pd_pref_autovid";
 function pdPrefGet(key) {
   try { return localStorage.getItem(key); } catch (e) { return null; }
 }
@@ -14607,12 +14611,14 @@ function renderSettings() {
   });
   const pal = pdPrefGet(PD_PREF_PALETTE) || "padrao";
   ov.querySelectorAll(".swatch").forEach((b) => b.classList.toggle("on", b.dataset.p === pal));
-  const keys = { foryou: PD_PREF_FORYOU, daily: PD_PREF_DAILY };
+  const keys = { foryou: PD_PREF_FORYOU, daily: PD_PREF_DAILY, autovid: PD_PREF_AUTOVID };
   ov.querySelectorAll("[data-sw]").forEach((b) => {
     const on = pdPrefOn(keys[b.dataset.sw]);
     b.classList.toggle("switch-on", on);
     b.setAttribute("aria-checked", on ? "true" : "false");
   });
+  const av = ov.querySelector('[data-sw="autovid"]');
+  if (av) av.style.opacity = state.motion === "normal" ? "" : "0.5";
   let logged = false;
   try {
     const u = window.firebaseAuth && window.firebaseAuth.currentUser;
@@ -14642,6 +14648,7 @@ function settingsSeg(btn) {
   } else if (name === "motion") {
     pdPrefSet(PD_PREF_MOTION, v);
     applyMotion();
+    if (typeof dstVidRefresh === "function") dstVidRefresh();
   } else if (name === "size") {
     pdPrefSet(PD_PREF_SIZE, v === "normal" ? null : v);
     applyUiSize();
@@ -14654,11 +14661,12 @@ function settingsPalette(btn) {
   renderSettings();
 }
 function settingsSwitch(btn) {
-  const key = btn.dataset.sw === "foryou" ? PD_PREF_FORYOU : PD_PREF_DAILY;
+  const key = { foryou: PD_PREF_FORYOU, daily: PD_PREF_DAILY, autovid: PD_PREF_AUTOVID }[btn.dataset.sw] || PD_PREF_DAILY;
   pdPrefSet(key, pdPrefOn(key) ? "0" : null);
   if (btn.dataset.sw === "foryou") {
     try { renderForYou(); } catch (e) {}
   }
+  if (btn.dataset.sw === "autovid" && typeof dstVidRefresh === "function") dstVidRefresh();
   renderSettings();
 }
 function shareApp() {
@@ -14684,6 +14692,8 @@ function settingsRestoreDefaults() {
     applyUiSize();
     pdPrefSet(PD_PREF_FORYOU, null);
     pdPrefSet(PD_PREF_DAILY, null);
+    pdPrefSet(PD_PREF_AUTOVID, null);
+    if (typeof dstVidRefresh === "function") dstVidRefresh();
     renderSettings();
     try { renderGrid(); } catch (e) {}
     try { renderForYou(); } catch (e) {}
@@ -26878,6 +26888,46 @@ function ppSetupSave() {
 var dstItems = [], dstAll = [], dstFormId = null, dstInView = "list";
 function dstSafeUrl(u) { u = String(u || "").trim(); return /^https?:\/\/[^\s]+$/i.test(u) ? u : ""; }
 function dstDb() { return window.firebaseFirestore; }
+function dstYtId(u) {
+  const m = String(u || "").match(/^https?:\/\/(?:www\.|m\.|music\.)?(?:youtube\.com\/(?:watch\?(?:[^#]*&)?v=|embed\/|shorts\/|live\/|v\/)|youtube-nocookie\.com\/embed\/|youtu\.be\/)([A-Za-z0-9_-]{11})/i);
+  return m ? m[1] : "";
+}
+function dstThumb(u) { const y = dstYtId(u); return y ? "https://img.youtube.com/vi/" + y + "/hqdefault.jpg" : u; }
+function dstMedia(d) {
+  const y = dstYtId(d.imagem);
+  const cap = dstSafeUrl(d.capa);
+  const bgImg = (cap ? 'url(&quot;' + escapeHtml(cap) + '&quot;),' : '') + 'url(https://img.youtube.com/vi/' + y + '/hqdefault.jpg)';
+  if (y) return '<div class="dst-vid" style="background-image:' + bgImg + '"><iframe data-src="https://www.youtube.com/embed/' + y + '?autoplay=1&mute=1&loop=1&playlist=' + y + '&controls=0&playsinline=1&rel=0&modestbranding=1&disablekb=1&iv_load_policy=3&enablejsapi=1" allow="autoplay; encrypted-media" tabindex="-1" title="" onload="dstYtListen(this)"></iframe></div>';
+  return '<img class="dst-img" loading="lazy" alt="" src="' + escapeHtml(d.imagem) + '" onerror="this.style.visibility=\'hidden\'">';
+}
+function dstVidRefresh() {
+  const t = document.getElementById("destaquesTrack");
+  const c = t && t.firstElementChild;
+  dstVidSync(c ? Math.round(t.scrollLeft / (c.offsetWidth + 12)) : -1);
+}
+function dstYtCmd(f, fn, args) {
+  try { f.contentWindow.postMessage(JSON.stringify({ event: "command", func: fn, args: args || [], id: 1, channel: "widget" }), "*"); } catch (e) {}
+}
+function dstVidSync(idx) {
+  const ok = document.documentElement.classList.contains("motion-on") && (typeof pdPrefOn !== "function" || pdPrefOn("pd_pref_autovid"));
+  document.querySelectorAll("#destaquesTrack .dst-card").forEach((card, i) => {
+    const f = card.querySelector(".dst-vid iframe");
+    if (!f) return;
+    const cur = f.getAttribute("src");
+    if (!ok) {
+      if (cur && cur !== "about:blank") f.src = "about:blank";
+      f.dataset.ytok = "0"; f.dataset.act = "0"; f.dataset.pl = "0"; f.dataset.okAt = "";
+      return;
+    }
+    const on = i === idx && !document.hidden;
+    const was = f.dataset.act === "1";
+    if (on) {
+      if (cur !== f.dataset.src) { f.dataset.ytok = "0"; f.dataset.pl = "0"; f.dataset.okAt = ""; f.src = f.dataset.src; }
+      else if (!was && f.dataset.ytok === "1") { f.dataset.pl = "0"; dstYtCmd(f, "seekTo", [0, true]); dstYtCmd(f, "playVideo"); }
+    } else if (was && f.dataset.ytok === "1") dstYtCmd(f, "pauseVideo");
+    f.dataset.act = on ? "1" : "0";
+  });
+}
 async function dstFetch() {
   const { collection, getDocs, query, orderBy } = window.firebaseModules;
   const snap = await getDocs(query(collection(dstDb(), "destaques"), orderBy("ordem", "asc")));
@@ -26894,7 +26944,7 @@ function dstRender() {
   sec.style.display = "block";
   sec.classList.toggle("dst-multi", dstItems.length > 1);
   track.innerHTML = dstItems.map((d, i) =>
-    '<div class="dst-card"><img class="dst-img" loading="lazy" alt="" src="' + escapeHtml(d.imagem) + '" onerror="this.style.visibility=\'hidden\'">' +
+    '<div class="dst-card">' + dstMedia(d) +
     '<div class="dst-body"><div class="dst-title">' + escapeHtml(d.titulo) + '</div>' +
     (d.texto ? '<div class="dst-text">' + escapeHtml(d.texto) + '</div>' : '') +
     '<button class="dst-btn" onclick="dstOpen(' + i + ')">' + escapeHtml(d.botao || "Saber mais") + '</button></div></div>').join("");
@@ -26904,8 +26954,93 @@ function dstRender() {
     const c = track.firstElementChild; if (!c) return;
     const idx = Math.round(track.scrollLeft / (c.offsetWidth + 12));
     dots.querySelectorAll(".dst-dot").forEach((el, i) => el.classList.toggle("on", i === idx));
+    dstVidSync(idx);
   };
+  dstVidSync(0);
+  dstAutoStart();
 }
+var dstAuto = { t: null, dir: 1, hold: 0, idx: -1, start: 0, playStart: 0 };
+document.addEventListener("visibilitychange", () => {
+  const t = document.getElementById("destaquesTrack");
+  const c = t && t.firstElementChild;
+  dstVidSync(c && !document.hidden ? Math.round(t.scrollLeft / (c.offsetWidth + 12)) : -1);
+});
+function dstYtListen(f) {
+  if (f.getAttribute("src") !== f.dataset.src) return;
+  let n = 0;
+  const t = setInterval(() => {
+    n++;
+    if (f.getAttribute("src") !== f.dataset.src || f.dataset.ytok === "1" || n > 60) { clearInterval(t); return; }
+    try { f.contentWindow.postMessage(JSON.stringify({ event: "listening", id: 1, channel: "widget" }), "*"); } catch (e) {}
+  }, 500);
+}
+window.addEventListener("message", (ev) => {
+  if (!/^https:\/\/www\.youtube(-nocookie)?\.com$/.test(ev.origin)) return;
+  let d = ev.data;
+  if (typeof d === "string") { try { d = JSON.parse(d); } catch (e) { return; } }
+  if (!d || typeof d !== "object") return;
+  const fs = document.querySelectorAll("#destaquesTrack .dst-vid iframe");
+  let f = null;
+  for (let i = 0; i < fs.length; i++) if (fs[i].contentWindow === ev.source) f = fs[i];
+  if (!f) return;
+  f.dataset.ytok = "1";
+  if (!f.dataset.okAt) f.dataset.okAt = String(Date.now());
+  const info = d.info && typeof d.info === "object" ? d.info : {};
+  const st = typeof d.info === "number" ? d.info : info.playerState;
+  if (info.duration > 0) f.dataset.dur = String(info.duration);
+  if (typeof st === "number") {
+    f.dataset.pl = st === 1 ? "1" : "0";
+    if (st === 1 && f.dataset.act !== "1") { f.dataset.pl = "0"; dstYtCmd(f, "pauseVideo"); }
+  }
+});
+function dstAutoTick() {
+  const tr = document.getElementById("destaquesTrack");
+  if (!tr || dstItems.length < 2 || document.hidden || Date.now() < dstAuto.hold) return;
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const r = tr.getBoundingClientRect();
+  if (!r.height || r.bottom < 0 || r.top > window.innerHeight) return;
+  const c = tr.firstElementChild;
+  if (!c) return;
+  const w = c.offsetWidth + 12;
+  const n = dstItems.length;
+  const i = Math.round(tr.scrollLeft / w);
+  const now = Date.now();
+  if (i !== dstAuto.idx) { dstAuto.idx = i; dstAuto.start = now; dstAuto.playStart = 0; }
+  const f = tr.children[i] && tr.children[i].querySelector(".dst-vid iframe");
+  const sr = f ? f.getAttribute("src") : "";
+  const vid = !!sr && sr !== "about:blank";
+  let wait = 4500, from = dstAuto.start;
+  if (vid) {
+    if (!dstAuto.playStart && f.dataset.pl === "1") dstAuto.playStart = now;
+    if (dstAuto.playStart) {
+      const dur = Number(f.dataset.dur) || 0;
+      wait = (dur ? Math.min(dur, 30) : 10) * 1000;
+      from = dstAuto.playStart;
+    } else {
+      const okAt = Number(f.dataset.okAt) || 0;
+      wait = okAt && now - Math.max(okAt, dstAuto.start) > 8000 ? 0 : 25000;
+    }
+  }
+  if (now - from < wait) return;
+  if (i >= n - 1) dstAuto.dir = -1;
+  else if (i <= 0) dstAuto.dir = 1;
+  const to = Math.max(0, Math.min(n - 1, i + dstAuto.dir));
+  dstAuto.start = now;
+  dstAuto.playStart = 0;
+  tr.scrollTo({ left: Math.min(to * w, tr.scrollWidth - tr.clientWidth), behavior: "smooth" });
+}
+function dstAutoStart() {
+  const track = document.getElementById("destaquesTrack");
+  if (!track) return;
+  if (!track.dataset.auto) {
+    track.dataset.auto = "1";
+    const hold = () => { dstAuto.hold = Date.now() + 7000; dstAuto.start = Date.now() + 7000; };
+    ["touchstart", "mousedown", "wheel", "pointerdown"].forEach((ev) => track.addEventListener(ev, hold, { passive: true }));
+  }
+  if (dstAuto.t) return;
+  dstAuto.t = setInterval(dstAutoTick, 500);
+}
+
 function dstOpen(i) {
   const u = dstSafeUrl(dstItems[i] && dstItems[i].url);
   if (u) window.open(u, "_blank");
@@ -26947,7 +27082,7 @@ async function dstList() {
   catch (e) { body.innerHTML = '<div class="manage-users-empty"><p>Sem permissão ou sem ligação.</p></div>'; return; }
   if (!dstAll.length) { body.innerHTML = '<div class="manage-users-empty"><p>Nenhum destaque. Toca em + para criar.</p></div>'; return; }
   body.innerHTML = dstAll.map((d, i) =>
-    '<div class="dst-row"><img alt="" src="' + escapeHtml(d.imagem) + '" onerror="this.style.visibility=\'hidden\'">' +
+    '<div class="dst-row"><img alt="" src="' + escapeHtml(dstYtId(d.imagem) && dstSafeUrl(d.capa) ? d.capa : dstThumb(d.imagem)) + '" onerror="this.style.visibility=\'hidden\'">' +
     '<div class="dst-row-info">' + escapeHtml(d.titulo) + '<small>Ordem ' + (Number(d.ordem) || 0) + (d.ativo === false ? ' · Oculto' : ' · Visível') + '</small></div>' +
     '<button class="dst-mini" onclick="dstForm(' + i + ')">Editar</button>' +
     '<button class="dst-mini del" onclick="dstDelete(' + i + ')">Apagar</button></div>').join("");
@@ -26960,7 +27095,8 @@ function dstForm(i) {
   const f = (id, label, val, ph, type) => '<div class="dst-field"><label>' + label + '</label><input class="dst-input" id="' + id + '" type="' + (type || "text") + '" value="' + escapeHtml(val == null ? "" : val) + '" placeholder="' + ph + '"></div>';
   document.getElementById("destaquesAdminOverlay").classList.add("active");
   document.getElementById("dstAdminBody").innerHTML =
-    f("dstImagem", "Link da imagem (16:9)", d.imagem, "https://...", "url") +
+    f("dstImagem", "Link da imagem ou do vídeo do YouTube (16:9)", d.imagem, "https://...", "url") +
+    f("dstCapa", "Imagem de capa do vídeo (opcional, 16:9)", d.capa, "https://... (usada quando o vídeo não toca)", "url") +
     f("dstTitulo", "Título", d.titulo, "Título do destaque") +
     '<div class="dst-field"><label>Texto</label><textarea class="dst-input" id="dstTexto" rows="3" placeholder="Descrição curta">' + escapeHtml(d.texto || "") + '</textarea></div>' +
     f("dstBotao", "Texto do botão (máx. 24 letras)", d.botao, "Saber mais") +
@@ -26972,7 +27108,7 @@ function dstForm(i) {
 async function dstSave() {
   if (!isPublisher) return;
   const v = (id) => document.getElementById(id).value.trim();
-  const data = { imagem: dstSafeUrl(v("dstImagem")), titulo: v("dstTitulo"), texto: v("dstTexto"), url: dstSafeUrl(v("dstUrl")), botao: v("dstBotao").slice(0, 24) || "Saber mais", ordem: Number(v("dstOrdem")) || 0, ativo: document.getElementById("dstAtivo").checked };
+  const data = { imagem: dstSafeUrl(v("dstImagem")), capa: dstSafeUrl(v("dstCapa")), titulo: v("dstTitulo"), texto: v("dstTexto"), url: dstSafeUrl(v("dstUrl")), botao: v("dstBotao").slice(0, 24) || "Saber mais", ordem: Number(v("dstOrdem")) || 0, ativo: document.getElementById("dstAtivo").checked };
   if (!data.imagem || !data.titulo || !data.url) { showCustomAlert("Preenche o título e os links da imagem e do botão (começam por https://)."); return; }
   const btn = document.getElementById("dstSaveBtn"); btn.disabled = true;
   try {
