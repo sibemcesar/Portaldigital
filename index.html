@@ -15062,7 +15062,7 @@ function updateSidebarProfileAvatar() {
   const avatarContainer = document.getElementById("sidebarProfileAvatar");
   if (!avatarContainer) return;
   if (userAvatar) {
-    avatarContainer.innerHTML = '<img src="' + userAvatar + '" alt="Avatar">';
+    avatarContainer.innerHTML = '<img src="' + escapeHtml(reqSafeUrl(userAvatar)) + '" alt="Avatar">';
   } else {
     avatarContainer.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>';
   }
@@ -17523,7 +17523,7 @@ function renderManageGamesList() {
     return gameMatchesSearch(game, searchTerm);
   });
   if (filteredGames.length === 0) {
-    const message = searchTerm ? `Nenhum resultado para "${searchInput.value.trim()}"` : "Nenhum conte\xFAdo nesta categoria.";
+    const message = searchTerm ? `Nenhum resultado para "${escapeHtml(searchInput.value.trim())}"` : "Nenhum conte\xFAdo nesta categoria.";
     manageList.innerHTML = `<div class="manage-empty-state"><div class="icon">\u{1F50D}</div><p>${message}</p></div>`;
     return;
   }
@@ -19113,7 +19113,7 @@ async function updateProfileAvatar() {
       if (avatarElement) {
         const statusClass = avatarElement.className.split(" ").find((c) => c.startsWith("status-")) || "status-pending";
         avatarElement.className = "profile-avatar-svg " + statusClass;
-        avatarElement.innerHTML = '<img src="' + imageUrl + '" alt="Avatar"><div class="profile-avatar-edit-hint">Alterar</div>';
+        avatarElement.innerHTML = '<img src="' + escapeHtml(reqSafeUrl(imageUrl)) + '" alt="Avatar"><div class="profile-avatar-edit-hint">Alterar</div>';
       }
       showCustomAlert("Foto de perfil atualizada com sucesso!");
     } catch (error) {
@@ -19123,7 +19123,7 @@ async function updateProfileAvatar() {
         const statusClass = avatarElement.className.split(" ").find((c) => c.startsWith("status-")) || "status-pending";
         avatarElement.className = "profile-avatar-svg " + statusClass;
         if (userAvatar) {
-          avatarElement.innerHTML = '<img src="' + userAvatar + '" alt="Avatar"><div class="profile-avatar-edit-hint">Alterar</div>';
+          avatarElement.innerHTML = '<img src="' + escapeHtml(reqSafeUrl(userAvatar)) + '" alt="Avatar"><div class="profile-avatar-edit-hint">Alterar</div>';
         } else {
           avatarElement.innerHTML = getDefaultAvatarSVG() + '<div class="profile-avatar-edit-hint">Alterar</div>';
         }
@@ -20048,7 +20048,7 @@ function renderUsersList() {
       approved: '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>',
       rejected: '<svg viewBox="0 0 24 24"><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>'
     };
-    const emptyMessage = searchTerm ? `Nenhum usu\xE1rio ${statusLabels[currentUserFilter]} encontrado para "${searchInput.value.trim()}"` : `Nenhum usu\xE1rio ${statusLabels[currentUserFilter]}`;
+    const emptyMessage = searchTerm ? `Nenhum usu\xE1rio ${statusLabels[currentUserFilter]} encontrado para "${escapeHtml(searchInput.value.trim())}"` : `Nenhum usu\xE1rio ${statusLabels[currentUserFilter]}`;
     usersList.innerHTML = `
           <div class="manage-users-empty">
             ${statusIcons[currentUserFilter]}
@@ -20233,7 +20233,7 @@ function viewUserProfile(userId) {
   let avatarStatusClass = "status-pending";
   if (status === "approved") avatarStatusClass = "status-verified";
   else if (status === "rejected") avatarStatusClass = "status-rejected";
-  const avatarContent = user.avatar ? `<img src="${user.avatar}" alt="Avatar">` : `<svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>`;
+  const avatarContent = user.avatar ? `<img src="${escapeHtml(reqSafeUrl(user.avatar))}" alt="Avatar">` : `<svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>`;
   const container = document.getElementById("viewUserProfileBody");
   container.innerHTML = `
         <div class="view-user-profile-avatar ${avatarStatusClass}">
@@ -20437,7 +20437,7 @@ function showCustomAlert(message) {
   modal.className = "custom-modal active";
   modal.innerHTML = `
         <div class="custom-modal-content">
-          <p style="margin: 0 0 16px 0;">${message}</p>
+          <p style="margin: 0 0 16px 0;">${escapeHtml(message)}</p>
           <div class="custom-modal-buttons">
             <button class="custom-modal-btn primary" onclick="this.closest('.custom-modal').remove()">OK</button>
           </div>
@@ -20490,8 +20490,8 @@ function showConfirmModal(title, message, onConfirm) {
   modal.className = "custom-modal active";
   modal.innerHTML = `
         <div class="custom-modal-content" style="max-width: 450px;">
-          <h2 style="margin: 0 0 16px 0; font-size: 18px; color: var(--text-primary);">${title}</h2>
-          <div style="margin: 0 0 20px 0; color: var(--text-secondary); font-size: 14px; line-height: 1.6; white-space: pre-line;">${message}</div>
+          <h2 style="margin: 0 0 16px 0; font-size: 18px; color: var(--text-primary);">${escapeHtml(title)}</h2>
+          <div style="margin: 0 0 20px 0; color: var(--text-secondary); font-size: 14px; line-height: 1.6; white-space: pre-line;">${escapeHtml(message)}</div>
           <div class="custom-modal-buttons">
             <button class="custom-modal-btn secondary confirm-cancel-btn">Cancelar</button>
             <button class="custom-modal-btn primary confirm-ok-btn">Confirmar</button>
@@ -20574,8 +20574,8 @@ function showNotificationToast(title, message) {
   const toast = document.createElement("div");
   toast.className = "toast-notification";
   toast.innerHTML = `
-        <div class="toast-title"> ${title}</div>
-        <div class="toast-message">${message.length > 80 ? message.substring(0, 80) + "..." : message}</div>
+        <div class="toast-title"> ${escapeHtml(title)}</div>
+        <div class="toast-message">${escapeHtml(String(message).length > 80 ? String(message).substring(0, 80) + "..." : String(message))}</div>
       `;
   toast.onclick = () => {
     toast.remove();
@@ -21177,7 +21177,7 @@ async function loadProfileData(user, container) {
       avatarStatusClass = "status-rejected";
     }
     document.getElementById("profileHeaderPointsValue").textContent = points;
-    const avatarContent = userAvatar ? '<img src="' + userAvatar + '" alt="Avatar"><div class="profile-avatar-edit-hint">Alterar</div>' : getDefaultAvatarSVG() + '<div class="profile-avatar-edit-hint">Alterar</div>';
+    const avatarContent = userAvatar ? '<img src="' + escapeHtml(reqSafeUrl(userAvatar)) + '" alt="Avatar"><div class="profile-avatar-edit-hint">Alterar</div>' : getDefaultAvatarSVG() + '<div class="profile-avatar-edit-hint">Alterar</div>';
     const stage = document.createElement("div");
     stage.innerHTML = `
           <div class="profile-header-card">
@@ -21198,7 +21198,7 @@ async function loadProfileData(user, container) {
     const displayName = userName || user.displayName || user.email?.split("@")[0] || "Usu\xE1rio";
     const email = user.email || "";
     document.getElementById("profileHeaderPointsValue").textContent = userPoints || 0;
-    const fallbackAvatarContent = userAvatar ? '<img src="' + userAvatar + '" alt="Avatar"><div class="profile-avatar-edit-hint">Alterar</div>' : getDefaultAvatarSVG() + '<div class="profile-avatar-edit-hint">Alterar</div>';
+    const fallbackAvatarContent = userAvatar ? '<img src="' + escapeHtml(reqSafeUrl(userAvatar)) + '" alt="Avatar"><div class="profile-avatar-edit-hint">Alterar</div>' : getDefaultAvatarSVG() + '<div class="profile-avatar-edit-hint">Alterar</div>';
     container.innerHTML = `
           <div class="profile-header-card">
             <div class="profile-avatar-svg status-pending" onclick="updateProfileAvatar()">${fallbackAvatarContent}</div>
@@ -21802,13 +21802,13 @@ function showLinkChoiceModal(url) {
             <div class="link-choice-modal-title">Como deseja abrir o link?</div>
             <div class="link-choice-modal-subtitle">${escapeHtml(truncatedUrl)}</div>
             <div class="link-choice-modal-buttons">
-              <button class="link-choice-btn browser-btn" onclick="openLinkInGA('${url.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/"/g, "&quot;")}')">
+              <button class="link-choice-btn browser-btn" onclick="openLinkInGA('${pdJsArg(url)}')">
                 <svg viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
                 </svg>
                 Abrir no Navegador
               </button>
-              <button class="link-choice-btn ga-btn" onclick="openLinkInBrowser('${url.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/"/g, "&quot;")}')">
+              <button class="link-choice-btn ga-btn" onclick="openLinkInBrowser('${pdJsArg(url)}')">
                 <svg viewBox="0 0 24 24" fill="currentColor">
                   <path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/>
                 </svg>
@@ -22950,9 +22950,9 @@ Novo saldo do destinat\xE1rio: ${recipientNewPoints} pontos.`);
 async function handleTransferToAll(amount) {
   showConfirmModal(
     ` Confirmar Transfer\xEAncia em Massa`,
-    `Voc\xEA est\xE1 prestes a transferir <strong>${amount} pontos</strong> para <strong>${allUsersForTransfer.length} usu\xE1rios</strong>.
+    `Voc\xEA est\xE1 prestes a transferir ${amount} pontos para ${allUsersForTransfer.length} usu\xE1rios.
 
-Total de pontos a serem distribu\xEDdos: <strong>${amount * allUsersForTransfer.length}</strong>
+Total de pontos a serem distribu\xEDdos: ${amount * allUsersForTransfer.length}
 
 Deseja continuar?`,
     async () => {
@@ -23370,7 +23370,7 @@ function showCustomConfirm(message, onConfirm) {
   modal.className = "custom-modal active";
   modal.innerHTML = `
         <div class="custom-modal-content">
-          <p style="margin: 0 0 16px 0;">${message}</p>
+          <p style="margin: 0 0 16px 0;">${escapeHtml(message)}</p>
           <div class="custom-modal-buttons">
             <button class="custom-modal-btn secondary" onclick="this.closest('.custom-modal').remove()">Cancelar</button>
             <button class="custom-modal-btn primary" id="confirmBtn">Confirmar</button>
@@ -25907,7 +25907,7 @@ async function pqSubmit() {
     showCustomAlert("Obrigado pela tua opinião! Ganhaste +" + pqPoints + " pontos. Total: " + newTotal + " pontos.");
   } catch (e) {
     console.error("[Inquérito] Erro ao enviar:", e);
-    showCustomAlert("Não foi possível enviar o inquérito.<br><small>Falhou ao: " + pqStep + "<br>Erro: " + String((e && (e.code || e.message)) || e).slice(0, 120).replace(/</g, "&lt;") + "</small>");
+    showCustomAlert("Não foi possível enviar o inquérito. Falhou ao: " + pqStep + ". Erro: " + String((e && (e.code || e.message)) || e).slice(0, 120));
   } finally {
     pqSending = false;
     if (document.getElementById("surveyOverlay").classList.contains("active")) pqRender();
