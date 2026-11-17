@@ -48,7 +48,7 @@ if (!isWebView()) {
   <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js">
   <script type="module">import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously, onAuthStateChanged, signOut, sendPasswordResetEmail, updateProfile, sendEmailVerification, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getDatabase, ref, set, get, update, remove, onValue, push, limitToLast, query as rtdbQuery, orderByChild, equalTo, serverTimestamp as rtdbServerTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getDatabase, ref, set, get, update, remove, onValue, push, limitToLast, query as rtdbQuery, orderByChild, equalTo, serverTimestamp as rtdbServerTimestamp, increment as rtdbIncrement } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 import { getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, addDoc, query, where, orderBy, limit, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 const firebaseConfig = {
   apiKey: "AIzaSyBgEfuLNpU5j9EIcvQ9Qs_reEvtXGPIbO0",
@@ -97,6 +97,7 @@ window.firebaseModules = {
   orderByChild,
   equalTo,
   rtdbServerTimestamp,
+  rtdbIncrement,
   collection,
   doc,
   getDoc,
@@ -4914,6 +4915,8 @@ window.firebaseModules = {
       font-weight: 500;
     }
 
+
+
     .transfer-overlay {
       display: none;
       position: fixed;
@@ -9253,6 +9256,31 @@ window.firebaseModules = {
     .pq-invite-pts { display: inline-block; margin: 4px 0 14px; padding: 6px 14px; border-radius: 999px; background: var(--accent-primary); color: var(--bg-primary); font-weight: 700; font-size: 15px; }
     .pq-invite-actions { display: flex; flex-direction: column; gap: 8px; }
     .pq-invite-actions .custom-modal-btn { width: 100%; }
+
+    .rf-content { max-width: 380px; padding: 24px 20px 20px; text-align: center; }
+    .rf-icon { font-size: 40px; line-height: 1; margin-bottom: 8px; }
+    .rf-content h2 { font-size: 19px; margin-bottom: 6px; }
+    .rf-sub { font-size: 14px; margin-bottom: 14px; }
+    .rf-sub b { color: var(--text-primary); }
+    .rf-box { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px 12px; margin-bottom: 12px; }
+    .rf-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
+    .rf-code { font-size: 28px; font-weight: 800; letter-spacing: 4px; color: var(--text-primary); }
+    .rf-link { font-size: 12px; color: var(--text-secondary); word-break: break-all; margin: 6px 0 12px; min-height: 14px; }
+    .rf-actions { display: flex; gap: 8px; }
+    .rf-actions .custom-modal-btn { flex: 1; padding: 11px 8px; }
+    .rf-regras-titulo { font-size: 13px; color: var(--text-secondary); text-align: left; margin: 0 0 4px; }
+    .rf-regras { text-align: left; font-size: 13px; color: var(--text-primary); margin: 0 0 12px; padding: 0; list-style: none; }
+    .rf-regras li { padding: 3px 0; }
+    .rf-stats { display: flex; gap: 8px; margin-bottom: 12px; }
+    .rf-stat { flex: 1; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px 4px; }
+    .rf-stat b { display: block; font-size: 20px; color: var(--text-primary); }
+    .rf-stat span { font-size: 11px; color: var(--text-secondary); }
+    .rf-lista { text-align: left; max-height: 170px; overflow-y: auto; margin-bottom: 6px; }
+    .rf-item { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--text-primary); }
+    .rf-vazio { font-size: 13px; color: var(--text-secondary); text-align: center; padding: 10px 0; }
+    .rf-chip { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--border-color); color: var(--text-secondary); white-space: nowrap; }
+    .rf-chip.ok { background: var(--accent-primary); color: var(--bg-primary); border-color: transparent; }
+    .rf-nota { font-size: 12px; color: var(--text-secondary); margin: 6px 0 12px; }
     .pq-link-btn { background: none; border: none; color: var(--text-muted); font-family: 'Inter', sans-serif; font-size: 13px; cursor: pointer; padding: 8px; }
 
     .pq-tabs { display: flex; gap: 8px; padding: 12px 16px; background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
@@ -11613,6 +11641,263 @@ window.firebaseModules = {
       html:not(.motion-on) .sidebar.open + .sidebar-backdrop { animation: none !important; }
     }
   </style>
+
+  <style id="m3e-withdraw">
+    #wdOverlay, #wdAdminOverlay {
+      --m3-blob-a: 42% 58% 56% 44% / 46% 44% 56% 54%;
+      --m3-blob-b: 58% 42% 44% 56% / 54% 56% 44% 46%;
+      --wd-card: var(--bg-secondary);
+      --wd-tonal: var(--bg-secondary);
+      --wd-tonal-hi: var(--border-color);
+      --wd-ok: #15803d; --wd-warn: #b45309; --wd-bad: #b91c1c;
+      --wd-ok-bg: rgba(22, 163, 74, .16); --wd-warn-bg: rgba(245, 158, 11, .2); --wd-bad-bg: rgba(220, 38, 38, .14);
+      display: flex; position: fixed; inset: 0; z-index: 2000; flex-direction: column;
+      background: var(--bg-primary);
+      opacity: 0; visibility: hidden; pointer-events: none; animation: none;
+      transform: translateY(32px) scale(.985);
+      transition: opacity .32s var(--m3-ease-std), transform .45s var(--m3-ease-emph), visibility 0s linear .45s;
+    }
+    html.dark #wdOverlay, html.dark #wdAdminOverlay { --wd-ok: #4ade80; --wd-warn: #fbbf24; --wd-bad: #f87171; }
+    @supports (background: color-mix(in srgb, red 10%, blue)) {
+      #wdOverlay, #wdAdminOverlay {
+        --wd-card: color-mix(in srgb, var(--accent-primary) 7%, var(--bg-secondary));
+        --wd-tonal: color-mix(in srgb, var(--accent-primary) 16%, var(--bg-primary));
+        --wd-tonal-hi: color-mix(in srgb, var(--accent-primary) 26%, var(--bg-primary));
+      }
+    }
+    #wdOverlay.active, #wdAdminOverlay.active {
+      opacity: 1; visibility: visible; pointer-events: auto; transform: none;
+      transition: opacity .32s var(--m3-ease-std), transform .45s var(--m3-ease-emph), visibility 0s linear 0s;
+    }
+
+    #wdOverlay .content-header, #wdAdminOverlay .content-header {
+      box-sizing: border-box; min-height: calc(64px + env(safe-area-inset-top, 0px));
+      padding: env(safe-area-inset-top, 0px) 12px 0 8px; gap: 6px; justify-content: flex-start;
+      background: var(--bg-primary); border-bottom: none;
+    }
+    #wdOverlay .content-header-title, #wdAdminOverlay .content-header-title {
+      margin: 0 4px 0 8px; text-align: left; font-size: 22px; font-weight: 700; letter-spacing: -.2px;
+    }
+    #wdOverlay .content-header-btn, #wdAdminOverlay .content-header-btn {
+      width: 44px; height: 44px; flex-shrink: 0; padding: 0; border: none; border-radius: 50%;
+      background: var(--wd-tonal); -webkit-tap-highlight-color: transparent;
+      transition: background .2s ease, transform .35s var(--m3-spring);
+    }
+    #wdOverlay .content-header-btn:hover, #wdAdminOverlay .content-header-btn:hover { background: var(--wd-tonal); }
+    #wdOverlay .content-header-btn:active, #wdAdminOverlay .content-header-btn:active { transform: scale(.86); }
+
+    .wd-content { width: 100%; height: 100%; max-width: 600px; margin: 0 auto; background: var(--bg-primary); display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
+    .wd-body { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: 8px 16px 28px; display: flex; flex-direction: column; gap: 20px; }
+    .wd-body > * { flex-shrink: 0; }
+    #wdOverlay.active .wd-sec, #wdAdminOverlay.active .wd-sec { animation: m3Rise .55s var(--m3-ease-emph) both; animation-delay: calc(var(--i, 0) * 60ms + 120ms); }
+    .wd-label { display: block; font-size: 14px; font-weight: 700; color: var(--text-primary); margin: 0 0 10px 4px; letter-spacing: .1px; }
+
+    .wd-hero { background: var(--wd-tonal); border-radius: 32px; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+    .wd-hero-top { display: flex; align-items: center; gap: 14px; }
+    .wd-hero-ic { width: 56px; height: 56px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: var(--m3-blob-a); background: var(--accent-primary); }
+    .wd-hero-ic svg { width: 28px; height: 28px; fill: var(--bg-primary); }
+    .wd-hero-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .wd-hero-lbl { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+    .wd-hero-num { display: flex; align-items: baseline; gap: 6px; color: var(--text-primary); }
+    .wd-hero-num span { font-size: 40px; font-weight: 800; letter-spacing: -1.2px; line-height: 1; font-variant-numeric: tabular-nums; }
+    .wd-hero-num small { font-size: 14px; font-weight: 600; color: var(--text-secondary); }
+    .wd-hero-pill { align-self: flex-start; padding: 8px 14px; border-radius: 999px; background: var(--bg-primary); color: var(--text-primary); font-size: 13px; font-weight: 700; animation: m3Rise .45s var(--m3-ease-emph) both; }
+    .wd-hero-pill[hidden] { display: none; }
+    .wd-hero-cap { font-size: 12.5px; line-height: 1.45; color: var(--text-secondary); }
+
+    .wd-note { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; border-radius: 24px; font-size: 13.5px; line-height: 1.45; background: var(--wd-warn-bg); color: var(--text-primary); animation: m3Rise .45s var(--m3-ease-emph) both; }
+    .wd-note::before { content: ""; width: 22px; height: 22px; flex-shrink: 0; background: var(--wd-warn);
+      -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z'/%3E%3C/svg%3E") center / contain no-repeat;
+      mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z'/%3E%3C/svg%3E") center / contain no-repeat; }
+    .wd-note.wd-total { background: var(--wd-tonal); align-items: center; font-weight: 600; }
+    .wd-note.wd-total::before { background: var(--accent-primary);
+      -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z'/%3E%3C/svg%3E") center / contain no-repeat;
+      mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z'/%3E%3C/svg%3E") center / contain no-repeat; }
+
+    .wd-x { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .45s var(--m3-ease-emph); }
+    .wd-x.open, .wd-pick.open > .wd-x, .wd-row.open > .wd-x { grid-template-rows: 1fr; }
+    .wd-x > div { min-height: 0; overflow: hidden; visibility: hidden; transition: visibility 0s linear .45s; }
+    .wd-x.open > div, .wd-pick.open > .wd-x > div, .wd-row.open > .wd-x > div { visibility: visible; transition-delay: 0s; }
+
+    .wd-pick { background: var(--wd-card); border: 1px solid var(--border-color); border-radius: 28px; overflow: hidden; transition: border-color .3s ease; }
+    .wd-pick.open { border-color: var(--accent-primary); }
+    .wd-pick-btn { width: 100%; display: flex; align-items: center; gap: 14px; padding: 14px 16px; border: 0; background: transparent; color: var(--text-primary); font: inherit; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background .2s ease; }
+    .wd-pick-btn:active { background: var(--wd-tonal); }
+    .wd-pick-ic { width: 44px; height: 44px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: var(--m3-blob-a); background: var(--wd-tonal); transition: background .3s ease, border-radius .6s var(--m3-spring); }
+    .wd-pick-ic svg { width: 24px; height: 24px; fill: var(--accent-primary); transition: fill .3s ease; }
+    .wd-pick.has .wd-pick-ic { background: var(--accent-primary); border-radius: var(--m3-blob-b); }
+    .wd-pick.has .wd-pick-ic svg { fill: var(--bg-primary); }
+    .wd-pick-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .wd-pick-txt b { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+    .wd-pick-txt small { font-size: 13px; color: var(--text-secondary); }
+    .wd-chev { width: 24px; height: 24px; fill: var(--text-secondary); flex-shrink: 0; transition: transform .5s var(--m3-spring); }
+    .wd-pick.open .wd-chev, .wd-row.open .wd-chev { transform: rotate(180deg); }
+    .wd-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 4px 12px 14px; }
+    .wd-tile { position: relative; border: 0; border-radius: 18px; padding: 12px 4px; background: var(--bg-primary); color: var(--text-primary); display: flex; flex-direction: column; align-items: center; gap: 1px; font-family: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent;
+      transition: background .25s ease, color .25s ease, border-radius .6s var(--m3-spring), transform .4s var(--m3-spring); }
+    .wd-tile b { font-size: 18px; font-weight: 800; letter-spacing: -.3px; line-height: 1.1; }
+    .wd-tile span { font-size: 11px; color: var(--text-secondary); }
+    .wd-tile em { font-style: normal; font-size: 12.5px; font-weight: 700; color: var(--accent-primary); margin-top: 4px; }
+    .wd-tile:active { transform: scale(.93); }
+    .wd-tile.sel { background: var(--accent-primary); color: var(--bg-primary); border-radius: 28px; }
+    .wd-tile.sel span, .wd-tile.sel em { color: var(--bg-primary); }
+    .wd-tile.off { opacity: .4; cursor: not-allowed; }
+    .wd-tile.off:active { transform: none; }
+    .wd-tile svg.lk { position: absolute; top: 7px; right: 8px; width: 13px; height: 13px; fill: var(--text-muted); }
+    .wd-pick.open .wd-tile { animation: wdPop .45s var(--m3-spring) backwards; animation-delay: calc(var(--k, 0) * 26ms + 90ms); }
+    @keyframes wdPop { from { opacity: 0; transform: translateY(10px) scale(.84); } }
+
+    .wd-chips { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .wd-met { display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 6px 12px; border: 1.5px solid var(--border-color); border-radius: 16px; background: var(--wd-card); color: var(--text-primary); font: 600 13.5px/1 'Inter', sans-serif; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent;
+      transition: background .25s ease, border-color .25s ease, color .25s ease, border-radius .6s var(--m3-spring), transform .4s var(--m3-spring); }
+    .wd-met > span:last-child { min-width: 0; line-height: 1.2; overflow-wrap: anywhere; }
+    .wd-met .ic { position: relative; width: 20px; height: 20px; flex-shrink: 0; }
+    .wd-met .ic svg { position: absolute; inset: 0; width: 20px; height: 20px; fill: currentColor; transition: transform .45s var(--m3-spring), opacity .25s ease; }
+    .wd-met .ic .ck { opacity: 0; transform: scale(.3) rotate(-30deg); }
+    .wd-met.sel .ic .ck { opacity: 1; transform: none; }
+    .wd-met.sel .ic svg:not(.ck) { opacity: 0; transform: scale(.3) rotate(30deg); }
+    .wd-met.sel { background: var(--wd-tonal-hi); border-color: transparent; color: var(--accent-primary); border-radius: 24px; }
+    .wd-met:active { transform: scale(.95); }
+
+    .wd-field-in { padding-top: 16px; }
+    .wd-input { width: 100%; box-sizing: border-box; height: 56px; padding: 0 18px; border-radius: 20px; border: 1.5px solid var(--border-color); background: var(--wd-card); color: var(--text-primary); font-size: 16px; outline: none; transition: border-color .2s ease, background .2s ease; }
+    textarea.wd-input { height: auto; padding: 14px 18px; }
+    .wd-input:focus { border-color: var(--accent-primary); background: var(--bg-primary); }
+    .wd-resume { margin-top: 16px; background: var(--wd-tonal); border-radius: 28px; padding: 18px 20px; display: flex; flex-direction: column; gap: 4px; }
+    .wd-res-k { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+    .wd-res-v { font-size: 30px; font-weight: 800; letter-spacing: -.8px; line-height: 1.1; color: var(--text-primary); }
+    .wd-res-d { font-size: 13.5px; line-height: 1.5; color: var(--text-secondary); margin-top: 4px; }
+    .wd-res-d b { color: var(--text-primary); font-weight: 700; }
+
+    .wd-foot { flex-shrink: 0; padding: 10px 16px calc(14px + env(safe-area-inset-bottom, 0px)); background: var(--bg-primary); }
+    .wd-btn { width: 100%; height: 56px; border: 0; border-radius: 999px; font: 700 16px/1 'Inter', sans-serif; color: var(--bg-primary); background: var(--accent-primary); cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent;
+      transition: transform .4s var(--m3-spring), border-radius .5s var(--m3-spring), background .25s ease, color .25s ease; }
+    .wd-btn:active:not(:disabled) { transform: scale(.97); border-radius: 22px; }
+    .wd-btn:disabled { background: var(--wd-tonal); color: var(--text-muted); cursor: not-allowed; }
+    .wd-btn.sm { width: auto; flex: 1; height: 48px; padding: 0 14px; font-size: 14px; }
+    .wd-btn.ok { background: var(--wd-ok); color: var(--bg-primary); }
+    .wd-btn.bad { background: var(--wd-bad-bg); color: var(--wd-bad); }
+
+    .wd-list { background: var(--wd-card); border: 1px solid var(--border-color); border-radius: 28px; overflow: hidden; }
+    .wd-row + .wd-row { border-top: 1px solid var(--border-color); }
+    .wd-in { animation: wdPop .5s var(--m3-spring) backwards; animation-delay: calc(var(--k, 0) * 45ms + 60ms); }
+    .wd-row-h { width: 100%; display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 0; background: transparent; color: var(--text-primary); font: inherit; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background .2s ease; }
+    .wd-row-h:active { background: var(--wd-tonal); }
+    .wd-av { width: 44px; height: 44px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: var(--m3-blob-a); font-size: 16px; font-weight: 800; transition: border-radius .6s var(--m3-spring); }
+    .wd-row.open .wd-av { border-radius: var(--m3-blob-b); }
+    .wd-av svg { width: 22px; height: 22px; fill: currentColor; }
+    .wd-av.pendente { background: var(--wd-warn-bg); color: var(--wd-warn); }
+    .wd-av.pago { background: var(--wd-ok-bg); color: var(--wd-ok); }
+    .wd-av.cancelado { background: var(--wd-bad-bg); color: var(--wd-bad); }
+    .wd-row-t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .wd-row-t b { font-size: 16px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .wd-row-t small { font-size: 12.5px; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .wd-chip { font-size: 12px; font-weight: 700; border-radius: 999px; padding: 5px 10px; white-space: nowrap; }
+    .wd-chip.pendente { background: var(--wd-warn-bg); color: var(--wd-warn); }
+    .wd-chip.pago { background: var(--wd-ok-bg); color: var(--wd-ok); }
+    .wd-chip.cancelado { background: var(--wd-bad-bg); color: var(--wd-bad); }
+    .wd-row .wd-chev { width: 22px; height: 22px; }
+    .wd-det { margin: 0 12px 14px; padding: 12px 14px; background: var(--bg-primary); border-radius: 20px; display: flex; flex-direction: column; gap: 8px; }
+    .wd-kv { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 13px; line-height: 1.4; }
+    .wd-kv span { color: var(--text-secondary); flex-shrink: 0; }
+    .wd-kv b { font-weight: 600; color: var(--text-primary); text-align: right; min-width: 0; word-break: break-word; }
+    .wd-sep { height: 1px; background: var(--border-color); margin: 2px 0; }
+    .wd-info { display: flex; flex-direction: column; gap: 8px; }
+    .wd-copy { border: 0; background: var(--wd-tonal); color: var(--accent-primary); font: 700 12px/1 'Inter', sans-serif; padding: 7px 12px; border-radius: 999px; cursor: pointer; margin-left: 8px; transition: transform .3s var(--m3-spring); }
+    .wd-copy:active { transform: scale(.9); }
+    .wd-actions { display: flex; gap: 10px; margin: 0 12px 14px; }
+    .wd-more { width: 100%; border: 0; border-top: 1px solid var(--border-color); background: transparent; color: var(--accent-primary); font: 700 14px/1 'Inter', sans-serif; padding: 16px; cursor: pointer; transition: background .2s ease; }
+    .wd-more:active { background: var(--wd-tonal); }
+    .wd-empty { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; color: var(--text-secondary); font-size: 14px; padding: 28px 12px; }
+    .wd-empty-ic { width: 56px; height: 56px; border-radius: var(--m3-blob-a); background: var(--wd-tonal); display: flex; align-items: center; justify-content: center; }
+    .wd-empty-ic svg { width: 26px; height: 26px; fill: var(--accent-primary); }
+
+    .wd-tabs { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); margin: 4px 16px 8px; padding: 4px; background: var(--wd-card); border: 1px solid var(--border-color); border-radius: 999px; flex-shrink: 0; }
+    .wd-tab-ind { position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc((100% - 8px) / 3); border-radius: 999px; background: var(--wd-tonal-hi); transition: transform .5s var(--m3-spring); }
+    .wd-tab { position: relative; z-index: 1; border: 0; background: transparent; color: var(--text-secondary); font: 600 12.5px/1 'Inter', sans-serif; padding: 12px 2px; border-radius: 999px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap; -webkit-tap-highlight-color: transparent; transition: color .25s ease; }
+    .wd-tab.active { color: var(--accent-primary); }
+    .wd-tab i { font-style: normal; font-size: 11px; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; background: var(--bg-primary); color: var(--text-secondary); transition: background .25s ease, color .25s ease; }
+    .wd-tab.active i { background: var(--accent-primary); color: var(--bg-primary); }
+
+    .wd-req { background: var(--wd-card); border: 1px solid var(--border-color); border-radius: 28px; overflow: hidden; transition: border-color .3s ease; }
+    .wd-req.open > .wd-x { grid-template-rows: 1fr; }
+    .wd-req.open > .wd-x > div { visibility: visible; transition-delay: 0s; }
+    .wd-req.open .wd-chev { transform: rotate(180deg); }
+    .wd-req .wd-pick-ic { background: var(--wd-warn-bg); transition: background .3s ease, border-radius .6s var(--m3-spring); }
+    .wd-req .wd-pick-ic svg { fill: var(--wd-warn); }
+    .wd-req.ok .wd-pick-ic { background: var(--wd-ok-bg); border-radius: var(--m3-blob-b); }
+    .wd-req.ok .wd-pick-ic svg { fill: var(--wd-ok); }
+    .wd-rq-list { display: flex; flex-direction: column; padding: 0 16px 12px; }
+    .wd-rq { display: flex; align-items: flex-start; gap: 12px; padding: 8px 0; }
+    .wd-rq .ic { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .wd-rq .ic svg { width: 15px; height: 15px; fill: currentColor; }
+    .wd-rq.ok .ic { background: var(--wd-ok-bg); color: var(--wd-ok); }
+    .wd-rq.no .ic { background: var(--wd-bad-bg); color: var(--wd-bad); }
+    .wd-rq .t { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+    .wd-rq b { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+    .wd-rq small { font-size: 12.5px; color: var(--text-secondary); line-height: 1.35; }
+    .wd-req.open .wd-rq { animation: wdPop .45s var(--m3-spring) backwards; animation-delay: calc(var(--k, 0) * 40ms + 80ms); }
+    #wdOverlay .wd-input:focus-visible { outline: none; }
+    #wdOverlay :focus-visible, #wdAdminOverlay :focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; }
+    @media (prefers-reduced-motion: reduce) {
+      html:not(.motion-on) #wdOverlay *, html:not(.motion-on) #wdAdminOverlay * { animation: none !important; }
+    }
+    html.reduce-motion #wdOverlay *, html.reduce-motion #wdAdminOverlay * { animation: none !important; }
+  </style>
+
+  <style id="m3e-wd-pline">
+    #profileOverlay .wd-pline {
+      display: flex; align-items: center; gap: 12px; width: 100%; box-sizing: border-box;
+      padding: 12px 16px 12px 12px; border: none; border-radius: 28px;
+      background: var(--m3-card, var(--bg-secondary)); color: var(--text-primary);
+      font: inherit; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent;
+      transition: transform .2s ease;
+    }
+    #profileOverlay .wd-pline[hidden] { display: none; }
+    #profileOverlay .wd-pline:active { transform: scale(.98); }
+    #profileOverlay .wd-pline:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; }
+    #profileOverlay .wd-pline-ic {
+      flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center;
+      background: var(--m3-tonal, var(--bg-secondary)); color: var(--accent-primary);
+    }
+    #profileOverlay .wd-pline-ic svg { width: 20px; height: 20px; fill: currentColor; }
+    #profileOverlay .wd-pline-txt { flex: 1; min-width: 0; font-size: 15px; font-weight: 600; color: var(--text-secondary); }
+    #profileOverlay .wd-pline.ok .wd-pline-txt { color: var(--text-primary); }
+    #profileOverlay .wd-pline-ch { flex: none; width: 22px; height: 22px; fill: currentColor; opacity: .5; }
+
+    #wdOverlay .wd-help { display: flex; flex-direction: column; gap: 10px; }
+    #wdOverlay .wd-info, #wdOverlay .wd-wa { border-radius: 28px; background: var(--wd-card); color: var(--text-primary); }
+    #wdOverlay .wd-info > summary {
+      list-style: none; display: flex; align-items: center; gap: 12px; padding: 12px 16px 12px 12px;
+      cursor: pointer; -webkit-tap-highlight-color: transparent; font-size: 15px; font-weight: 700;
+    }
+    #wdOverlay .wd-info > summary::-webkit-details-marker { display: none; }
+    #wdOverlay .wd-info-ic, #wdOverlay .wd-wa-ic {
+      flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center;
+      background: var(--wd-tonal); color: var(--accent-primary);
+    }
+    #wdOverlay .wd-wa-ic { background: #25D366; color: #fff; }
+    #wdOverlay .wd-info-ic svg, #wdOverlay .wd-wa-ic svg { width: 20px; height: 20px; fill: currentColor; }
+    #wdOverlay .wd-info-t { flex: 1; min-width: 0; }
+    #wdOverlay .wd-info-ch { flex: none; width: 22px; height: 22px; fill: currentColor; opacity: .55; transition: transform .25s ease; }
+    #wdOverlay .wd-info[open] > summary .wd-info-ch { transform: rotate(180deg); }
+    #wdOverlay .wd-info-list { list-style: none; margin: 0; padding: 0 18px 16px 18px; display: grid; gap: 10px; font-size: 13.5px; line-height: 1.5; color: var(--text-secondary); }
+    #wdOverlay .wd-info-list li { position: relative; padding-left: 14px; }
+    #wdOverlay .wd-info-list li::before { content: ""; position: absolute; left: 0; top: .6em; width: 5px; height: 5px; border-radius: 50%; background: var(--accent-primary); }
+    #wdOverlay .wd-info-list b { color: var(--text-primary); }
+    #wdOverlay .wd-wa { display: flex; align-items: center; gap: 12px; padding: 12px 16px 12px 12px; text-decoration: none; -webkit-tap-highlight-color: transparent; transition: transform .2s ease; }
+    #wdOverlay .wd-wa:active { transform: scale(.98); }
+    #wdOverlay .wd-wa-t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    #wdOverlay .wd-wa-t b { font-size: 15px; }
+    #wdOverlay .wd-wa-t small { font-size: 13px; color: var(--text-secondary); }
+    #wdOverlay .wd-wa-go { transform: none; }
+    #wdOverlay .wd-wait { margin: 0 12px 14px; font-size: 13px; line-height: 1.45; color: var(--text-secondary); }
+    #wdOverlay .wd-btn.wd-proof { background: #25D366; color: #fff; gap: 8px; }
+    #wdOverlay .wd-btn.wd-proof svg { width: 20px; height: 20px; fill: currentColor; flex: none; }
+    .pn-chip.pn-wa { background: rgba(37, 211, 102, .16); color: #128C4A; }
+    .pn-chip.pn-wa:hover { background: rgba(37, 211, 102, .28); }
+  </style>
+
   <style id="compact-a16">
     .header {
       min-height: 56px;
@@ -12226,6 +12511,68 @@ window.firebaseModules = {
 @keyframes aiPulse{0%,100%{opacity:.55}50%{opacity:1}}
 @keyframes aiDot{0%,80%,100%{opacity:.25}40%{opacity:1}}
 </style>
+  <style id="m3e-referral">
+    #referralModal {
+      --m3-blob-a: 42% 58% 56% 44% / 46% 44% 56% 54%;
+      display: flex; opacity: 0; visibility: hidden; pointer-events: none; animation: none;
+      transform: translateY(32px) scale(.985);
+      transition: opacity .32s var(--m3-ease-std), transform .45s var(--m3-ease-emph), visibility 0s linear .45s;
+    }
+    #referralModal.active {
+      opacity: 1; visibility: visible; pointer-events: auto; transform: none;
+      transition: opacity .32s var(--m3-ease-std), transform .45s var(--m3-ease-emph), visibility 0s linear 0s;
+    }
+    #referralModal .content-header {
+      box-sizing: border-box; min-height: calc(64px + env(safe-area-inset-top, 0px));
+      padding: env(safe-area-inset-top, 0px) 12px 0 8px; gap: 6px;
+      justify-content: flex-start; background: var(--bg-primary); border-bottom: none; flex-shrink: 0;
+    }
+    #referralModal .content-header-title { margin: 0 4px 0 8px; text-align: left; font-size: 22px; font-weight: 700; letter-spacing: -.2px; flex: 1; }
+    #referralModal .content-header-btn {
+      width: 44px; height: 44px; flex-shrink: 0; padding: 0; border: none; border-radius: 50%;
+      background: var(--bg-secondary); -webkit-tap-highlight-color: transparent;
+      transition: background .2s ease, transform .35s var(--m3-spring);
+    }
+    #referralModal .content-header-btn:active { transform: scale(.88); }
+    #referralModal .rf-scroll {
+      flex: 1; overflow-y: auto; overflow-x: hidden; padding: 4px 16px calc(24px + env(safe-area-inset-bottom, 0px));
+      display: flex; flex-direction: column; gap: 12px; text-align: left;
+    }
+    #referralModal .rf-scroll > * { opacity: 0; transform: translateY(24px); }
+    #referralModal.active .rf-scroll > * { animation: m3Rise .5s var(--m3-ease-emph) both; }
+    #referralModal.active .rf-scroll > *:nth-child(1) { animation-delay: .08s; }
+    #referralModal.active .rf-scroll > *:nth-child(2) { animation-delay: .14s; }
+    #referralModal.active .rf-scroll > *:nth-child(3) { animation-delay: .20s; }
+    #referralModal.active .rf-scroll > *:nth-child(4) { animation-delay: .26s; }
+    #referralModal.active .rf-scroll > *:nth-child(5) { animation-delay: .32s; }
+    #referralModal.active .rf-scroll > *:nth-child(6) { animation-delay: .38s; }
+
+    #referralModal .rf-hero { padding: 18px; border-radius: 28px; background: var(--bg-secondary); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+    #referralModal .rf-hero-icon { width: 56px; height: 56px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: var(--m3-blob-a); background: var(--accent-primary); }
+    #referralModal .rf-hero-icon svg { width: 28px; height: 28px; fill: var(--bg-primary); }
+    #referralModal .rf-hero-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    #referralModal .rf-hero-text strong { font-size: 20px; font-weight: 700; color: var(--text-primary); }
+    #referralModal .rf-hero-text > span { font-size: 13px; line-height: 1.45; color: var(--text-muted); }
+
+    #referralModal .rf-box { margin: 0; padding: 20px 16px; border-radius: 28px; background: var(--bg-secondary); text-align: center; flex-shrink: 0; }
+    #referralModal .rf-code { font-size: 34px; letter-spacing: 6px; padding: 8px 0 2px; }
+    #referralModal .rf-actions { gap: 10px; }
+    #referralModal .rf-actions .custom-modal-btn { height: 52px; padding: 0 16px; border-radius: 999px; font-size: 15px; font-weight: 700; -webkit-tap-highlight-color: transparent; transition: transform .35s var(--m3-spring), opacity .2s ease; }
+    #referralModal .rf-actions .custom-modal-btn:active { transform: scale(.95); }
+    #referralModal .rf-stats { margin: 0; flex-shrink: 0; }
+    #referralModal .rf-stat { border-radius: 22px; background: var(--bg-secondary); padding: 14px 4px; }
+    #referralModal .rf-card { padding: 16px 18px; border-radius: 28px; background: var(--bg-secondary); flex-shrink: 0; }
+    #referralModal .rf-regras-titulo { margin: 0 0 6px; font-weight: 700; }
+    #referralModal .rf-regras { margin: 0; }
+    #referralModal .rf-lista { max-height: none; margin: 0; overflow: visible; }
+    #referralModal .rf-item:last-child { border-bottom: none; }
+    #referralModal .rf-nota { margin: 0 6px; flex-shrink: 0; }
+    #referralModal .rf-nota:empty { display: none; }
+    @media (prefers-reduced-motion: reduce) {
+      #referralModal, #referralModal.active { transition: opacity .15s linear; transform: none; }
+      #referralModal .rf-scroll > * { opacity: 1; transform: none; animation: none !important; }
+    }
+  </style>
 </head>
 <body>
   <div class="offline-banner" id="offlineBanner">
@@ -12330,9 +12677,24 @@ window.firebaseModules = {
       Resgatar Código
     </button>
 
+    <button class="btn" id="wdBtn" onclick="wdOpen()" style="display: none;">
+      <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+      Levantar Saldo
+    </button>
+
+    <button class="btn" id="wdAdminBtn" onclick="wdAdminOpen()" style="display: none;">
+      <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+      Pedidos de Levantamento
+    </button>
+
     <button class="btn" id="rewardedAdsBtn" onclick="RewardedAds.abrirPagina()">
       <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
       Ganhar Pontos
+    </button>
+
+    <button class="btn" id="referralBtn" onclick="referralOpen()">
+      <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+      Convidar Amigos
     </button>
 
     <button class="btn" id="adFreeBtn" onclick="openAdFreeSheet()">
@@ -12885,6 +13247,12 @@ window.firebaseModules = {
               <input type="password" id="registerPasswordConfirm" placeholder="Repita a senha" minlength="8" required>
             </div>
 
+            <div class="auth-input-group">
+              <label>Código de convite (opcional)</label>
+              <input type="text" id="registerRefCode" placeholder="Ex.: ABC123" maxlength="12" autocapitalize="characters" autocorrect="off" spellcheck="false" autocomplete="off">
+              <small>Se um amigo te convidou, escreve o código dele</small>
+            </div>
+
             <button type="submit" class="auth-submit-btn">Criar Conta</button>
           </form>
 
@@ -13358,7 +13726,7 @@ window.firebaseModules = {
       </div>
       <div class="about-container">
         <div class="terms-intro">Portal Digital · Atualizado em outubro de 2026</div>
-        <div class="terms-sec"><h3 class="terms-h">1. Aceitação</h3><p class="terms-p">Ao criar uma conta ou usar o Portal Digital, concorda com estes Termos de uso. Se não concordar, não utilize o aplicativo.</p></div><div class="terms-sec"><h3 class="terms-h">2. O que é o Portal Digital</h3><p class="terms-p">Um catálogo de jogos, aplicativos e tutoriais para Android e PC, com descrições e links de download. Alguns conteúdos podem exigir pontos para libertar o link.</p></div><div class="terms-sec"><h3 class="terms-h">3. Conta</h3><p class="terms-p">Deve fornecer dados verdadeiros e manter a sua conta segura. É responsável por tudo o que acontece na sua conta. Menores de idade devem usar o aplicativo com o acompanhamento de um responsável.</p></div><div class="terms-sec"><h3 class="terms-h">4. Pontos, códigos e recompensas</h3><p class="terms-p">Os pontos servem apenas para libertar downloads dentro do aplicativo. Não têm valor em dinheiro, não podem ser trocados por dinheiro nem são reembolsáveis. Podem ser obtidos por recompensa diária, anúncios, inquéritos e códigos. Pontos ou códigos obtidos por fraude, erro ou abuso podem ser removidos ou cancelados sem aviso.</p></div><div class="terms-sec"><h3 class="terms-h">5. Downloads e conteúdos de terceiros</h3><p class="terms-p">Os jogos e aplicativos pertencem aos seus respetivos autores e marcas. O Portal Digital não garante que funcionem em todos os aparelhos nem que estejam livres de erros. Use por sua conta e risco e confirme sempre a compatibilidade com o seu aparelho.</p></div><div class="terms-sec"><h3 class="terms-h">6. Comentários, pedidos e denúncias</h3><p class="terms-p">Seja respeitoso. É proibido publicar conteúdo ofensivo, ilegal, enganoso, spam ou que invada a privacidade de outras pessoas. Podemos remover conteúdos e limitar contas que não cumpram estas regras.</p></div><div class="terms-sec"><h3 class="terms-h">7. Condutas proibidas</h3><p class="terms-p">Criar várias contas para ganhar pontos, usar programas automáticos ou truques para obter recompensas, tentar aceder a áreas restritas, copiar ou alterar o aplicativo, ou prejudicar outros utilizadores e o funcionamento do serviço.</p></div><div class="terms-sec"><h3 class="terms-h">8. Anúncios</h3><p class="terms-p">O aplicativo pode mostrar anúncios e promoções. Os anúncios de terceiros são da responsabilidade dos respetivos anunciantes.</p></div><div class="terms-sec"><h3 class="terms-h">9. Suspensão e encerramento</h3><p class="terms-p">Podemos suspender ou encerrar contas que violem estes Termos. Pode deixar de usar o aplicativo a qualquer momento.</p></div><div class="terms-sec"><h3 class="terms-h">10. Responsabilidade</h3><p class="terms-p">O serviço é oferecido como está, sem garantia de disponibilidade contínua. Não somos responsáveis por perdas causadas pelo uso de conteúdos de terceiros, falhas de internet ou indisponibilidade temporária.</p></div><div class="terms-sec"><h3 class="terms-h">11. Direitos de autor</h3><p class="terms-p">Se é titular de direitos e acredita que algum conteúdo viola os seus direitos, contacte-nos com a identificação do conteúdo para análise e remoção, se for caso disso.</p></div><div class="terms-sec"><h3 class="terms-h">12. Alterações</h3><p class="terms-p">Podemos atualizar estes Termos. O uso do aplicativo depois da atualização significa que aceita a nova versão.</p></div><div class="terms-sec"><h3 class="terms-h">13. Privacidade</h3><p class="terms-p">O tratamento dos seus dados está descrito na Política de privacidade.</p></div>
+        <div class="terms-sec"><h3 class="terms-h">1. Aceitação</h3><p class="terms-p">Ao criar uma conta ou usar o Portal Digital, concorda com estes Termos de uso. Se não concordar, não utilize o aplicativo.</p></div><div class="terms-sec"><h3 class="terms-h">2. O que é o Portal Digital</h3><p class="terms-p">Um catálogo de jogos, aplicativos e tutoriais para Android e PC, com descrições e links de download. Alguns conteúdos podem exigir pontos para libertar o link.</p></div><div class="terms-sec"><h3 class="terms-h">3. Conta</h3><p class="terms-p">Deve fornecer dados verdadeiros e manter a sua conta segura. É responsável por tudo o que acontece na sua conta. Menores de idade devem usar o aplicativo com o acompanhamento de um responsável.</p></div><div class="terms-sec"><h3 class="terms-h">4. Pontos, códigos e recompensas</h3><p class="terms-p">Os pontos servem para libertar downloads dentro do aplicativo e, quando o levantamento estiver disponível, podem ser trocados por saldo nos valores e condições indicados no ecrã Levantar Saldo. Cada pedido é analisado e pago manualmente pelo administrador, e pode ser cancelado se houver suspeita de fraude ou dados inválidos (neste caso os pontos são devolvidos). Fora deste processo, os pontos não têm valor em dinheiro nem são reembolsáveis. Podem ser obtidos por recompensa diária, anúncios, inquéritos e códigos. Pontos ou códigos obtidos por fraude, erro ou abuso podem ser removidos ou cancelados sem aviso.</p></div><div class="terms-sec"><h3 class="terms-h">5. Downloads e conteúdos de terceiros</h3><p class="terms-p">Os jogos e aplicativos pertencem aos seus respetivos autores e marcas. O Portal Digital não garante que funcionem em todos os aparelhos nem que estejam livres de erros. Use por sua conta e risco e confirme sempre a compatibilidade com o seu aparelho.</p></div><div class="terms-sec"><h3 class="terms-h">6. Comentários, pedidos e denúncias</h3><p class="terms-p">Seja respeitoso. É proibido publicar conteúdo ofensivo, ilegal, enganoso, spam ou que invada a privacidade de outras pessoas. Podemos remover conteúdos e limitar contas que não cumpram estas regras.</p></div><div class="terms-sec"><h3 class="terms-h">7. Condutas proibidas</h3><p class="terms-p">Criar várias contas para ganhar pontos, usar programas automáticos ou truques para obter recompensas, tentar aceder a áreas restritas, copiar ou alterar o aplicativo, ou prejudicar outros utilizadores e o funcionamento do serviço.</p></div><div class="terms-sec"><h3 class="terms-h">8. Anúncios</h3><p class="terms-p">O aplicativo pode mostrar anúncios e promoções. Os anúncios de terceiros são da responsabilidade dos respetivos anunciantes.</p></div><div class="terms-sec"><h3 class="terms-h">9. Suspensão e encerramento</h3><p class="terms-p">Podemos suspender ou encerrar contas que violem estes Termos. Pode deixar de usar o aplicativo a qualquer momento.</p></div><div class="terms-sec"><h3 class="terms-h">10. Responsabilidade</h3><p class="terms-p">O serviço é oferecido como está, sem garantia de disponibilidade contínua. Não somos responsáveis por perdas causadas pelo uso de conteúdos de terceiros, falhas de internet ou indisponibilidade temporária.</p></div><div class="terms-sec"><h3 class="terms-h">11. Direitos de autor</h3><p class="terms-p">Se é titular de direitos e acredita que algum conteúdo viola os seus direitos, contacte-nos com a identificação do conteúdo para análise e remoção, se for caso disso.</p></div><div class="terms-sec"><h3 class="terms-h">12. Alterações</h3><p class="terms-p">Podemos atualizar estes Termos. O uso do aplicativo depois da atualização significa que aceita a nova versão.</p></div><div class="terms-sec"><h3 class="terms-h">13. Privacidade</h3><p class="terms-p">O tratamento dos seus dados está descrito na Política de privacidade.</p></div>
         <div class="terms-sec">
           <h3 class="terms-h">14. Contacto</h3>
           <p class="terms-p">Dúvidas sobre estes Termos: <b>portaldigitalao@gmail.com</b></p>
@@ -13621,6 +13989,49 @@ window.firebaseModules = {
         <button class="custom-modal-btn primary" onclick="openSurvey()">Responder agora</button>
         <button class="custom-modal-btn secondary" onclick="pqInviteLater()">Lembrar mais tarde</button>
         <button class="pq-link-btn" onclick="pqInviteNever()">Não quero responder</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="referralModal" class="manage-users-overlay rf-overlay" role="dialog" aria-label="Convidar Amigos">
+    <div class="manage-users-overlay-content rf-overlay-content">
+      <div class="content-header">
+        <button class="content-header-btn back-btn" onclick="referralClose()" aria-label="Voltar">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <h1 class="content-header-title">Convidar Amigos</h1>
+        <span style="width:44px"></span>
+      </div>
+      <div class="rf-scroll">
+        <div class="rf-hero">
+          <div class="rf-hero-icon"><svg viewBox="0 0 24 24"><path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 12 7.4 15.38 12 17 10.83 14.92 8H20v6z"/></svg></div>
+          <div class="rf-hero-text">
+            <strong>Ganha <span id="rfPts">100</span> pontos</strong>
+            <span>por cada amigo que convidares.</span>
+          </div>
+        </div>
+        <div class="rf-box">
+          <div class="rf-label">O teu código de convite</div>
+          <div class="rf-code" id="rfCodigo">...</div>
+          <div class="rf-link" id="rfLink"></div>
+          <div class="rf-actions">
+            <button class="custom-modal-btn secondary" onclick="referralCopyCode(this)">Copiar código</button>
+            <button class="custom-modal-btn primary" onclick="referralShare(this)">Partilhar link</button>
+          </div>
+        </div>
+        <div class="rf-stats">
+          <div class="rf-stat"><b id="rfTotal">0</b><span>Convidados</span></div>
+          <div class="rf-stat"><b id="rfValidos">0</b><span>Validados</span></div>
+          <div class="rf-stat"><b id="rfGanhos">0</b><span>Pontos ganhos</span></div>
+        </div>
+        <div class="rf-card">
+          <p class="rf-regras-titulo" id="rfRegrasTitulo"></p>
+          <ul class="rf-regras" id="rfRegras"></ul>
+        </div>
+        <div class="rf-card">
+          <div class="rf-lista" id="rfLista"></div>
+        </div>
+        <div class="rf-nota" id="rfNota"></div>
       </div>
     </div>
   </div>
@@ -14248,6 +14659,97 @@ window.firebaseModules = {
           <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm3-4H6v-2h9v2zm0-4H6V7h9v2z"/></svg>
           <span class="reports-empty-text">Carregando reports...</span>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="wdOverlay" class="wd-overlay">
+    <div class="wd-content">
+      <div class="content-header">
+        <button class="content-header-btn back-btn" onclick="wdClose()" aria-label="Voltar"><svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+        <h1 class="content-header-title">Levantar Saldo</h1>
+      </div>
+      <div class="wd-body">
+        <section class="wd-hero wd-sec" style="--i:0">
+          <div class="wd-hero-top">
+            <div class="wd-hero-ic"><svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg></div>
+            <div class="wd-hero-txt">
+              <span class="wd-hero-lbl">Saldo disponível</span>
+              <div class="wd-hero-num"><span id="wdSaldo">0</span><small>pontos</small></div>
+            </div>
+          </div>
+          <span class="wd-hero-pill" id="wdSaldoKz" hidden></span>
+          <p class="wd-hero-cap">Os pontos do pedido são descontados logo ao enviar.</p>
+        </section>
+        <section class="wd-sec wd-help" style="--i:1">
+          <details class="wd-info" id="wdInfo">
+            <summary>
+              <span class="wd-info-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></span>
+              <span class="wd-info-t">Como funciona o levantamento</span>
+              <svg class="wd-info-ch" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+            </summary>
+            <ul class="wd-info-list" id="wdInfoList"></ul>
+          </details>
+          <a class="wd-wa" id="wdWa" href="#" target="_blank" rel="noopener noreferrer">
+            <span class="wd-wa-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></span>
+            <span class="wd-wa-t"><b>Dúvidas? Fale no WhatsApp</b><small id="wdWaNum"></small></span>
+            <svg class="wd-info-ch wd-wa-go" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+          </a>
+        </section>
+        <section class="wd-sec wd-req" id="wdReq" style="--i:1">
+          <button type="button" class="wd-pick-btn" id="wdReqBtn" aria-expanded="false">
+            <span class="wd-pick-ic" id="wdReqIc"></span>
+            <span class="wd-pick-txt"><b id="wdReqTit">Requisitos</b><small id="wdReqSub">A verificar...</small></span>
+            <svg class="wd-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+          </button>
+          <div class="wd-x"><div><div class="wd-rq-list" id="wdReqList"></div></div></div>
+        </section>
+        <section class="wd-sec" style="--i:2">
+          <span class="wd-label">Quanto quer trocar</span>
+          <div class="wd-pick" id="wdPick">
+            <button type="button" class="wd-pick-btn" id="wdPickBtn" aria-expanded="false" aria-controls="wdPickPanel">
+              <span class="wd-pick-ic"><svg viewBox="0 0 24 24"><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/></svg></span>
+              <span class="wd-pick-txt"><b id="wdPickTit">Escolher valor</b><small id="wdPickSub">Toque para ver as opções</small></span>
+              <svg class="wd-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+            </button>
+            <div class="wd-x" id="wdPickPanel"><div><div class="wd-grid" id="wdGrid"></div></div></div>
+          </div>
+        </section>
+        <section class="wd-sec" style="--i:3">
+          <span class="wd-label">Como quer receber</span>
+          <div class="wd-chips" id="wdMethods"></div>
+          <div class="wd-x" id="wdAccWrap"><div><div class="wd-field-in">
+            <span class="wd-label" id="wdAccLabel">Número</span>
+            <input type="text" id="wdAcc" class="wd-input" autocomplete="off" maxlength="40">
+          </div></div></div>
+          <div class="wd-x" id="wdResumeX"><div><div id="wdResume" class="wd-resume"></div></div></div>
+        </section>
+        <section class="wd-sec" style="--i:4">
+          <span class="wd-label">Os seus pedidos</span>
+          <div id="wdHist"></div>
+        </section>
+      </div>
+      <div class="wd-foot">
+        <button type="button" class="wd-btn" id="wdSubmit" onclick="wdSubmit()">Pedir levantamento</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="wdAdminOverlay" class="wd-overlay">
+    <div class="wd-content">
+      <div class="content-header">
+        <button class="content-header-btn back-btn" onclick="wdAdminClose()" aria-label="Voltar"><svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+        <h1 class="content-header-title">Pedidos de Levantamento</h1>
+      </div>
+      <div class="wd-tabs" id="wdTabs">
+        <span class="wd-tab-ind" id="wdTabInd"></span>
+        <button type="button" class="wd-tab active" data-t="pendente">Pendentes <i id="wdCntPendente">0</i></button>
+        <button type="button" class="wd-tab" data-t="pago">Pagos <i id="wdCntPago">0</i></button>
+        <button type="button" class="wd-tab" data-t="cancelado">Cancelados <i id="wdCntCancelado">0</i></button>
+      </div>
+      <div class="wd-body">
+        <div id="wdAdminTotal" class="wd-note wd-total" style="display: none;"></div>
+        <div id="wdAdminList"></div>
       </div>
     </div>
   </div>
@@ -15030,6 +15532,7 @@ function updateUIForUser() {
       updateReportsBadge();
     }
   }
+  if (typeof wdUpdateUI === "function") wdUpdateUI();
   updateSidebarProfileAvatar();
 }
 function updateNavProfileAvatar() {
@@ -18056,8 +18559,10 @@ function pnMaskCode(c) {
 }
 function pnFooter(notif, cls) {
   const id = String(notif.id).replace(/'/g, "");
+  const proof = /levantamento pago/i.test(String(notif.title || "")) && typeof wdPedirComprovativoNotif === "function"
+    ? `<button class="pn-chip pn-wa" onclick="wdPedirComprovativoNotif('${pdJsArg(id)}')">Pedir comprovativo</button>` : "";
   const ok = notif.isRead ? "" : `<button class="pn-chip pn-ok" onclick="markNotificationAsRead('${pdJsArg(id)}')">${PN_ICONS.check}Lida</button>`;
-  return `<div class="${cls}">${ok}<button class="pn-chip pn-del" onclick="dismissNotification('${pdJsArg(id)}')">${PN_ICONS.trash}Apagar</button></div>`;
+  return `<div class="${cls}">${proof}${ok}<button class="pn-chip pn-del" onclick="dismissNotification('${pdJsArg(id)}')">${PN_ICONS.trash}Apagar</button></div>`;
 }
 function ppPointsCard(notif, idx) {
   const id = String(notif.id).replace(/'/g, "");
@@ -19176,14 +19681,18 @@ async function handleRegister(e) {
         console.error("Erro ao fazer upload do avatar:", uploadError);
       }
     }
+    let refBy = "";
+    try { if (typeof window.referralResolve === "function") refBy = await window.referralResolve(user.uid); } catch (e) { refBy = ""; }
     await set(ref(database, `users/${user.uid}`), {
       name,
       email,
       points: 0,
       status: "pending",
       avatar: avatarUrl,
-      createdAt: Date.now()
+      createdAt: Date.now(),
+      ...(refBy ? { referredBy: refBy } : {})
     });
+    if (refBy) { try { await window.referralAfterRegister(user.uid, name, refBy); } catch (e) {} }
     userAvatar = avatarUrl;
     userName = name;
     userStatus = "pending";
@@ -21031,7 +21540,11 @@ async function pdEnhanceProfile(container, user, createdAtMs, pre) {
     const cardCart = histCart.length ? '<div class="pdp-card" data-pdp="1" id="pdpCartCard"></div>' : "";
 
     const cardNudge = ppProfileIncomplete(uid) ? '<div class="pdp-card pp-nudge" data-pdp="1"><div class="pp-nudge-t">Complete o seu perfil</div><div class="pp-nudge-d">' + ppNudgeText(uid) + '</div><button type="button" class="custom-modal-btn primary" onclick="ppNudgeAction()">Completar agora</button></div>' : "";
-    card.insertAdjacentHTML("afterend", cardNudge + cardNivel + cardStats + cardPers + cardConq + cardRec);
+    const cardLev = '<button type="button" class="wd-pline" id="wdProfileLine" data-pdp="1" hidden onclick="wdOpen()" aria-label="Levantar saldo">' +
+      '<span class="wd-pline-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg></span>' +
+      '<span class="wd-pline-txt" id="wdProfileLineTxt"></span>' +
+      '<svg class="wd-pline-ch" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></button>';
+    card.insertAdjacentHTML("afterend", cardLev + cardNudge + cardNivel + cardStats + cardPers + cardConq + cardRec);
     const fill = container.querySelector("#pdpXpFill");
     if (fill) setTimeout(() => { fill.style.width = nv.pct + "%"; }, 60);
 
@@ -21193,6 +21706,7 @@ async function loadProfileData(user, container) {
     window.__pdCreatedAtMs = null;
     if (tok !== window.__pdLoadTok) return;
     container.replaceChildren(...stage.childNodes);
+    if (typeof wdPerfilLinha === "function") wdPerfilLinha();
   } catch (error) {
     console.error("Error loading profile:", error);
     const displayName = userName || user.displayName || user.email?.split("@")[0] || "Usu\xE1rio";
@@ -25469,9 +25983,12 @@ function renderAdStats() {
     reportsOverlay: "closeViewReportsModal",
     transferOverlay: "closeTransferModal",
     surveyOverlay: "closeSurveyOverlay",
+    referralModal: "referralClose",
     surveyAdminOverlay: "closeSurveyAdmin",
     settingsOverlay: "closeSettings",
-    reqSheet: "reqCloseCompose"
+    reqSheet: "reqCloseCompose",
+    wdOverlay: "wdClose",
+    wdAdminOverlay: "wdAdminClose"
   };
 
   var lastState = history.state;
@@ -25548,6 +26065,17 @@ function renderAdStats() {
 <script>
 const PQ_CACHE_KEY = "pdPesquisaCfg";
 const PQ_CACHE_TTL = 6 * 36e5;
+const PQ_EXTRA = [
+  { id: "ia1", bloco: "Assistente IA", texto: "Já usaste o Assistente do Portal Digital?", tipo: "unica", opcoes: ["Sim, uso com frequência", "Já usei algumas vezes", "Vi, mas nunca usei", "Não sabia que existia"], obrigatoria: true, ativa: true },
+  { id: "ia2", bloco: "Assistente IA", texto: "Para que costumas usar o Assistente?", tipo: "multipla", opcoes: ["Encontrar jogos e aplicativos", "Tirar dúvidas sobre o app", "Pedir recomendações", "Ajuda com downloads", "Só para experimentar"], obrigatoria: false, ativa: true },
+  { id: "ia3", bloco: "Assistente IA", texto: "Como avalias as respostas do Assistente (utilidade e rapidez)?", tipo: "escala", opcoes: [], obrigatoria: true, ativa: true },
+  { id: "lv1", bloco: "Levantar Saldo", texto: "Já viste o ecrã Levantar Saldo ou fizeste um pedido de levantamento?", tipo: "unica", opcoes: ["Já fiz um pedido", "Já vi, mas ainda não pedi", "Ainda não vi", "Não percebi o que é"], obrigatoria: true, ativa: true },
+  { id: "lv2", bloco: "Levantar Saldo", texto: "Como avalias a clareza do levantamento (valores, condições e prazos)?", tipo: "escala", opcoes: [], obrigatoria: true, ativa: true },
+  { id: "lv3", bloco: "Levantar Saldo", texto: "O que mais gostavas de melhorar no Levantar Saldo?", tipo: "multipla", opcoes: ["Pagamento mais rápido", "Valor mínimo mais baixo", "Mais métodos de pagamento", "Explicações mais claras", "Está bom assim"], max: 2, obrigatoria: false, ativa: true },
+  { id: "cv1", bloco: "Convidar Amigos", texto: "Já convidaste amigos para o Portal Digital com o teu código?", tipo: "unica", opcoes: ["Sim, vários amigos", "Sim, um amigo", "Ainda não, mas vou convidar", "Não pretendo convidar"], obrigatoria: true, ativa: true },
+  { id: "cv2", bloco: "Convidar Amigos", texto: "Como avalias o Convidar Amigos (facilidade de partilhar e de ganhar pontos)?", tipo: "escala", opcoes: [], obrigatoria: true, ativa: true },
+  { id: "cv3", bloco: "Convidar Amigos", texto: "Tens alguma sugestão para melhorar o Assistente, o Levantar Saldo ou o Convidar Amigos?", tipo: "texto", opcoes: [], minChars: 0, obrigatoria: false, ativa: true }
+];
 const PQ_DEFAULT_CFG = {
   ativa: true,
   pontos: 300,
@@ -25565,6 +26093,7 @@ const PQ_DEFAULT_CFG = {
     { id: "q10", bloco: "O que melhorar", texto: "Se pudesses mudar uma coisa no app, o que seria?", tipo: "texto", opcoes: [], minChars: 15, obrigatoria: true, ativa: true }
   ]
 };
+PQ_DEFAULT_CFG.perguntas = PQ_DEFAULT_CFG.perguntas.concat(PQ_EXTRA);
 const PQ_TIPOS = { unica: "Escolha única", multipla: "Múltipla escolha", escala: "Escala 1-5", texto: "Texto livre" };
 
 let userSurveyDone = false;
@@ -25573,8 +26102,14 @@ let pqConfig = null;
 function pqClone(o) { return JSON.parse(JSON.stringify(o)); }
 
 function pqNormalizeCfg(d) {
-  const src = d && Array.isArray(d.perguntas) ? d.perguntas : PQ_DEFAULT_CFG.perguntas;
+  let src = d && Array.isArray(d.perguntas) ? d.perguntas : PQ_DEFAULT_CFG.perguntas;
+  if (d && Array.isArray(d.perguntas) && !d.extrasV1) {
+    const ids = {};
+    src.forEach((q) => { ids[String(q && q.id)] = true; });
+    src = src.concat(PQ_EXTRA.filter((q) => !ids[q.id]));
+  }
   return {
+    extrasV1: true,
     ativa: d && typeof d.ativa === "boolean" ? d.ativa : true,
     pontos: d && Number.isFinite(d.pontos) ? d.pontos : PQ_DEFAULT_CFG.pontos,
     atualizadoEm: d && d.atualizadoEm ? d.atualizadoEm : 0,
@@ -26051,7 +26586,7 @@ function pqToggleAtiva(i) {
   pqRenderPerguntas();
 }
 function pqRestoreDefaults() {
-  showCustomConfirm("Substituir as perguntas atuais pelas 10 perguntas padrão? (Só fica guardado quando carregares em Guardar alterações.)", () => {
+  showCustomConfirm("Substituir as perguntas atuais pelas perguntas padrão? (Só fica guardado quando carregares em Guardar alterações.)", () => {
     pqDraft.perguntas = pqClone(PQ_DEFAULT_CFG.perguntas);
     pqMarkDirty();
     pqRenderPerguntas();
@@ -27344,6 +27879,7 @@ function aiGuide() {
     "- Recompensa diária: +20 pontos, e só pode ser resgatada de 24 em 24 horas (botão Recompensa Diária no menu lateral).\n" +
     "- Ganhar Pontos (anúncios com recompensa, botão no menu lateral, abre com ir_para pontos): cada recompensa pede para ver 2 vídeos seguidos e dá 25 pontos. Dá para receber até 6 vezes e no máximo 150 pontos por ciclo de 24 horas, contados desde a primeira. Há uma pausa curta entre anúncios. Se o usuário saltar o vídeo, sair do app a meio ou tocar no link do anúncio, esse vídeo não conta.\n" +
     "- Verificar o e-mail: 10 pontos de bónus, uma só vez.\n" +
+    (typeof window.referralGuideText === "function" ? window.referralGuideText() : "") +
     "- Avaliar o app: 4 estrelas dão 5 pontos de bónus e 5 estrelas dão 10. Com 1 a 3 estrelas não há bónus.\n" +
     "- Inquérito de opinião: dá pontos uma só vez (normalmente 300; o valor certo aparece no próprio inquérito).\n" +
     "- Códigos de resgate (ver abaixo).\n" +
@@ -27793,27 +28329,1038 @@ new MutationObserver(() => {
   else if (aiReturn.seen) { aiReturn = null; aiOpen(); }
 }).observe(document.body, { attributes: true, attributeFilter: ["class"], subtree: true });
 </script>
+
+<script>
+(function () {
+  "use strict";
+  var TABELA = [[250, 25], [500, 50], [750, 100], [1000, 150], [1500, 200], [2000, 250], [2500, 300], [3000, 350], [3500, 400], [4000, 450], [5000, 700]];
+  var METODOS = [
+    { id: "multicaixa", nome: "Multicaixa Express", tipo: "tel" },
+    { id: "unitel", nome: "Unitel Money", tipo: "tel" },
+    { id: "afrimoney", nome: "Afrimoney", tipo: "tel" },
+    { id: "iban", nome: "IBAN", tipo: "iban" }
+  ];
+  var WHATSAPP = "932535389";
+  var WA_PAIS = "244";
+  var HORAS_PERGUNTAR = 6;
+  var MIN_DIAS_CONTA = 7;
+  var INTERVALO_DIAS = 7;
+  var PTS_ALTO = 3000;
+  var MIN_DIAS_ALTO = 30;
+  var TETO_MES_KZ = 0;
+  var DAY = 864e5;
+  var sel = { pts: 0, met: "" };
+  var estado = { createdAt: 0, pontos: 0, pedidos: [] };
+  var busy = false;
+  var admin = { lista: [], tab: "pendente", info: {}, open: {} };
+
+  function $(id) { return document.getElementById(id); }
+  function esc(v) { return String(v == null ? "" : v).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function kz(n) { return Number(n || 0).toLocaleString("pt-PT") + " Kz"; }
+  function dataHora(ms) { if (!ms) return "—"; var d = new Date(ms); return d.toLocaleDateString("pt-PT") + " " + d.toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" }); }
+  function soData(ms) { return ms ? new Date(ms).toLocaleDateString("pt-PT") : "—"; }
+  function mod() { return window.firebaseModules; }
+  function db() { return window.firebaseDatabase; }
+  function metodoPorId(id) { for (var i = 0; i < METODOS.length; i++) if (METODOS[i].id === id) return METODOS[i]; return null; }
+  function valorKz(p) { for (var i = 0; i < TABELA.length; i++) if (TABELA[i][0] === p) return TABELA[i][1]; return 0; }
+  function diasDeConta() { return estado.createdAt ? Math.floor((Date.now() - estado.createdAt) / DAY) : 9999; }
+  function erro(e) { return (e && (e.code || e.message)) || "tente novamente"; }
+
+  window.wdUpdateUI = function () {
+    var logado = !!(window.currentUser || (typeof currentUser !== "undefined" && currentUser)) && !currentUser.isAnonymous;
+    var b = $("wdBtn"), a = $("wdAdminBtn");
+    if (b) b.style.display = logado ? "flex" : "none";
+    if (a) a.style.display = logado && isPublisher ? "flex" : "none";
+  };
+
+  function dd(n) { return n + (n === 1 ? " dia" : " dias"); }
+  function elegibilidade() { var b = bloqueio(); return b ? b.msg : ""; }
+
+  function bloqueio() {
+    if (!currentUser || currentUser.isAnonymous) return { msg: "Entre na sua conta para levantar saldo.", curto: "" };
+    if (!isPublisher && userStatus !== "approved") return { msg: "A sua conta precisa de estar verificada para levantar saldo.", curto: "Conta por verificar" };
+    var dias = diasDeConta();
+    if (!isPublisher && dias < MIN_DIAS_CONTA) return { msg: "A conta precisa de ter pelo menos " + MIN_DIAS_CONTA + " dias. Faltam " + (MIN_DIAS_CONTA - dias) + " dia(s).", curto: "Disponível em " + dd(MIN_DIAS_CONTA - dias) };
+    var ult = 0, mes = 0, agora = Date.now();
+    for (var i = 0; i < estado.pedidos.length; i++) {
+      var p = estado.pedidos[i];
+      if (p.status === "pendente") return { msg: "Já tem um pedido pendente. Espere que seja pago ou cancelado.", curto: "Pedido pendente" };
+      if (p.status !== "cancelado") {
+        if (p.criadoEm > ult) ult = p.criadoEm;
+        if (agora - p.criadoEm < 30 * DAY) mes += Number(p.kz) || 0;
+      }
+    }
+    if (!isPublisher && ult && agora - ult < INTERVALO_DIAS * DAY) return { msg: "Só pode fazer 1 levantamento a cada " + INTERVALO_DIAS + " dias. Próximo: " + soData(ult + INTERVALO_DIAS * DAY) + ".", curto: "Disponível em " + dd(Math.max(1, Math.ceil((ult + INTERVALO_DIAS * DAY - agora) / DAY))) };
+    if (TETO_MES_KZ > 0 && mes >= TETO_MES_KZ) return { msg: "Atingiu o limite de " + kz(TETO_MES_KZ) + " em 30 dias.", curto: "Limite mensal atingido" };
+    if (estado.pontos < TABELA[0][0]) return { msg: "Precisa de pelo menos " + TABELA[0][0] + " pontos para levantar.", curto: "Faltam " + (TABELA[0][0] - estado.pontos) + " pontos" };
+    return null;
+  }
+
+  function opcaoBloqueada(pts) {
+    if (pts > estado.pontos) return "Pontos insuficientes";
+    if (!isPublisher && pts >= PTS_ALTO && diasDeConta() < MIN_DIAS_ALTO) return "Conta com " + MIN_DIAS_ALTO + "+ dias";
+    if (TETO_MES_KZ > 0) {
+      var agora = Date.now(), mes = 0;
+      for (var i = 0; i < estado.pedidos.length; i++) { var p = estado.pedidos[i]; if (p.status !== "cancelado" && agora - p.criadoEm < 30 * DAY) mes += Number(p.kz) || 0; }
+      if (mes + valorKz(pts) > TETO_MES_KZ) return "Passa o limite mensal";
+    }
+    return "";
+  }
+
+  var hOpen = {}, hAll = false, numShown = null, numAnim = 0, reqTouched = false;
+  var IC = {
+    chev: '<svg class="wd-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>',
+    ck: '<svg class="ck" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>',
+    lock: '<svg class="lk" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>',
+    tel: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>',
+    bank: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h3v7H4zm6.5 0h3v7h-3zM2 19h20v3H2zm15-9h3v7h-3zM12 1L2 6v2h20V6z"/></svg>',
+    pendente: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>',
+    pago: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>',
+    cancelado: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>',
+    info: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>',
+    x: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>',
+    wa: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>',
+    inbox: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3H4.99c-1.11 0-1.98.89-1.98 2L3 19c0 1.1.88 2 1.99 2H19c1.1 0 2-.9 2-2V5c0-1.11-.9-2-2-2zm0 12h-4c0 1.66-1.35 3-3 3s-3-1.34-3-3H4.99V5H19v10z"/></svg>'
+  };
+  var ROT = { pendente: "Pendente", pago: "Pago", cancelado: "Cancelado" };
+
+  function semMov() {
+    var h = document.documentElement;
+    return h.classList.contains("reduce-motion") || (!!window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches && !h.classList.contains("motion-on"));
+  }
+  function animarNum(el, to) {
+    cancelAnimationFrame(numAnim);
+    var from = numShown == null ? 0 : numShown;
+    if (semMov() || from === to) { numShown = to; el.textContent = to.toLocaleString("pt-PT"); return; }
+    var t0 = 0;
+    function passo(t) {
+      if (!t0) t0 = t;
+      var k = Math.min(1, (t - t0) / 700), e = 1 - Math.pow(1 - k, 3);
+      numShown = Math.round(from + (to - from) * e);
+      el.textContent = numShown.toLocaleString("pt-PT");
+      if (k < 1) numAnim = requestAnimationFrame(passo);
+    }
+    numAnim = requestAnimationFrame(passo);
+  }
+  function kv(k, v) { return '<div class="wd-kv"><span>' + k + "</span><b>" + v + "</b></div>"; }
+  function alternar(row, mapa, k) {
+    var o = !row.classList.contains("open");
+    row.classList.toggle("open", o);
+    var h = row.querySelector(".wd-row-h");
+    if (h) h.setAttribute("aria-expanded", o ? "true" : "false");
+    if (o) mapa[k] = 1; else delete mapa[k];
+  }
+  function setPick(o) {
+    var p = $("wdPick"); if (!p) return;
+    p.classList.toggle("open", !!o);
+    $("wdPickBtn").setAttribute("aria-expanded", o ? "true" : "false");
+  }
+  function maxKz() {
+    var m = 0;
+    for (var i = 0; i < TABELA.length; i++) if (!opcaoBloqueada(TABELA[i][0]) && TABELA[i][1] > m) m = TABELA[i][1];
+    return m;
+  }
+
+  function renderGrid() {
+    var h = "";
+    for (var i = 0; i < TABELA.length; i++) {
+      var p = TABELA[i][0], v = TABELA[i][1], bl = opcaoBloqueada(p), on = sel.pts === p;
+      h += '<button type="button" class="wd-tile' + (on ? " sel" : "") + (bl ? " off" : "") + '" data-p="' + p + '" style="--k:' + i + '" aria-pressed="' + (on ? "true" : "false") + '"' + (bl ? ' title="' + esc(bl) + '"' : "") + "><b>" + p + "</b><span>pontos</span><em>" + kz(v) + "</em>" + (bl ? IC.lock : "") + "</button>";
+    }
+    $("wdGrid").innerHTML = h;
+  }
+  function marcarGrid() {
+    var n = $("wdGrid").children;
+    for (var i = 0; i < n.length; i++) {
+      var on = Number(n[i].dataset.p) === sel.pts;
+      n[i].classList.toggle("sel", on);
+      n[i].setAttribute("aria-pressed", on ? "true" : "false");
+    }
+  }
+  function renderPick() {
+    var has = !!sel.pts;
+    $("wdPick").classList.toggle("has", has);
+    $("wdPickTit").textContent = has ? sel.pts + " pontos" : "Escolher valor";
+    $("wdPickSub").textContent = has ? "Recebe " + kz(valorKz(sel.pts)) : "Toque para ver as opções";
+  }
+  function renderMetodos() {
+    var h = "";
+    for (var i = 0; i < METODOS.length; i++) {
+      var m = METODOS[i], on = sel.met === m.id;
+      h += '<button type="button" class="wd-met' + (on ? " sel" : "") + '" data-m="' + m.id + '" aria-pressed="' + (on ? "true" : "false") + '"><span class="ic">' + (m.tipo === "iban" ? IC.bank : IC.tel) + IC.ck + "</span><span>" + esc(m.nome) + "</span></button>";
+    }
+    $("wdMethods").innerHTML = h;
+    contaCampo();
+  }
+  function marcarMetodos() {
+    var n = $("wdMethods").children;
+    for (var i = 0; i < n.length; i++) {
+      var on = n[i].dataset.m === sel.met;
+      n[i].classList.toggle("sel", on);
+      n[i].setAttribute("aria-pressed", on ? "true" : "false");
+    }
+  }
+  function contaCampo() {
+    var m = metodoPorId(sel.met), w = $("wdAccWrap");
+    w.classList.toggle("open", !!m);
+    if (!m) return;
+    $("wdAccLabel").textContent = m.tipo === "iban" ? "O seu IBAN (AO06...)" : "Número de telefone da conta " + m.nome;
+    $("wdAcc").placeholder = m.tipo === "iban" ? "AO06 0000 0000 0000 0000 0000 0" : "9XX XXX XXX";
+    $("wdAcc").inputMode = m.tipo === "iban" ? "text" : "numeric";
+  }
+  function renderResumo() {
+    var x = $("wdResumeX");
+    if (!sel.pts) { x.classList.remove("open"); return; }
+    var m = metodoPorId(sel.met);
+    $("wdResume").innerHTML = '<span class="wd-res-k">Vai receber</span><span class="wd-res-v">' + kz(valorKz(sel.pts)) + '</span><span class="wd-res-d">Troca de <b>' + sel.pts + " pontos</b>" + (m ? " via <b>" + esc(m.nome) + "</b>" : "") + ". Ficam <b>" + Math.max(0, estado.pontos - sel.pts) + "</b> pontos na conta.</span>";
+    x.classList.add("open");
+  }
+  function renderElig() {
+    var msg = elegibilidade();
+    $("wdSubmit").disabled = !!msg || busy;
+  }
+  function setReq(o) {
+    var r = $("wdReq"); if (!r) return;
+    r.classList.toggle("open", !!o);
+    $("wdReqBtn").setAttribute("aria-expanded", o ? "true" : "false");
+  }
+  function requisitos() {
+    var L = [], dias = diasDeConta(), agora = Date.now(), pend = false, ult = 0, mes = 0;
+    estado.pedidos.forEach(function (p) {
+      if (p.status === "pendente") pend = true;
+      if (p.status !== "cancelado") { if (p.criadoEm > ult) ult = p.criadoEm; if (agora - p.criadoEm < 30 * DAY) mes += Number(p.kz) || 0; }
+    });
+    var verif = isPublisher || userStatus === "approved";
+    L.push({ ok: verif, t: "Conta verificada", d: verif ? "" : "A sua conta ainda não foi verificada" });
+    var idadeOk = isPublisher || dias >= MIN_DIAS_CONTA;
+    L.push({ ok: idadeOk, t: "Conta com " + MIN_DIAS_CONTA + " dias ou mais", d: idadeOk ? "" : "Tem " + dias + " dia(s), faltam " + (MIN_DIAS_CONTA - dias) });
+    L.push({ ok: !pend, t: "Sem pedido pendente", d: pend ? "Espere que seja pago ou cancelado" : "" });
+    var intOk = isPublisher || !ult || agora - ult >= INTERVALO_DIAS * DAY;
+    L.push({ ok: intOk, t: "1 levantamento a cada " + INTERVALO_DIAS + " dias", d: intOk ? "" : "Próximo: " + soData(ult + INTERVALO_DIAS * DAY) });
+    L.push({ ok: estado.pontos >= TABELA[0][0], t: "Mínimo de " + TABELA[0][0] + " pontos", d: "Tem " + estado.pontos + " pontos" });
+    if (TETO_MES_KZ > 0) L.push({ ok: mes < TETO_MES_KZ, t: "Limite de " + kz(TETO_MES_KZ) + " em 30 dias", d: "Já usou " + kz(mes) });
+    if (estado.pontos >= PTS_ALTO) {
+      var altoOk = isPublisher || dias >= MIN_DIAS_ALTO;
+      L.push({ ok: altoOk, soft: true, t: "Conta com " + MIN_DIAS_ALTO + " dias para " + PTS_ALTO + " pontos ou mais", d: altoOk ? "" : "Tem " + dias + " dia(s)" });
+    }
+    return L;
+  }
+  function renderReq() {
+    var L = requisitos(), falta = 0, h = "";
+    L.forEach(function (r, i) {
+      if (!r.ok && !r.soft) falta++;
+      h += '<div class="wd-rq ' + (r.ok ? "ok" : "no") + '" style="--k:' + i + '"><span class="ic">' + (r.ok ? IC.ck : IC.x) + '</span><span class="t"><b>' + esc(r.t) + "</b>" + (r.d ? "<small>" + esc(r.d) + "</small>" : "") + "</span></div>";
+    });
+    $("wdReqList").innerHTML = h;
+    var ok = falta === 0;
+    $("wdReq").classList.toggle("ok", ok);
+    $("wdReqIc").innerHTML = ok ? IC.pago : IC.info;
+    $("wdReqTit").textContent = ok ? "Pode levantar saldo" : "Ainda não pode levantar";
+    $("wdReqSub").textContent = ok ? "Cumpre todos os requisitos" : "Falta cumprir " + falta + (falta === 1 ? " requisito" : " requisitos");
+    if (!reqTouched) setReq(!ok);
+  }
+  function renderHero() {
+    var k = $("wdSaldoKz"), m = elegibilidade() ? 0 : maxKz();
+    if (m > 0) { k.textContent = "Dá para levantar até " + kz(m); k.hidden = false; } else k.hidden = true;
+  }
+  function acaoPedido(p) {
+    if (p.status === "pago") {
+      return '<div class="wd-actions"><button type="button" class="wd-btn sm wd-proof" data-a="comprovativo" data-i="' + esc(p.id) + '">' + IC.wa + "Pedir comprovativo</button></div>";
+    }
+    if (p.status === "pendente") {
+      var libera = p.criadoEm + HORAS_PERGUNTAR * 36e5;
+      if (Date.now() >= libera) {
+        return '<div class="wd-actions"><button type="button" class="wd-btn sm wd-proof" data-a="perguntar" data-i="' + esc(p.id) + '">' + IC.wa + "Perguntar pelo pedido</button></div>";
+      }
+      return '<p class="wd-wait">Em análise. Se ainda estiver pendente a partir de ' + dataHora(libera) + ", poderá perguntar pelo pedido por WhatsApp.</p>";
+    }
+    return "";
+  }
+  function renderHist(anim) {
+    var l = estado.pedidos.slice().sort(function (a, b) { return b.criadoEm - a.criadoEm; });
+    if (!l.length) { $("wdHist").innerHTML = '<div class="wd-empty"><span class="wd-empty-ic">' + IC.inbox + "</span>Ainda não fez nenhum pedido.</div>"; return; }
+    var lim = hAll ? l.length : 3, h = '<div class="wd-list">';
+    for (var i = 0; i < l.length && i < lim; i++) {
+      var p = l[i], st = ROT[p.status] ? p.status : "pendente", o = !!hOpen[p.id];
+      var det = kv("Pontos", Number(p.pontos)) + kv("Método", esc(p.metodoNome || p.metodo)) + kv("Pedido em", dataHora(p.criadoEm));
+      if (p.status === "pago" && p.resolvidoEm) det += kv("Pago em", dataHora(p.resolvidoEm));
+      if (p.status === "cancelado") det += kv("Estado", "Pontos devolvidos") + (p.motivo ? kv("Motivo", esc(p.motivo)) : "");
+      h += '<div class="wd-row' + (o ? " open" : "") + (anim || i >= 3 ? " wd-in" : "") + '" data-k="' + esc(p.id) + '" style="--k:' + Math.min(i, 8) + '">' +
+        '<button type="button" class="wd-row-h" data-a="tg" aria-expanded="' + (o ? "true" : "false") + '"><span class="wd-av ' + st + '">' + IC[st] + '</span>' +
+        '<span class="wd-row-t"><b>' + kz(p.kz) + "</b><small>" + esc(p.metodoNome || p.metodo) + ", " + soData(p.criadoEm) + "</small></span>" +
+        '<span class="wd-chip ' + st + '">' + ROT[st] + "</span>" + IC.chev + "</button>" +
+        '<div class="wd-x"><div><div class="wd-det">' + det + "</div>" +
+        acaoPedido(p) +
+        "</div></div></div>";
+    }
+    if (l.length > 3) h += '<button type="button" class="wd-more" data-a="more">' + (hAll ? "Mostrar menos" : "Ver todos (" + l.length + ")") + "</button>";
+    $("wdHist").innerHTML = h + "</div>";
+  }
+  function abrirWhats(texto) {
+    var url = "https://wa.me/" + WA_PAIS + WHATSAPP + "?text=" + encodeURIComponent(texto);
+    var w = null;
+    try { w = window.open(url, "_blank"); } catch (e) {}
+    if (!w || w.closed || typeof w.closed === "undefined") {
+      var a = document.createElement("a");
+      a.href = url; a.target = "_blank"; a.rel = "noopener noreferrer";
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    }
+  }
+  function quemSou() {
+    var nome = (typeof userName !== "undefined" && userName) || (currentUser && currentUser.displayName) || "—";
+    return "Nome: " + nome + "\nEmail: " + ((currentUser && currentUser.email) || "—");
+  }
+  window.wdPedirComprovativo = function (id) {
+    var p = null;
+    for (var i = 0; i < estado.pedidos.length; i++) if (estado.pedidos[i].id === id) p = estado.pedidos[i];
+    if (!p) { showCustomAlert("Não encontrei esse pedido. Feche e abra o Levantar Saldo e tente de novo."); return; }
+    var t = "Olá! O meu levantamento no Portal Digital aparece como pago e gostava de receber o comprovativo do pagamento.\n\n" +
+      "Pedido: " + p.id + "\n" +
+      "Valor: " + kz(p.kz) + " (" + Number(p.pontos) + " pontos)\n" +
+      "Método: " + (p.metodoNome || p.metodo || "—") + "\n" +
+      "Conta: " + (p.conta || "—") + "\n" +
+      "Pedido em: " + dataHora(p.criadoEm) + "\n" +
+      (p.resolvidoEm ? "Pago em: " + dataHora(p.resolvidoEm) + "\n" : "") +
+      "\n" + quemSou() + "\n\nObrigado!";
+    abrirWhats(t);
+  };
+  window.wdPerguntarPedido = function (id) {
+    var p = null;
+    for (var i = 0; i < estado.pedidos.length; i++) if (estado.pedidos[i].id === id) p = estado.pedidos[i];
+    if (!p) { showCustomAlert("Não encontrei esse pedido. Feche e abra o Levantar Saldo e tente de novo."); return; }
+    if (p.status !== "pendente") { showCustomAlert("Este pedido já não está pendente."); renderHist(false); return; }
+    if (Date.now() < p.criadoEm + HORAS_PERGUNTAR * 36e5) { renderHist(false); return; }
+    var t = "Olá! Fiz um pedido de levantamento no Portal Digital e ainda aparece como pendente. Podem verificar, por favor?\n\n" +
+      "Pedido: " + p.id + "\n" +
+      "Valor: " + kz(p.kz) + " (" + Number(p.pontos) + " pontos)\n" +
+      "Método: " + (p.metodoNome || p.metodo || "—") + "\n" +
+      "Conta: " + (p.conta || "—") + "\n" +
+      "Pedido em: " + dataHora(p.criadoEm) + "\n" +
+      "\n" + quemSou() + "\n\nObrigado!";
+    abrirWhats(t);
+  };
+  window.wdPedirComprovativoNotif = function (notifId) {
+    var n = null, L = (typeof userNotifications !== "undefined" && userNotifications) || [];
+    for (var i = 0; i < L.length; i++) if (String(L[i].id) === String(notifId)) n = L[i];
+    if (!n) { showCustomAlert("Não foi possível abrir a notificação. Tente de novo."); return; }
+    var t = "Olá! Recebi a notificação de levantamento pago no Portal Digital e gostava de receber o comprovativo do pagamento.\n\n" +
+      "Notificação: " + String(n.message || n.title || "").slice(0, 300) + "\n" +
+      (n.createdAt ? "Recebida em: " + dataHora(Number(n.createdAt)) + "\n" : "") +
+      "\n" + quemSou() + "\n\nObrigado!";
+    abrirWhats(t);
+  };
+  function renderInfo() {
+    var ul = $("wdInfoList");
+    if (ul) {
+      var valores = TABELA.map(function (r) { return r[0] + " pts = " + kz(r[1]); }).join(" · ");
+      var metodos = METODOS.map(function (m) { return esc(m.nome); }).join(", ");
+      var L = [
+        "<b>Valores:</b> " + esc(valores) + ".",
+        "<b>Receber por:</b> " + metodos + ".",
+        "<b>Pontos:</b> são descontados logo ao enviar o pedido e devolvidos se o pedido for cancelado.",
+        "<b>Pagamento:</b> é feito por um administrador. Até lá o pedido fica “Pendente”. Se passadas " + HORAS_PERGUNTAR + " horas ainda estiver pendente, aparece o botão “Perguntar pelo pedido”.",
+        "<b>Comprovativo:</b> quando o pedido estiver “Pago”, abra-o e toque em “Pedir comprovativo” para o pedir por WhatsApp.",
+        "<b>Limites:</b> 1 pedido pendente de cada vez e 1 levantamento a cada " + INTERVALO_DIAS + " dias (pedidos cancelados não contam)." + (TETO_MES_KZ > 0 ? " Máximo de " + kz(TETO_MES_KZ) + " em 30 dias." : ""),
+        "<b>Conta:</b> verificada e com pelo menos " + MIN_DIAS_CONTA + " dias. Para trocar " + PTS_ALTO + " pontos ou mais, a conta precisa de ter " + MIN_DIAS_ALTO + " dias ou mais.",
+        "<b>Antes de enviar:</b> confirme o número ou IBAN. O pagamento é feito para os dados que indicar.",
+        "<b>Dúvidas?</b> Fale connosco no WhatsApp."
+      ];
+      ul.innerHTML = L.map(function (t) { return "<li>" + t + "</li>"; }).join("");
+    }
+    var a = $("wdWa"), n = $("wdWaNum");
+    if (a) a.href = "https://wa.me/" + WA_PAIS + WHATSAPP + "?text=" + encodeURIComponent("Olá! Tenho uma dúvida sobre o levantamento de saldo no Portal Digital.");
+    if (n) n.textContent = "+" + WA_PAIS + " " + WHATSAPP.replace(/(\d{3})(?=\d)/g, "$1 ");
+  }
+  function renderTudo() {
+    animarNum($("wdSaldo"), estado.pontos);
+    renderElig(); renderReq(); renderHero(); renderGrid(); renderPick(); renderMetodos(); renderResumo(); renderHist(true);
+  }
+
+  async function lerEstado() {
+    var M = mod(), uid = currentUser.uid;
+    var res = await Promise.all([M.get(M.ref(db(), "users/" + uid)), M.get(M.ref(db(), "withdrawals/" + uid))]);
+    var u = res[0].val() || {};
+    estado.pontos = Number(u.points) || 0;
+    estado.createdAt = Number(u.createdAt) || 0;
+    var l = [];
+    res[1].forEach(function (c) { var v = c.val() || {}; v.id = c.key; v.criadoEm = Number(v.criadoEm) || 0; l.push(v); });
+    estado.pedidos = l;
+    if (typeof _syncPointsDisplay === "function" && estado.pontos !== userPoints) _syncPointsDisplay(estado.pontos);
+  }
+
+  async function carregar() {
+    try {
+      await lerEstado();
+    } catch (e) {
+      console.error("[LEVANTAMENTO] Erro ao carregar:", e);
+      showCustomAlert("Não foi possível carregar os seus dados. Verifique a internet e tente de novo.");
+    }
+    renderTudo();
+    pintarLinhaPerfil();
+  }
+
+  var perfilTok = 0;
+  function pintarLinhaPerfil() {
+    var el = $("wdProfileLine"), tx = $("wdProfileLineTxt");
+    if (!el || !tx) return;
+    var b = bloqueio(), ok = !b, txt = b ? b.curto : "";
+    if (ok) { var m = maxKz(); txt = m > 0 ? "Pode levantar até " + kz(m) : "Limite mensal atingido"; ok = m > 0; }
+    if (!txt) { el.hidden = true; return; }
+    tx.textContent = txt;
+    el.classList.toggle("ok", ok);
+    el.hidden = false;
+  }
+  window.wdPerfilLinha = async function () {
+    var el = $("wdProfileLine"); if (!el) return;
+    if (!currentUser || currentUser.isAnonymous) { el.hidden = true; return; }
+    var meu = ++perfilTok;
+    try { await lerEstado(); } catch (e) { console.error("[LEVANTAMENTO] Linha do perfil:", e); return; }
+    if (meu !== perfilTok) return;
+    pintarLinhaPerfil();
+  };
+
+  window.wdOpen = function () {
+    if (!currentUser || currentUser.isAnonymous) { showCustomAlert("Entre na sua conta para levantar saldo."); return; }
+    closeSidebar();
+    sel.pts = 0; sel.met = ""; $("wdAcc").value = ""; hOpen = {}; hAll = false; numShown = null; reqTouched = false; setPick(false); setReq(false);
+    estado.pontos = userPoints || 0;
+    renderInfo();
+    $("wdOverlay").classList.add("active");
+    document.body.style.overflow = "hidden";
+    renderTudo();
+    carregar();
+  };
+  window.wdClose = function () {
+    $("wdOverlay").classList.remove("active");
+    var po = $("profileOverlay");
+    document.body.style.overflow = po && po.classList.contains("active") ? "hidden" : "";
+  };
+
+  function limparConta(m, v) {
+    v = String(v || "");
+    if (m.tipo === "iban") return v.replace(/\s+/g, "").toUpperCase();
+    return v.replace(/\D+/g, "");
+  }
+  function contaValida(m, c) {
+    if (m.tipo === "iban") return /^AO\d{23}$/.test(c);
+    return /^9\d{8}$/.test(c);
+  }
+
+  window.wdSubmit = function () {
+    if (busy) return;
+    var msg = elegibilidade();
+    if (msg) { showCustomAlert(msg); return; }
+    if (!sel.pts) { showCustomAlert("Escolha quanto quer trocar."); return; }
+    var bl = opcaoBloqueada(sel.pts);
+    if (bl) { showCustomAlert("Este valor não está disponível: " + bl + "."); return; }
+    var m = metodoPorId(sel.met);
+    if (!m) { showCustomAlert("Escolha como quer receber."); return; }
+    var conta = limparConta(m, $("wdAcc").value);
+    if (!contaValida(m, conta)) {
+      showCustomAlert(m.tipo === "iban" ? "IBAN inválido. Deve ter 25 caracteres e começar por AO." : "Número inválido. Use 9 dígitos, ex.: 923456789.");
+      return;
+    }
+    var pts = sel.pts, v = valorKz(pts);
+    showCustomConfirm("Trocar " + pts + " pontos por " + kz(v) + " via " + m.nome + " (" + conta + ")? Os pontos são descontados agora e devolvidos se o pedido for cancelado.", function () { enviar(pts, v, m, conta); });
+  };
+
+  async function enviar(pts, v, m, conta) {
+    if (busy) return;
+    busy = true; $("wdSubmit").disabled = true;
+    try {
+      var M = mod(), uid = currentUser.uid;
+      await carregar();
+      var msg = elegibilidade();
+      if (msg) throw { wdMsg: msg };
+      if (estado.pontos < pts) throw { wdMsg: "Pontos insuficientes. Saldo atual: " + estado.pontos + "." };
+      var id = M.push(M.ref(db(), "withdrawals/" + uid)).key;
+      var agora = await getServerTimestamp();
+      var pedido = { pontos: pts, kz: v, metodo: m.id, metodoNome: m.nome, conta: conta, status: "pendente", criadoEm: agora, nome: userName || "", email: currentUser.email || "" };
+      var up = {};
+      up["withdrawals/" + uid + "/" + id] = pedido;
+      up["users/" + uid + "/points"] = M.rtdbIncrement(-pts);
+      await M.update(M.ref(db()), up);
+      sel.pts = 0; sel.met = ""; $("wdAcc").value = ""; setPick(false);
+      await carregar();
+      showCustomAlert("Pedido enviado! " + pts + " pontos foram descontados. Vai receber " + kz(v) + " assim que o administrador aprovar.");
+    } catch (e) {
+      console.error("[LEVANTAMENTO] Erro ao enviar:", e);
+      showCustomAlert(e && e.wdMsg ? e.wdMsg : "Não foi possível enviar o pedido (" + erro(e) + "). Os seus pontos não foram descontados.");
+      try { await carregar(); } catch (x) {}
+    } finally {
+      busy = false; renderElig();
+    }
+  }
+
+  document.addEventListener("click", function (ev) {
+    var tg = ev.target && ev.target.closest ? ev.target : null, ov = $("wdOverlay");
+    if (!tg || !ov || !ov.contains(tg)) return;
+    if (tg.closest("#wdReqBtn")) { reqTouched = true; setReq(!$("wdReq").classList.contains("open")); return; }
+    if (tg.closest("#wdPickBtn")) { setPick(!$("wdPick").classList.contains("open")); return; }
+    var t = tg.closest(".wd-tile");
+    if (t) {
+      var p = Number(t.dataset.p), bl = opcaoBloqueada(p);
+      if (bl) { showCustomAlert("Este valor não está disponível: " + bl + "."); return; }
+      sel.pts = p; marcarGrid(); renderPick(); renderResumo();
+      setTimeout(function () { setPick(false); }, 260);
+      return;
+    }
+    var mt = tg.closest(".wd-met");
+    if (mt) {
+      sel.met = mt.dataset.m; marcarMetodos(); contaCampo(); renderResumo();
+      setTimeout(function () { try { $("wdAcc").focus(); } catch (e) {} }, 380);
+      return;
+    }
+    var ha = tg.closest("#wdHist [data-a]");
+    if (ha) {
+      if (ha.dataset.a === "tg") { var row = ha.closest(".wd-row"); if (row) alternar(row, hOpen, row.dataset.k); }
+      else if (ha.dataset.a === "comprovativo") { wdPedirComprovativo(ha.dataset.i); }
+      else if (ha.dataset.a === "perguntar") { wdPerguntarPedido(ha.dataset.i); }
+      else if (ha.dataset.a === "more") { hAll = !hAll; renderHist(false); }
+    }
+  });
+
+  window.wdAdminOpen = function () {
+    if (!isPublisher) { showCustomAlert("Apenas administradores."); return; }
+    closeSidebar();
+    admin.tab = "pendente"; admin.info = {}; admin.open = {};
+    document.querySelectorAll("#wdTabs .wd-tab").forEach(function (b) { b.classList.toggle("active", b.dataset.t === "pendente"); });
+    moverInd();
+    $("wdAdminOverlay").classList.add("active");
+    document.body.style.overflow = "hidden";
+    adminCarregar();
+  };
+  window.wdAdminClose = function () {
+    $("wdAdminOverlay").classList.remove("active");
+    document.body.style.overflow = "";
+  };
+
+  async function adminCarregar() {
+    $("wdAdminList").innerHTML = '<div class="wd-empty">A carregar...</div>';
+    try {
+      var M = mod(), snap = await M.get(M.ref(db(), "withdrawals")), l = [];
+      snap.forEach(function (u) {
+        u.forEach(function (c) { var v = c.val() || {}; v.id = c.key; v.uid = u.key; v.criadoEm = Number(v.criadoEm) || 0; l.push(v); });
+      });
+      admin.lista = l;
+    } catch (e) {
+      console.error("[LEVANTAMENTO] Erro ADM:", e);
+      $("wdAdminList").innerHTML = '<div class="wd-empty">Erro ao carregar (' + esc(erro(e)) + ").</div>";
+      return;
+    }
+    adminRender();
+  }
+
+  function contar(st) { return admin.lista.filter(function (p) { return p.status === st; }).length; }
+
+  function moverInd() {
+    var ind = $("wdTabInd"), i = 0;
+    document.querySelectorAll("#wdTabs .wd-tab").forEach(function (b, ix) { if (b.classList.contains("active")) i = ix; });
+    if (ind) ind.style.transform = "translateX(" + (i * 100) + "%)";
+  }
+
+  function adminRender() {
+    ["pendente", "pago", "cancelado"].forEach(function (s) { var e = $("wdCnt" + s.charAt(0).toUpperCase() + s.slice(1)); if (e) e.textContent = contar(s); });
+    var l = admin.lista.filter(function (p) { return p.status === admin.tab; });
+    l.sort(function (a, b) { return admin.tab === "pendente" ? a.criadoEm - b.criadoEm : b.criadoEm - a.criadoEm; });
+    var tot = $("wdAdminTotal");
+    if (admin.tab === "pendente" && l.length) {
+      var s = 0; l.forEach(function (p) { s += Number(p.kz) || 0; });
+      tot.style.display = ""; tot.textContent = "A pagar: " + kz(s) + " em " + l.length + " pedido(s).";
+    } else tot.style.display = "none";
+    if (!l.length) { $("wdAdminList").innerHTML = '<div class="wd-empty"><span class="wd-empty-ic">' + IC.inbox + "</span>Nada por aqui.</div>"; return; }
+    var h = '<div class="wd-list">';
+    l.forEach(function (p, i) {
+      var key = p.uid + "_" + p.id, o = !!admin.open[key], st = ROT[p.status] ? p.status : "pendente", nome = p.nome || "Sem nome";
+      var det = kv("Email", esc(p.email || "—")) +
+        '<div class="wd-kv"><span>' + esc(p.metodoNome || p.metodo) + "</span><b>" + esc(p.conta) + '<button type="button" class="wd-copy" data-a="copiar" data-v="' + esc(p.conta) + '">Copiar</button></b></div>' +
+        kv("Pontos", Number(p.pontos)) + kv("Pedido em", dataHora(p.criadoEm));
+      if (p.status === "pago" && p.resolvidoEm) det += kv("Pago em", dataHora(p.resolvidoEm));
+      if (p.status === "cancelado") det += kv("Estado", "Pontos devolvidos") + (p.motivo ? kv("Motivo", esc(p.motivo)) : "");
+      det += '<div class="wd-sep"></div><div class="wd-info" data-info="' + esc(p.uid) + '"><div class="wd-kv"><span>A carregar dados do usuário...</span></div></div>';
+      h += '<div class="wd-row wd-in' + (o ? " open" : "") + '" data-k="' + esc(key) + '" data-u="' + esc(p.uid) + '" style="--k:' + Math.min(i, 8) + '">' +
+        '<button type="button" class="wd-row-h" data-a="tg" aria-expanded="' + (o ? "true" : "false") + '"><span class="wd-av ' + st + '">' + esc(nome.charAt(0).toUpperCase()) + "</span>" +
+        '<span class="wd-row-t"><b>' + esc(nome) + "</b><small>" + kz(p.kz) + " por " + Number(p.pontos) + " pts</small></span>" +
+        '<span class="wd-chip ' + st + '">' + ROT[st] + "</span>" + IC.chev + "</button>" +
+        '<div class="wd-x"><div><div class="wd-det">' + det + "</div>" +
+        (p.status === "pendente" ? '<div class="wd-actions"><button type="button" class="wd-btn sm bad" data-a="cancelar" data-u="' + esc(p.uid) + '" data-i="' + esc(p.id) + '">Cancelar</button><button type="button" class="wd-btn sm ok" data-a="pagar" data-u="' + esc(p.uid) + '" data-i="' + esc(p.id) + '">Marcar como pago</button></div>' : "") +
+        "</div></div></div>";
+    });
+    $("wdAdminList").innerHTML = h + "</div>";
+    var vistos = {};
+    l.forEach(function (p) { if (admin.open[p.uid + "_" + p.id] && !vistos[p.uid]) { vistos[p.uid] = 1; carregarInfo(p.uid); } });
+  }
+
+  async function carregarInfo(uid) {
+    try {
+      if (!admin.info[uid]) {
+        var M = mod();
+        var ler1 = function (path) { return M.get(M.ref(db(), path)).then(function (sn) { return sn.val(); }).catch(function (e) { console.warn("[LEVANTAMENTO] sem acesso a " + path, e); return null; }); };
+        var r = await Promise.all([ler1("users/" + uid), ler1("adRewards/" + uid), ler1("downloadClaims/" + uid)]);
+        var u = r[0] || {}, a = r[1] || {}, d = r[2];
+        admin.info[uid] = { nome: u.name, email: u.email, status: u.status, createdAt: Number(u.createdAt) || 0, pontos: Number(u.points) || 0, anuncios: Number(a.totalEarned) || 0, downloads: d && typeof d === "object" ? Object.keys(d).length : 0 };
+      }
+    } catch (e) {
+      admin.info[uid] = { erro: erro(e) };
+    }
+    var i = admin.info[uid], pagos = 0, canc = 0;
+    admin.lista.forEach(function (p) { if (p.uid === uid) { if (p.status === "pago") pagos++; if (p.status === "cancelado") canc++; } });
+    var html;
+    if (i.erro) html = '<div class="wd-kv"><span>Não foi possível carregar (' + esc(i.erro) + ").</span></div>";
+    else {
+      var sm = { approved: "Verificada", pending: "Por verificar", rejected: "Bloqueada" };
+      html = kv("Conta criada", i.createdAt ? soData(i.createdAt) + " (" + Math.floor((Date.now() - i.createdAt) / DAY) + " dias)" : "sem data") +
+        kv("Estado da conta", esc(sm[i.status] || i.status || "—")) +
+        kv("Pontos agora", i.pontos) +
+        kv("Pontos ganhos com anúncios", i.anuncios) +
+        kv("Downloads feitos", i.downloads) +
+        kv("Pedidos anteriores", pagos + " pago(s), " + canc + " cancelado(s)");
+    }
+    document.querySelectorAll('[data-info="' + uid + '"]').forEach(function (n) { n.innerHTML = html; });
+  }
+
+  function pedirMotivo(cb) {
+    var m = document.createElement("div");
+    m.className = "custom-modal active";
+    m.innerHTML = '<div class="custom-modal-content"><p style="margin:0 0 6px 0;font-weight:700">Cancelar pedido</p><p style="margin:0 0 10px 0;font-size:13px;opacity:.8">Os pontos voltam para a conta do usuário.</p><textarea class="wd-input" id="wdMotivo" rows="3" maxlength="200" placeholder="Motivo (opcional)"></textarea><div class="custom-modal-buttons" style="margin-top:14px"><button class="custom-modal-btn secondary" data-x="n">Voltar</button><button class="custom-modal-btn primary" data-x="s">Cancelar pedido</button></div></div>';
+    document.body.appendChild(m);
+    m.addEventListener("click", function (ev) {
+      var x = ev.target && ev.target.getAttribute ? ev.target.getAttribute("data-x") : null;
+      if (!x) return;
+      var motivo = (m.querySelector("#wdMotivo").value || "").trim().slice(0, 200);
+      m.remove();
+      if (x === "s") cb(motivo);
+    });
+  }
+
+  async function ler(uid, id) {
+    var M = mod(), s = await M.get(M.ref(db(), "withdrawals/" + uid + "/" + id));
+    return s.exists() ? s.val() : null;
+  }
+
+  async function pagar(uid, id) {
+    if (busy) return; busy = true;
+    try {
+      var M = mod(), p = await ler(uid, id);
+      if (!p || p.status !== "pendente") throw { wdMsg: "Este pedido já foi tratado." };
+      var agora = await getServerTimestamp(), base = "withdrawals/" + uid + "/" + id, up = {};
+      up[base + "/status"] = "pago";
+      up[base + "/resolvidoEm"] = agora;
+      up[base + "/resolvidoPor"] = currentUser.email || "";
+      await M.update(M.ref(db()), up);
+      try { sendPush("Levantamento pago", "O seu levantamento de " + kz(p.kz) + " foi pago via " + (p.metodoNome || p.metodo) + ".", uid, { tag: "levantamento", validadeHoras: 72 }); } catch (e) {}
+    } catch (e) {
+      console.error("[LEVANTAMENTO] Erro ao pagar:", e);
+      showCustomAlert(e && e.wdMsg ? e.wdMsg : "Erro ao marcar como pago: " + erro(e));
+    } finally { busy = false; }
+    adminCarregar();
+  }
+
+  async function cancelar(uid, id, motivo) {
+    if (busy) return; busy = true;
+    try {
+      var M = mod(), p = await ler(uid, id);
+      if (!p || p.status !== "pendente") throw { wdMsg: "Este pedido já foi tratado." };
+      var agora = await getServerTimestamp(), base = "withdrawals/" + uid + "/" + id, up = {};
+      up[base + "/status"] = "cancelado";
+      up[base + "/resolvidoEm"] = agora;
+      up[base + "/resolvidoPor"] = currentUser.email || "";
+      up[base + "/reembolsado"] = true;
+      if (motivo) up[base + "/motivo"] = motivo;
+      up["users/" + uid + "/points"] = M.rtdbIncrement(Number(p.pontos) || 0);
+      await M.update(M.ref(db()), up);
+      try { sendPush("Levantamento cancelado", "O seu pedido de " + kz(p.kz) + " foi cancelado e os " + p.pontos + " pontos foram devolvidos." + (motivo ? " Motivo: " + motivo : ""), uid, { tag: "levantamento", validadeHoras: 72 }); } catch (e) {}
+      delete admin.info[uid];
+    } catch (e) {
+      console.error("[LEVANTAMENTO] Erro ao cancelar:", e);
+      showCustomAlert(e && e.wdMsg ? e.wdMsg : "Erro ao cancelar: " + erro(e));
+    } finally { busy = false; }
+    adminCarregar();
+  }
+
+  document.addEventListener("click", function (ev) {
+    var tab = ev.target && ev.target.closest ? ev.target.closest("#wdTabs .wd-tab") : null;
+    if (tab) {
+      admin.tab = tab.dataset.t;
+      document.querySelectorAll("#wdTabs .wd-tab").forEach(function (b) { b.classList.toggle("active", b === tab); });
+      moverInd();
+      adminRender();
+      return;
+    }
+    var b = ev.target && ev.target.closest ? ev.target.closest("#wdAdminList [data-a]") : null;
+    if (!b) return;
+    var a = b.dataset.a;
+    if (a === "tg") {
+      var row = b.closest(".wd-row");
+      if (!row) return;
+      alternar(row, admin.open, row.dataset.k);
+      if (row.classList.contains("open")) carregarInfo(row.dataset.u);
+    } else if (a === "copiar") {
+      var v = b.dataset.v || "";
+      try { navigator.clipboard.writeText(v); b.textContent = "Copiado"; setTimeout(function () { b.textContent = "Copiar"; }, 1400); } catch (e) { showCustomAlert(v); }
+    } else if (a === "pagar") {
+      if (!isPublisher) return;
+      showCustomConfirm("Confirma que já pagou este pedido?", function () { pagar(b.dataset.u, b.dataset.i); });
+    } else if (a === "cancelar") {
+      if (!isPublisher) return;
+      pedirMotivo(function (motivo) { cancelar(b.dataset.u, b.dataset.i, motivo); });
+    }
+  });
+})();
+</script>
+<script>
+(function () {
+  var RF_PONTOS = 100;
+  var RF_MAX_DIA = 10;
+  var RF_MAX_TOTAL = 100;
+  var RF_ANUNCIOS_MIN = 25;
+  var RF_BASE = "https://portaldigital.vercel.app/";
+  var RF_ALFABETO = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  var RF_DIA_MS = 24 * 60 * 60 * 1000;
+
+  var sessaoUid = null;
+  var verificando = false;
+  var agendado = null;
+  var semConvite = {};
+  var tentados = {};
+  var codigoAtual = "";
+
+  function M() { return window.firebaseModules; }
+  function DB() { return window.firebaseDatabase; }
+  function lerLS(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function gravarLS(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function apagarLS(k) { try { localStorage.removeItem(k); } catch (e) {} }
+  function limparCodigo(v) { return String(v || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12); }
+  function logado() { return typeof currentUser !== "undefined" && !!currentUser && !currentUser.isAnonymous; }
+  function aprovado() { return logado() && userStatus === "approved"; }
+  function el(id) { return document.getElementById(id); }
+  function linkDe(c) { return RF_BASE + "?ref=" + c; }
+  function primeiroNome(n) { return String(n || "").trim().split(/\s+/)[0].slice(0, 30) || "Amigo"; }
+
+  function gerarCodigo() {
+    var out = "";
+    var buf = new Uint32Array(6);
+    try { crypto.getRandomValues(buf); } catch (e) { for (var j = 0; j < 6; j++) buf[j] = Math.floor(Math.random() * 4294967296); }
+    for (var i = 0; i < 6; i++) out += RF_ALFABETO.charAt(buf[i] % RF_ALFABETO.length);
+    return out;
+  }
+
+  async function garantirCodigo(uid) {
+    var guardado = limparCodigo(lerLS("pdRefOwn_" + uid));
+    if (guardado) return guardado;
+    var m = M(), db = DB();
+    var s = await m.get(m.ref(db, "users/" + uid + "/refCode"));
+    var atual = s.exists() ? limparCodigo(s.val()) : "";
+    if (atual) { gravarLS("pdRefOwn_" + uid, atual); return atual; }
+    for (var i = 0; i < 6; i++) {
+      var c = gerarCodigo();
+      var o = await m.get(m.ref(db, "referralCodes/" + c));
+      if (o.exists()) continue;
+      var up = {};
+      up["referralCodes/" + c] = uid;
+      up["users/" + uid + "/refCode"] = c;
+      await m.update(m.ref(db), up);
+      gravarLS("pdRefOwn_" + uid, c);
+      return c;
+    }
+    return "";
+  }
+
+  function capturar() {
+    try {
+      var c = limparCodigo(new URLSearchParams(location.search).get("ref"));
+      if (c.length >= 4) gravarLS("pdRefCode", c);
+    } catch (e) {}
+    var g = limparCodigo(lerLS("pdRefCode"));
+    var inp = el("registerRefCode");
+    if (inp && g && !inp.value) inp.value = g;
+  }
+
+  async function resolver(uid) {
+    try {
+      var inp = el("registerRefCode");
+      var codigo = limparCodigo(inp ? inp.value : "") || limparCodigo(lerLS("pdRefCode"));
+      if (!codigo) return "";
+      var m = M(), db = DB();
+      var snap = await m.get(m.ref(db, "referralCodes/" + codigo));
+      var dono = snap.exists() ? snap.val() : "";
+      if (typeof dono !== "string" || !dono || dono === uid) return "";
+      return dono;
+    } catch (e) {
+      console.warn("[CONVITES] código não verificado", e);
+      return "";
+    }
+  }
+
+  window.referralResolve = function (uid) {
+    return Promise.race([resolver(uid), new Promise(function (r) { setTimeout(function () { r(""); }, 5000); })]);
+  };
+
+  window.referralAfterRegister = async function (uid, nome, dono) {
+    try {
+      if (dono) {
+        var m = M(), db = DB();
+        var t = await getServerTimestamp();
+        var up = {};
+        up["referrals/" + dono + "/" + uid + "/name"] = primeiroNome(nome);
+        up["referrals/" + dono + "/" + uid + "/createdAt"] = t;
+        await m.update(m.ref(db), up);
+      }
+    } catch (e) {
+      console.warn("[CONVITES] convite não registado", e);
+    } finally {
+      apagarLS("pdRefCode");
+      delete semConvite[uid];
+    }
+  };
+
+  async function verificarConvidado() {
+    if (!aprovado() || verificando || window.__pdRegistering) return;
+    var uid = currentUser.uid;
+    if (semConvite[uid] || lerLS("pdRefFim_" + uid)) return;
+    verificando = true;
+    try {
+      var m = M(), db = DB();
+      var r = await m.get(m.ref(db, "users/" + uid + "/referredBy"));
+      var dono = r.exists() ? r.val() : null;
+      if (typeof dono !== "string" || !dono || dono === uid) { semConvite[uid] = true; return; }
+      var a = await m.get(m.ref(db, "adRewards/" + uid));
+      var ganho = a.exists() ? Number((a.val() || {}).totalEarned) || 0 : 0;
+      if (ganho < RF_ANUNCIOS_MIN) return;
+      var up = {};
+      up["referrals/" + dono + "/" + uid + "/ready"] = true;
+      await m.update(m.ref(db), up);
+      gravarLS("pdRefFim_" + uid, "1");
+    } catch (err) {
+      console.warn("[CONVITES] validação do convidado falhou", err);
+    } finally {
+      verificando = false;
+    }
+  }
+
+  async function reclamarInterno() {
+    if (!aprovado()) return null;
+    try {
+      var uid = currentUser.uid;
+      var m = M(), db = DB();
+      var res = await Promise.all([
+        m.get(m.ref(db, "referrals/" + uid)),
+        m.get(m.ref(db, "referralClaims/" + uid))
+      ]);
+      var lista = res[0].exists() ? (res[0].val() || {}) : {};
+      var c = res[1].exists() ? (res[1].val() || {}) : null;
+      var chaves = Object.keys(lista).filter(function (k) { return lista[k] && typeof lista[k] === "object" && k !== uid; });
+      var t = await getServerTimestamp();
+      var janela = c && t - (Number(c.windowStart) || 0) < RF_DIA_MS;
+      var contagem = janela ? Number(c.count) || 0 : 0;
+      var total = c ? Number(c.total) || 0 : 0;
+      var pend = chaves.filter(function (k) { return lista[k].ready === true && lista[k].paid !== true && !tentados[k]; })
+        .sort(function (a, b) { return (Number(lista[a].createdAt) || 0) - (Number(lista[b].createdAt) || 0); });
+      var ganhou = 0;
+      var convites = 0;
+      var retidos = 0;
+      for (var i = 0; i < pend.length; i++) {
+        var k = pend[i];
+        if (contagem >= RF_MAX_DIA || total >= RF_MAX_TOTAL) { retidos = pend.length - i; break; }
+        try {
+          var agora = await getServerTimestamp();
+          var ps = await m.get(m.ref(db, "users/" + uid + "/points"));
+          var novo = (Number(ps.val()) || 0) + RF_PONTOS;
+          var inicio = janela || (c && agora - (Number(c.windowStart) || 0) < RF_DIA_MS) ? Number(c.windowStart) : agora;
+          var up = {};
+          up["referralPaid/" + k] = { inviter: uid, points: RF_PONTOS, paidAt: agora };
+          up["referralClaims/" + uid] = {
+            windowStart: inicio,
+            count: contagem + 1,
+            total: total + 1,
+            lastClaimedAt: agora,
+            inviteeId: k,
+            pointsAwarded: RF_PONTOS,
+            newPointsTotal: novo
+          };
+          up["users/" + uid + "/points"] = novo;
+          up["referrals/" + uid + "/" + k + "/paid"] = true;
+          await m.update(m.ref(db), up);
+          c = { windowStart: inicio, count: contagem + 1, total: total + 1 };
+          janela = true;
+          contagem += 1;
+          total += 1;
+          ganhou += RF_PONTOS;
+          convites += 1;
+          lista[k].paid = true;
+          _syncPointsDisplay(novo);
+        } catch (e) {
+          tentados[k] = true;
+          console.warn("[CONVITES] convite ainda não elegível", k, e && e.code);
+        }
+      }
+      return { lista: lista, chaves: chaves, ganhou: ganhou, convites: convites, retidos: retidos };
+    } catch (e) {
+      console.warn("[CONVITES] leitura dos convites falhou", e);
+      return null;
+    }
+  }
+
+  var fila = Promise.resolve();
+  function reclamar() {
+    var p = fila.then(reclamarInterno, reclamarInterno);
+    fila = p.catch(function () {});
+    return p;
+  }
+
+  function avisarGanho(r) {
+    if (r && r.ganhou > 0 && typeof showCustomAlert === "function") {
+      showCustomAlert((r.convites === 1 ? "Convite validado!" : r.convites + " convites validados!") + " +" + r.ganhou + " pontos.");
+    }
+  }
+
+  async function inicioSessao() {
+    if (!aprovado()) return;
+    var uid = currentUser.uid;
+    if (sessaoUid === uid) return;
+    sessaoUid = uid;
+    avisarGanho(await reclamar());
+  }
+
+  function agendar() {
+    if (!logado()) return;
+    clearTimeout(agendado);
+    agendado = setTimeout(function () {
+      verificarConvidado();
+      inicioSessao();
+    }, 1500);
+  }
+
+  function escreverRegras() {
+    var ul = el("rfRegras");
+    if (ul) ul.innerHTML = "<li>✓ Verificar a conta</li><li>✓ Ganhar pontos a ver anúncios em Ganhar Pontos</li>";
+    var tit = el("rfRegrasTitulo");
+    if (tit) tit.textContent = "Um convite conta quando o teu amigo, depois de criar a conta:";
+  }
+
+  function desenhar(r) {
+    var lista = r ? r.lista : {};
+    var chaves = r ? r.chaves : [];
+    var validos = chaves.filter(function (k) { return lista[k].paid === true || lista[k].ready === true; }).length;
+    var pagos = chaves.filter(function (k) { return lista[k].paid === true; }).length;
+    el("rfTotal").textContent = chaves.length;
+    el("rfValidos").textContent = validos;
+    el("rfGanhos").textContent = pagos * RF_PONTOS;
+    var cont = el("rfLista");
+    if (!chaves.length) {
+      cont.innerHTML = '<div class="rf-vazio">Ainda ninguém usou o teu código.</div>';
+    } else {
+      cont.innerHTML = chaves.sort(function (a, b) { return (Number(lista[b].createdAt) || 0) - (Number(lista[a].createdAt) || 0); })
+        .slice(0, 30).map(function (k) {
+          var c = lista[k];
+          var chip = c.paid === true ? '<span class="rf-chip ok">+' + RF_PONTOS + ' pts</span>'
+            : c.ready === true ? '<span class="rf-chip">A creditar</span>'
+            : '<span class="rf-chip">Pendente</span>';
+          return '<div class="rf-item"><span>' + escapeHtml(c.name || "Amigo") + '</span>' + chip + '</div>';
+        }).join("");
+    }
+    el("rfNota").textContent = r && r.retidos > 0
+      ? "Limite atingido: os restantes convites são creditados quando o limite diário reiniciar."
+      : "Limite: " + RF_MAX_DIA + " convites recompensados a cada 24 horas.";
+  }
+
+  async function copiarTexto(texto, btn, rotulo) {
+    var ok = false;
+    try { await navigator.clipboard.writeText(texto); ok = true; } catch (e) {
+      try {
+        var ta = document.createElement("textarea");
+        ta.value = texto;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        ok = document.execCommand("copy");
+        ta.remove();
+      } catch (e2) {}
+    }
+    if (btn) {
+      btn.textContent = ok ? "Copiado" : "Não foi possível copiar";
+      setTimeout(function () { btn.textContent = rotulo; }, 1500);
+    }
+  }
+
+  window.referralCopyCode = function (btn) {
+    if (codigoAtual) copiarTexto(codigoAtual, btn, "Copiar código");
+  };
+
+  window.referralShare = function (btn) {
+    if (!codigoAtual) return;
+    var url = linkDe(codigoAtual);
+    var texto = "Cria a tua conta no Portal Digital com o meu código " + codigoAtual + ":";
+    if (navigator.share) {
+      navigator.share({ title: "Portal Digital", text: texto, url: url }).catch(function () {});
+    } else {
+      copiarTexto(texto + " " + url, btn, "Partilhar link");
+    }
+  };
+
+  window.referralClose = function () {
+    var m = el("referralModal");
+    if (m) m.classList.remove("active");
+  };
+
+  window.referralOpen = async function () {
+    if (typeof closeSidebar === "function") closeSidebar();
+    if (!logado()) {
+      if (typeof showSignupPrompt === "function") showSignupPrompt("convidar amigos");
+      return;
+    }
+    if (!aprovado()) {
+      showCustomAlert("Verifique a sua conta para poder convidar amigos e ganhar pontos.");
+      return;
+    }
+    el("rfPts").textContent = RF_PONTOS;
+    escreverRegras();
+    el("rfCodigo").textContent = "...";
+    el("rfLink").textContent = "";
+    el("rfTotal").textContent = "0";
+    el("rfValidos").textContent = "0";
+    el("rfGanhos").textContent = "0";
+    el("rfLista").innerHTML = '<div class="rf-vazio">A carregar...</div>';
+    el("rfNota").textContent = "";
+    el("referralModal").classList.add("active");
+    try {
+      codigoAtual = await garantirCodigo(currentUser.uid);
+    } catch (e) {
+      codigoAtual = "";
+      console.warn("[CONVITES] código indisponível", e);
+    }
+    el("rfCodigo").textContent = codigoAtual || "Indisponível";
+    el("rfLink").textContent = codigoAtual ? linkDe(codigoAtual) : "Tente novamente mais tarde.";
+    var r = await reclamar();
+    if (r) { desenhar(r); avisarGanho(r); }
+    else el("rfLista").innerHTML = '<div class="rf-vazio">Não foi possível carregar os convites.</div>';
+  };
+
+  window.referralGuideText = function () {
+    return "- Convidar amigos (botão Convidar Amigos no menu lateral): cada usuário com conta verificada tem um código e um link de convite. Por cada amigo que criar conta com esse código, verificar a conta e ganhar pontos a ver anúncios em Ganhar Pontos, o usuário ganha " + RF_PONTOS + " pontos. No máximo " + RF_MAX_DIA + " convites recompensados a cada 24 horas e " + RF_MAX_TOTAL + " no total, e não dá para usar o próprio código. Os pontos entram quando o usuário abre o app ou a janela de convites.\n";
+  };
+
+  var oUi = window.updateUIForUser;
+  if (typeof oUi === "function") {
+    window.updateUIForUser = function () {
+      var r = oUi.apply(this, arguments);
+      agendar();
+      return r;
+    };
+  }
+  var oPts = window._syncPointsDisplay;
+  if (typeof oPts === "function") {
+    window._syncPointsDisplay = function () {
+      var r = oPts.apply(this, arguments);
+      agendar();
+      return r;
+    };
+  }
+
+  capturar();
+  agendar();
+})();
+</script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
