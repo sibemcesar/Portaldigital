@@ -13993,6 +13993,19 @@ window.firebaseModules = {
     </div>
   </div>
 
+  <div id="wdAvisoModal" class="custom-modal">
+    <div class="custom-modal-content pq-invite-content">
+      <div class="pq-invite-icon"><svg viewBox="0 0 24 24" width="44" height="44" aria-hidden="true" style="fill:var(--accent-primary)"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg></div>
+      <h2>Os teus pontos valem dinheiro</h2>
+      <p id="wdAvisoTxt"></p>
+      <div class="pq-invite-pts" id="wdAvisoKz"></div>
+      <div class="pq-invite-actions">
+        <button class="custom-modal-btn primary" onclick="wdAvisoTrocar()">Trocar agora</button>
+        <button class="custom-modal-btn secondary" onclick="wdAvisoFechar()">Usar os pontos aqui</button>
+      </div>
+    </div>
+  </div>
+
   <div id="referralModal" class="manage-users-overlay rf-overlay" role="dialog" aria-label="Convidar Amigos">
     <div class="manage-users-overlay-content rf-overlay-content">
       <div class="content-header">
@@ -14690,7 +14703,7 @@ window.firebaseModules = {
             </summary>
             <ul class="wd-info-list" id="wdInfoList"></ul>
           </details>
-          <a class="wd-wa" id="wdWa" href="#" target="_blank" rel="noopener noreferrer">
+          <a class="wd-wa" id="wdWa" href="#" role="button">
             <span class="wd-wa-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></span>
             <span class="wd-wa-t"><b>Dúvidas? Fale no WhatsApp</b><small id="wdWaNum"></small></span>
             <svg class="wd-info-ch wd-wa-go" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
@@ -27872,7 +27885,7 @@ function aiPickGames(all) {
   return Array.from(chosen.values());
 }
 function aiGuide() {
-  return "\nGUIA DO APP (regras reais; usa só isto para responder a dúvidas sobre pontos, bónus, códigos e pedidos, e nunca inventes valores, prazos ou regras que não estejam aqui. Se a dúvida não estiver coberta, diz que não sabes e sugere abrir a Ajuda ou Reportar um problema com a ferramenta ir_para):\n" +
+  return "\nGUIA DO APP (regras reais; usa só isto para responder a dúvidas sobre pontos, bónus, códigos, pedidos, levantamento de saldo e convites, e nunca inventes valores, prazos ou regras que não estejam aqui. Se a dúvida não estiver coberta, diz que não sabes e sugere abrir a Ajuda ou Reportar um problema com a ferramenta ir_para):\n" +
     "CONTA: sem conta (visitante) não dá para baixar, ganhar pontos, resgatar códigos nem fazer pedidos; é preciso criar conta, que é grátis. A conta tem de estar verificada: enquanto estiver à espera de aprovação, o app avisa e bloqueia downloads, recompensas, códigos e pedidos. Verificar o e-mail aprova a conta.\n" +
     "PONTOS: o saldo aparece no topo do app. Gastam-se a baixar conteúdos: cada conteúdo tem o seu custo, que se vê na página dele, e há conteúdos grátis (custo 0). Se o saldo não chegar, o app avisa e sugere resgatar um código ou ganhar mais pontos. Não sabes o custo de cada conteúdo, por isso manda o usuário ver na página do conteúdo.\n" +
     "COMO GANHAR PONTOS:\n" +
@@ -27887,6 +27900,7 @@ function aiGuide() {
     "RESGATAR PONTOS (página): abre-se em Resgatar Código no menu lateral, ou a tocar nos pontos no topo (ir_para resgatar). Nessa página, o ícone de presente no canto superior direito mostra ou esconde o campo para escrever um código. A mesma página serve para comprar pontos (ver COMPRAR PONTOS).\n" +
     "RESGATAR CÓDIGOS: na página Resgatar Pontos, toca no ícone de presente para mostrar o campo, escreve o código (os espaços são ignorados) e toca em Resgatar Código. Os pontos entram logo. Cada código só pode ser usado uma vez e o valor em pontos depende de cada código. Mensagens possíveis: código inválido (confere os caracteres), já foi usado, já resgataste este código, ou está reservado para outra conta. Há um intervalo de 3 segundos entre tentativas e, depois de 10 tentativas, é preciso esperar cerca de 15 minutos. Os códigos que a equipa envia podem aparecer também nas notificações.\n" +
     "COMPRAR PONTOS: dá para comprar pontos na página Resgatar Pontos (ir_para resgatar). Em \"Cartões disponíveis\" aparecem cartões de pontos, cada um com a quantidade de pontos, o valor em Kz e só os 3 últimos dígitos do código. Dá para filtrar por pontos (Todos, Acima de, Abaixo de). Ao tocar em Comprar, abre o WhatsApp do Portal Digital com uma mensagem já preenchida com os dados do cartão e da conta do usuário, e a equipa explica como pagar. Depois do pagamento, a equipa liberta o cartão para a conta do usuário e ele aparece em \"Meus cartões\", na mesma página, com os botões Resgatar (os pontos entram logo) e Copiar código. Precisa de conta (visitante é convidado a criar uma). Os cartões e valores mudam e podem não haver cartões no momento (a página mostra \"Nenhum cartão disponível\"), por isso manda o usuário ver na página e nunca inventes preços, valores, formas de pagamento ou prazos de entrega. Se perguntarem como pagar, diz que é combinado com a equipa pelo WhatsApp.\n" +
+    (typeof window.wdGuideText === "function" ? window.wdGuideText() : "") +
     "PEDIDOS: servem para pedir um jogo, app, tutorial ou outro conteúdo (ir_para pedidos) e não custam pontos. Precisa de conta verificada. O texto tem de ter entre 8 e 300 caracteres. Ao enviar, escolhe-se o tipo: Jogo, App, Tutorial ou Outro. Tem de se esperar 20 segundos entre um pedido e o seguinte. O app mostra pedidos parecidos antes de enviar, e o usuário pode apoiar pedidos de outras pessoas (não o próprio) e apagar os seus. O estado do pedido pode ser: Em aberto, Em análise, Atendido, Já existe ou Recusado. Quando é atendido ou já existe, o usuário recebe uma notificação. Não prometas prazos nem que um pedido vai ser atendido.\n";
 }
 function aiSystem() {
@@ -27921,7 +27935,7 @@ function aiTools() {
     },
     {
       name: "ir_para",
-      description: "Leva o usuário a uma secção do app. Chaves: inicio (página inicial), favoritos (conteúdos guardados), notificacoes, pedidos (pedir conteúdos), perfil (conta e perfil), configuracoes (tema, cores, aparência), comunidade, historico (conteúdos vistos), sobre, termos, ajuda (perguntas frequentes), reportar (reportar um problema), senha (alterar senha), resgatar (resgatar códigos e comprar pontos), pontos (ganhar pontos), pesquisa (pesquisar).",
+      description: "Leva o usuário a uma secção do app. Chaves: inicio (página inicial), favoritos (conteúdos guardados), notificacoes, pedidos (pedir conteúdos), perfil (conta e perfil), configuracoes (tema, cores, aparência), comunidade, historico (conteúdos vistos), sobre, termos, ajuda (perguntas frequentes), reportar (reportar um problema), senha (alterar senha), resgatar (resgatar códigos e comprar pontos), pontos (ganhar pontos), levantar (Levantar Saldo: trocar pontos por dinheiro), convidar (Convidar Amigos: código e link de convite), pesquisa (pesquisar).",
       parameters: { type: "OBJECT", properties: {
         secao: { type: "STRING", enum: Object.keys(AI_DEST), description: "Chave da secção." },
         consulta: { type: "STRING", description: "Só para secao=pesquisa: texto a pesquisar no ecrã de pesquisa." }
@@ -28137,6 +28151,8 @@ var AI_DEST = {
   senha: ["Alterar senha", () => aiLogged("alterar a senha", openChangePasswordOverlay), true],
   resgatar: ["Resgatar código", () => aiLogged("resgatar um código", openRedeemCodeModal), true],
   pontos: ["Ganhar pontos", () => aiLogged("ganhar pontos", () => RewardedAds.abrirPagina()), true],
+  levantar: ["Levantar Saldo", () => aiLogged("levantar saldo", () => { if (typeof wdOpen === "function") wdOpen(); }), true],
+  convidar: ["Convidar Amigos", () => { if (typeof referralOpen === "function") referralOpen(); }, true],
   pesquisa: ["Pesquisar", () => openSearchOverlay(), true]
 };
 function aiStripIds(t, found) {
@@ -28597,14 +28613,7 @@ new MutationObserver(() => {
     $("wdHist").innerHTML = h + "</div>";
   }
   function abrirWhats(texto) {
-    var url = "https://wa.me/" + WA_PAIS + WHATSAPP + "?text=" + encodeURIComponent(texto);
-    var w = null;
-    try { w = window.open(url, "_blank"); } catch (e) {}
-    if (!w || w.closed || typeof w.closed === "undefined") {
-      var a = document.createElement("a");
-      a.href = url; a.target = "_blank"; a.rel = "noopener noreferrer";
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    }
+    openLinkInGA("https://wa.me/" + WA_PAIS + WHATSAPP + "?text=" + encodeURIComponent(texto));
   }
   function quemSou() {
     var nome = (typeof userName !== "undefined" && userName) || (currentUser && currentUser.displayName) || "—";
@@ -28668,9 +28677,56 @@ new MutationObserver(() => {
       ul.innerHTML = L.map(function (t) { return "<li>" + t + "</li>"; }).join("");
     }
     var a = $("wdWa"), n = $("wdWaNum");
-    if (a) a.href = "https://wa.me/" + WA_PAIS + WHATSAPP + "?text=" + encodeURIComponent("Olá! Tenho uma dúvida sobre o levantamento de saldo no Portal Digital.");
+    if (a) {
+      var urlDuv = "https://wa.me/" + WA_PAIS + WHATSAPP + "?text=" + encodeURIComponent("Olá! Tenho uma dúvida sobre o levantamento de saldo no Portal Digital.");
+      a.href = "#";
+      a.onclick = function (ev) { ev.preventDefault(); openLinkInGA(urlDuv); return false; };
+    }
     if (n) n.textContent = "+" + WA_PAIS + " " + WHATSAPP.replace(/(\d{3})(?=\d)/g, "$1 ");
   }
+  var AVISO_MIN = 500, avisoTimer = null, avisoTent = 0, avisoVisto = {};
+  function avisoLS(uid) { try { return Number(localStorage.getItem("pdWdAviso_" + uid)) || 0; } catch (e) { return 0; } }
+  function nivelPor(pts) { var n = 0; for (var i = 0; i < TABELA.length; i++) if (TABELA[i][0] >= AVISO_MIN && TABELA[i][0] <= pts) n = TABELA[i][0]; return n; }
+  function agendarAviso() {
+    var u = window.currentUser || (typeof currentUser !== "undefined" ? currentUser : null);
+    if (!u || u.isAnonymous || avisoTimer) return;
+    var n = nivelPor(Number(typeof userPoints !== "undefined" ? userPoints : 0) || 0);
+    if (!n || n <= avisoLS(u.uid) || avisoVisto[u.uid] === n) return;
+    avisoTimer = setTimeout(function () { avisoTimer = null; tentarAviso(); }, avisoTent ? 8000 : 14000);
+  }
+  async function tentarAviso() {
+    var u = currentUser;
+    if (!u || u.isAnonymous) return;
+    if (document.querySelector(".custom-modal.active, .manage-users-overlay.active, .wd-overlay.active")) { if (++avisoTent < 4) agendarAviso(); return; }
+    var uid = u.uid, lido = nivelPor(Number(userPoints) || 0);
+    try { await lerEstado(); } catch (e) { return; }
+    if (!currentUser || currentUser.uid !== uid) return;
+    avisoVisto[uid] = lido;
+    if (bloqueio()) return;
+    var n = 0;
+    for (var i = TABELA.length - 1; i >= 0; i--) { if (TABELA[i][0] >= AVISO_MIN && !opcaoBloqueada(TABELA[i][0])) { n = TABELA[i][0]; break; } }
+    if (!n || n <= avisoLS(uid)) return;
+    try { localStorage.setItem("pdWdAviso_" + uid, String(n)); } catch (e) {}
+    avisoTent = 0;
+    $("wdAvisoTxt").textContent = "Tens " + estado.pontos + " pontos. Podes trocar " + n + " pontos por " + kz(valorKz(n)) + " e receber por Multicaixa Express, Unitel Money, Afrimoney ou IBAN.";
+    $("wdAvisoKz").textContent = n + " pontos = " + kz(valorKz(n));
+    $("wdAvisoModal").classList.add("active");
+  }
+  window.wdAvisoFechar = function () { var m = $("wdAvisoModal"); if (m) m.classList.remove("active"); };
+  window.wdAvisoTrocar = function () { window.wdAvisoFechar(); window.wdOpen(); };
+  (function () {
+    var oUi = window.updateUIForUser;
+    if (typeof oUi === "function") window.updateUIForUser = function () { var r = oUi.apply(this, arguments); agendarAviso(); return r; };
+    var oPts = window._syncPointsDisplay;
+    if (typeof oPts === "function") window._syncPointsDisplay = function () { var r = oPts.apply(this, arguments); agendarAviso(); return r; };
+    agendarAviso();
+  })();
+
+  window.wdGuideText = function () {
+    var valores = TABELA.map(function (r) { return r[0] + " pontos = " + kz(r[1]); }).join("; ");
+    var metodos = METODOS.map(function (m) { return m.nome; }).join(", ");
+    return "LEVANTAR SALDO (botão Levantar Saldo no menu lateral, ou ir_para levantar; também aparece uma linha no perfil que mostra se já pode levantar): serve para trocar pontos por dinheiro em Kz. Precisa de conta (visitante é convidado a criar uma), verificada e com pelo menos " + MIN_DIAS_CONTA + " dias. Mínimo de " + TABELA[0][0] + " pontos. Valores fixos: " + valores + ". Para trocar " + PTS_ALTO + " pontos ou mais, a conta precisa de ter " + MIN_DIAS_ALTO + " dias ou mais. Escolhe-se o valor, o método de recebimento (" + metodos + ") e escreve-se o número (ou o IBAN). Os pontos são descontados logo ao enviar o pedido e devolvidos se o pedido for cancelado (por exemplo por dados inválidos ou suspeita de fraude). O pedido fica \"Pendente\" até um administrador o pagar à mão; não há prazo garantido, por isso nunca prometas quando será pago. Se passarem " + HORAS_PERGUNTAR + " horas e ainda estiver pendente, aparece o botão Perguntar pelo pedido (WhatsApp). Quando estiver \"Pago\", dá para tocar em Pedir comprovativo (WhatsApp). Limites: 1 pedido pendente de cada vez e 1 levantamento a cada " + INTERVALO_DIAS + " dias (cancelados não contam)." + (TETO_MES_KZ > 0 ? " Máximo de " + kz(TETO_MES_KZ) + " em 30 dias." : "") + " Aconselha a confirmar bem o número ou IBAN antes de enviar, porque o pagamento vai para os dados indicados. Dúvidas: WhatsApp do Portal Digital, no próprio ecrã. Não sabes o saldo nem o estado dos pedidos do usuário: manda-o ver no ecrã Levantar Saldo.\n";
+  };
   function renderTudo() {
     animarNum($("wdSaldo"), estado.pontos);
     renderElig(); renderReq(); renderHero(); renderGrid(); renderPick(); renderMetodos(); renderResumo(); renderHist(true);
@@ -29338,7 +29394,7 @@ new MutationObserver(() => {
   };
 
   window.referralGuideText = function () {
-    return "- Convidar amigos (botão Convidar Amigos no menu lateral): cada usuário com conta verificada tem um código e um link de convite. Por cada amigo que criar conta com esse código, verificar a conta e ganhar pontos a ver anúncios em Ganhar Pontos, o usuário ganha " + RF_PONTOS + " pontos. No máximo " + RF_MAX_DIA + " convites recompensados a cada 24 horas e " + RF_MAX_TOTAL + " no total, e não dá para usar o próprio código. Os pontos entram quando o usuário abre o app ou a janela de convites.\n";
+    return "- Convidar amigos (botão Convidar Amigos no menu lateral, ou ir_para convidar; a janela tem o botão Copiar código, o botão Partilhar link e a lista dos amigos convidados): cada usuário com conta verificada tem um código e um link de convite. Por cada amigo que criar conta com esse código (o amigo escreve-o no campo \"Código de convite (opcional)\" ao criar a conta, ou entra pelo link), verificar a conta e ganhar pelo menos " + RF_ANUNCIOS_MIN + " pontos a ver anúncios em Ganhar Pontos, o usuário ganha " + RF_PONTOS + " pontos. No máximo " + RF_MAX_DIA + " convites recompensados a cada 24 horas e " + RF_MAX_TOTAL + " no total, e não dá para usar o próprio código. Os pontos entram quando o usuário abre o app ou a janela de convites.\n";
   };
 
   var oUi = window.updateUIForUser;
