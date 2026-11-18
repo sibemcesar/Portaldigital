@@ -2,7 +2,7 @@
 <html lang="pt-AO">
 <head>
   <script>try{var _z=localStorage.getItem("pd_size");if(_z==="compacto"||_z==="grande")document.documentElement.setAttribute("data-size",_z)}catch(e){}</script>
-  <script>try{if(localStorage.getItem("pd_motion")!=="normal")document.documentElement.classList.add("reduce-motion")}catch(e){document.documentElement.classList.add("reduce-motion")}</script>
+  <script>try{var _m=localStorage.getItem("pd_motion");if(_m==="reduzida")document.documentElement.classList.add("reduce-motion");else if(_m==="normal")document.documentElement.classList.add("motion-on");else document.documentElement.classList.add("motion-on","motion-mid")}catch(e){document.documentElement.classList.add("motion-on","motion-mid")}</script>
   <meta charset="utf-8">
   <title>Portal Digital – Jogos, Aplicativos e Tutoriais</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
@@ -1861,6 +1861,16 @@ window.firebaseModules = {
       overflow-wrap: anywhere;
       white-space: pre-line;
     }
+
+    .modal-description a.desc-link {
+      color: var(--accent-primary);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      word-break: break-all;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .modal-description a.desc-link:active { opacity: 0.7; }
 
     .rating-section {
       background: var(--bg-card);
@@ -12128,6 +12138,65 @@ window.firebaseModules = {
     html.reduce-motion .bottom-nav { border-top: 1px solid var(--border-color); }
     html.reduce-motion .header { border-bottom: 1px solid var(--border-color); }
   </style>
+  <style id="motion-balanced">
+    html.motion-mid *, html.motion-mid *::before, html.motion-mid *::after {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      will-change: auto !important;
+      text-shadow: none !important;
+    }
+    html.motion-mid .bottom-nav-badge.pulsing,
+    html.motion-mid .live-dot,
+    html.motion-mid .new-since-banner .nsb-dot,
+    html.motion-mid .notification-unread-indicator,
+    html.motion-mid .notification-badge,
+    html.motion-mid .profile-header-card::before,
+    html.motion-mid .profile-avatar-svg.pdp-frame-neon,
+    html.motion-mid .profile-avatar-svg.pdp-frame-arco,
+    html.motion-mid .auth-overlay-content::before,
+    html.motion-mid .auth-overlay-content::after,
+    html.motion-mid #pdAdOverlay.aberto .pdad-topo button,
+    html.motion-mid #pdAdOverlay.aberto .pdad-topo::after,
+    html.motion-mid #pdAdOverlay.aberto .pdad-fill,
+    html.motion-mid #rwAdOverlay.aberto .rw-ad-topo button,
+    html.motion-mid #rwAdOverlay.aberto .rw-ad-topo::after,
+    html.motion-mid #rwAdOverlay.aberto .rw-ad-fill { animation: none !important; }
+    html.motion-mid .auth-welcome-icon { animation: a16Pop .75s var(--m3-spring) both !important; }
+    html.motion-mid .card:nth-child(n+9),
+    html.motion-mid .fav-item:nth-child(n+9),
+    html.motion-mid .req-card:nth-child(n+9),
+    html.motion-mid .community-item:nth-child(n+9),
+    html.motion-mid .report-card:nth-child(n+9),
+    html.motion-mid .history-item:nth-child(n+9),
+    html.motion-mid .pn-card:nth-child(n+9) { animation: none !important; opacity: 1 !important; }
+    html.motion-mid .card,
+    html.motion-mid .fav-item,
+    html.motion-mid .req-card,
+    html.motion-mid .community-item,
+    html.motion-mid .report-card {
+      content-visibility: auto;
+      contain-intrinsic-size: auto 200px;
+    }
+  </style>
+  <style id="motion-tip-style">
+    @keyframes m3DialogIn { from { transform: scale(.9) translateY(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+    #motionTipOverlay { position: fixed; inset: 0; z-index: 10300; display: none; align-items: center; justify-content: center; box-sizing: border-box; padding: 24px; background: rgba(0, 0, 0, .55); }
+    #motionTipOverlay.active { display: flex; animation: m3Scrim .25s var(--m3-ease-std) both; }
+    #motionTipOverlay .mt-box { width: 100%; max-width: 360px; box-sizing: border-box; padding: 28px 22px 20px; border-radius: 28px; background: var(--bg-primary); color: var(--text-primary); text-align: center; }
+    #motionTipOverlay.active .mt-box { animation: m3DialogIn .4s var(--m3-ease-emph) both; }
+    #motionTipOverlay .mt-ic { width: 72px; height: 72px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; border-radius: 42% 58% 56% 44% / 46% 44% 56% 54%; background: var(--bg-secondary); }
+    #motionTipOverlay .mt-ic svg { width: 36px; height: 36px; fill: var(--accent-primary); }
+    #motionTipOverlay .mt-t { margin: 0 0 8px; font-size: 22px; font-weight: 700; letter-spacing: -.2px; line-height: 1.25; }
+    #motionTipOverlay .mt-s { margin: 0 0 20px; font-size: 14px; line-height: 1.5; color: var(--text-muted); }
+    #motionTipOverlay .mt-btn { display: block; width: 100%; height: 52px; margin-top: 10px; padding: 0 20px; border: none; border-radius: 999px; font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform .35s var(--m3-spring); }
+    #motionTipOverlay .mt-btn:first-of-type { margin-top: 0; }
+    #motionTipOverlay .mt-btn:active { transform: scale(.96); }
+    #motionTipOverlay .mt-btn.main { background: var(--accent-primary); color: var(--bg-primary); }
+    #motionTipOverlay .mt-btn.tonal { background: var(--bg-secondary); color: var(--text-primary); }
+    @supports (background: color-mix(in srgb, red 10%, blue)) {
+      #motionTipOverlay .mt-ic { background: color-mix(in srgb, var(--accent-primary) 16%, var(--bg-secondary)); }
+    }
+  </style>
   <style id="ui-size-settings">
     .settings-row.static { cursor: default; }
     .settings-row.static:active { background: none; }
@@ -12573,6 +12642,184 @@ window.firebaseModules = {
       #referralModal .rf-scroll > * { opacity: 1; transform: none; animation: none !important; }
     }
   </style>
+  <style id="upStyles">
+    .up-overlay { display: none; position: fixed; inset: 0; background: var(--bg-primary); z-index: 1900; flex-direction: column; animation: fadeIn .25s ease; }
+    .up-overlay.active { display: flex; }
+    .up-wrap { width: 100%; height: 100%; max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; min-height: 0; }
+    .up-wrap .content-header { padding-top: calc(12px + env(safe-area-inset-top, 0px)); }
+    .up-body { flex: 1; min-height: 0; overflow-y: auto; padding: 16px 16px calc(24px + env(safe-area-inset-bottom, 0px)); -webkit-overflow-scrolling: touch; }
+    .up-hero { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 24px; padding: 16px; margin-bottom: 14px; }
+    .up-hero strong { display: block; font-size: 16px; margin-bottom: 6px; color: var(--text-primary); }
+    .up-hero p { margin: 0 0 10px; font-size: 13px; line-height: 1.45; color: var(--text-secondary); }
+    .up-hero ul { margin: 0 0 14px; padding-left: 18px; font-size: 12.5px; line-height: 1.5; color: var(--text-secondary); }
+    .up-main-btn { width: 100%; border: none; border-radius: 999px; padding: 14px 18px; font-size: 15px; font-weight: 700; background: var(--accent-primary); color: var(--bg-primary); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    .up-main-btn:active { transform: scale(.97); }
+    .up-sub-btn { border: 1px solid var(--border-color); background: transparent; color: var(--text-primary); border-radius: 999px; padding: 9px 14px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .up-h { font-size: 13px; font-weight: 700; letter-spacing: .3px; text-transform: uppercase; color: var(--text-secondary); margin: 18px 4px 10px; }
+    .up-item { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 18px; padding: 12px; margin-bottom: 10px; }
+    .up-row { display: flex; gap: 12px; align-items: center; }
+    .up-cover { width: 56px; height: 56px; border-radius: 12px; object-fit: cover; background: var(--bg-secondary); flex-shrink: 0; }
+    .up-info { flex: 1; min-width: 0; }
+    .up-title { font-size: 15px; font-weight: 700; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .up-meta { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+    .up-chip { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px; margin-top: 6px; }
+    .up-st-pending { background: rgba(255,170,0,.16); color: #b26a00; }
+    .up-st-approved { background: rgba(30,142,62,.16); color: #1e8e3e; }
+    .up-st-rejected { background: rgba(217,48,37,.14); color: #d93025; }
+    .up-reason { margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: rgba(217,48,37,.08); font-size: 13px; line-height: 1.4; color: var(--text-primary); }
+    .up-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .up-empty { text-align: center; padding: 28px 12px; font-size: 14px; color: var(--text-secondary); line-height: 1.5; }
+    .pq-badge { margin-left: auto; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--accent-primary); color: var(--bg-primary); font-size: 11px; font-weight: 800; display: none; align-items: center; justify-content: center; }
+    .pd-monet { display: flex; align-items: center; gap: 10px; cursor: pointer; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; font-size: 14px; font-weight: 600; color: var(--text-primary); }
+    .pd-monet input { width: 20px; height: 20px; flex-shrink: 0; }
+    .up-reject-text { width: 100%; box-sizing: border-box; min-height: 90px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); padding: 10px; font-size: 14px; font-family: inherit; resize: vertical; margin: 10px 0 14px; }
+  <style id="m3e-publish">
+    #upOverlay, #pqOverlay, #publishOverlay {
+      --pf-blob-a: 42% 58% 56% 44% / 46% 44% 56% 54%;
+      --pf-blob-b: 58% 42% 44% 56% / 54% 56% 44% 46%;
+      display: flex; opacity: 0; visibility: hidden; pointer-events: none; animation: none;
+      transform: translateY(32px) scale(.985);
+      transition: opacity .32s var(--m3-ease-std), transform .45s var(--m3-ease-emph), visibility 0s linear .45s;
+    }
+    #upOverlay.active, #pqOverlay.active, #publishOverlay.active {
+      opacity: 1; visibility: visible; pointer-events: auto; transform: none; animation: none;
+      transition: opacity .32s var(--m3-ease-std), transform .45s var(--m3-ease-emph), visibility 0s linear 0s;
+    }
+    #upOverlay .content-header, #pqOverlay .content-header, #publishOverlay .content-header {
+      box-sizing: border-box; min-height: calc(64px + env(safe-area-inset-top, 0px));
+      padding: env(safe-area-inset-top, 0px) 12px 0 8px; gap: 6px;
+      justify-content: flex-start; background: var(--bg-primary); border-bottom: none;
+      transition: background .25s var(--m3-ease-std);
+    }
+    #upOverlay .content-header.pf-elev, #pqOverlay .content-header.pf-elev, #publishOverlay .content-header.pf-elev { background: var(--bg-secondary); }
+    #upOverlay .content-header > div[style], #pqOverlay .content-header > div[style], #publishOverlay .content-header > div[style] { display: none; }
+    #upOverlay .content-header-title, #pqOverlay .content-header-title, #publishOverlay .content-header-title {
+      margin: 0 4px 0 8px; text-align: left; font-size: 22px; font-weight: 700; letter-spacing: -.2px;
+    }
+    #upOverlay .content-header-btn, #pqOverlay .content-header-btn, #publishOverlay .content-header-btn {
+      width: 44px; height: 44px; flex-shrink: 0; padding: 0; border: none; border-radius: 50%;
+      background: var(--bg-secondary); -webkit-tap-highlight-color: transparent;
+      transition: background .2s ease, transform .35s var(--m3-spring);
+    }
+    #upOverlay .content-header-btn:active, #pqOverlay .content-header-btn:active, #publishOverlay .content-header-btn:active { transform: scale(.88); }
+
+    .up-body { padding: 8px 16px calc(32px + env(safe-area-inset-bottom, 0px)); }
+    .up-hero { position: relative; overflow: hidden; border-radius: 32px; padding: 20px; margin-bottom: 8px; animation: m3Rise .5s var(--m3-ease-emph) both; }
+    .up-hero::after { content: ""; position: absolute; right: -36px; top: -44px; width: 150px; height: 150px; border-radius: var(--pf-blob-b, 58% 42% 44% 56% / 54% 56% 44% 46%); background: var(--accent-primary); opacity: .08; pointer-events: none; }
+    .up-hero-top { position: relative; z-index: 1; display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+    .up-hero-icon { width: 64px; height: 64px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 42% 58% 56% 44% / 46% 44% 56% 54%; background: var(--accent-primary); animation: pfFloat 4.5s ease-in-out infinite alternate; }
+    .up-hero-icon svg { width: 30px; height: 30px; fill: var(--bg-primary); }
+    .up-hero-text { flex: 1; min-width: 0; }
+    .up-hero strong { font-size: 20px; font-weight: 700; margin-bottom: 4px; letter-spacing: -.2px; }
+    .up-hero p { margin: 0; font-size: 13px; line-height: 1.45; }
+    .up-hero .up-rules { position: relative; z-index: 1; list-style: none; margin: 0 0 18px; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .up-hero .up-rules li { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 20px; background: var(--bg-card); font-size: 13px; line-height: 1.4; color: var(--text-secondary); }
+    .up-hero .up-rules li i { width: 34px; height: 34px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--bg-secondary); }
+    .up-hero .up-rules li svg { width: 18px; height: 18px; fill: var(--accent-primary); }
+    .up-main-btn { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 10px; height: 56px; border-radius: 20px; font-size: 16px; box-shadow: 0 4px 14px rgba(0, 0, 0, .16); transition: transform .35s var(--m3-spring), border-radius .35s var(--m3-spring); }
+    .up-main-btn svg { width: 22px; height: 22px; fill: currentColor; }
+    .up-main-btn:active { transform: scale(.96); border-radius: 28px; }
+    .up-h { display: flex; align-items: center; justify-content: space-between; margin: 22px 6px 12px; font-size: 14px; letter-spacing: .4px; color: var(--accent-primary); }
+    .up-count { min-width: 24px; height: 24px; padding: 0 8px; box-sizing: border-box; align-items: center; justify-content: center; border-radius: 999px; background: var(--accent-primary); color: var(--bg-primary); font-size: 12px; font-weight: 800; letter-spacing: 0; }
+    .up-item { border-radius: 28px; padding: 14px; margin-bottom: 12px; }
+    .up-enter .up-item { animation: favIn .5s var(--m3-ease-emph) both; animation-delay: calc(var(--i, 0) * 55ms); }
+    .up-cover { width: 64px; height: 64px; border-radius: 42% 58% 56% 44% / 46% 44% 56% 54%; }
+    .up-item:nth-child(even) .up-cover { border-radius: 58% 42% 44% 56% / 54% 56% 44% 46%; }
+    .up-title { font-size: 16px; }
+    .up-chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px 5px 9px; margin-top: 8px; }
+    .up-chip svg { width: 14px; height: 14px; fill: currentColor; flex-shrink: 0; }
+    html.dark .up-st-pending { color: #fbbf24; }
+    html.dark .up-st-approved { color: #4ade80; }
+    html.dark .up-st-rejected { color: #f87171; }
+    .up-reason { border-radius: 18px; padding: 12px 14px; }
+    .up-sub-btn { border: none; background: var(--bg-secondary); padding: 10px 16px; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; transition: transform .3s var(--m3-spring), background .2s ease; }
+    .up-sub-btn:active { transform: scale(.93); }
+    .up-sub-btn.danger { background: rgba(220, 38, 38, .10); color: #d93025; }
+    html.dark .up-sub-btn.danger { color: #f87171; }
+    .up-empty { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 28px 16px; }
+    .up-empty-ic { width: 104px; height: 104px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; border-radius: 42% 58% 56% 44% / 46% 44% 56% 54%; background: var(--bg-secondary); animation: pfFloat 5s ease-in-out infinite alternate; }
+    .up-empty-ic svg { width: 44px; height: 44px; fill: var(--accent-primary); }
+    .up-empty strong { font-size: 17px; color: var(--text-primary); }
+    .up-skel { height: 92px; margin-bottom: 12px; border-radius: 28px; background: var(--bg-secondary); animation: pfPulse 1.1s ease-in-out infinite alternate; }
+    @keyframes pfPulse { from { opacity: .4; } to { opacity: 1; } }
+    @keyframes pfFloat { from { transform: rotate(-5deg) scale(1); } to { transform: rotate(5deg) scale(1.06); } }
+
+    #publishOverlay .publish-form-container { padding: 8px 16px 28px; gap: 14px; }
+    .pf-sec { margin: 0; padding: 18px 16px 6px; border-radius: 28px; background: var(--bg-secondary); }
+    #publishOverlay.active .pf-sec { animation: m3Rise .5s var(--m3-ease-emph) both; animation-delay: calc(var(--i, 0) * 60ms + 100ms); }
+    .pf-sec-title { display: flex; align-items: center; gap: 10px; margin: 0 0 16px; font-size: 16px; font-weight: 700; color: var(--text-primary); }
+    .pf-sec-ic { width: 34px; height: 34px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 42% 58% 56% 44% / 46% 44% 56% 54%; background: var(--accent-primary); }
+    .pf-sec:nth-of-type(even) .pf-sec-ic { border-radius: 58% 42% 44% 56% / 54% 56% 44% 46%; }
+    .pf-sec-ic svg { width: 18px; height: 18px; fill: var(--bg-primary); }
+    #publishOverlay .pf-sec .form-group { margin-bottom: 16px; }
+    #publishOverlay .pf-sec .form-label { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin: 0 0 8px 4px; font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+    .pf-count { font-size: 11px; font-weight: 600; color: var(--text-muted); transition: color .2s ease; }
+    .pf-count.near { color: #d97706; }
+    #publishOverlay .form-input, #publishOverlay .form-textarea, #publishOverlay .form-select {
+      box-sizing: border-box; border-radius: 16px; border: 1px solid var(--border-color); background: var(--bg-card);
+      padding: 14px 16px; font-size: 16px; -webkit-tap-highlight-color: transparent;
+      transition: box-shadow .2s ease, border-color .2s ease;
+    }
+    #publishOverlay .form-input:focus, #publishOverlay .form-textarea:focus, #publishOverlay .form-select:focus { border-color: var(--accent-primary); box-shadow: inset 0 0 0 1px var(--accent-primary); }
+    #publishOverlay .pf-touched:invalid { border-color: #d93025; box-shadow: inset 0 0 0 1px #d93025; }
+    #publishOverlay .form-select {
+      -webkit-appearance: none; appearance: none; padding-right: 46px; background-repeat: no-repeat; background-position: right 16px center; background-size: 20px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23888' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    }
+    #publishOverlay .form-hint { margin: 6px 4px 0; }
+    .pf-poster { display: none; align-items: center; justify-content: center; width: 100%; max-height: 190px; margin: 0 0 16px; overflow: hidden; border-radius: 24px; background: var(--bg-card); animation: pfPop .4s var(--m3-spring) both; }
+    .pf-poster img { display: block; width: 100%; max-height: 190px; object-fit: cover; }
+
+    #publishOverlay .pd-genre-chip {
+      display: inline-flex; align-items: center; height: 40px; padding: 0 16px; border-radius: 14px; border: 1px solid var(--border-color);
+      background: var(--bg-card); color: var(--text-secondary); font: 600 14px 'Inter', sans-serif; -webkit-tap-highlight-color: transparent;
+      transition: background .2s ease, color .2s ease, border-color .2s ease, border-radius .35s var(--m3-spring), transform .3s var(--m3-spring);
+    }
+    #publishOverlay .pd-genre-chip::before { content: ""; display: inline-block; width: 0; height: 11px; margin-right: 0; opacity: 0; border: solid currentColor; border-width: 0 2px 2px 0; box-sizing: border-box; transform: rotate(45deg) scale(.8); transition: width .25s var(--m3-ease-emph), margin .25s var(--m3-ease-emph), opacity .2s ease; }
+    #publishOverlay .pd-genre-chip.on { background: var(--accent-primary); border-color: var(--accent-primary); color: var(--bg-primary); border-radius: 20px; font-weight: 700; }
+    #publishOverlay .pd-genre-chip.on::before { width: 6px; margin: -3px 10px 0 2px; opacity: 1; }
+    #publishOverlay .pd-genre-chip:active { transform: scale(.93); }
+
+    #publishOverlay .download-link-group { margin-bottom: 12px; padding: 14px; border-radius: 22px; background: var(--bg-card); border: 1px solid var(--border-color); animation: pfPop .4s var(--m3-spring) both; }
+    #publishOverlay .download-link-group.leaving { animation: pfOut .2s ease forwards; pointer-events: none; }
+    #publishOverlay .download-link-header { margin-bottom: 12px; }
+    #publishOverlay .download-link-number { padding: 4px 12px; border-radius: 999px; background: var(--bg-secondary); font-size: 13px; }
+    #publishOverlay .remove-link-btn { width: 36px; height: 36px; border: none; background: rgba(220, 38, 38, .10); color: #d93025; -webkit-tap-highlight-color: transparent; transition: transform .3s var(--m3-spring), background .2s ease; }
+    #publishOverlay .remove-link-btn:active { transform: scale(.85); }
+    #publishOverlay .add-link-btn { height: 52px; padding: 0 14px; margin: 0 0 12px; border-radius: 20px; border: 2px dashed var(--border-color); background: transparent; -webkit-tap-highlight-color: transparent; transition: transform .35s var(--m3-spring), border-radius .35s var(--m3-spring), border-color .2s ease, background .2s ease; }
+    #publishOverlay .add-link-btn:active { transform: scale(.96); border-radius: 26px; }
+    @keyframes pfPop { from { opacity: 0; transform: translateY(10px) scale(.93); } to { opacity: 1; transform: none; } }
+    @keyframes pfOut { from { opacity: 1; transform: none; } to { opacity: 0; transform: scale(.92); } }
+
+    #publishOverlay .pd-monet { justify-content: space-between; flex-direction: row-reverse; padding: 14px 16px; border-radius: 20px; background: var(--bg-card); }
+    #publishOverlay .pd-monet input {
+      -webkit-appearance: none; appearance: none; position: relative; flex-shrink: 0; width: 52px; height: 32px; margin: 0; border-radius: 16px;
+      border: 2px solid var(--text-muted); background: transparent; cursor: pointer; -webkit-tap-highlight-color: transparent;
+      transition: background .25s ease, border-color .25s ease;
+    }
+    #publishOverlay .pd-monet input::before { content: ""; position: absolute; top: 50%; left: 6px; width: 16px; height: 16px; margin-top: -8px; border-radius: 50%; background: var(--text-muted); transition: transform .4s var(--m3-spring), width .25s ease, height .25s ease, margin-top .25s ease, background .25s ease; }
+    #publishOverlay .pd-monet input:checked { background: var(--accent-primary); border-color: var(--accent-primary); }
+    #publishOverlay .pd-monet input:checked::before { width: 24px; height: 24px; margin-top: -12px; background: var(--bg-primary); transform: translateX(14px); }
+    #gameCostGroup, #notifyUpdateGroup { animation: m3Rise .35s var(--m3-ease-emph) both; }
+
+    #publishOverlay .publish-footer { gap: 12px; padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px)); background: var(--bg-primary); border-top: none; box-shadow: 0 -6px 18px rgba(0, 0, 0, .06); }
+    #publishOverlay .publish-footer .publish-btn { position: relative; height: 52px; padding: 0 20px; border: none; border-radius: 20px; font-size: 15px; font-weight: 700; -webkit-tap-highlight-color: transparent; transition: transform .35s var(--m3-spring), border-radius .35s var(--m3-spring), opacity .2s ease; }
+    #publishOverlay .publish-footer .publish-btn.primary { flex: 1.5; }
+    #publishOverlay .publish-footer .publish-btn.secondary { background: var(--bg-secondary); color: var(--text-primary); border: none; }
+    #publishOverlay .publish-footer .publish-btn:active { transform: scale(.96); border-radius: 26px; }
+    #publishOverlay .publish-footer .publish-btn.busy { color: transparent; pointer-events: none; opacity: .75; }
+    #publishOverlay .publish-footer .publish-btn.busy::after { content: ""; position: absolute; left: 50%; top: 50%; width: 20px; height: 20px; margin: -10px 0 0 -10px; box-sizing: border-box; border-radius: 50%; border: 3px solid rgba(127, 127, 127, .4); border-top-color: var(--bg-primary); animation: pfSpin .7s linear infinite; }
+    @keyframes pfSpin { to { transform: rotate(360deg); } }
+
+    html.reduce-motion .up-hero, html.reduce-motion .up-hero-icon, html.reduce-motion .up-empty-ic, html.reduce-motion .up-skel,
+    html.reduce-motion .up-enter .up-item, html.reduce-motion #publishOverlay.active .pf-sec, html.reduce-motion .pf-poster,
+    html.reduce-motion #publishOverlay .download-link-group, html.reduce-motion #gameCostGroup, html.reduce-motion #notifyUpdateGroup { animation: none !important; opacity: 1 !important; }
+    @media (prefers-reduced-motion: reduce) {
+      html:not(.motion-on) .up-hero, html:not(.motion-on) .up-hero-icon, html:not(.motion-on) .up-empty-ic, html:not(.motion-on) .up-skel,
+      html:not(.motion-on) .up-enter .up-item, html:not(.motion-on) #publishOverlay.active .pf-sec, html:not(.motion-on) .pf-poster,
+      html:not(.motion-on) #publishOverlay .download-link-group, html:not(.motion-on) #gameCostGroup, html:not(.motion-on) #notifyUpdateGroup { animation: none !important; opacity: 1 !important; }
+    }
+  </style>
 </head>
 <body>
   <div class="offline-banner" id="offlineBanner">
@@ -12644,6 +12891,17 @@ window.firebaseModules = {
     <button class="btn" id="manageUsersBtn" onclick="openManageUsersModal()" style="display: none;">
       <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
       Gerenciar Usuários
+    </button>
+
+    <button class="btn" id="pqAdminBtn" onclick="pqOpen()" style="display: none;">
+      <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+      Publicações dos Usuários
+      <span id="pqAdminBadge" class="pq-badge">0</span>
+    </button>
+
+    <button class="btn" id="requestsMenuBtn" onclick="navOpenRequests()" style="display: none;">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 14h-3v3h-2v-3H8v-2h3v-3h2v3h3v2zm-3-7V3.5L18.5 9H13z"/></svg>
+      Pedidos
     </button>
 
     <button class="btn" id="manageAdsBtn" onclick="openManageAdsModal()" style="display: none;">
@@ -12926,11 +13184,12 @@ window.firebaseModules = {
       <span id="navNotificationsBadge" class="bottom-nav-badge">0</span>
       <span>Alertas</span>
     </button>
-    <button class="bottom-nav-item bottom-nav-center" id="navRequestsBtn" onclick="navOpenRequests()">
+    <button class="bottom-nav-item bottom-nav-center" id="navPublishBtn" onclick="navOpenPublish()">
       <div class="nav-center-circle">
-        <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 14h-3v3h-2v-3H8v-2h3v-3h2v3h3v2zm-3-7V3.5L18.5 9H13z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
       </div>
-      <span>Pedidos</span>
+      <span id="navPublishBadge" class="bottom-nav-badge">0</span>
+      <span>Publicar</span>
     </button>
     <button class="bottom-nav-item" id="navFavoritesBtn" onclick="navOpenFavorites()">
       <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
@@ -13329,6 +13588,8 @@ window.firebaseModules = {
       <form id="publishForm" onsubmit="handlePublish(event)">
         <input type="hidden" id="editGameId">
         <div class="publish-form-container">
+          <section class="pf-sec" style="--i:0">
+            <h2 class="pf-sec-title"><span class="pf-sec-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></span>Informações</h2>
           <div class="form-group">
             <label class="form-label">Categoria</label>
             <select class="form-select" id="gameType" required onchange="pdGenresTypeChanged()">
@@ -13342,7 +13603,7 @@ window.firebaseModules = {
 
           <div class="form-group">
             <label class="form-label">Título</label>
-            <input type="text" class="form-input" id="gameTitle" required>
+            <input type="text" class="form-input" id="gameTitle" maxlength="120" autocomplete="off" required>
             <small class="form-hint">Mods: use o formato Nome (Mod: o que muda). Ex.: Nome do Jogo (Mod: dinheiro infinito)</small>
           </div>
 
@@ -13355,7 +13616,7 @@ window.firebaseModules = {
 
           <div class="form-group">
             <label class="form-label">Tamanho</label>
-            <input type="text" class="form-input" id="gameSize" placeholder="Ex: 1.5 GB" required>
+            <input type="text" class="form-input" id="gameSize" maxlength="40" placeholder="Ex: 1.5 GB" required>
           </div>
 
           <div class="form-group">
@@ -13363,6 +13624,9 @@ window.firebaseModules = {
             <input type="text" class="form-input" id="gameVersion" maxlength="20" placeholder="Ex: 1.4.0">
           </div>
 
+</section>
+          <section class="pf-sec" style="--i:1">
+            <h2 class="pf-sec-title"><span class="pf-sec-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18h12v-2H3v2zM3 6v2h18V6H3zm0 7h18v-2H3v2z"/></svg></span>Descrição</h2>
           <div class="form-group">
             <label class="form-label">Descrição curta (aparece no cartão)</label>
             <input type="text" class="form-input" id="gameShortDesc" maxlength="90" placeholder="Ex: Corra, salte e desvie de obstáculos">
@@ -13371,19 +13635,26 @@ window.firebaseModules = {
 
           <div class="form-group">
             <label class="form-label">Descrição</label>
-            <textarea class="form-textarea" id="gameDescription" required></textarea>
+            <textarea class="form-textarea" id="gameDescription" maxlength="5000" required></textarea>
           </div>
 
+</section>
+          <section class="pf-sec" style="--i:2">
+            <h2 class="pf-sec-title"><span class="pf-sec-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg></span>Imagem e vídeo</h2>
+          <div class="pf-poster" id="pfPoster" style="display:none"><img id="pfPosterImg" alt="" referrerpolicy="no-referrer"></div>
           <div class="form-group">
             <label class="form-label">URL da Capa (imagem)</label>
-            <input type="url" class="form-input" id="gamePoster" required>
+            <input type="url" class="form-input" id="gamePoster" maxlength="2000" pattern="https://.+" title="O link tem de começar por https://" required>
           </div>
 
           <div class="form-group">
             <label class="form-label">Link do Vídeo YouTube (opcional)</label>
-            <input type="url" class="form-input" id="gameVideo" placeholder="https://www.youtube.com/watch?v=...">
+            <input type="url" class="form-input" id="gameVideo" maxlength="2000" pattern="https://.+" title="O link tem de começar por https://" placeholder="https://www.youtube.com/watch?v=...">
           </div>
 
+</section>
+          <section class="pf-sec" style="--i:3">
+            <h2 class="pf-sec-title"><span class="pf-sec-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg></span>Downloads</h2>
           <div class="form-group">
             <label class="form-label">Links de Download</label>
             <div id="downloadLinksContainer">
@@ -13393,10 +13664,10 @@ window.firebaseModules = {
                   <span class="download-link-number">Link 1</span>
                   <button type="button" class="remove-link-btn" onclick="removeDownloadLink(1)" style="display: none;">✕</button>
                 </div>
-                <input type="text" class="form-input" placeholder="Descrição (ex: Jogo Principal, Emulador, ISO...)" id="linkDesc1" required>
+                <input type="text" class="form-input" placeholder="Descrição (ex: Jogo Principal, Emulador, ISO...)" id="linkDesc1" maxlength="80" required>
                 <div style="display: flex; gap: 8px; margin-top: 8px;">
-                  <input type="url" class="form-input" placeholder="Link G.A" id="linkGA1" required style="flex: 1;">
-                  <input type="url" class="form-input" placeholder="Link ADM" id="linkADM1" required style="flex: 1;">
+                  <input type="url" class="form-input" placeholder="Link G.A" id="linkGA1" maxlength="2000" pattern="https://.+" title="O link tem de começar por https://" required style="flex: 1;">
+                  <input type="url" class="form-input" placeholder="Link ADM" id="linkADM1" maxlength="2000" pattern="https://.+" title="O link tem de começar por https://" required style="flex: 1;">
                 </div>
               </div>
             </div>
@@ -13405,9 +13676,21 @@ window.firebaseModules = {
             </button>
           </div>
 
+</section>
+          <section class="pf-sec" style="--i:4">
+            <h2 class="pf-sec-title"><span class="pf-sec-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/></svg></span>Pontos</h2>
           <div class="form-group">
+            <label for="gameMonetize" class="pd-monet">
+              <input type="checkbox" id="gameMonetize" onchange="pdMonetizeChanged()">
+              <span>Monetizar este conteúdo</span>
+            </label>
+            <small class="form-hint">Desligado: o download é grátis (0 pontos). Ligado: tens de definir quantos pontos o conteúdo custa.</small>
+          </div>
+
+          <div class="form-group" id="gameCostGroup" style="display: none;">
             <label class="form-label">Custo em Pontos</label>
-            <input type="number" class="form-input" id="gameCost" min="0" required>
+            <input type="number" class="form-input" id="gameCost" min="0" max="5000" value="0" required>
+            <small class="form-hint">Entre 1 e 5000 pontos.</small>
           </div>
 
           <div class="form-group" id="notifyUpdateGroup" style="display: none;">
@@ -13416,6 +13699,7 @@ window.firebaseModules = {
               <span style="font-size: 14px; line-height: 1.4;">&#x1F514; Notificar usuários que este conteúdo foi atualizado</span>
             </label>
           </div>
+          </section>
         </div>
 
         <div class="publish-footer">
@@ -13423,6 +13707,70 @@ window.firebaseModules = {
           <button type="submit" class="publish-btn primary">Publicar</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <div id="upOverlay" class="up-overlay">
+    <div class="up-wrap">
+      <div class="content-header">
+        <button class="content-header-btn back-btn" onclick="upClose()" aria-label="Voltar">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <h1 class="content-header-title">Publicar</h1>
+        <button class="content-header-btn" id="upRequestsBtn" onclick="navOpenRequests()" title="Pedidos" aria-label="Pedidos" style="margin-left:auto;"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 14h-3v3h-2v-3H8v-2h3v-3h2v3h3v2zm-3-7V3.5L18.5 9H13z"/></svg></button>
+      </div>
+      <div class="up-body">
+        <div class="up-hero">
+          <div class="up-hero-top">
+            <div class="up-hero-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4v2h14V4H5zm0 10h4v6h6v-6h4l-7-7-7 7z"/></svg></div>
+            <div class="up-hero-text">
+              <strong>Publica o teu conteúdo</strong>
+              <p>Aplicativos, jogos, tutoriais, programas ou outros conteúdos. A equipa analisa e, se aprovado, aparece no Portal Digital.</p>
+            </div>
+          </div>
+          <ul class="up-rules">
+            <li><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></i><span>Usa só links seguros (https).</span></li>
+            <li><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM4 12c0-4.42 3.58-8 8-8 1.85 0 3.55.63 4.9 1.69L5.69 16.9C4.63 15.55 4 13.85 4 12zm8 8c-1.85 0-3.55-.63-4.9-1.69L18.31 7.1C19.37 8.45 20 10.15 20 12c0 4.42-3.58 8-8 8z"/></svg></i><span>Nada de vírus, conteúdo ilegal ou cópias sem autorização.</span></li>
+            <li><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg></i><span>Até 3 envios pendentes ao mesmo tempo.</span></li>
+            <li><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/></svg></i><span>Monetizar: define quantos pontos custa. Sem monetizar, o download é grátis.</span></li>
+          </ul>
+          <button class="up-main-btn" onclick="upNew()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span>Novo envio</span></button>
+        </div>
+        <div class="up-h"><span>Os meus envios</span><span class="up-count" id="upCount" style="display:none">0</span></div>
+        <div id="upList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="pqOverlay" class="up-overlay">
+    <div class="up-wrap">
+      <div class="content-header">
+        <button class="content-header-btn back-btn" onclick="pqClose()" aria-label="Voltar">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <h1 class="content-header-title">Publicações dos Usuários</h1>
+        <div style="width: 40px;"></div>
+      </div>
+      <div class="up-body">
+        <div class="up-hero">
+          <p>Ao tocar em "Rever e publicar", todos os campos do envio entram automaticamente no formulário de Publicar. Podes ajustar o que quiseres antes de publicar.</p>
+          <button class="up-main-btn" onclick="pqClose(); openPublishModal();">Publicar diretamente</button>
+        </div>
+        <div class="up-h">Pendentes</div>
+        <div id="pqList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="pqRejectModal" class="custom-modal">
+    <div class="custom-modal-content">
+      <h2>Recusar envio</h2>
+      <p>Diz ao usuário porque foi recusado (opcional). Ele recebe esta mensagem.</p>
+      <textarea id="pqRejectReason" class="up-reject-text" maxlength="300" placeholder="Ex: o link de download não funciona"></textarea>
+      <div class="pq-invite-actions">
+        <button class="custom-modal-btn primary" onclick="pqRejectConfirm()">Recusar</button>
+        <button class="custom-modal-btn secondary" onclick="pqRejectCancel()">Cancelar</button>
+      </div>
     </div>
   </div>
 
@@ -13649,8 +13997,8 @@ window.firebaseModules = {
           </div>
           <div class="settings-item">
             <div class="settings-label">Animações</div>
-            <div class="seg" data-seg="motion"><button type="button" class="seg-btn" data-v="normal" onclick="settingsSeg(this)">Normais</button><button type="button" class="seg-btn" data-v="reduzida" onclick="settingsSeg(this)">Reduzidas</button></div>
-            <div class="settings-hint">Reduzidas (padrão) deixa o app muito mais leve: sem animações, sombras e desfoques. Poupa bateria e ajuda em aparelhos mais lentos.</div>
+            <div class="seg" data-seg="motion"><button type="button" class="seg-btn" data-v="normal" onclick="settingsSeg(this)">Normais</button><button type="button" class="seg-btn" data-v="equilibrada" onclick="settingsSeg(this)">Equilibradas</button><button type="button" class="seg-btn" data-v="reduzida" onclick="settingsSeg(this)">Sem animações</button></div>
+            <div class="settings-hint">Equilibradas (padrão): mantém as animações de entrada e de toque, mas sem desfoques, sem efeitos que repetem sem parar e com menos itens animados de uma vez. Normais: tudo ativado. Sem animações: nenhuma animação, sombra ou desfoque, o app fica o mais leve possível.</div>
           </div>
         </div>
       </section>
@@ -15088,10 +15436,15 @@ function applyPalette() {
 function pdSystemReducesMotion() {
   try { return window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) { return false; }
 }
+function pdMotionPref() {
+  const v = pdPrefGet(PD_PREF_MOTION);
+  return v === "normal" || v === "reduzida" ? v : "equilibrada";
+}
 function applyMotion() {
-  const m = pdPrefGet(PD_PREF_MOTION) || "reduzida";
-  document.documentElement.classList.toggle("reduce-motion", m !== "normal");
-  document.documentElement.classList.toggle("motion-on", m === "normal");
+  const m = pdMotionPref();
+  document.documentElement.classList.toggle("reduce-motion", m === "reduzida");
+  document.documentElement.classList.toggle("motion-on", m !== "reduzida");
+  document.documentElement.classList.toggle("motion-mid", m === "equilibrada");
 }
 function getThemeMode() {
   const s = getSavedThemePreference();
@@ -15112,7 +15465,7 @@ function renderSettings() {
   const state = {
     theme: getThemeMode(),
     view: gridViewMode,
-    motion: pdPrefGet(PD_PREF_MOTION) || "reduzida",
+    motion: pdMotionPref(),
     size: pdPrefGet(PD_PREF_SIZE) || "normal"
   };
   const verEl = document.getElementById("settingsVersionValue");
@@ -15545,6 +15898,8 @@ function updateUIForUser() {
       updateReportsBadge();
     }
   }
+  const requestsMenuBtn = document.getElementById("requestsMenuBtn");
+  if (requestsMenuBtn) requestsMenuBtn.style.display = (currentUser && !currentUser.isAnonymous && isPublisher) ? "flex" : "none";
   if (typeof wdUpdateUI === "function") wdUpdateUI();
   updateSidebarProfileAvatar();
 }
@@ -16064,7 +16419,7 @@ function buildCompactListCard(game, rank) {
           <div class="blog-card-img-container">
             ${rank ? `<div class="trending-rank">${rank}</div>` : ""}
             <img src="${escapeHtml(game.poster || "logo.png")}" alt="${escapeHtml(game.titulo || "")}" loading="lazy" onload="this.classList.add('loaded')" onerror="this.onerror=null;this.classList.add('loaded','img-error');this.src='logo.png'">
-            <div class="card-type type-${game.type}">${typeLabels[game.type] || game.type}</div>
+            <div class="card-type type-${pdTypeKey(game.type)}">${escapeHtml(typeLabels[game.type] || game.type)}</div>
             ${badgeHtml(game)}
             ${versionBadgeHtml(game)}
           </div>
@@ -16119,7 +16474,7 @@ function renderForYou() {
     card.innerHTML = `
           <div class="card-img-container">
             <img src="${escapeHtml(game.poster)}" alt="${escapeHtml(game.titulo || "")}" loading="lazy" onload="this.classList.add('loaded')" onerror="this.classList.add('loaded','img-error');this.src='logo.png'">
-            <div class="card-type type-${game.type}">${typeLabels[game.type] || game.type}</div>
+            <div class="card-type type-${pdTypeKey(game.type)}">${escapeHtml(typeLabels[game.type] || game.type)}</div>
             ${badgeHtml(game)}
             ${versionBadgeHtml(game)}
           </div>
@@ -16193,7 +16548,7 @@ function renderTrending() {
           <div class="card-img-container">
             <div class="trending-rank">${index + 1}</div>
             <img src="${escapeHtml(game.poster)}" alt="${escapeHtml(game.titulo)}" loading="lazy" onload="this.classList.add('loaded')" onerror="this.classList.add('loaded','img-error');this.src='logo.png'">
-            <div class="card-type type-${game.type}">${typeLabels[game.type] || game.type}</div>
+            <div class="card-type type-${pdTypeKey(game.type)}">${escapeHtml(typeLabels[game.type] || game.type)}</div>
             ${badgeHtml(game)}
             ${versionBadgeHtml(game)}
           </div>
@@ -16229,7 +16584,7 @@ function buildBlogCardEl(game, index, typeLabels, beforeOpen) {
   card.innerHTML = `
       <div class="blog-card-img-container">
         <img src="${escapeHtml(game.poster)}" alt="${escapeHtml(game.titulo)}" loading="lazy" onload="this.classList.add('loaded')" onerror="this.classList.add('loaded','img-error');this.src='logo.png'">
-        <div class="card-type type-${game.type}">${typeLabels[game.type] || game.type}</div>
+        <div class="card-type type-${pdTypeKey(game.type)}">${escapeHtml(typeLabels[game.type] || game.type)}</div>
             ${badgeHtml(game)}
             ${versionBadgeHtml(game)}
       </div>
@@ -16607,7 +16962,7 @@ function buildDiscoveryCard(game, typeLabels, position) {
   card.innerHTML = `
           <div class="card-img-container">
             <img src="${escapeHtml(game.poster || "logo.png")}" alt="${escapeHtml(game.titulo || "")}" loading="lazy" onload="this.classList.add('loaded')" onerror="this.onerror=null;this.classList.add('loaded','img-error');this.src='logo.png'">
-            <div class="card-type type-${game.type}">${typeLabels[game.type] || game.type}</div>
+            <div class="card-type type-${pdTypeKey(game.type)}">${escapeHtml(typeLabels[game.type] || game.type)}</div>
             ${badgeHtml(game)}
             ${versionBadgeHtml(game)}
           </div>
@@ -16692,7 +17047,7 @@ function buildGridCard(game, index, typeLabels, position) {
   card.innerHTML = `
           <div class="card-img-container">
             <img src="${escapeHtml(game.poster)}" alt="${escapeHtml(game.titulo)}" loading="lazy" onload="this.classList.add('loaded')" onerror="this.classList.add('loaded','img-error');this.src='logo.png'">
-            <div class="card-type type-${game.type}">${typeLabels[game.type] || game.type}</div>
+            <div class="card-type type-${pdTypeKey(game.type)}">${escapeHtml(typeLabels[game.type] || game.type)}</div>
             ${badgeHtml(game)}
             ${versionBadgeHtml(game)}
           </div>
@@ -16700,7 +17055,7 @@ function buildGridCard(game, index, typeLabels, position) {
             <div class="card-title">${escapeHtml(game.titulo)}</div>
             ${cardDescHtml(game)}
             <div class="card-meta">
-              <span>${game.size || "N/A"}</span>
+              <span>${escapeHtml(String(game.size || "N/A"))}</span>
               <span>\u2022</span>
               <span><svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/></svg>${game.downloads || 0}</span>
               ${pdRatingMeta(game)}
@@ -17020,7 +17375,7 @@ async function openGameDetail(id, skipPushState) {
       return String(n);
     }
   };
-  const _cost = game.cost || 0;
+  const _cost = pdCostClamp(game.cost);
   const _versionItem = game.versao ? `
         <div class="modal-meta-item" title="Vers\xE3o" style="--c:var(--accent-primary)">
           <span class="stat-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/></svg></span>
@@ -17049,7 +17404,7 @@ async function openGameDetail(id, skipPushState) {
           <span class="stat-lbl">${_cost > 0 ? "Pontos" : "Custo"}</span>
         </div>
       `;
-  document.getElementById("modalDescription").textContent = game.descricao;
+  document.getElementById("modalDescription").innerHTML = descricaoComLinks(game.descricao);
   const videoContainer = document.getElementById("videoContainer");
   if (game.videoUrl) {
     const videoId = extractYoutubeId(game.videoUrl);
@@ -17067,7 +17422,7 @@ async function openGameDetail(id, skipPushState) {
   } else {
     videoContainer.style.display = "none";
   }
-  const cost = game.cost || 0;
+  const cost = pdCostClamp(game.cost);
   const downloadsInsufficientWarning = document.getElementById("downloadsInsufficientWarning");
   if (currentUser && userPoints < cost) {
     downloadsInsufficientWarning.style.display = "block";
@@ -17103,8 +17458,8 @@ async function openGameDetail(id, skipPushState) {
           <div class="download-section">
             <div class="download-section-title">${escapeHtml(link.desc || "Download")}</div>
             <div class="download-section-buttons">
-              ${hasGA ? `<button class="btn-main download-btn type-${game.type}" data-game-id="${id}" data-app-type="GA" data-link-index="${index}" data-cost="${cost}">Link 1</button>` : ""}
-              ${hasADM ? `<button class="btn-main download-btn type-${game.type}" data-game-id="${id}" data-app-type="ADM" data-link-index="${index}" data-cost="${cost}">Link 2</button>` : ""}
+              ${hasGA ? `<button class="btn-main download-btn type-${pdTypeKey(game.type)}" data-game-id="${escapeHtml(id)}" data-app-type="GA" data-link-index="${index}" data-cost="${cost}">Link 1</button>` : ""}
+              ${hasADM ? `<button class="btn-main download-btn type-${pdTypeKey(game.type)}" data-game-id="${escapeHtml(id)}" data-app-type="ADM" data-link-index="${index}" data-cost="${cost}">Link 2</button>` : ""}
             </div>
           </div>
         `;
@@ -17157,7 +17512,7 @@ async function openGameDetail(id, skipPushState) {
   }
 }
 function extractYoutubeId(url) {
-  const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+  const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([A-Za-z0-9_-]{11})/;
   const match = url.match(regex);
   return match ? match[1] : null;
 }
@@ -17302,6 +17657,8 @@ function mostrarLinkPronto(url, cost, pontosRestantes) {
   document.body.appendChild(modal);
 }
 function abrirLinkDownload(appType, url) {
+  url = pdSafeUrl(url, false);
+  if (!url) return;
   if (typeof Android !== "undefined" && Android.openApp) {
     const tempLink = document.createElement("a");
     tempLink.href = url;
@@ -17316,7 +17673,7 @@ function abrirLinkDownload(appType, url) {
     }, 200);
   } else {
     if (appType === "GA") {
-      const gaIntent = `intent://${url.replace(/^https?:\/\//, "")}#Intent;scheme=https;package=porg.sixtysecond.crazy.browser;end`;
+      const gaIntent = pdIntentUrl(url, "porg.sixtysecond.crazy.browser");
       const gaLink = document.createElement("a");
       gaLink.href = gaIntent;
       gaLink.style.display = "none";
@@ -17324,7 +17681,7 @@ function abrirLinkDownload(appType, url) {
       gaLink.click();
       document.body.removeChild(gaLink);
     } else if (appType === "ADM") {
-      const admIntent = `intent://${url.replace(/^https?:\/\//, "")}#Intent;scheme=https;package=com.dv.adm;end`;
+      const admIntent = pdIntentUrl(url, "com.dv.adm");
       const admLink = document.createElement("a");
       admLink.href = admIntent;
       admLink.style.display = "none";
@@ -17346,6 +17703,8 @@ function abrirLinkDownload(appType, url) {
   }
 }
 async function downloadGame(gameId, appType, url, cost) {
+  cost = pdCostClamp(cost);
+  url = pdSafeUrl(url, false);
   if (window._downloadEmCurso) return;
   if (!currentUser || currentUser.isAnonymous) {
     showSignupPrompt("baixar conteúdos");
@@ -17910,41 +18269,112 @@ function pdGenresSet(value) {
   });
   pdGenresSync();
 }
+
+function pdTypeKey(t) {
+  return ["aplicativos", "jogos", "tutoriais", "pc", "outros"].indexOf(t) >= 0 ? t : "outros";
+}
+function pdCostClamp(v) {
+  const n = parseInt(v, 10);
+  return isFinite(n) ? Math.max(0, Math.min(5000, n)) : 0;
+}
+function pdSafeUrl(u, httpsOnly, max) {
+  const s = String(u == null ? "" : u).trim();
+  if (!s || s.length > (max || 2000)) return "";
+  if (/[\u0000-\u0020\u007F-\u009F"'<>\\`\u200B-\u200F\u2028\u2029\u202A-\u202E\u2066-\u2069\uFEFF]/.test(s)) return "";
+  let p;
+  try { p = new URL(s); } catch (e) { return ""; }
+  if (p.protocol !== "https:" && !(p.protocol === "http:" && !httpsOnly)) return "";
+  if (!p.hostname || p.hostname.indexOf(".") < 1 || p.username || p.password) return "";
+  return p.href;
+}
+function pdIntentUrl(url, pkg) {
+  const p = new URL(url);
+  return "intent://" + p.host + p.pathname + p.search + "#Intent;scheme=" + p.protocol.replace(":", "") + ";package=" + pkg + ";end";
+}
+function pdCleanLine(v, max) {
+  return String(v == null ? "" : v)
+    .replace(/[\u0000-\u001F\u007F-\u009F\u200B-\u200F\u2028\u2029\u202A-\u202E\u2066-\u2069\uFEFF]/g, " ")
+    .replace(/\s+/g, " ").trim().slice(0, max);
+}
+function pdCleanBlock(v, max) {
+  return String(v == null ? "" : v).replace(/\r\n?/g, "\n")
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F\u200B-\u200F\u2028\u2029\u202A-\u202E\u2066-\u2069\uFEFF]/g, "")
+    .replace(/[ \t]+\n/g, "\n").replace(/\n{4,}/g, "\n\n\n").trim().slice(0, max);
+}
+function pdHasMarkup(t) {
+  return /<\s*\/?\s*[a-z!?]/i.test(t) || /(?:^|[\s"'(=])(?:javascript|vbscript)\s*:/i.test(t) || /&#?\w+;/.test(t) && /&#x?[0-9a-f]+;?/i.test(t);
+}
+function pdSanitizeGameInput() {
+  const $v = (id) => { const el = document.getElementById(id); return el ? el.value : ""; };
+  const tipo = $v("gameType");
+  if (["aplicativos", "jogos", "tutoriais", "pc", "outros"].indexOf(tipo) < 0) return { error: "Categoria inv\u00E1lida." };
+  const titulo = pdCleanLine($v("gameTitle"), 120);
+  const size = pdCleanLine($v("gameSize"), 40);
+  const versao = pdCleanLine($v("gameVersion"), 20);
+  const descCurta = pdCleanLine($v("gameShortDesc"), 90);
+  const descricao = pdCleanBlock($v("gameDescription"), 5000);
+  const genres = String($v("gameGenre")).split(",").map((g) => pdCleanLine(g, 30)).filter(Boolean).slice(0, 3);
+  if (!titulo) return { error: "Indique o t\u00EDtulo." };
+  if (!size) return { error: "Indique o tamanho." };
+  if (!descricao) return { error: "Indique a descri\u00E7\u00E3o." };
+  if (!genres.length) return { error: "Escolha pelo menos um g\u00E9nero." };
+  const textos = [titulo, size, versao, descCurta, descricao].concat(genres);
+  if (textos.some(pdHasMarkup)) return { error: "N\u00E3o use c\u00F3digo, HTML ou 'javascript:' nos campos de texto." };
+  const poster = pdSafeUrl($v("gamePoster"), true);
+  if (!poster) return { error: "A capa precisa de ser um link v\u00E1lido que comece por https://" };
+  let videoUrl = "";
+  const videoRaw = $v("gameVideo").trim();
+  if (videoRaw) {
+    const vSafe = pdSafeUrl(videoRaw, true);
+    const vid = vSafe ? extractYoutubeId(vSafe) : null;
+    if (!vid) return { error: "O link do v\u00EDdeo precisa de ser do YouTube e come\u00E7ar por https://" };
+    videoUrl = "https://www.youtube.com/watch?v=" + vid;
+  }
+  const rawLinks = getDownloadLinksData();
+  if (!rawLinks.length) return { error: "Por favor, adicione pelo menos um link de download." };
+  if (rawLinks.length > 10) return { error: "No m\u00E1ximo 10 links de download." };
+  const downloadLinks = [];
+  for (const l of rawLinks) {
+    const desc = pdCleanLine(l.desc, 80);
+    const linkGA = pdSafeUrl(l.linkGA, true);
+    const linkADM = pdSafeUrl(l.linkADM, true);
+    if (!desc || pdHasMarkup(desc)) return { error: "A descri\u00E7\u00E3o dos links n\u00E3o pode estar vazia nem conter c\u00F3digo." };
+    if (!linkGA || !linkADM) return { error: "Os links de download precisam de ser v\u00E1lidos e come\u00E7ar por https://" };
+    downloadLinks.push({ desc, linkGA, linkADM });
+  }
+  const monet = !!(document.getElementById("gameMonetize") && document.getElementById("gameMonetize").checked);
+  let cost = 0;
+  if (monet) {
+    cost = parseInt($v("gameCost"), 10);
+    if (!isFinite(cost) || cost < 1 || cost > 5000) return { error: "Indique um custo entre 1 e 5000 pontos." };
+  }
+  return { data: { type: tipo, titulo, genero: genres.join(", "), size, descricao, descCurta, versao, poster, videoUrl, downloadLinks, cost } };
+}
 async function handlePublish(e) {
   e.preventDefault();
   if (!isPublisher) {
-    showCustomAlert("Apenas publicadores autorizados podem publicar jogos.");
+    return upSubmit();
+  }
+  const _v = pdSanitizeGameInput();
+  if (_v.error) {
+    showCustomAlert(_v.error);
     return;
   }
-  const downloadLinks = getDownloadLinksData();
-  if (downloadLinks.length === 0) {
-    showCustomAlert("Por favor, adicione pelo menos um link de download.");
-    return;
-  }
-  if (!document.getElementById("gameGenre").value.trim()) {
-    showCustomAlert("Escolha pelo menos um g\xE9nero.");
-    return;
-  }
+  const downloadLinks = _v.data.downloadLinks;
   const editId = document.getElementById("editGameId").value;
   const gameData = {
-    type: document.getElementById("gameType").value,
-    titulo: document.getElementById("gameTitle").value,
-    genero: document.getElementById("gameGenre").value,
-    size: document.getElementById("gameSize").value,
-    descricao: document.getElementById("gameDescription").value,
-    descCurta: document.getElementById("gameShortDesc").value.trim(),
-    versao: document.getElementById("gameVersion").value.trim(),
-    poster: document.getElementById("gamePoster").value,
-    videoUrl: document.getElementById("gameVideo").value || "",
-    downloadLinks,
-    linkGA: downloadLinks[0]?.linkGA || "",
-    linkADM: downloadLinks[0]?.linkADM || "",
-    cost: parseInt(document.getElementById("gameCost").value),
+    ..._v.data,
+    linkGA: downloadLinks[0].linkGA,
+    linkADM: downloadLinks[0].linkADM,
     authorId: currentUser.uid,
     authorEmail: currentUser.email,
     createdAt: Date.now(),
     downloads: 0
   };
+  if (window.pqApproveCtx && !editId) {
+    gameData.submittedBy = window.pqApproveCtx.userId;
+    gameData.submittedByName = window.pqApproveCtx.userName || "";
+  }
   try {
     const { collection, doc, setDoc, addDoc } = window.firebaseModules;
     const firestore = window.firebaseFirestore;
@@ -17966,6 +18396,7 @@ async function handlePublish(e) {
       showCustomAlert("Jogo atualizado com sucesso!");
     } else {
       const novoDoc = await addDoc(collection(firestore, "games"), gameData);
+      if (window.pqApproveCtx) pqApproveDone(novoDoc.id, gameData);
       sendPush(NOTIF_TITULOS[gameData.type] || "\uD83C\uDFAE Novo no Portal Digital", gameData.titulo, null, {
         link: SITE_URL + "/web.html?id=" + novoDoc.id,
         imagem: /^https:\/\//.test(gameData.poster || "") ? gameData.poster : "",
@@ -18072,6 +18503,7 @@ function editGame(id) {
   document.getElementById("gamePoster").value = game.poster;
   document.getElementById("gameVideo").value = game.videoUrl || "";
   document.getElementById("gameCost").value = game.cost;
+  pdMonetizeSet(game.cost);
   if (game.downloadLinks && game.downloadLinks.length > 0) {
     setDownloadLinksData(game.downloadLinks);
   } else {
@@ -18995,14 +19427,14 @@ function renderSearchOverlayResults() {
     card.innerHTML = `
           <div class="card-img-container">
             <img src="${escapeHtml(game.poster)}" alt="${escapeHtml(game.titulo)}" loading="lazy" onload="this.classList.add('loaded')" onerror="this.classList.add('loaded','img-error');this.src='logo.png'">
-            <div class="card-type type-${game.type}">${typeLabels[game.type] || game.type}</div>
+            <div class="card-type type-${pdTypeKey(game.type)}">${escapeHtml(typeLabels[game.type] || game.type)}</div>
             ${versionBadgeHtml(game)}
           </div>
           <div class="card-info">
             <div class="card-title">${escapeHtml(game.titulo)}</div>
             ${cardDescHtml(game)}
             <div class="card-meta">
-              <span>${game.size || "N/A"}</span>
+              <span>${escapeHtml(String(game.size || "N/A"))}</span>
               <span>\u2022</span>
               <span><svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/></svg>${game.downloads || 0}</span>
               ${pdRatingMeta(game)}
@@ -19774,10 +20206,10 @@ function resetDownloadLinks() {
             <span class="download-link-number">Link 1</span>
             <button type="button" class="remove-link-btn" onclick="removeDownloadLink(1)" style="display: none;">\u2715</button>
           </div>
-          <input type="text" class="form-input" placeholder="Descri\xE7\xE3o (ex: Jogo Principal, Emulador, ISO...)" id="linkDesc1" required>
+          <input type="text" class="form-input" placeholder="Descri\xE7\xE3o (ex: Jogo Principal, Emulador, ISO...)" id="linkDesc1" maxlength="80" required>
           <div style="display: flex; gap: 8px; margin-top: 8px;">
-            <input type="url" class="form-input" placeholder="Link G.A" id="linkGA1" required style="flex: 1;">
-            <input type="url" class="form-input" placeholder="Link ADM" id="linkADM1" required style="flex: 1;">
+            <input type="url" class="form-input" placeholder="Link G.A" id="linkGA1" maxlength="2000" pattern="https://.+" title="O link tem de começar por https://" required style="flex: 1;">
+            <input type="url" class="form-input" placeholder="Link ADM" id="linkADM1" maxlength="2000" pattern="https://.+" title="O link tem de começar por https://" required style="flex: 1;">
           </div>
         </div>
       `;
@@ -19791,10 +20223,10 @@ function addDownloadLink() {
             <span class="download-link-number">Link ${downloadLinksCount}</span>
             <button type="button" class="remove-link-btn" onclick="removeDownloadLink(${downloadLinksCount})">\u2715</button>
           </div>
-          <input type="text" class="form-input" placeholder="Descri\xE7\xE3o (ex: Emulador, ISO, DLC...)" id="linkDesc${downloadLinksCount}" required>
+          <input type="text" class="form-input" placeholder="Descri\xE7\xE3o (ex: Emulador, ISO, DLC...)" id="linkDesc${downloadLinksCount}" maxlength="80" required>
           <div style="display: flex; gap: 8px; margin-top: 8px;">
-            <input type="url" class="form-input" placeholder="Link G.A" id="linkGA${downloadLinksCount}" required style="flex: 1;">
-            <input type="url" class="form-input" placeholder="Link ADM" id="linkADM${downloadLinksCount}" required style="flex: 1;">
+            <input type="url" class="form-input" placeholder="Link G.A" id="linkGA${downloadLinksCount}" maxlength="2000" pattern="https://.+" title="O link tem de começar por https://" required style="flex: 1;">
+            <input type="url" class="form-input" placeholder="Link ADM" id="linkADM${downloadLinksCount}" maxlength="2000" pattern="https://.+" title="O link tem de começar por https://" required style="flex: 1;">
           </div>
         </div>
       `;
@@ -19807,20 +20239,28 @@ function addDownloadLink() {
 function removeDownloadLink(index) {
   const container = document.getElementById("downloadLinksContainer");
   const linkGroup = container.querySelector(`[data-link-index="${index}"]`);
-  if (linkGroup) {
+  if (!linkGroup || linkGroup.classList.contains("leaving")) return;
+  const finish = () => {
     linkGroup.remove();
     const remainingLinks = container.querySelectorAll(".download-link-group");
     if (remainingLinks.length === 1) {
       const removeBtn = remainingLinks[0].querySelector(".remove-link-btn");
       if (removeBtn) removeBtn.style.display = "none";
     }
+  };
+  if (document.documentElement.classList.contains("reduce-motion")) {
+    finish();
+    return;
   }
+  linkGroup.classList.add("leaving");
+  setTimeout(finish, 220);
 }
 function getDownloadLinksData() {
   const container = document.getElementById("downloadLinksContainer");
   const linkGroups = container.querySelectorAll(".download-link-group");
   const links = [];
   linkGroups.forEach((group) => {
+    if (group.classList.contains("leaving")) return;
     const index = group.dataset.linkIndex;
     const desc = document.getElementById(`linkDesc${index}`)?.value || "";
     const linkGA = document.getElementById(`linkGA${index}`)?.value || "";
@@ -20062,7 +20502,7 @@ function renderCommunityList() {
           <div class="community-item-info">
             <h3 class="community-item-title">${escapeHtml(game.titulo)}</h3>
             <div class="community-item-meta">
-              <span class="community-item-type type-${game.type}">${typeLabels[game.type] || game.type}</span>
+              <span class="community-item-type type-${pdTypeKey(game.type)}">${escapeHtml(typeLabels[game.type] || game.type)}</span>
               <span class="community-item-comments">
                 <svg viewBox="0 0 24 24"><path d="M21 6h-2V3c0-.55-.45-1-1-1H2c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1v-2h2c.55 0 1-.45 1-1V7c0-.55-.45-1-1-1zm-4 6H6.83L5 13.83V4h12v8z"/></svg>
                 ${game.commentsCount} ${game.commentsCount === 1 ? "coment\xE1rio" : "coment\xE1rios"}
@@ -22303,6 +22743,32 @@ function closeRatingOverlay() {
   document.getElementById("ratingConfirmModal").classList.remove("active");
   selectedRating = 0;
 }
+function descricaoComLinks(text) {
+  const src = String(text == null ? "" : text);
+  const urlRegex = /((?:https?:\/\/|www\.)[^\s<>"']+)/gi;
+  let out = "";
+  let last = 0;
+  let m;
+  while ((m = urlRegex.exec(src)) !== null) {
+    let raw = m[1];
+    let trailing = "";
+    const tail = raw.match(/[.,;:!?)\]}]+$/);
+    if (tail) {
+      trailing = tail[0];
+      raw = raw.slice(0, raw.length - trailing.length);
+    }
+    if (!raw || /^www\.$/i.test(raw)) continue;
+    const href = /^https?:\/\//i.test(raw) ? raw : "https://" + raw;
+    out += escapeHtml(src.slice(last, m.index));
+    out += `<a href="#" class="desc-link" data-url="${escapeHtml(href)}" onclick="abrirLinkDescricao(this.dataset.url); return false;">${escapeHtml(raw)}</a>`;
+    out += escapeHtml(trailing);
+    last = m.index + m[1].length;
+  }
+  return out + escapeHtml(src.slice(last));
+}
+function abrirLinkDescricao(url) {
+  abrirLinkDownload("GA", url);
+}
 function convertUrlsToLinks(text) {
   const urlRegex = /(https?:\/\/[^\s<>"']+)/gi;
   const src = String(text == null ? "" : text);
@@ -23794,6 +24260,8 @@ function isAnyModalOpen() {
     "redeemOverlay",
     "rwOverlay",
     "publishOverlay",
+    "upOverlay",
+    "pqOverlay",
     "manageOverlay",
     "searchOverlay",
     "communityOverlay",
@@ -24001,6 +24469,10 @@ document.addEventListener("keydown", (e) => {
     }
     if (publishOverlay && publishOverlay.classList.contains("active")) {
       closePublishModal();
+    } else if (document.getElementById("pqOverlay") && document.getElementById("pqOverlay").classList.contains("active")) {
+      pqClose();
+    } else if (document.getElementById("upOverlay") && document.getElementById("upOverlay").classList.contains("active")) {
+      upClose();
     } else if (manageOverlay && manageOverlay.classList.contains("active")) {
       closeManageModal();
     } else if (redeemOverlay && redeemOverlay.classList.contains("active")) {
@@ -26737,7 +27209,6 @@ function navOpenRequests() {
     showCustomAlert("Sua conta precisa estar verificada para ver e fazer pedidos.");
     return;
   }
-  setActiveNavItem("navRequestsBtn");
   openRequestsOverlay();
 }
 function openRequestsOverlay() {
@@ -27457,7 +27928,7 @@ function dstYtCmd(f, fn, args) {
   try { f.contentWindow.postMessage(JSON.stringify({ event: "command", func: fn, args: args || [], id: 1, channel: "widget" }), "*"); } catch (e) {}
 }
 function dstVidSync(idx) {
-  const ok = document.documentElement.classList.contains("motion-on") && (typeof pdPrefOn !== "function" || pdPrefOn("pd_pref_autovid"));
+  const ok = document.documentElement.classList.contains("motion-on") && !document.documentElement.classList.contains("motion-mid") && (typeof pdPrefOn !== "function" || pdPrefOn("pd_pref_autovid"));
   document.querySelectorAll("#destaquesTrack .dst-card").forEach((card, i) => {
     const f = card.querySelector(".dst-vid iframe");
     if (!f) return;
@@ -29418,5 +29889,894 @@ new MutationObserver(() => {
   agendar();
 })();
 </script>
+<script>
+(function () {
+  var MAX_PEND = 3;
+  var TIPOS = { aplicativos: "Aplicativos", jogos: "Jogos", tutoriais: "Tutoriais", pc: "PC", outros: "Outros" };
+  var STATUS = { pending: "Pendente", approved: "Aprovado", rejected: "Recusado" };
+  var upUnsub = null, pqUnsub = null;
+  var upData = {}, pqData = {}, upEditId = "", pqRejectId = "";
+  window.pqApproveCtx = null;
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function safeUrl(u) { return /^https:\/\//i.test(u || "") ? u : ""; }
+  function idOk(id) { return /^[-_A-Za-z0-9]{6,40}$/.test(id || ""); }
+  function logado() { return !!currentUser && !currentUser.isAnonymous; }
+  function fmtData(ts) { try { return new Date(ts || 0).toLocaleDateString("pt-PT", { day: "2-digit", month: "short", year: "numeric" }); } catch (e) { return ""; } }
+  function nomeUser() { return (typeof userName === "string" && userName) || (currentUser && currentUser.displayName) || ((currentUser && currentUser.email) || "").split("@")[0] || "Usuário"; }
+
+  window.pdMonetizeSet = function (cost) {
+    var n = Math.max(0, parseInt(cost, 10) || 0);
+    var on = n > 0;
+    $("gameMonetize").checked = on;
+    $("gameCostGroup").style.display = on ? "block" : "none";
+    $("gameCost").min = on ? "1" : "0";
+    $("gameCost").value = n;
+  };
+  window.pdMonetizeChanged = function () {
+    var on = $("gameMonetize").checked;
+    $("gameCostGroup").style.display = on ? "block" : "none";
+    $("gameCost").min = on ? "1" : "0";
+    if (on) {
+      $("gameCost").value = "";
+      setTimeout(function () { try { $("gameCost").focus(); } catch (e) {} }, 50);
+    } else {
+      $("gameCost").value = 0;
+    }
+  };
+  function custoTxt(d) { var c = Number(d && d.cost) || 0; return c > 0 ? c + " pontos" : "Grátis"; }
+
+  function modo(btn, titulo) {
+    var b = document.querySelector("#publishForm .publish-btn.primary");
+    if (b) b.textContent = btn;
+    var t = $("publishModalTitle");
+    if (t) t.textContent = titulo;
+  }
+  function fillForm(d) {
+    $("publishForm").reset();
+    pdMonetizeSet(0);
+    if (!d) { pdGenresSet(""); resetDownloadLinks(); return; }
+    $("gameType").value = d.type || "aplicativos";
+    pdGenresSet(d.genero || "");
+    $("gameTitle").value = d.titulo || "";
+    $("gameSize").value = d.size || "";
+    $("gameVersion").value = d.versao || "";
+    $("gameShortDesc").value = d.descCurta || "";
+    $("gameDescription").value = d.descricao || "";
+    $("gamePoster").value = d.poster || "";
+    $("gameVideo").value = d.videoUrl || "";
+    pdMonetizeSet(d.cost);
+    setDownloadLinksData(d.downloadLinks && d.downloadLinks.length ? d.downloadLinks : [{ desc: "Download Principal", linkGA: "", linkADM: "" }]);
+  }
+  function abrirForm() {
+    $("editGameId").value = "";
+    $("notifyUpdate").checked = false;
+    $("notifyUpdateGroup").style.display = "none";
+    $("publishOverlay").classList.add("active");
+  }
+
+  var oClose = window.closePublishModal;
+  window.closePublishModal = function () {
+    var r = oClose.apply(this, arguments);
+    upEditId = "";
+    window.pqApproveCtx = null;
+    pdMonetizeSet(0);
+    modo("Publicar", "Publicar Jogo");
+    return r;
+  };
+
+  window.navOpenPublish = function () {
+    if (!logado()) { showSignupPrompt("publicar os teus conteúdos"); return; }
+    if (!(isPublisher || userStatus === "approved")) { showCustomAlert("Sua conta precisa estar verificada para publicar."); return; }
+    if (isPublisher) { window.pqOpen(); return; }
+    upOpen();
+  };
+
+  function upOpen() {
+    closeSidebar();
+    $("upOverlay").classList.add("active");
+    document.body.style.overflow = "hidden";
+    upSub();
+  }
+  window.upClose = function () {
+    $("upOverlay").classList.remove("active");
+    document.body.style.overflow = "";
+    if (upUnsub) { try { upUnsub(); } catch (e) {} upUnsub = null; }
+  };
+  function upSub() {
+    if (upUnsub) { try { upUnsub(); } catch (e) {} upUnsub = null; }
+    var list = $("upList");
+    list.removeAttribute("data-rendered");
+    list.innerHTML = '<div class="up-skel"></div><div class="up-skel"></div><div class="up-skel"></div>';
+    var m = window.firebaseModules;
+    var q = m.rtdbQuery(m.ref(window.firebaseDatabase, "publishRequests"), m.orderByChild("userId"), m.equalTo(currentUser.uid));
+    upUnsub = m.onValue(q, function (snap) { upData = snap.val() || {}; upRender(); }, function () {
+      list.innerHTML = '<div class="up-empty">Não foi possível carregar os teus envios. Tenta novamente mais tarde.</div>';
+    });
+  }
+  function upCountPend(exceto) {
+    return Object.keys(upData).filter(function (k) { return k !== exceto && (upData[k].status || "pending") === "pending"; }).length;
+  }
+  var UP_ICO = {
+    pending: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>',
+    approved: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>',
+    rejected: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>'
+  };
+  function upRender() {
+    var box = $("upList"), cnt = $("upCount");
+    var ids = Object.keys(upData).filter(idOk).sort(function (a, b) { return (upData[b].createdAt || 0) - (upData[a].createdAt || 0); });
+    if (cnt) { cnt.textContent = ids.length; cnt.style.display = ids.length ? "inline-flex" : "none"; }
+    if (!ids.length) {
+      box.removeAttribute("data-rendered");
+      box.innerHTML = '<div class="up-empty"><div class="up-empty-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4v2h14V4H5zm0 10h4v6h6v-6h4l-7-7-7 7z"/></svg></div><strong>Ainda sem envios</strong><span>Toca em "Novo envio" para começar.</span></div>';
+      return;
+    }
+    var first = !box.getAttribute("data-rendered");
+    box.setAttribute("data-rendered", "1");
+    box.innerHTML = ids.map(function (id, n) {
+      var r = upData[id], d = r.dados || {}, st = STATUS[r.status] ? r.status : "pending";
+      var img = safeUrl(d.poster);
+      var acoes = "";
+      if (st === "pending") acoes = '<button class="up-sub-btn" onclick="upEdit(\'' + id + '\')">Editar</button><button class="up-sub-btn danger" onclick="upDelete(\'' + id + '\')">Cancelar envio</button>';
+      else if (st === "rejected") acoes = '<button class="up-sub-btn" onclick="upEdit(\'' + id + '\')">Editar e reenviar</button><button class="up-sub-btn danger" onclick="upDelete(\'' + id + '\')">Apagar</button>';
+      var click = st === "approved" && r.gameId && idOk(r.gameId);
+      return '<div class="up-item' + (click ? ' up-click' : '') + '"' + (click ? ' role="button" tabindex="0" onclick="upStats(\'' + r.gameId + '\')"' : '') + ' style="--i:' + Math.min(n, 10) + '"><div class="up-row">' +
+        (img ? '<img class="up-cover" src="' + esc(img) + '" alt="" loading="lazy" referrerpolicy="no-referrer">' : '<div class="up-cover"></div>') +
+        '<div class="up-info"><div class="up-title">' + esc(d.titulo || "Sem título") + '</div>' +
+        '<div class="up-meta">' + esc(TIPOS[d.type] || "") + ' · ' + esc(custoTxt(d)) + ' · ' + esc(fmtData(r.createdAt)) + '</div>' +
+        '<span class="up-chip up-st-' + st + '">' + UP_ICO[st] + STATUS[st] + '</span>' + (click ? '<span class="up-stat-hint">Ver estatísticas \u203A</span>' : '') + '</div></div>' +
+        (st === "rejected" && r.rejectReason ? '<div class="up-reason"><strong>Motivo:</strong> ' + esc(r.rejectReason) + '</div>' : '') +
+        (acoes ? '<div class="up-actions">' + acoes + '</div>' : '') + '</div>';
+    }).join("");
+    if (first) {
+      box.classList.add("up-enter");
+      setTimeout(function () { box.classList.remove("up-enter"); }, 900);
+    }
+  }
+  window.upNew = function () {
+    if (upCountPend("") >= MAX_PEND) { showCustomAlert("Já tens " + MAX_PEND + " envios pendentes. Espera pela análise antes de enviar mais."); return; }
+    upEditId = "";
+    fillForm(null);
+    modo("Enviar para aprovação", "Novo envio");
+    abrirForm();
+  };
+  window.upEdit = function (id) {
+    var r = upData[id];
+    if (!idOk(id) || !r || r.status === "approved") return;
+    upEditId = id;
+    fillForm(r.dados || {});
+    modo("Enviar para aprovação", "Editar envio");
+    abrirForm();
+  };
+  window.upDelete = function (id) {
+    if (!idOk(id)) return;
+    showCustomConfirm("Queres mesmo apagar este envio?", function () {
+      var m = window.firebaseModules;
+      m.remove(m.ref(window.firebaseDatabase, "publishRequests/" + id)).catch(function () { showCustomAlert("Não foi possível apagar. Tenta de novo."); });
+    });
+  };
+  window.upSubmit = async function () {
+    if (!logado() || userStatus !== "approved") { showCustomAlert("Sua conta precisa estar verificada para publicar."); return; }
+    var vv = pdSanitizeGameInput();
+    if (vv.error) { showCustomAlert(vv.error); return; }
+    if (!upEditId && upCountPend("") >= MAX_PEND) { showCustomAlert("Já tens " + MAX_PEND + " envios pendentes. Espera pela análise antes de enviar mais."); return; }
+    var dados = vv.data;
+    var m = window.firebaseModules, db = window.firebaseDatabase;
+    var id = upEditId || m.push(m.ref(db, "publishRequests")).key;
+    var antigo = upData[id];
+    var rec = {
+      userId: currentUser.uid,
+      userName: nomeUser().slice(0, 60),
+      userEmail: currentUser.email || "",
+      status: "pending",
+      createdAt: antigo && antigo.createdAt ? antigo.createdAt : Date.now(),
+      updatedAt: Date.now(),
+      dados: dados
+    };
+    try {
+      await m.set(m.ref(db, "publishRequests/" + id), rec);
+      closePublishModal();
+      showCustomAlert("Enviado! A nossa equipa vai analisar e vais receber um aviso com a resposta.");
+    } catch (e) {
+      showCustomAlert("Não foi possível enviar. Tenta de novo.");
+    }
+  };
+
+  function pqSub() {
+    if (pqUnsub) return;
+    var m = window.firebaseModules;
+    var q = m.rtdbQuery(m.ref(window.firebaseDatabase, "publishRequests"), m.orderByChild("status"), m.equalTo("pending"));
+    pqUnsub = m.onValue(q, function (snap) { pqData = snap.val() || {}; pqBadge(); if ($("pqOverlay").classList.contains("active")) pqRender(); }, function () {
+      pqData = {}; pqBadge();
+      if ($("pqOverlay").classList.contains("active")) $("pqList").innerHTML = '<div class="up-empty">Sem permissão para ler os envios. Confirma as regras do Realtime Database.</div>';
+    });
+  }
+  function pqStop() {
+    if (pqUnsub) { try { pqUnsub(); } catch (e) {} pqUnsub = null; }
+    pqData = {}; pqBadge();
+  }
+  function pqBadge() {
+    var n = isPublisher ? Object.keys(pqData).length : 0;
+    var t = n > 99 ? "99+" : String(n);
+    var a = $("pqAdminBadge"), b = $("navPublishBadge");
+    if (a) { a.textContent = t; a.style.display = n ? "flex" : "none"; }
+    if (b) { b.textContent = t; b.style.display = n ? "flex" : "none"; }
+  }
+  function pqRender() {
+    var box = $("pqList");
+    var ids = Object.keys(pqData).filter(idOk).sort(function (a, b) { return (pqData[a].createdAt || 0) - (pqData[b].createdAt || 0); });
+    if (!ids.length) { box.innerHTML = '<div class="up-empty">Não há envios pendentes.</div>'; return; }
+    box.innerHTML = ids.map(function (id) {
+      var r = pqData[id], d = r.dados || {}, img = safeUrl(d.poster);
+      return '<div class="up-item"><div class="up-row">' +
+        (img ? '<img class="up-cover" src="' + esc(img) + '" alt="" loading="lazy" referrerpolicy="no-referrer">' : '<div class="up-cover"></div>') +
+        '<div class="up-info"><div class="up-title">' + esc(d.titulo || "Sem título") + '</div>' +
+        '<div class="up-meta">' + esc(TIPOS[d.type] || "") + ' · ' + esc(custoTxt(d)) + ' · por ' + esc(r.userName || "Usuário") + '</div>' +
+        '<div class="up-meta">' + esc(fmtData(r.createdAt)) + '</div></div></div>' +
+        '<div class="up-actions"><button class="up-sub-btn" style="background:var(--accent-primary);color:var(--bg-primary);border-color:transparent" onclick="pqReview(\'' + id + '\')">Rever e publicar</button>' +
+        '<button class="up-sub-btn" onclick="pqReject(\'' + id + '\')">Recusar</button></div></div>';
+    }).join("");
+  }
+  window.pqOpen = function () {
+    if (!isPublisher) return;
+    closeSidebar();
+    pqSub();
+    pqRender();
+    $("pqOverlay").classList.add("active");
+    document.body.style.overflow = "hidden";
+  };
+  window.pqClose = function () {
+    $("pqOverlay").classList.remove("active");
+    document.body.style.overflow = "";
+  };
+  window.pqReview = function (id) {
+    var r = pqData[id];
+    if (!isPublisher || !idOk(id) || !r || !r.dados) return;
+    pqClose();
+    fillForm(r.dados);
+    window.pqApproveCtx = { id: id, userId: r.userId, userName: r.userName || "" };
+    modo("Publicar", "Publicar envio de " + (r.userName || "usuário"));
+    abrirForm();
+  };
+  window.pqApproveDone = function (gameId, g) {
+    var c = window.pqApproveCtx;
+    if (!c) return;
+    var m = window.firebaseModules;
+    m.update(m.ref(window.firebaseDatabase, "publishRequests/" + c.id), { status: "approved", gameId: gameId, reviewedAt: Date.now(), rejectReason: null }).catch(function () {});
+    sendPush("\u2705 Publicação aprovada", (g.titulo || "O teu envio") + " já está no Portal Digital.", c.userId, {
+      link: SITE_URL + "/web.html?id=" + gameId,
+      imagem: /^https:\/\//.test(g.poster || "") ? g.poster : "",
+      tipo: g.type,
+      tag: "pub-ok-" + c.id,
+      validadeHoras: 72
+    });
+  };
+  window.pqReject = function (id) {
+    if (!isPublisher || !idOk(id) || !pqData[id]) return;
+    pqRejectId = id;
+    $("pqRejectReason").value = "";
+    $("pqRejectModal").classList.add("active");
+  };
+  window.pqRejectCancel = function () { pqRejectId = ""; $("pqRejectModal").classList.remove("active"); };
+  window.pqRejectConfirm = function () {
+    var id = pqRejectId, r = pqData[id];
+    if (!isPublisher || !id || !r) { pqRejectCancel(); return; }
+    var motivo = $("pqRejectReason").value.trim().slice(0, 300) || "Não cumpre as regras do Portal Digital.";
+    var m = window.firebaseModules;
+    m.update(m.ref(window.firebaseDatabase, "publishRequests/" + id), { status: "rejected", rejectReason: motivo, reviewedAt: Date.now() }).then(function () {
+      sendPush("Publicação recusada", ((r.dados && r.dados.titulo) || "O teu envio") + ": " + motivo, r.userId, { tag: "pub-no-" + id, validadeHoras: 72 });
+    }).catch(function () { showCustomAlert("Não foi possível recusar. Tenta de novo."); });
+    pqRejectCancel();
+  };
+
+  function atualizar() {
+    var btn = $("pqAdminBtn");
+    if (btn) btn.style.display = isPublisher && logado() ? "flex" : "none";
+    if (isPublisher && logado()) pqSub(); else pqStop();
+  }
+  var oUi = window.updateUIForUser;
+  if (typeof oUi === "function") window.updateUIForUser = function () { var r = oUi.apply(this, arguments); try { atualizar(); } catch (e) {} return r; };
+  try { atualizar(); } catch (e) {}
+})();
+</script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var form = $("publishForm"), ov = $("publishOverlay");
+  if (!form || !ov) return;
+
+  function elev(rootId, scrollSel) {
+    var root = $(rootId); if (!root) return;
+    var sc = root.querySelector(scrollSel), hd = root.querySelector(".content-header");
+    if (!sc || !hd) return;
+    var on = false;
+    sc.addEventListener("scroll", function () {
+      var n = sc.scrollTop > 4;
+      if (n !== on) { on = n; hd.classList.toggle("pf-elev", n); }
+    }, { passive: true });
+  }
+  elev("upOverlay", ".up-body");
+  elev("pqOverlay", ".up-body");
+  elev("publishOverlay", ".publish-form-container");
+
+  var COUNT_IDS = ["gameTitle", "gameShortDesc", "gameDescription"];
+  COUNT_IDS.forEach(function (id) {
+    var el = $(id); if (!el) return;
+    var lb = el.parentNode.querySelector(".form-label"); if (!lb) return;
+    var c = document.createElement("span");
+    c.className = "pf-count"; c.id = "pfc_" + id;
+    lb.appendChild(c);
+  });
+  function upd(id) {
+    var el = $(id), c = $("pfc_" + id); if (!el || !c) return;
+    var max = parseInt(el.getAttribute("maxlength"), 10) || 0, n = el.value.length;
+    c.textContent = max ? n + "/" + max : String(n);
+    c.className = "pf-count" + (max && n >= max * 0.9 ? " near" : "");
+  }
+  var pt = null;
+  function poster() {
+    var box = $("pfPoster"), img = $("pfPosterImg"), v = $("gamePoster");
+    if (!box || !img || !v) return;
+    var u = typeof pdSafeUrl === "function" ? pdSafeUrl(v.value, true) : "";
+    if (!u) { box.style.display = "none"; img.removeAttribute("src"); return; }
+    if (img.getAttribute("src") === u) { box.style.display = "flex"; return; }
+    img.onload = function () { box.style.display = "flex"; };
+    img.onerror = function () { box.style.display = "none"; };
+    img.src = u;
+  }
+  function refresh() { COUNT_IDS.forEach(upd); poster(); }
+  function clearTouched() {
+    Array.prototype.forEach.call(form.querySelectorAll(".pf-touched"), function (el) { el.classList.remove("pf-touched"); });
+  }
+
+  form.addEventListener("input", function (e) {
+    var id = e.target && e.target.id;
+    if (COUNT_IDS.indexOf(id) >= 0) upd(id);
+    if (id === "gamePoster") { clearTimeout(pt); pt = setTimeout(poster, 500); }
+  });
+  form.addEventListener("focusout", function (e) {
+    var t = e.target;
+    if (t && t.classList && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) && t.type !== "checkbox") t.classList.add("pf-touched");
+  });
+  form.addEventListener("invalid", function (e) { if (e.target && e.target.classList) e.target.classList.add("pf-touched"); }, true);
+
+  var was = false;
+  if (window.MutationObserver) {
+    new MutationObserver(function () {
+      var a = ov.classList.contains("active");
+      if (a === was) return;
+      was = a;
+      clearTouched();
+      if (a) {
+        refresh();
+        var sc = ov.querySelector(".publish-form-container");
+        if (sc) sc.scrollTop = 0;
+      }
+    }).observe(ov, { attributes: true, attributeFilter: ["class"] });
+  }
+
+  var orig = window.handlePublish;
+  if (typeof orig === "function") {
+    window.handlePublish = async function (e) {
+      var b = form.querySelector(".publish-btn.primary");
+      if (b && b.classList.contains("busy")) { if (e && e.preventDefault) e.preventDefault(); return; }
+      if (b) { b.classList.add("busy"); b.disabled = true; }
+      try { return await orig.apply(this, arguments); }
+      finally { if (b) { b.classList.remove("busy"); b.disabled = false; } }
+    };
+  }
+})();
+</script>
+<style id="dl-hist-style">
+  html.dl-admin .blog-card-stat[title="Downloads"], html.dl-admin .modal-meta-item[title="Downloads"] { cursor: pointer; }
+  html.dl-admin .blog-card-stat[title="Downloads"] { text-decoration: underline dotted; text-underline-offset: 3px; }
+  #dlHistOverlay { display: none; position: fixed; inset: 0; z-index: 2600; background: var(--bg-primary); color: var(--text-primary); flex-direction: column; }
+  #dlHistOverlay.active { display: flex; animation: fadeIn .22s ease; }
+  #dlHistOverlay .dlh-head { display: flex; align-items: center; gap: 6px; box-sizing: border-box; min-height: calc(64px + env(safe-area-inset-top, 0px)); padding: env(safe-area-inset-top, 0px) 12px 0 8px; background: var(--bg-primary); }
+  #dlHistOverlay .dlh-btn { width: 44px; height: 44px; flex-shrink: 0; border: none; border-radius: 50%; background: var(--bg-secondary); color: var(--text-primary); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  #dlHistOverlay .dlh-btn svg { width: 24px; height: 24px; fill: currentColor; }
+  #dlHistOverlay .dlh-title { flex: 1; min-width: 0; margin: 0 4px 0 8px; font-size: 20px; font-weight: 700; letter-spacing: -.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #dlHistOverlay .dlh-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 8px 16px calc(32px + env(safe-area-inset-bottom, 0px)); }
+  #dlHistOverlay .dlh-game { font-size: 14px; color: var(--text-muted); margin: 0 4px 12px; }
+  #dlHistOverlay .dlh-stats { display: flex; gap: 8px; margin-bottom: 12px; }
+  #dlHistOverlay .dlh-stat { flex: 1; background: var(--bg-secondary); border-radius: 18px; padding: 12px 8px; text-align: center; }
+  #dlHistOverlay .dlh-stat b { display: block; font-size: 20px; font-weight: 800; color: var(--accent-primary); }
+  #dlHistOverlay .dlh-stat span { font-size: 11.5px; color: var(--text-muted); }
+  #dlHistOverlay .dlh-note { font-size: 12.5px; color: var(--text-muted); margin: 0 4px 12px; line-height: 1.4; }
+  #dlHistOverlay .dlh-search { width: 100%; box-sizing: border-box; height: 44px; padding: 0 16px; margin-bottom: 10px; border: none; border-radius: 22px; background: var(--bg-secondary); color: var(--text-primary); font-size: 16px; outline: none; }
+  #dlHistOverlay .dlh-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; margin-bottom: 8px; background: var(--bg-secondary); border-radius: 20px; }
+  #dlHistOverlay .dlh-av { width: 44px; height: 44px; flex-shrink: 0; border-radius: 50%; background: var(--accent-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 17px; overflow: hidden; }
+  #dlHistOverlay .dlh-av img { width: 100%; height: 100%; object-fit: cover; }
+  #dlHistOverlay .dlh-info { flex: 1; min-width: 0; }
+  #dlHistOverlay .dlh-name { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #dlHistOverlay .dlh-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; line-height: 1.35; }
+  #dlHistOverlay .dlh-n { flex-shrink: 0; min-width: 38px; text-align: center; padding: 6px 10px; border-radius: 14px; font-size: 14px; font-weight: 800; background: color-mix(in srgb, var(--accent-primary) 16%, transparent); color: var(--accent-primary); }
+  #dlHistOverlay .dlh-msg { text-align: center; color: var(--text-muted); padding: 40px 16px; font-size: 14px; line-height: 1.5; }
+  #dlHistOverlay .dlh-actions { display: flex; gap: 8px; margin-bottom: 12px; }
+  #dlHistOverlay .dlh-act { flex: 1; height: 44px; border: none; border-radius: 22px; background: var(--accent-primary); color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  #dlHistOverlay .dlh-act.alt { background: var(--bg-secondary); color: var(--accent-primary); }
+  #dlHistOverlay .dlh-tag { display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; background: rgba(245,158,11,.2); color: #b45309; vertical-align: middle; }
+  #dlHistOverlay .dlh-more { display: block; width: 100%; height: 44px; margin-top: 4px; border: none; border-radius: 22px; background: var(--bg-secondary); color: var(--accent-primary); font-weight: 700; font-size: 14px; cursor: pointer; }
+</style>
+<div id="dlHistOverlay" role="dialog" aria-label="Histórico de downloads">
+  <div class="dlh-head">
+    <button type="button" class="dlh-btn" id="dlHistBack" aria-label="Voltar"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+    <h1 class="dlh-title">Histórico de downloads</h1>
+    <button type="button" class="dlh-btn" id="dlHistRefresh" aria-label="Atualizar" title="Atualizar"><svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.96 7.96 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg></button>
+  </div>
+  <div class="dlh-body" id="dlHistBody"></div>
+</div>
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var idx = null, idxAt = 0, usersCache = {}, curId = "", curGame = null, curRows = [], shown = 0, PAGE = 30, token = 0;
+
+  function isAdmin() { return typeof isPublisher !== "undefined" && isPublisher && typeof currentUser !== "undefined" && currentUser && !currentUser.isAnonymous; }
+  function syncClass() { document.documentElement.classList.toggle("dl-admin", !!isAdmin()); }
+  var oUi = window.updateUIForUser;
+  if (typeof oUi === "function") window.updateUIForUser = function () { var r = oUi.apply(this, arguments); try { syncClass(); } catch (e) {} return r; };
+  try { syncClass(); } catch (e) {}
+
+  function esc(s) { return typeof escapeHtml === "function" ? escapeHtml(String(s == null ? "" : s)) : String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function fmt(ts) { return typeof vupFmtDate === "function" ? vupFmtDate(ts) : (ts ? new Date(Number(ts)).toLocaleString("pt-BR") : "—"); }
+  function safeImg(u) { return /^(https:\/\/|data:image\/)/i.test(u || "") ? u : ""; }
+
+  async function buildIndex(force) {
+    if (!force && idx && Date.now() - idxAt < 120000) return;
+    var m = window.firebaseModules, db = window.firebaseDatabase;
+    var snap = await m.get(m.ref(db, "downloadClaims"));
+    var out = {}, all = snap.exists() ? snap.val() : {};
+    Object.keys(all).forEach(function (uid) {
+      var claims = all[uid] || {};
+      Object.keys(claims).forEach(function (k) {
+        var c = claims[k];
+        if (!c || !c.gameId) return;
+        var g = out[c.gameId] || (out[c.gameId] = {});
+        var u = g[uid] || (g[uid] = { uid: uid, n: 0, first: 0, last: 0 });
+        var t = Number(c.downloadedAt) || 0;
+        u.n++;
+        if (t && (!u.first || t < u.first)) u.first = t;
+        if (t > u.last) u.last = t;
+      });
+    });
+    idx = out; idxAt = Date.now();
+  }
+  async function loadUsers(uids, tk) {
+    var m = window.firebaseModules, db = window.firebaseDatabase;
+    var todo = uids.filter(function (u) { return !usersCache[u]; });
+    for (var i = 0; i < todo.length; i += 20) {
+      if (tk !== token) return;
+      await Promise.all(todo.slice(i, i + 20).map(function (uid) {
+        return m.get(m.ref(db, "users/" + uid)).then(function (s) { usersCache[uid] = s.exists() ? (s.val() || {}) : { _gone: true }; }).catch(function () { usersCache[uid] = { _err: true }; });
+      }));
+    }
+  }
+  function nameOf(uid) {
+    var u = usersCache[uid] || {};
+    if (u._gone) return "Usuário removido";
+    var n = String(u.name || "").trim();
+    if (n) return n;
+    var e = String(u.email || "");
+    return e ? e.split("@")[0] : "Usuário";
+  }
+  function row(r) {
+    var u = usersCache[r.uid] || {}, nm = nameOf(r.uid), av = safeImg(u.avatar);
+    var avatar = av ? '<img src="' + esc(av) + '" alt="" loading="lazy" referrerpolicy="no-referrer">' : esc(nm.charAt(0).toUpperCase() || "?");
+    var sub = (r.n > 1 ? "1.º: " + fmt(r.first) + "<br>Último: " + fmt(r.last) : fmt(r.last)) + (u.email ? "<br>" + esc(u.email) : "");
+    return '<div class="dlh-item"><div class="dlh-av">' + avatar + '</div><div class="dlh-info"><div class="dlh-name">' + esc(nm) + (curGame && curGame.owner && r.uid === curGame.owner ? '<span class="dlh-tag">Publicador · não conta</span>' : "") + '</div><div class="dlh-sub">' + sub + '</div></div><div class="dlh-n" title="Downloads deste usuário">' + r.n + "×</div></div>";
+  }
+  function draw(filter) {
+    var list = $("dlHistList"); if (!list) return;
+    var q = String(filter || "").trim().toLowerCase();
+    var rows = q ? curRows.filter(function (r) { var u = usersCache[r.uid] || {}; return (nameOf(r.uid) + " " + (u.email || "")).toLowerCase().indexOf(q) >= 0; }) : curRows;
+    if (!rows.length) { list.innerHTML = '<div class="dlh-msg">' + (q ? "Nenhum usuário encontrado." : "Ainda não há registos de downloads deste conteúdo.") + "</div>"; return; }
+    shown = Math.min(rows.length, shown || PAGE);
+    list.innerHTML = rows.slice(0, shown).map(row).join("") + (shown < rows.length ? '<button type="button" class="dlh-more" id="dlHistMore">Ver mais (' + (rows.length - shown) + ")</button>" : "");
+    var more = $("dlHistMore");
+    if (more) more.onclick = function () { shown += PAGE; draw($("dlHistSearch") ? $("dlHistSearch").value : ""); };
+  }
+  async function render(id, force) {
+    var body = $("dlHistBody"), tk = ++token;
+    var game = (typeof allGames !== "undefined" && allGames && allGames[id]) || (typeof currentGameData !== "undefined" && currentGameData && currentGameData.id === id ? currentGameData : null) || {};
+    body.innerHTML = '<div class="dlh-msg">A carregar histórico…</div>';
+    try {
+      await buildIndex(force);
+      if (tk !== token) return;
+      var g = idx[id] || {};
+      curRows = Object.keys(g).map(function (k) { return g[k]; }).sort(function (a, b) { return b.last - a.last; });
+      await loadUsers(curRows.map(function (r) { return r.uid; }), tk);
+      if (tk !== token) return;
+    } catch (e) {
+      if (tk !== token) return;
+      var denied = e && (e.code === "PERMISSION_DENIED" || /permission/i.test(String(e.message || "")));
+      body.innerHTML = '<div class="dlh-msg">' + (denied ? "Sem permissão para ler os registos de downloads. As regras do Realtime Database têm de permitir que o administrador leia <b>downloadClaims</b>." : "Não foi possível carregar o histórico. Tenta novamente.") + "</div>";
+      return;
+    }
+    curGame = { id: id, titulo: game.titulo || "Conteúdo", cost: Number(game.cost) || 0, downloads: Number(game.downloads) || 0, owner: game.submittedBy || "", ownerName: game.submittedByName || "" };
+    var regs = curRows.reduce(function (s, r) { return s + r.n; }, 0);
+    var total = Number(game.downloads) || 0;
+    var note = total > regs ? '<p class="dlh-note">' + (total - regs) + " download(s) do contador não têm registo individual (anteriores ao registo por usuário ou não gravados).</p>" : "";
+    shown = 0;
+    body.innerHTML = '<p class="dlh-game">' + esc(game.titulo || "Conteúdo") + "</p>" +
+      '<div class="dlh-stats"><div class="dlh-stat"><b>' + (total || regs) + "</b><span>Total de downloads</span></div>" +
+      '<div class="dlh-stat"><b>' + curRows.length + "</b><span>Usuários</span></div></div>" + note +
+      (curRows.length ? '<div class="dlh-actions"><button type="button" class="dlh-act" id="dlHistCopy">Copiar relatório</button><button type="button" class="dlh-act alt" id="dlHistCsv">Baixar CSV</button></div>' : "") +
+      (curRows.length > 8 ? '<input type="search" class="dlh-search" id="dlHistSearch" placeholder="Procurar usuário…" autocomplete="off">' : "") +
+      '<div id="dlHistList"></div>';
+    var s = $("dlHistSearch");
+    if (s) s.addEventListener("input", function () { shown = 0; draw(s.value); });
+    draw("");
+  }
+  function counts(r) { return !(curGame && curGame.owner && r.uid === curGame.owner); }
+  function reportStats() {
+    var regs = 0, contam = 0, uContam = 0;
+    curRows.forEach(function (r) { regs += r.n; if (counts(r)) { contam += r.n; uContam++; } });
+    return { regs: regs, contam: contam, uContam: uContam, pontos: contam * (curGame ? curGame.cost : 0) };
+  }
+  function buildReport() {
+    var st = reportStats(), g = curGame, now = new Date();
+    var L = [];
+    L.push("RELATÓRIO DE DOWNLOADS - Portal Digital");
+    L.push("Conteúdo: " + g.titulo);
+    L.push("Publicador: " + (g.ownerName || (g.owner ? g.owner : "não identificado")));
+    L.push("Custo: " + (g.cost > 0 ? g.cost + " pontos" : "Grátis"));
+    L.push("Gerado em: " + now.toLocaleDateString("pt-BR") + " " + now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }));
+    L.push("");
+    L.push("Downloads (contador): " + (g.downloads || st.regs));
+    L.push("Registos individuais: " + st.regs + " de " + curRows.length + " usuários");
+    L.push("Downloads que contam (sem os do publicador): " + st.contam + " de " + st.uContam + " usuários");
+    L.push("Pontos estimados gerados: " + st.pontos + " (" + st.contam + " x " + g.cost + ")");
+    L.push("");
+    L.push("USUÁRIOS:");
+    curRows.forEach(function (r, i) {
+      var u = usersCache[r.uid] || {};
+      L.push((i + 1) + ". " + nameOf(r.uid) + (u.email ? " <" + u.email + ">" : "") + " - " + r.n + (r.n === 1 ? " download" : " downloads") + " - 1.º: " + fmt(r.first) + " - último: " + fmt(r.last) + (counts(r) ? "" : " [publicador, não conta]"));
+    });
+    return L.join("\n");
+  }
+  function csvCell(v) { return '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"'; }
+  function buildCsv() {
+    var rows = [["Nome", "Email", "Downloads", "Primeiro download", "Último download", "Conta para ganhos"]];
+    curRows.forEach(function (r) {
+      var u = usersCache[r.uid] || {};
+      rows.push([nameOf(r.uid), u.email || "", r.n, fmt(r.first), fmt(r.last), counts(r) ? "Sim" : "Não"]);
+    });
+    return "\ufeff" + rows.map(function (x) { return x.map(csvCell).join(";"); }).join("\r\n");
+  }
+  function flash(btn, txt) {
+    var old = btn.textContent; btn.textContent = txt;
+    setTimeout(function () { btn.textContent = old; }, 1600);
+  }
+  function copyText(txt) {
+    if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(txt);
+    return new Promise(function (ok, fail) {
+      try {
+        var ta = document.createElement("textarea");
+        ta.value = txt; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.appendChild(ta); ta.select();
+        var done = document.execCommand("copy"); document.body.removeChild(ta);
+        done ? ok() : fail();
+      } catch (e) { fail(e); }
+    });
+  }
+  function slug(t) { return String(t || "conteudo").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Za-z0-9]+/g, "-").replace(/^-+|-+$/g, "").toLowerCase().slice(0, 40) || "conteudo"; }
+  $("dlHistBody").addEventListener("click", function (e) {
+    var t = e.target && e.target.closest ? e.target.closest("#dlHistCopy, #dlHistCsv") : null;
+    if (!t || !curGame || !curRows.length) return;
+    if (t.id === "dlHistCopy") {
+      copyText(buildReport()).then(function () { flash(t, "Copiado ✓"); }, function () { flash(t, "Não foi possível copiar"); });
+    } else {
+      try {
+        var blob = new Blob([buildCsv()], { type: "text/csv;charset=utf-8" });
+        var url = URL.createObjectURL(blob), a = document.createElement("a");
+        a.href = url; a.download = "downloads-" + slug(curGame.titulo) + "-" + new Date().toISOString().slice(0, 10) + ".csv";
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+        flash(t, "CSV pronto ✓");
+      } catch (err) { flash(t, "Falhou"); }
+    }
+  });
+  window.openDownloadsHistory = function (id) {
+    if (!isAdmin() || !id) return;
+    curId = id;
+    $("dlHistOverlay").classList.add("active");
+    render(id, false);
+  };
+  window.closeDownloadsHistory = function () { token++; $("dlHistOverlay").classList.remove("active"); };
+  $("dlHistBack").addEventListener("click", window.closeDownloadsHistory);
+  $("dlHistRefresh").addEventListener("click", function () { if (curId) render(curId, true); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && $("dlHistOverlay").classList.contains("active")) { e.stopImmediatePropagation(); window.closeDownloadsHistory(); }
+  }, true);
+
+  document.addEventListener("click", function (e) {
+    if (!isAdmin()) return;
+    var t = e.target && e.target.closest ? e.target.closest('.blog-card-stat[title="Downloads"], .modal-meta-item[title="Downloads"]') : null;
+    if (!t) return;
+    var id = "";
+    if (t.classList.contains("modal-meta-item")) id = (typeof currentGameData !== "undefined" && currentGameData && currentGameData.id) || "";
+    else { var card = t.closest("[data-cl-id]"); id = card ? card.dataset.clId : ""; }
+    if (!id) return;
+    e.stopPropagation(); e.preventDefault();
+    window.openDownloadsHistory(id);
+  }, true);
+})();
+</script>
+
+<style id="up-stats-style">
+  .up-item.up-click { cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform .2s ease; }
+  .up-item.up-click:active { transform: scale(.98); }
+  .up-stat-hint { display: block; margin-top: 6px; font-size: 12px; font-weight: 700; color: var(--accent-primary); }
+  #upStatsOverlay { display: none; position: fixed; inset: 0; z-index: 2550; background: var(--bg-primary); color: var(--text-primary); flex-direction: column; }
+  #upStatsOverlay.active { display: flex; animation: fadeIn .22s ease; }
+  #upStatsOverlay .ust-head { display: flex; align-items: center; gap: 6px; box-sizing: border-box; min-height: calc(64px + env(safe-area-inset-top, 0px)); padding: env(safe-area-inset-top, 0px) 12px 0 8px; }
+  #upStatsOverlay .ust-btn { width: 44px; height: 44px; flex-shrink: 0; border: none; border-radius: 50%; background: var(--bg-secondary); color: var(--text-primary); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  #upStatsOverlay .ust-btn svg { width: 24px; height: 24px; fill: currentColor; }
+  #upStatsOverlay .ust-title { flex: 1; min-width: 0; margin: 0 4px 0 8px; font-size: 22px; font-weight: 700; letter-spacing: -.2px; }
+  #upStatsOverlay .ust-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 8px 16px calc(32px + env(safe-area-inset-bottom, 0px)); }
+  #upStatsOverlay .ust-game { display: flex; gap: 12px; align-items: center; margin-bottom: 14px; }
+  #upStatsOverlay .ust-cover { width: 64px; height: 64px; border-radius: 18px; object-fit: cover; background: var(--bg-secondary); flex-shrink: 0; }
+  #upStatsOverlay .ust-gname { font-size: 17px; font-weight: 700; line-height: 1.25; }
+  #upStatsOverlay .ust-gmeta { font-size: 12.5px; color: var(--text-muted); margin-top: 3px; }
+  #upStatsOverlay .ust-card { background: var(--bg-secondary); border-radius: 26px; padding: 16px; margin-bottom: 12px; }
+  #upStatsOverlay .ust-card h3 { margin: 0 0 12px; font-size: 13px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; color: var(--text-muted); }
+  #upStatsOverlay .ust-bar { display: flex; height: 14px; border-radius: 7px; overflow: hidden; margin: 6px 0 10px; }
+  #upStatsOverlay .ust-bar i { display: block; height: 100%; }
+  #upStatsOverlay .ust-leg { display: flex; justify-content: space-between; gap: 8px; font-size: 13.5px; }
+  #upStatsOverlay .ust-leg b { font-weight: 800; }
+  #upStatsOverlay .ust-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; }
+  #upStatsOverlay .ust-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  #upStatsOverlay .ust-stat { background: var(--bg-secondary); border-radius: 22px; padding: 14px 12px; }
+  #upStatsOverlay .ust-stat b { display: block; font-size: 22px; font-weight: 800; }
+  #upStatsOverlay .ust-stat span { font-size: 12px; color: var(--text-muted); }
+  #upStatsOverlay .ust-stat.hl b { color: var(--accent-primary); }
+  #upStatsOverlay .ust-row { display: flex; justify-content: space-between; gap: 10px; padding: 9px 0; font-size: 14px; border-bottom: 1px solid var(--border-color); }
+  #upStatsOverlay .ust-row:last-child { border-bottom: none; }
+  #upStatsOverlay .ust-row span { color: var(--text-muted); }
+  #upStatsOverlay .ust-row b { font-weight: 700; text-align: right; }
+  #upStatsOverlay .ust-note { font-size: 12.5px; line-height: 1.5; color: var(--text-muted); margin: 4px 4px 0; }
+  #upStatsOverlay .ust-free { font-size: 14px; line-height: 1.5; }
+  #upStatsOverlay .ust-rules { margin: 0; padding: 0; list-style: none; }
+  #upStatsOverlay .ust-rules li { position: relative; padding: 8px 0 8px 26px; font-size: 14px; line-height: 1.45; }
+  #upStatsOverlay .ust-rules li::before { content: ""; position: absolute; left: 4px; top: 14px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent-primary); }
+  #upStatsOverlay .ust-sub { margin: 14px 0 4px; font-size: 13px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; color: var(--text-muted); }
+  #upStatsOverlay .ust-steps { margin: 0; padding: 0; list-style: none; counter-reset: ust; }
+  #upStatsOverlay .ust-steps li { position: relative; counter-increment: ust; padding: 8px 0 8px 36px; font-size: 14px; line-height: 1.45; }
+  #upStatsOverlay .ust-steps li::before { content: counter(ust); position: absolute; left: 0; top: 7px; width: 24px; height: 24px; border-radius: 50%; background: color-mix(in srgb, var(--accent-primary) 18%, transparent); color: var(--accent-primary); font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+  #upStatsOverlay .ust-wa { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 48px; margin-top: 12px; border: none; border-radius: 24px; background: #25D366; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  #upStatsOverlay .ust-wa svg { width: 20px; height: 20px; fill: currentColor; }
+  #upStatsOverlay .ust-pay { width: 100%; height: 48px; margin: 0 0 12px; border: none; border-radius: 24px; background: var(--accent-primary); color: var(--bg-primary); font-size: 15px; font-weight: 700; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  #upStatsPayModal { display: none; position: absolute; inset: 0; z-index: 5; background: rgba(0,0,0,.5); align-items: flex-end; justify-content: center; }
+  #upStatsPayModal.active { display: flex; animation: fadeIn .18s ease; }
+  #upStatsPayModal .usp-box { width: 100%; max-width: 520px; box-sizing: border-box; background: var(--bg-primary); color: var(--text-primary); border-radius: 28px 28px 0 0; padding: 20px 16px calc(20px + env(safe-area-inset-bottom, 0px)); }
+  #upStatsPayModal .usp-t { margin: 0 0 4px; font-size: 18px; font-weight: 700; }
+  #upStatsPayModal .usp-s { margin: 0 0 14px; font-size: 13.5px; line-height: 1.45; color: var(--text-muted); }
+  #upStatsPayModal .usp-opt { display: block; width: 100%; height: 52px; margin-bottom: 10px; border: 1px solid var(--border-color); border-radius: 18px; background: var(--bg-secondary); color: var(--text-primary); font-size: 15px; font-weight: 600; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  #upStatsPayModal .usp-opt:active { border-color: var(--accent-primary); }
+  #upStatsPayModal .usp-cancel { display: block; width: 100%; height: 44px; border: none; background: transparent; color: var(--text-muted); font-size: 14px; font-weight: 600; cursor: pointer; }
+  #upStatsOverlay .ust-msg { text-align: center; color: var(--text-muted); padding: 40px 16px; font-size: 14px; line-height: 1.5; }
+</style>
+<div id="upStatsOverlay" role="dialog" aria-label="Estatísticas do conteúdo">
+  <div class="ust-head">
+    <button type="button" class="ust-btn" id="upStatsBack" aria-label="Voltar"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+    <h1 class="ust-title">Estatísticas</h1>
+  </div>
+  <div class="ust-body" id="upStatsBody"></div>
+  <div id="upStatsPayModal" role="dialog" aria-label="Frequência de recebimento">
+    <div class="usp-box">
+      <h2 class="usp-t">Receber os teus ganhos</h2>
+      <p class="usp-s">Por quanto tempo queres receber os teus ganhos? Ao escolher, abrimos o WhatsApp com a mensagem pronta para o suporte.</p>
+      <button type="button" class="usp-opt" data-d="7">De 7 em 7 dias</button>
+      <button type="button" class="usp-opt" data-d="15">De 15 em 15 dias</button>
+      <button type="button" class="usp-opt" data-d="30">De 30 em 30 dias</button>
+      <button type="button" class="usp-cancel" id="upStatsPayCancel">Cancelar</button>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  "use strict";
+  var PORTAL_PCT = 40;
+  var curId = "";
+  var $ = function (id) { return document.getElementById(id); };
+  var TIPOS = { aplicativos: "Aplicativos", jogos: "Jogos", tutoriais: "Tutoriais", pc: "PC", outros: "Outros" };
+  function esc(s) { return typeof escapeHtml === "function" ? escapeHtml(String(s == null ? "" : s)) : String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function num(n) { n = Number(n) || 0; var r = Math.round(n * 10) / 10; return r.toLocaleString("pt-PT", { maximumFractionDigits: 1 }); }
+  function safeImg(u) { return /^(https:\/\/|data:image\/)/i.test(u || "") ? u : "logo.png"; }
+  function dt(v) {
+    var ms = typeof pdToMs === "function" ? pdToMs(v) : Number(v) || 0;
+    if (!ms) return "—";
+    try { return new Date(ms).toLocaleDateString("pt-PT", { day: "2-digit", month: "short", year: "numeric" }); } catch (e) { return "—"; }
+  }
+  function calc(g) {
+    var cost = Number(g && g.cost) || 0, dl = Number(g && g.downloads) || 0;
+    var total = cost * dl;
+    var portal = total * PORTAL_PCT / 100;
+    return { cost: cost, dl: dl, total: total, portal: portal, owner: total - portal, perOwner: cost * (100 - PORTAL_PCT) / 100, perPortal: cost * PORTAL_PCT / 100 };
+  }
+  function render(id) {
+    var body = $("upStatsBody");
+    var all = typeof allGames !== "undefined" && allGames ? allGames : {};
+    var g = all[id];
+    if (!g) { body.innerHTML = '<div class="ust-msg">Este conteúdo já não está disponível no portal.</div>'; return; }
+    var c = calc(g);
+    curId = id;
+    var uid = typeof currentUser !== "undefined" && currentUser ? currentUser.uid : "";
+    var mine = { dl: 0, owner: 0, n: 0 };
+    Object.keys(all).forEach(function (k) {
+      var x = all[k];
+      if (uid && x && x.submittedBy === uid) { var cc = calc(x); mine.n++; mine.dl += cc.dl; mine.owner += cc.owner; }
+    });
+    var rc = Number(g.ratingCount) || 0, avg = rc > 0 ? (Number(g.ratingSum) || 0) / rc : 0;
+    var h = '<div class="ust-game"><img class="ust-cover" src="' + esc(safeImg(g.poster)) + '" alt="" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'logo.png\'"><div><div class="ust-gname">' + esc(g.titulo || "Sem título") + '</div><div class="ust-gmeta">' + esc(TIPOS[g.type] || "") + (g.versao ? " · v" + esc(String(g.versao).replace(/^v/i, "")) : "") + "</div></div></div>";
+    if (c.cost > 0) {
+      h += '<div class="ust-card"><h3>Divisão de referência por download</h3><div class="ust-leg"><span>Custo do conteúdo</span><b>' + num(c.cost) + " pontos</b></div>" +
+        '<div class="ust-bar"><i style="width:' + (100 - PORTAL_PCT) + '%;background:var(--accent-primary)"></i><i style="width:' + PORTAL_PCT + '%;background:#F59E0B"></i></div>' +
+        '<div class="ust-leg"><span><i class="ust-dot" style="background:var(--accent-primary)"></i>Para ti (~' + (100 - PORTAL_PCT) + '%)</span><b>' + num(c.perOwner) + ' pts</b></div>' +
+        '<div class="ust-leg" style="margin-top:6px"><span><i class="ust-dot" style="background:#F59E0B"></i>Portal (~' + PORTAL_PCT + '%)</span><b>' + num(c.perPortal) + " pts</b></div></div>";
+    } else {
+      h += '<div class="ust-card"><h3>Monetização</h3><div class="ust-free">Este conteúdo é <b>grátis</b>, por isso não gera pontos. Para ganhar, edita o envio e define um custo em pontos: a divisão de referência é ' + (100 - PORTAL_PCT) + '% para ti e ' + PORTAL_PCT + "% para o portal.</div></div>";
+    }
+    h += '<div class="ust-grid">' +
+      '<div class="ust-stat"><b>' + num(c.dl) + "</b><span>Downloads</span></div>" +
+      '<div class="ust-stat"><b>' + num(c.total) + "</b><span>Pontos gastos pelos usuários</span></div>" +
+      '<div class="ust-stat hl"><b>' + num(c.owner) + "</b><span>Teus pontos (estimado)</span></div>" +
+      '<div class="ust-stat"><b>' + num(c.portal) + "</b><span>Portal (estimado)</span></div></div>";
+    h += '<div class="ust-card"><h3>Engajamento</h3>' +
+      '<div class="ust-row"><span>Avaliação média</span><b>' + (rc > 0 ? "★ " + avg.toFixed(1) + " (" + num(rc) + ")" : "Sem avaliações") + "</b></div>" +
+      '<div class="ust-row"><span>Curtidas</span><b>' + num(g.likesCount) + "</b></div></div>";
+    h += '<div class="ust-card"><h3>Detalhes</h3>' +
+      '<div class="ust-row"><span>Publicado em</span><b>' + dt(g.createdAt) + "</b></div>" +
+      '<div class="ust-row"><span>Última atualização</span><b>' + dt(g.updatedAt) + "</b></div>" +
+      '<div class="ust-row"><span>Custo atual</span><b>' + (c.cost > 0 ? num(c.cost) + " pontos" : "Grátis") + "</b></div></div>";
+    if (mine.n > 1) {
+      h += '<div class="ust-card"><h3>Todos os teus conteúdos</h3>' +
+        '<div class="ust-row"><span>Conteúdos publicados</span><b>' + mine.n + "</b></div>" +
+        '<div class="ust-row"><span>Downloads somados</span><b>' + num(mine.dl) + "</b></div>" +
+        '<div class="ust-row"><span>Teus pontos somados</span><b>' + num(mine.owner) + "</b></div></div>";
+    }
+    h += '<button type="button" class="ust-pay" id="upStatsPay">Escolher quando receber os ganhos</button>';
+    h += '<p class="ust-note">Valores estimados: downloads × custo atual. Se o custo mudou ou houve downloads grátis antes, o valor real pode ser diferente.</p>';
+    h += '<div class="ust-card" style="margin-top:12px"><h3>Regras da monetização</h3><ul class="ust-rules">' +
+      '<li>A monetização <b>não é permanente</b>. Pode ser alterada ou terminada pelo portal.</li>' +
+      '<li>Os downloads feitos por ti, o publicador, <b>não contam</b>.</li>' +
+      '<li>Se houver <b>downloads suspeitos</b>, a monetização do conteúdo pode ser cancelada.</li>' +
+      '<li>A percentagem <b>não é fixa</b>. A divisão ' + (100 - PORTAL_PCT) + '/' + PORTAL_PCT + ' é só uma referência: na hora de receber a recompensa podem ser mais ou menos pontos.</li>' +
+      '</ul>' +
+      '<div class="ust-sub">Como é feito o pagamento</div><ol class="ust-steps">' +
+      '<li>A nossa equipa vê quem baixou o teu conteúdo e quando.</li>' +
+      '<li>Depois cria um relatório com essa análise.</li>' +
+      '<li>Enviamos-te o relatório por WhatsApp, e-mail e notificações.</li>' +
+      '<li>Só depois transferimos os pontos para ti.</li></ol>' +
+      '<p class="ust-note" style="margin:10px 0 0">Qualquer dúvida, fala connosco no WhatsApp.</p>' +
+      '<button type="button" class="ust-wa" id="upStatsWa" data-t="' + esc(g.titulo || "") + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 004.74 1.21c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm0 18.15c-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 01-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23s8.23 3.69 8.23 8.23-3.7 8.24-8.23 8.24zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.12-.17.25-.64.81-.78.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.5.11-.11.25-.29.37-.43.12-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.23.25-.87.85-.87 2.07s.89 2.4 1.01 2.56c.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.14-1.18-.06-.1-.23-.16-.48-.29z"/></svg>Falar no WhatsApp</button></div>';
+    body.innerHTML = h;
+    body.scrollTop = 0;
+  }
+  window.upStats = function (id) {
+    if (!id) return;
+    $("upStatsOverlay").classList.add("active");
+    render(id);
+  };
+  window.closeUpStats = function () { $("upStatsOverlay").classList.remove("active"); $("upStatsPayModal").classList.remove("active"); };
+  var WA_URL = "https://wa.me/" + "244" + "932535389";
+  function openWa(titulo) {
+    var txt = "Olá! Tenho uma dúvida sobre a monetização" + (titulo ? " do meu conteúdo \"" + titulo + "\"" : "") + " no Portal Digital.";
+    var url = WA_URL + "?text=" + encodeURIComponent(txt);
+    if (typeof openLinkInGA === "function") openLinkInGA(url); else window.open(url, "_blank", "noopener");
+  }
+  function payModal(on) { $("upStatsPayModal").classList.toggle("active", !!on); }
+  function sendPay(dias) {
+    var all = typeof allGames !== "undefined" && allGames ? allGames : {};
+    var g = all[curId] || {};
+    var c = calc(g);
+    var u = typeof currentUser !== "undefined" && currentUser ? currentUser : null;
+    var nome = (typeof userName === "string" && userName) || (u && u.displayName) || (u && u.email ? u.email.split("@")[0] : "") || "—";
+    var linhas = [
+      "Olá! Quero receber os meus ganhos da monetização de " + dias + " em " + dias + " dias.",
+      "",
+      "*Publicador*",
+      "Nome: " + nome,
+      "E-mail: " + ((u && u.email) || "—"),
+      "ID da conta: " + ((u && u.uid) || "—"),
+      "",
+      "*Conteúdo*",
+      "Título: " + (g.titulo || "—"),
+      "ID: " + (curId || "—"),
+      "Custo: " + (c.cost > 0 ? num(c.cost) + " pontos" : "Grátis"),
+      "Downloads: " + num(c.dl),
+      "Pontos gastos pelos usuários: " + num(c.total),
+      "Teus pontos (estimado): " + num(c.owner),
+      "",
+      "*Frequência escolhida:* de " + dias + " em " + dias + " dias"
+    ];
+    payModal(false);
+    var url = WA_URL + "?text=" + encodeURIComponent(linhas.join("\n"));
+    if (typeof openLinkInGA === "function") openLinkInGA(url); else window.open(url, "_blank", "noopener");
+  }
+  $("upStatsPayModal").addEventListener("click", function (e) {
+    var t = e.target;
+    if (t === $("upStatsPayModal") || (t.closest && t.closest("#upStatsPayCancel"))) { payModal(false); return; }
+    var b = t.closest ? t.closest(".usp-opt") : null;
+    if (b) sendPay(parseInt(b.getAttribute("data-d"), 10));
+  });
+  $("upStatsBody").addEventListener("click", function (e) {
+    if (e.target && e.target.closest && e.target.closest("#upStatsPay")) payModal(true);
+    var b = e.target && e.target.closest ? e.target.closest("#upStatsWa") : null;
+    if (b) openWa(b.getAttribute("data-t") || "");
+  });
+  $("upStatsBack").addEventListener("click", window.closeUpStats);
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && $("upStatsOverlay").classList.contains("active")) { e.stopImmediatePropagation(); if ($("upStatsPayModal").classList.contains("active")) payModal(false); else window.closeUpStats(); }
+  }, true);
+})();
+</script>
+
+<script>
+(function () {
+  "use strict";
+  var KEY = "pd_motion_tip";
+  var tries = 0;
+  var SPEED = "M20.38 8.57l-1.23 1.85a8 8 0 01-.22 7.58H5.07A8 8 0 0115.58 6.85l1.85-1.23A10 10 0 003.35 19a2 2 0 001.72 1h13.85a2 2 0 001.74-1 10 10 0 00-.27-10.44zm-9.79 6.84a2 2 0 002.83 0l5.66-8.49-8.49 5.66a2 2 0 000 2.83z";
+  function answered() { try { return localStorage.getItem(KEY) === "1"; } catch (e) { return true; } }
+  function markAnswered() { try { localStorage.setItem(KEY, "1"); } catch (e) {} }
+  function noAnimation() { return typeof pdMotionPref === "function" && pdMotionPref() === "reduzida"; }
+  function blocked() {
+    return document.hidden || !!document.querySelector(".custom-modal.active, .auth-overlay.active, .pdprep-overlay.active, .afree-overlay.active, #pdAdOverlay.aberto, #rwAdOverlay.aberto");
+  }
+  function close() {
+    var el = document.getElementById("motionTipOverlay");
+    if (el) el.classList.remove("active");
+  }
+  function removeAnimation() {
+    markAnswered();
+    close();
+    try {
+      pdPrefSet(PD_PREF_MOTION, "reduzida");
+      applyMotion();
+      if (typeof dstVidRefresh === "function") dstVidRefresh();
+      var st = document.getElementById("settingsOverlay");
+      if (st && st.classList.contains("active") && typeof renderSettings === "function") renderSettings();
+    } catch (e) {}
+  }
+  function keep() {
+    markAnswered();
+    close();
+  }
+  function build() {
+    var el = document.getElementById("motionTipOverlay");
+    if (el) return el;
+    el = document.createElement("div");
+    el.id = "motionTipOverlay";
+    el.setAttribute("role", "dialog");
+    el.setAttribute("aria-modal", "true");
+    el.setAttribute("aria-labelledby", "motionTipTitle");
+    el.innerHTML = '<div class="mt-box">' +
+      '<div class="mt-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + SPEED + '"/></svg></div>' +
+      '<h2 class="mt-t" id="motionTipTitle">O Portal Digital está lento?</h2>' +
+      '<p class="mt-s">Se o Portal Digital estiver muito lento, desative as animações para ele ficar mais leve. Pode mudar isto depois em Configurações, em Animações.</p>' +
+      '<button type="button" class="mt-btn main" id="motionTipRemove">Remover animação</button>' +
+      '<button type="button" class="mt-btn tonal" id="motionTipKeep">Está melhor assim</button></div>';
+    document.body.appendChild(el);
+    document.getElementById("motionTipRemove").addEventListener("click", removeAnimation);
+    document.getElementById("motionTipKeep").addEventListener("click", keep);
+    return el;
+  }
+  function attempt() {
+    if (answered() || noAnimation()) return;
+    if (blocked()) {
+      if (++tries < 12) setTimeout(attempt, 10000);
+      return;
+    }
+    build().classList.add("active");
+  }
+  function start() { setTimeout(attempt, 20000); }
+  if (document.readyState === "complete") start();
+  else window.addEventListener("load", start);
+})();
+</script>
+
 </body>
 </html>
